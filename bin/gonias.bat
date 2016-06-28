@@ -9,13 +9,7 @@ cd\go-nias
 
 rem Run the NIAS services. Add to the BOTTOM of this list
 start gnatsd
-start aggregator
-start aslvalidator
-start idvalidator
-start schemavalidator
-start dobvalidator -tstyr 2016
-start csvxmlconverter
-start webui
+start harness
 
 rem Run the web client (launch browser here)
-start http://localhost:8080/nias
+start http://localhost:1325/nias

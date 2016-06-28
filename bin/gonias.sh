@@ -15,14 +15,8 @@ fi
 # give the nats server time to come up
 sleep 2
 
-./aggregator & echo $! >> nias.pid
-./aslvalidator & echo $! >> nias.pid
-./idvalidator & echo $! >> nias.pid
-./schemavalidator & echo $! >> nias.pid
-./csvxmlconverter & echo $! >> nias.pid
-./dobvalidator -tstyr 2016 & echo $! >> nias.pid
-./webui & echo $! >> nias.pid
+./release & echo $! >> nias.pid
 
 echo "Run the web client (launch browser here):"
-echo "http://localhost:8080/nias"
+echo "http://localhost:1325/nias"
 
