@@ -1,0 +1,20 @@
+/*timesheet.css*/
+
+/*simple css helpers added to support the timesheet web app*/
+
+#content > div {
+    display: none;
+    width: 50%;
+    margin: 0 auto;
+}
+
+#content > div:target {
+    display: block;
+}
+
+#content > div a.hide {
+    display: block;
+    text-align: right;
+}
+
+

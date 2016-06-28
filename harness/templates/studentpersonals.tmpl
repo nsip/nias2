@@ -1,0 +1,84 @@
+<StudentPersonals  xmlns="http://www.sifassociation.org/au/datamodel/3.4">{{ range . }}
+    <StudentPersonal RefId="{{.SIFuuid}}">
+      <LocalId>{{.LocalId}}</LocalId>
+      <StateProvinceId>{{.JurisdictionId}}</StateProvinceId>
+      <OtherIdList>
+        <OtherId Type="SectorStudentId">{{.SectorId}}</OtherId>
+        <OtherId Type="DiocesanStudentId">{{.DiocesanId}}</OtherId>
+        <OtherId Type="OtherStudentId">{{.OtherId}}</OtherId>
+        <OtherId Type="TAAStudentId">{{.TAAId}}</OtherId>
+        <OtherId Type="NationalStudentId">{{.NationalId}}</OtherId>
+        <OtherId Type="NAPPlatformStudentId">{{.PlatformId}}</OtherId>
+        <OtherId Type="PreviousLocalSchoolStudentId">{{.PreviousLocalId}}</OtherId>
+        <OtherId Type="PreviousSectorStudentId">{{.PreviousSectorId}}</OtherId>
+        <OtherId Type="PreviousDiocesanStudentId">{{.PreviousDiocesanId}}</OtherId>
+        <OtherId Type="PreviousOtherStudentId">{{.PreviousOtherId}}</OtherId>
+        <OtherId Type="PreviousTAAStudentId">{{.PreviousTAAId}}</OtherId>
+        <OtherId Type="PreviousStateProvinceId">{{.PreviousJurisdictionId}}</OtherId>
+        <OtherId Type="PreviousNationalStudentId">{{.PreviousNationalId}}</OtherId>
+        <OtherId Type="PreviousNAPPlatformStudentId">{{.PreviousPlatformId}}</OtherId>
+      </OtherIdList>
+      <PersonInfo>
+        <Name Type="LGL">
+          <FamilyName>{{.FamilyName}}</FamilyName>
+          <GivenName>{{.GivenName}}</GivenName>
+          <MiddleName>{{.MiddleName}}</MiddleName>
+          <PreferredGivenName>{{.PreferredName}}</PreferredGivenName>
+        </Name>
+        <Demographics>
+          <IndigenousStatus>{{.IndigenousStatus}}</IndigenousStatus>
+          <Sex>{{.Sex}}</Sex>
+          <BirthDate>{{.BirthDate}}</BirthDate>
+          <CountryOfBirth>{{.CountryOfBirth}}</CountryOfBirth>
+          <LanguageList>
+            <Language>
+              <Code>{{.StudentLOTE}}</Code>
+              <LanguageType>4</LanguageType>
+            </Language>
+          </LanguageList>
+          <VisaSubClass>{{.VisaCode}}</VisaSubClass>
+          <LBOTE>{{.LBOTE}}</LBOTE>
+        </Demographics>
+        <AddressList>
+          <Address Type="0765" Role="012B">
+            <Street>
+              <Line1>{{.AddressLine1}}</Line1>
+              <Line2>{{.AddressLine2}}</Line2>
+            </Street>
+            <City>{{.Locality}}</City>
+            <StateProvince>{{.StateTerritory}}</StateProvince>
+            <Country>1101</Country>
+            <PostalCode>{{.Postcode}}</PostalCode>
+          </Address>
+        </AddressList>
+      </PersonInfo>
+      <MostRecent>
+        <SchoolLocalId>{{.SchoolLocalId}}</SchoolLocalId>
+        <YearLevel>
+          <Code>{{.YearLevel}}</Code>
+        </YearLevel>
+        <FTE>{{.FTE}}</FTE>
+        <Parent1Language>{{.Parent1LOTE}}</Parent1Language>
+        <Parent2Language>{{.Parent2LOTE}}</Parent2Language>
+        <Parent1EmploymentType>{{.Parent1Occupation}}</Parent1EmploymentType>
+        <Parent2EmploymentType>{{.Parent2Occupation}}</Parent2EmploymentType>
+        <Parent1SchoolEducationLevel>{{.Parent1SchoolEducation}}</Parent1SchoolEducationLevel>
+        <Parent2SchoolEducationLevel>{{.Parent2SchoolEducation}}</Parent2SchoolEducationLevel>
+        <Parent1NonSchoolEducation>{{.Parent1NonSchoolEducation}}</Parent1NonSchoolEducation>
+        <Parent2NonSchoolEducation>{{.Parent2NonSchoolEducation}}</Parent2NonSchoolEducation>
+        <LocalCampusId>{{.LocalCampusId}}</LocalCampusId>
+        <SchoolACARAId>{{.ASLSchoolId}}</SchoolACARAId>
+        <TestLevel><Code>{{.TestLevel}}</Code></TestLevel>
+        <Homegroup>{{.HomeGroup}}</Homegroup>
+        <ClassCode>{{.ClassCode}}</ClassCode>
+        <MembershipType>{{.MainSchoolFlag}}</MembershipType>
+        <FFPOS>{{.FFPOS}}</FFPOS>
+        <ReportingSchoolId>{{.ReportingSchoolId}}</ReportingSchoolId>
+        <OtherEnrollmentSchoolACARAId>{{.OtherSchoolId}}</OtherEnrollmentSchoolACARAId>
+      </MostRecent>
+      <EducationSupport>{{.EducationSupport}}</EducationSupport>
+      <HomeSchooledStudent>{{.HomeSchooledStudent}}</HomeSchooledStudent>
+      <Sensitive>{{.Sensitive}}</Sensitive>
+      <OfflineDelivery>{{.OfflineDelivery}}</OfflineDelivery>
+    </StudentPersonal>{{ end }}
+</StudentPersonals>

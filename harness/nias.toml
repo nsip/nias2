@@ -1,0 +1,13 @@
+
+# Baseline year for DOB checks
+TestYear = "2016"
+
+# Validations to invoke
+# ValidationRoute = ["schema", "local", "id", "dob", "asl"]
+ValidationRoute = ["schema", "id", "dob", "asl"]
+
+# Webserver port
+WebServerPort = "1325"
+
+# Number of validation engines
+PoolSize = 4
