@@ -57,6 +57,7 @@ build_mac64() {
 	ZIP=go-nias-Mac.zip
 	do_build
 	do_upx
+	do_shells
 	do_zip
 	echo "...all Mac binaries built..."
 }
@@ -73,6 +74,7 @@ build_windows64() {
 	HARNESS=harness.exe
 	ZIP=go-nias-Win64.zip
 	do_build
+	do_bats
 	do_zip
 	echo "...all Windows64 binaries built..."
 }
@@ -89,6 +91,7 @@ build_windows32() {
 	ZIP=go-nias-Win32.zip
 	do_build
 	do_upx
+	do_bats
 	do_zip
 	echo "...all Windows32 binaries built..."
 }
@@ -105,6 +108,7 @@ build_linux64() {
 	ZIP=go-nias-Linux64.zip
 	do_build
 	do_goupx
+	do_shells
 	do_zip
 	echo "...all Linux64 binaries built..."
 }
@@ -121,6 +125,7 @@ build_linux32() {
 	ZIP=go-nias-Linux32.zip
 	do_build
 	do_goupx
+	do_shells
 	do_zip
 	echo "...all Linux32 binaries built..."
 }
