@@ -23,11 +23,12 @@ do_build() {
 
 do_shells() {
 	cp bin/gonias.sh $OUTPUT/
-	cp bin/shutdown.sh $OUTPUT/
+	cp bin/stopnias.sh $OUTPUT/
 }
 
 do_bats() {
 	cp bin/gonias.bat $OUTPUT/
+	cp bin/stopnias.bat $OUTPUT/
 }
 
 do_upx() {
