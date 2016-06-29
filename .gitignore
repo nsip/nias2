@@ -29,3 +29,5 @@ _testmain.go
 # GO Linux/Mac EXEs
 harness/harness
 tools/release
+
+harness/var
