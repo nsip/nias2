@@ -15,7 +15,7 @@ fi
 # give the nats server time to come up
 sleep 2
 
-./release & echo $! >> nias.pid
+./harness & echo $! >> nias.pid
 
 echo "Run the web client (launch browser here):"
 echo "http://localhost:1325/nias"
