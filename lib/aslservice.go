@@ -84,7 +84,7 @@ func (asls *ASLService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 // only needs to be invoked once at application startup
 func LoadASLLookupData() {
 
-	f, err := os.Open("./schoolslist/asl_schools.csv")
+	f, err := os.Open("./schoolslist/asl_schools_20160321.csv")
 	reader := csv.WithIoReader(f)
 	records, err := csv.ReadAll(reader)
 	log.Printf("ASL records read: %v", len(records))

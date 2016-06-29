@@ -16,9 +16,9 @@ func main() {
 
 	poolsize := nias2.NiasConfig.PoolSize
 
-	log.Println("Starting storage engine...")
+	log.Println("Starting ledis server...")
 	go nias2.LaunchLedisServer()
-	log.Println("...Storage service running")
+	log.Println("...ledis service running")
 
 	log.Println("Loading ASL Lookup data")
 	nias2.LoadASLLookupData()
