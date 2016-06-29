@@ -39,7 +39,7 @@ func LaunchLedisServer() {
 	cfg.DataDir = "./var"
 	app, err := server.NewApp(cfg)
 	if err != nil {
-		log.Fatalln("Cannot launch database server, aborting....")
+		log.Fatalln("Cannot launch database server, aborting....", err)
 	}
 	go app.Run()
 
