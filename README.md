@@ -1,4 +1,4 @@
-# nias-go-naplan-registration
+# nias2
 NIAS. golang naplan registration modules.
 
 TODO - Update for nias2
@@ -22,8 +22,8 @@ Then run gonias.bat file from that directory
 `$GOPATH` etc (common mistake is to skip the `src/` directory after `$GOPATH`)
 
 In `$GOPATH/src/github.com/nsip` do:
-   git clone https://github.com/nsip/nias-go-naplan-registration
-   ./build.sh
+    git clone https://github.com/nsip/nias2
+    ./build.sh
 
 # Running
 
