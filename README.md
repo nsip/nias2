@@ -5,7 +5,7 @@ TODO - Update for nias2
 
 Install
 * go version 1.6+
-* go get github.com/pwaller/goupx
+* ````go get github.com/pwaller/goupx````
 
 This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components, specific to NAPLAN validation. It uses
 [NATS](http://nats.io) queues. This module is currently limited to NAPLAN registration validation.
@@ -22,6 +22,7 @@ Then run gonias.bat file from that directory
 `$GOPATH` etc (common mistake is to skip the `src/` directory after `$GOPATH`)
 
 In `$GOPATH/src/github.com/nsip` do:
+
     git clone https://github.com/nsip/nias2
     ./build.sh
 
