@@ -40,6 +40,24 @@ type IngestResponse struct {
 	Records int
 }
 
+// truncate the record by removing items that have blank entries.
+// this prevents the validation from throwing validation exceptions
+// for fields that are not mandatory but included as empty in the
+// dataset
+func removeBlanks(m map[string]string) map[string]string {
+
+        log.Println("HELLO")
+        reducedmap := make(map[string]string)
+        for key, val := range m {
+                if val != "" {
+                        reducedmap[key] = val
+                }
+        }
+        log.Println(reducedmap)
+        return reducedmap
+}
+
+
 // read csv file as stream an post records onto processing queue
 func enqueueCSV(file multipart.File) (IngestResponse, error) {
 
@@ -57,9 +75,10 @@ func enqueueCSV(file multipart.File) (IngestResponse, error) {
 		// stripBlanks????
 
 		regr := RegistrationRecord{}
-		// r := removeBlanks(record.AsMap())
+		r := removeBlanks(record.AsMap())
 		// log.Printf("record is:\n%v\n", r)
-		decode_err := ms.Decode(record.AsMap(), &regr)
+		//decode_err := ms.Decode(record.AsMap(), &regr)
+		decode_err := ms.Decode(r, &regr)
 		if decode_err != nil {
 			return ir, decode_err
 		}
@@ -225,6 +244,7 @@ func (nws *NIASWebServer) Run() {
 		sprsnls := make([]map[string]string, 0)
 		for _, r := range records {
 			r := r.AsMap()
+			r = removeBlanks(r)
 			r["SIFuuid"] = uuid.NewV4().String()
 			sprsnls = append(sprsnls, r)
 		}

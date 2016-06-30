@@ -288,6 +288,7 @@
             "id": "http://naplan.edu.au/PlatformId",
             "type": "string",
             "title": "PlatformId schema.",
+	    "pattern": "[RD][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][KMRASPDHEG]",
             "maxLength": 36,
             "description": "Description",
             "name": "PlatformId"
@@ -297,6 +298,7 @@
             "type": "string",
             "title": "Postcode schema.",
             "maxLength": 4,
+            "minLength": 4,
             "description": "Description",
             "name": "Postcode"
         },
@@ -354,6 +356,7 @@
             "title": "PreviousPlatformId schema.",
             "description": "Description",
             "maxLength": 36,
+	    "pattern": "[RD][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][KMRASPDHEG]",
             "name": "PreviousPlatformId"
         },
         "PreviousSectorId": {
@@ -474,7 +477,7 @@
             "id": "http://naplan.edu.au/YearLevel",
             "type": "string",
             "title": "YearLevel schema.",
-            "enum": ["F","P","0","1","2","3","4","5","6","7","8","9","10","11","12","UG"],
+            "enum": ["F","P","0","1","2","3","4","5","6","7","8","9","10","11","12","UG","11MINUS","12PLUS","CC","K","K3","K4","PS","UGJunSec","UGPri","UGSec","UGSnrSec"],
             "description": "Description",
             "name": "YearLevel"
         }
