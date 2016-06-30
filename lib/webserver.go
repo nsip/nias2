@@ -8,14 +8,14 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/fasthttp"
+	//"github.com/labstack/echo/engine/fasthttp"
 	"html/template"
 	"log"
 	"path"
 	"strconv"
 	"strings"
 	"time"
-	// "github.com/labstack/echo/engine/standard"
+	"github.com/labstack/echo/engine/standard"
 	mw "github.com/labstack/echo/middleware"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/nats-io/nats"
@@ -46,14 +46,12 @@ type IngestResponse struct {
 // dataset
 func removeBlanks(m map[string]string) map[string]string {
 
-        log.Println("HELLO")
         reducedmap := make(map[string]string)
         for key, val := range m {
                 if val != "" {
                         reducedmap[key] = val
                 }
         }
-        log.Println(reducedmap)
         return reducedmap
 }
 
@@ -71,8 +69,6 @@ func enqueueCSV(file multipart.File) (IngestResponse, error) {
 	for record := range reader.C() {
 
 		i = i + 1
-
-		// stripBlanks????
 
 		regr := RegistrationRecord{}
 		r := removeBlanks(record.AsMap())
@@ -356,7 +352,7 @@ func (nws *NIASWebServer) Run() {
 	port := NiasConfig.WebServerPort
 	log.Println("Service is listening on localhost:" + port)
 
-	e.Run(fasthttp.New(":" + port))
-	// e.Run(standard.New(":1325"))
+	//e.Run(fasthttp.New(":" + port))
+	e.Run(standard.New(":1325"))
 
 }
