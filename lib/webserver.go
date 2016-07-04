@@ -8,22 +8,22 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/fasthttp"
-	"html/template"
-	"log"
-	"path"
-	"strconv"
-	"strings"
-	"time"
-	//"github.com/labstack/echo/engine/standard"
+	//"github.com/labstack/echo/engine/fasthttp"
+	"github.com/labstack/echo/engine/standard"
 	mw "github.com/labstack/echo/middleware"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/nats-io/nats"
 	"github.com/nats-io/nuid"
 	"github.com/twinj/uuid"
 	"github.com/wildducktheories/go-csv"
+	"html/template"
+	"log"
 	"mime/multipart"
 	"net/http"
+	"path"
+	"strconv"
+	"strings"
+	"time"
 )
 
 var VALIDATION_ROUTE = NiasConfig.ValidationRoute
@@ -46,15 +46,14 @@ type IngestResponse struct {
 // dataset
 func removeBlanks(m map[string]string) map[string]string {
 
-        reducedmap := make(map[string]string)
-        for key, val := range m {
-                if val != "" {
-                        reducedmap[key] = val
-                }
-        }
-        return reducedmap
+	reducedmap := make(map[string]string)
+	for key, val := range m {
+		if val != "" {
+			reducedmap[key] = val
+		}
+	}
+	return reducedmap
 }
-
 
 // read csv file as stream an post records onto processing queue
 func enqueueCSV(file multipart.File) (IngestResponse, error) {
@@ -352,7 +351,7 @@ func (nws *NIASWebServer) Run() {
 	port := NiasConfig.WebServerPort
 	log.Println("Service is listening on localhost:" + port)
 
-	e.Run(fasthttp.New(":" + port))
-	//e.Run(standard.New(":1325"))
+	//e.Run(fasthttp.New(":" + port))
+	e.Run(standard.New(":1325"))
 
 }

@@ -115,7 +115,7 @@ func (dob *DOBService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 			if yrlvl != dob.calculateYearLevel(t) {
 				// log.Println("Student is in wrong yr level: ", yrlvl)
 				desc = "Student Year Level (yr " + yrlvl + ") does not match year level derived from BirthDate (yr " + dob.calculateYearLevel(t) + ")"
-				field = field + "/" + "YearLevel "
+				field = field + "/" + "YearLevel"
 				ok = false
 			}
 			tstlvl := rr.TestLevel

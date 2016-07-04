@@ -2,183 +2,142 @@ package main
 
 import (
 	"os"
-	//"io/ioutil"
+	"path"
 	"testing"
+	"time"
 	//"bytes"
-        //"strconv"
+	//"strconv"
 	//"time"
-        //"encoding/json"
+	"encoding/json"
 	"log"
-	//"strings"
+	"net/url"
+	"strings"
 
-	//"github.com/nats-io/nats"
-	//lib "github.com/nsip/nias-go-naplan-registration/lib"
-        //"github.com/wildducktheories/go-csv"
-        "github.com/dghubble/sling"
 	Nias2 "github.com/nsip/nias2/lib"
-
+	"menteslibres.net/gosexy/rest"
 )
 
-// var web_ec *nats.EncodedConn
-
-/*
-func csv2nats(csvstring string) ([]map[string]string, error) {
-	// input csv, and output a slice of records to push to NATS. the same way that aggregator Post("/naplan/reg/:stateID") does
-	reader := csv.WithIoReader(ioutil.NopCloser(bytes.NewReader([]byte(csvstring))))
-	records, err := csv.ReadAll(reader)
-	ret := make([]map[string]string, len(records))
-	for i, r := range records {
-		ret[i] = r.AsMap()
-		ret[i]["OriginalLine"] = strconv.Itoa(i + 1)
-		ret[i]["TxID"] = "dummyTxID"
-	}
-	return ret, err
-}
-*/
+var customClient *rest.Client
 
 func TestSexMissingMandatory(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatorySex.csv", "Sex", "Sex must be one of the following")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatorySex.csv", "Sex", "Sex is required")
 }
-/*
+
 func TestSexInvalid(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1studentsInvalidSex.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "Sex", "Sex must be one of the following")
+	test_harness(t, "../unit_test_files/1studentsInvalidSex.csv", "Sex", "Sex must be one of the following")
 }
 
 func TestYearLevelPrep(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1students1YearLevelPrep.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "BirthDate/TestLevel", "Year level supplied is P, does not match expected test level")
+	test_harness(t, "../unit_test_files/1students1YearLevelPrep.csv", "BirthDate/TestLevel", "Year level supplied is P, does not match expected test level")
 }
 
 func TestYearLevelF(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1students2YearLevelF.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "BirthDate/YearLevel", "Student Year Level (yr F) does not match year level derived from BirthDate")
+	test_harness(t, "../unit_test_files/1students2YearLevelF.csv", "BirthDate/YearLevel", "Student Year Level (yr F) does not match year level derived from BirthDate")
 }
 
 func TestFutureBirthdate(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1studentsFutureBirthDates.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "BirthDate/YearLevel", "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges")
+	test_harness(t, "../unit_test_files/1studentsFutureBirthDates.csv", "BirthDate/YearLevel", "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges")
 }
 
 func TestMissingParent2LOTE(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1students2MissingParent2LOTE.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "Parent2LOTE", "Language Code is not one of ASCL 1267.0 codeset")
+	test_harness(t, "../unit_test_files/1students2MissingParent2LOTE.csv", "Parent2LOTE", "Parent2LOTE is required")
 }
 
 func TestACARAIDandStateBlank(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1studentsACARAIDandStateBlank.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "StateTerritory", "StateTerritory must be one of the following")
+	test_harness(t, "../unit_test_files/1studentsACARAIDandStateBlank.csv", "ASLSchoolId", "ASLSchoolId is required")
 }
 
 func TestBirthdateYearLevel(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1studentsBirthdateYearLevel.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "BirthDate/YearLevel/TestLevel", "does not match year level derived from BirthDate")
+	test_harness(t, "../unit_test_files/1studentsBirthdateYearLevel.csv", "BirthDate/YearLevel/TestLevel", "does not match year level derived from BirthDate")
 }
 
 func TestACARAIDandStateMismatch(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1studentsACARAIDandStateMismatch.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "ASLSchoolId", "is a valid ID, but not for")
+	test_harness(t, "../unit_test_files/1studentsACARAIDandStateMismatch.csv", "ASLSchoolID", "is a valid ID, but not for")
 }
 
 func TestMissingSurname(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1studentsMissingSurname.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "FamilyName", "FamilyName is required")
+	test_harness(t, "../unit_test_files/1studentsMissingSurname.csv", "FamilyName", "FamilyName is required")
 }
 
 func TestEmptySurname(t *testing.T) {
-	data, err := ioutil.ReadFile("../unit_test_files/1studentsEmptySurname.csv")
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	test_harness(t, string(data), "ASLSchoolId", "is a valid ID, but not for")
+	test_harness(t, "../unit_test_files/1studentsEmptySurname.csv", "FamilyName", "FamilyName is required")
 }
-*/
-
-type Issue struct {
-    txid  string `json:"TxID"`
-    msgid   string `json:"MsgID"`
-}
-
 
 func test_harness(t *testing.T, filename string, errfield string, errdescription string) {
-/*
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-*/
-        port := Nias2.NiasConfig.WebServerPort
-	f, err := os.Open(filename)
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	issues := new([]Issue)
-	resp, err := sling.New().Post(":"+port+"/naplan/reg/validate").Body(f).ReceiveSuccess(issues)
-	log.Println(resp)
-	log.Println()
-	log.Println(issues)
+	var f *os.File
+	var err error
 
-
-
-/*
-	records, err := csv2nats(csv)
+	if f, err = os.Open(filename); err != nil {
+		t.Fatalf("Error %s", err)
+	}
+	defer f.Close()
+	files := rest.FileMap{
+		"validationFile": []rest.File{
+			{
+				Name:   path.Base(f.Name()),
+				Reader: f,
+			},
+		},
+	}
+	requestVariables := url.Values{
+		"name": {path.Base(f.Name())},
+	}
+	msg, err := rest.NewMultipartMessage(requestVariables, files)
 	if err != nil {
 		t.Fatalf("Error %s", err)
 	}
-	log.Printf("records received: %v", len(records))
-	sub, err := natsconn.Nc.SubscribeSync("validation.errors") 
-	if err != nil {
+	dst := map[string]interface{}{}
+	if err = customClient.PostMultipart(&dst, "/naplan/reg/validate", msg); err != nil {
 		t.Fatalf("Error %s", err)
 	}
-	for _, r := range records {
-		log.Println(r)
-		natsconn.Ec.Publish("validation.naplan", r)
-	}
-	msg, err := sub.NextMsg(5 * time.Second) 
-	if err != nil {
+	txid := dst["TxID"].(string)
+	bytebuf := []byte{}
+	//dat := []map[string]interface{}{}
+	dat := []map[string]string{}
+	time.Sleep(2 * time.Second)
+	if err = customClient.Get(&bytebuf, "/naplan/reg/results/"+txid, nil); err != nil {
 		t.Fatalf("Error %s", err)
 	}
-	dat := make(map[string]string)
-	if err := json.Unmarshal(msg.Data, &dat); err != nil {
-		t.Fatalf("Error unmarshalling json message: %s", err)
+	// we are getting back a JSON array
+	if err = json.Unmarshal(bytebuf, &dat); err != nil {
+		t.Fatalf("Error %s", err)
 	}
 	log.Println(dat)
-	if dat["errField"] != errfield {
-		t.Fatalf("Expected error field %s, got field %s", errfield, dat["errField"])
+	if len(dat) < 1 {
+		t.Fatalf("Expected error field %s, got no error", errfield)
+	} else {
+		if dat[0]["errField"] != errfield {
+			t.Fatalf("Expected error field %s, got field %s", errfield, dat[0]["errField"])
+		}
+		if !strings.Contains(dat[0]["description"], errdescription) {
+			t.Fatalf("Expected error description %s, got description %s", errdescription, dat[0]["description"])
+		}
 	}
-	if !strings.Contains(dat["description"], errdescription) {
-		t.Fatalf("Expected error description %s, got description %s", errdescription, dat["description"])
-	}
-*/
+
+	/*
+		for _, r := range records {
+			log.Println(r)
+			natsconn.Ec.Publish("validation.naplan", r)
+		}
+		msg, err := sub.NextMsg(5 * time.Second)
+		if err != nil {
+			t.Fatalf("Error %s", err)
+		}
+		dat := make(map[string]string)
+		if err := json.Unmarshal(msg.Data, &dat); err != nil {
+			t.Fatalf("Error unmarshalling json message: %s", err)
+		}
+		log.Println(dat)
+		if dat["errField"] != errfield {
+			t.Fatalf("Expected error field %s, got field %s", errfield, dat["errField"])
+		}
+		if !strings.Contains(dat["description"], errdescription) {
+			t.Fatalf("Expected error description %s, got description %s", errdescription, dat["description"])
+		}
+	*/
 }
 
 func TestMain(m *testing.M) {
+	customClient, _ = rest.New("http://localhost:" + Nias2.NiasConfig.WebServerPort + "/")
 	os.Exit(m.Run())
 }
