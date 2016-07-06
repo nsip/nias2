@@ -12,10 +12,12 @@ import (
 
 const DEF_ADDRESS = "127.0.0.1:6380"
 
-func CreateLedisConnection() *goredis.Client {
+func CreateLedisConnection(readBufferSize int, writeBufferSize int) *goredis.Client {
 
 	log.Println("Creating ledis client")
 	c := goredis.NewClient(DEF_ADDRESS, "")
+	c.SetReadBufferSize(readBufferSize)
+	c.SetWriteBufferSize(writeBufferSize)
 	return c
 
 }
@@ -31,6 +33,10 @@ func LaunchLedisServer() {
 
 	cfg.ConnReadBufferSize = 1024
 	cfg.ConnWriteBufferSize = 1024
+	/*
+		cfg.ConnReadBufferSize = 1024
+		cfg.ConnWriteBufferSize = 80
+	*/
 
 	// log.Println("\tRead buffer is", cfg.ConnReadBufferSize)
 	// log.Println("\tWrite buffer is", cfg.ConnWriteBufferSize)

@@ -74,9 +74,7 @@ func (ids *IDService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 		r.Body = ve
 		responses = append(responses, r)
 
-	}
-
-	if SimpleIDKeyExists(req) {
+	} else if SimpleIDKeyExists(req) {
 		desc := "LocalID (Student) and ASL ID (School) are potential duplicate of record: " + ol
 
 		ve := ValidationError{

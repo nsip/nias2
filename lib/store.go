@@ -32,7 +32,7 @@ func (ms *MessageStore) Run(poolsize int) {
 
 	ms_ec := CreateNATSConnection()
 	for i := 0; i < poolsize; i++ {
-		c := CreateLedisConnection()
+		c := CreateLedisConnection(1024, 1024)
 		// defer c.Close()
 		ms_ec.QueueSubscribe(STORE_TOPIC, "msg_store", func(m *NiasMessage) {
 			// don't store if no content
@@ -84,7 +84,7 @@ func (mt *MessageTracker) Run(poolsize int) {
 func GetTxData(txid string, fulldata bool) ([]interface{}, error) {
 
 	data := make([]interface{}, 0)
-	c := CreateLedisConnection()
+	c := CreateLedisConnection(1024, 1024)
 	defer c.Close()
 
 	var endpoint int

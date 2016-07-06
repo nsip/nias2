@@ -3,15 +3,15 @@ package nias2
 
 import (
 	"github.com/siddontang/goredis"
-	// "log"
+	"log"
 )
 
 //
 // encapsulation of all hash-based ledis lookups
 //
 
-var id_c = CreateLedisConnection()
-var asl_c = CreateLedisConnection()
+var id_c = CreateLedisConnection(64, 64)
+var asl_c = CreateLedisConnection(1024, 1024)
 
 const ID_PREFIX = "id:"
 const ASL_KEY = "asl:lookup"
@@ -39,11 +39,15 @@ func SimpleIDKeyExists(msg *NiasMessage) bool {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
+	log.Printf("%s %v", ID_PREFIX+msg.TxID, k)
+	log.Println("queried")
 
 	if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, k); resp != nil {
+		log.Println("found")
 		return true
 	}
 
+	log.Println("not found")
 	return false
 
 }
@@ -63,10 +67,14 @@ func ComplexIDKeyExists(msg *NiasMessage) bool {
 		BirthDate:   rr.BirthDate,
 	}
 
+	log.Println(ek)
+	log.Println("queried")
 	if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, ek); resp != nil {
+		log.Println("found")
 		return true
 	}
 
+	log.Println("not found")
 	return false
 }
 
@@ -79,10 +87,14 @@ func GetIDValue(msg *NiasMessage) (string, error) {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
+	log.Printf("%s %v", ID_PREFIX+msg.TxID, k)
+	log.Println("queried")
 
 	if ol, err := goredis.String(id_c.Do("hget", ID_PREFIX+msg.TxID, k)); err != nil {
+		log.Println("not found")
 		return "", err
 	} else {
+		log.Println("found")
 		return ol, nil
 	}
 
@@ -99,8 +111,11 @@ func SetIDValue(msg *NiasMessage) error {
 		ASLSchoolId: rr.ASLSchoolId,
 	}
 	if _, err := id_c.Do("hset", ID_PREFIX+msg.TxID, k, msg.SeqNo); err != nil {
+		log.Println("err1")
 		return err
 	}
+	log.Printf("%s %v", ID_PREFIX+msg.TxID, k)
+	log.Println("set")
 
 	// then the complex type
 	ek := IDExtendedKey{
@@ -111,8 +126,11 @@ func SetIDValue(msg *NiasMessage) error {
 		BirthDate:   rr.BirthDate,
 	}
 	if _, err := id_c.Do("hset", ID_PREFIX+msg.TxID, ek, msg.SeqNo); err != nil {
+		log.Println("err2")
 		return err
 	}
+	log.Println(ek)
+	log.Println("set")
 
 	return nil
 

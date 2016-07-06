@@ -92,6 +92,12 @@ func (ss *SchemaService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) 
 				}
 
 			}
+			if desc.Type() == "pattern" {
+				switch desc.Field() {
+				case "PlatformId", "PreviousPlatformId":
+					desc.SetDescription("PlatformId is not in correct format")
+				}
+			}
 
 			ve := ValidationError{
 				Description:  desc.Description(),
