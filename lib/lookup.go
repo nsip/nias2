@@ -2,6 +2,8 @@
 package nias2
 
 import (
+	"errors"
+	"fmt"
 	"github.com/siddontang/goredis"
 	"log"
 )
@@ -39,16 +41,69 @@ func SimpleIDKeyExists(msg *NiasMessage) bool {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
-	log.Printf("%s %v", ID_PREFIX+msg.TxID, k)
+	log.Printf("SimpleIDKeyExists %s %v", ID_PREFIX+msg.TxID, k)
 	log.Println("queried")
 
-	if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, k); resp != nil {
+	//if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, k); resp != nil {
+	if resp, _ := id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k), msg.SeqNo); resp == 0 {
 		log.Println("found")
 		return true
 	}
 
 	log.Println("not found")
 	return false
+
+}
+
+// SetNx simple key
+func SimpleIDKeySetnx(msg *NiasMessage) bool {
+
+	rr := msg.Body.(RegistrationRecord)
+	var resp int
+	var err error
+
+	k := IDSimpleKey{
+		LocalId:     rr.LocalId,
+		ASLSchoolId: rr.ASLSchoolId,
+	}
+	log.Printf("SimpleIDKeySetnx %s %v", ID_PREFIX+msg.TxID, k)
+	log.Println("queried")
+
+	resp, err = goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k), msg.SeqNo))
+	log.Printf(":: %v %v %v", resp, err, msg.SeqNo)
+	if err == nil && resp == 0 {
+		log.Println("set")
+		return true
+	}
+
+	log.Printf("found:%v", resp)
+	return false
+
+}
+
+// Seen simple key: its value is a msg.SeqNo other than the current one
+func SimpleIDKeySeen(msg *NiasMessage) (string, error) {
+
+	rr := msg.Body.(RegistrationRecord)
+
+	k := IDSimpleKey{
+		LocalId:     rr.LocalId,
+		ASLSchoolId: rr.ASLSchoolId,
+	}
+	log.Printf("SimpleIDKeySeen %s %v", ID_PREFIX+msg.TxID, k)
+	log.Println("queried")
+
+	resp, err := goredis.String(id_c.Do("get", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k)))
+	if err != nil {
+		log.Println("err")
+		return "", err
+	}
+	if resp == msg.SeqNo {
+		log.Println("not found")
+		return "", errors.New("ID not seen")
+	}
+	log.Println("found")
+	return fmt.Sprint(resp), nil
 
 }
 
@@ -67,15 +122,68 @@ func ComplexIDKeyExists(msg *NiasMessage) bool {
 		BirthDate:   rr.BirthDate,
 	}
 
-	log.Println(ek)
+	log.Printf("ComplexIDKeyExists %s %v", ID_PREFIX+msg.TxID, ek)
 	log.Println("queried")
-	if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, ek); resp != nil {
+	//if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, ek); resp != nil {
+	if resp, _ := id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek)); resp == 0 {
 		log.Println("found")
 		return true
 	}
 
 	log.Println("not found")
 	return false
+}
+
+// SetNx complex key
+func ComplexIDKeySetnx(msg *NiasMessage) bool {
+
+	rr := msg.Body.(RegistrationRecord)
+
+	ek := IDExtendedKey{
+		LocalId:     rr.LocalId,
+		ASLSchoolId: rr.ASLSchoolId,
+		FamilyName:  rr.FamilyName,
+		GivenName:   rr.GivenName,
+		BirthDate:   rr.BirthDate,
+	}
+
+	log.Printf("ComplexIDKeySetnx %s %v", ID_PREFIX+msg.TxID, ek)
+	log.Println("queried")
+	if resp, err := goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek))); err != nil && resp == 0 {
+		log.Println("set")
+		return true
+	}
+
+	log.Println("found")
+	return false
+}
+
+// Seen complex key: its value is a msg.SeqNo other than the current one
+func ComplexIDKeySeen(msg *NiasMessage) (string, error) {
+
+	rr := msg.Body.(RegistrationRecord)
+
+	ek := IDExtendedKey{
+		LocalId:     rr.LocalId,
+		ASLSchoolId: rr.ASLSchoolId,
+		FamilyName:  rr.FamilyName,
+		GivenName:   rr.GivenName,
+		BirthDate:   rr.BirthDate,
+	}
+
+	log.Printf("ComplexIDKeySeen %s %v", ID_PREFIX+msg.TxID, ek)
+	log.Println("queried")
+	resp, err := goredis.String(id_c.Do("get", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek)))
+	if err != nil {
+		log.Println("err")
+		return "", err
+	}
+	if resp == msg.SeqNo {
+		log.Println("not found")
+		return "", errors.New("ID not seen")
+	}
+	log.Println("found")
+	return fmt.Sprint(resp), nil
 }
 
 // return the original line (ol) number that holds this identity if a duplicate
@@ -87,7 +195,7 @@ func GetIDValue(msg *NiasMessage) (string, error) {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
-	log.Printf("%s %v", ID_PREFIX+msg.TxID, k)
+	log.Printf("GetIDValue %s %v", ID_PREFIX+msg.TxID, k)
 	log.Println("queried")
 
 	if ol, err := goredis.String(id_c.Do("hget", ID_PREFIX+msg.TxID, k)); err != nil {
@@ -102,36 +210,36 @@ func GetIDValue(msg *NiasMessage) (string, error) {
 
 // store an identity
 func SetIDValue(msg *NiasMessage) error {
+	/*
+		rr := msg.Body.(RegistrationRecord)
 
-	rr := msg.Body.(RegistrationRecord)
+		// first set a simple key type
+		k := IDSimpleKey{
+			LocalId:     rr.LocalId,
+			ASLSchoolId: rr.ASLSchoolId,
+		}
+		if _, err := id_c.Do("hset", ID_PREFIX+msg.TxID, k, msg.SeqNo); err != nil {
+			log.Println("err1")
+			return err
+		}
+		log.Printf("%s %v", ID_PREFIX+msg.TxID, k)
+		log.Println("set")
 
-	// first set a simple key type
-	k := IDSimpleKey{
-		LocalId:     rr.LocalId,
-		ASLSchoolId: rr.ASLSchoolId,
-	}
-	if _, err := id_c.Do("hset", ID_PREFIX+msg.TxID, k, msg.SeqNo); err != nil {
-		log.Println("err1")
-		return err
-	}
-	log.Printf("%s %v", ID_PREFIX+msg.TxID, k)
-	log.Println("set")
-
-	// then the complex type
-	ek := IDExtendedKey{
-		LocalId:     rr.LocalId,
-		ASLSchoolId: rr.ASLSchoolId,
-		FamilyName:  rr.FamilyName,
-		GivenName:   rr.GivenName,
-		BirthDate:   rr.BirthDate,
-	}
-	if _, err := id_c.Do("hset", ID_PREFIX+msg.TxID, ek, msg.SeqNo); err != nil {
-		log.Println("err2")
-		return err
-	}
-	log.Println(ek)
-	log.Println("set")
-
+		// then the complex type
+		ek := IDExtendedKey{
+			LocalId:     rr.LocalId,
+			ASLSchoolId: rr.ASLSchoolId,
+			FamilyName:  rr.FamilyName,
+			GivenName:   rr.GivenName,
+			BirthDate:   rr.BirthDate,
+		}
+		if _, err := id_c.Do("hset", ID_PREFIX+msg.TxID, ek, msg.SeqNo); err != nil {
+			log.Println("err2")
+			return err
+		}
+		log.Println(ek)
+		log.Println("set")
+	*/
 	return nil
 
 }
