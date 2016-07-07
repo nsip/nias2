@@ -16,7 +16,6 @@ import (
 
 var customClient *rest.Client
 
-/*
 func TestSexMissingMandatory(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsMissingMandatorySex.csv", "Sex", "Sex is required")
 }
@@ -158,11 +157,135 @@ func TestInvalidValuesYearLevel(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsInvalidValuesYearLevel.csv", "YearLevel", "YearLevel must be one of the following")
 }
 
-*/
-
-func TestInvalidVisaClass(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsInvalidVisaSubClass.csv", "VisaCode", "is not one of known values from")
+func TestMissingMandatoryParent1SchlEduc(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent1SchlEduc.csv", "Parent1SchoolEducation", "Parent1SchoolEducation is required")
 }
+
+func TestMissingMandatoryASLSchoolID(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryASLSchoolID.csv", "ASLSchoolId", "ASLSchoolId is required")
+}
+
+func TestMissingMandatoryDOB(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryDOB.csv", "BirthDate", "BirthDate is required")
+}
+
+func TestMissingMandatoryFFPOS(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryFFPOS.csv", "FFPOS", "FFPOS is required")
+}
+
+func TestMissingMandatoryGivenName(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryGivenName.csv", "GivenName", "GivenName is required")
+}
+
+func TestMissingMandatoryIndigenousStatus(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryIndigenousStatus.csv", "IndigenousStatus", "IndigenousStatus is required")
+}
+
+func TestMissingMandatoryLocalId(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryLocalId.csv", "LocalId", "LocalId is required")
+}
+
+func TestMissingMandatoryParent1LOTE(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent1LOTE.csv", "Parent1LOTE", "Parent1LOTE is required")
+}
+
+func TestMissingMandatoryParent1NonSchoolEducation(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent1NonSchlEduc.csv", "Parent1NonSchoolEducation", "Parent1NonSchoolEducation is required")
+}
+
+func TestMissingMandatoryParent1Occupation(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent1Occupation.csv", "Parent1Occupation", "Parent1Occupation is required")
+}
+
+func TestMissingMandatoryParent2LOTE(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2LOTE.csv", "Parent2LOTE", "Parent2LOTE is required")
+}
+
+func TestMissingMandatoryParent2NonSchoolEducation(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2NonSchoolEduc.csv", "Parent2NonSchoolEducation", "Parent2NonSchoolEducation is required")
+}
+
+func TestMissingMandatoryParent2Occupation(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2Occupation.csv", "Parent2Occupation", "Parent2Occupation is required")
+}
+
+func TestMissingMandatoryParent2SchoolEducation(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2SchlEduc.csv", "Parent2SchoolEducation", "Parent2SchoolEducation is required")
+}
+
+func TestMissingMandatoryCountryOfBirth(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryStudentCountryBirth.csv", "CountryOfBirth", "CountryOfBirth is required")
+}
+
+func TestMissingMandatoryStudentLOTE(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryStudentLOTE.csv", "StudentLOTE", "StudentLOTE is required")
+}
+
+func TestMissingMandatoryTestLevel(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryTestLevel.csv", "TestLevel", "TestLevel is required")
+}
+
+func TestMissingMandatoryYearLevel(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryYearLevel.csv", "YearLevel", "YearLevel is required")
+}
+
+func TestOptionalMissing(t *testing.T) {
+	test_harness(t, "../unit_test_files/5studentsOptionalMissing.csv", "", "")
+}
+
+func TestOutsideAgeRange3(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsOutsideAgeRange3.csv", "BirthDate/YearLevel", "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges")
+}
+
+func TestOutsideAgeRange5(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsOutsideAgeRange5.csv", "BirthDate/YearLevel", "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges")
+}
+
+func TestOutsideAgeRange7(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsOutsideAgeRange7.csv", "BirthDate/YearLevel", "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges")
+}
+
+func TestOutsideAgeRange9(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsOutsideAgeRange9.csv", "BirthDate/YearLevel", "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges")
+}
+
+func TestOutsideAgeRangeUG(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsOutsideAgeRangeUG.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+}
+
+func TestSameStudentIdTwoDifferentSchoolId(t *testing.T) {
+	test_harness(t, "../unit_test_files/2studentsSameStudentIdTwoDifferentSchoolId.csv", "", "")
+}
+
+func TestUngradedValuesUGJunSec(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsUngradedValuesUGJunSec.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+}
+
+func TestUngradedValuesUGSnrSec(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsUngradedValuesUGSnrSec.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+}
+
+func TestUngradedValuesUGPri(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsUngradedValuesUGPri.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+}
+
+func TestUngradedValuesUGSec(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsUngradedValuesUGSec.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+}
+
+func TestUnusualCountryCodes(t *testing.T) {
+	test_harness(t, "../unit_test_files/3studentsUnusualCountryCodes.csv", "", "")
+}
+
+func TestUnusualLanguageCodes(t *testing.T) {
+	test_harness(t, "../unit_test_files/3studentsUnusualLanguageCodes.csv", "", "")
+}
+
+func TestYearLevelTestLevelMismatch(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
+}
+
+
 
 /* if errfield is nil, we expect test to pass */
 func test_harness(t *testing.T, filename string, errfield string, errdescription string) {
