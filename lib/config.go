@@ -12,7 +12,8 @@ type NIASConfig struct {
 	TestYear        string
 	WebServerPort   string
 	ValidationRoute []string
-	PoolSize        int
+	PoolSize        int // number of service processors
+	MsgTransport    string
 }
 
 var NiasConfig = loadDefaultConfig()

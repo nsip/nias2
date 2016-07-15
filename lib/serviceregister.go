@@ -5,6 +5,7 @@ package nias2
 // will be matched against required tasks in NasMessage.Route meta-data
 
 import (
+	"log"
 	"sync"
 )
 
@@ -18,9 +19,7 @@ type ServiceRegister struct {
 // creates a ServiceRegister with properly initilaised internal map
 // processing services are stored with a name and the referenced NiasService
 func NewServiceRegister() *ServiceRegister {
-	reg := ServiceRegister{}
-	reg.registry = make(map[string]NiasService)
-	return &reg
+	return createDefaultServiceRegister()
 }
 
 // add a service to the registry with a name
@@ -42,4 +41,76 @@ func (sr *ServiceRegister) FindService(servicename string) NiasService {
 	sr.RLock()
 	defer sr.RUnlock()
 	return sr.registry[servicename]
+}
+
+// build register with default set of services
+func createDefaultServiceRegister() *ServiceRegister {
+
+	log.Println("Creating services & register")
+	sr := ServiceRegister{}
+	sr.registry = make(map[string]NiasService)
+
+	schema1, err := NewCoreSchemaService()
+	if err != nil {
+		log.Fatal("Unable to create schema service ", err)
+	}
+
+	schema2, err := NewCustomSchemaService("local.json")
+	if err != nil {
+		log.Fatal("Unable to create schema service ", err)
+	}
+
+	id1, err := NewIDService()
+	if err != nil {
+		log.Fatal("Unable to create id service ", err)
+	}
+
+	dob1, err := NewDOBService(NiasConfig.TestYear)
+	if err != nil {
+		log.Fatal("Unable to create dob service ", err)
+	}
+
+	asl1, err := NewASLService()
+	if err != nil {
+		log.Fatal("Unable to create asl service ", err)
+	}
+
+	sr.AddService("schema", schema1)
+	sr.AddService("local", schema2)
+	sr.AddService("id", id1)
+	sr.AddService("dob", dob1)
+	sr.AddService("asl", asl1)
+
+	log.Println("services created & installed in register")
+
+	return &sr
+
+}
+
+func (sr *ServiceRegister) ProcessByRoute(m *NiasMessage) []NiasMessage {
+
+	response_msgs := make([]NiasMessage, 0)
+
+	route := m.Route
+
+	for _, sname := range route {
+
+		// retrieve service from registry & execute
+		srvc := sr.FindService(sname)
+		responses, err := srvc.HandleMessage(m)
+		if err != nil {
+			log.Println("\t *** got an error on service handler " + sname + " ***")
+			log.Println("\t", err)
+		} else {
+			// pass the responses to the message store
+			for _, r := range responses {
+				response := r
+				response.Source = sname
+				response_msgs = append(response_msgs, response)
+			}
+		}
+	}
+
+	return response_msgs
+
 }
