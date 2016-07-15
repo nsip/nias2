@@ -7,96 +7,155 @@
 package nias2
 
 import (
-	"github.com/nats-io/nats"
+	"github.com/nats-io/go-nats-streaming"
 	"log"
 )
 
 type Distributor struct{}
 
-func createServiceRegister() *ServiceRegister {
-
-	log.Println("Creating services & register")
-	sr := NewServiceRegister()
-
-	schema1, err := NewCoreSchemaService()
-	if err != nil {
-		log.Fatal("Unable to create schema service ", err)
-	}
-
-	schema2, err := NewCustomSchemaService("local.json")
-	if err != nil {
-		log.Fatal("Unable to create schema service ", err)
-	}
-
-	id1, err := NewIDService()
-	if err != nil {
-		log.Fatal("Unable to create id service ", err)
-	}
-
-	dob1, err := NewDOBService(NiasConfig.TestYear)
-	if err != nil {
-		log.Fatal("Unable to create dob service ", err)
-	}
-
-	asl1, err := NewASLService()
-	if err != nil {
-		log.Fatal("Unable to create asl service ", err)
-	}
-
-	sr.AddService("schema", schema1)
-	sr.AddService("local", schema2)
-	sr.AddService("id", id1)
-	sr.AddService("dob", dob1)
-	sr.AddService("asl", asl1)
-
-	log.Println("services created & installed in register")
-
-	return sr
-
-}
-
-func serviceHandler(m *NiasMessage, sr *ServiceRegister, dist_ec *nats.EncodedConn) {
-
-	route := m.Route
-
-	for _, sname := range route {
-
-		// retrieve service from registry & execute
-		srvc := sr.FindService(sname)
-		responses, err := srvc.HandleMessage(m)
-		if err != nil {
-			log.Println("\t *** got an error on service handler " + sname + " ***")
-			log.Println("\t", err)
-		} else {
-			// pass the responses to the message store
-			for _, r := range responses {
-				response := r
-				response.Source = sname
-				err := dist_ec.Publish(STORE_TOPIC, response)
-				if err != nil {
-					log.Println("Error saving response to message store: ", err)
-				}
-			}
-		}
-	}
-	// update the progress tracker
-	err := dist_ec.Publish(TRACK_TOPIC, m.TxID)
-	if err != nil {
-		log.Println("Error saving tracking data: ", err)
-	}
-
-}
-
 // creates a pool of message handlers which process the
 // routing slip of each message thru the listed services
-func (d *Distributor) Run(poolsize int) {
+
+// Use STAN as message bus
+func (d *Distributor) RunSTANBus(poolsize int) {
 
 	for i := 0; i < poolsize; i++ {
 
-		sr := createServiceRegister()
-		dist_ec := CreateNATSConnection()
-		dist_ec.QueueSubscribe(REQUEST_TOPIC, "distributor", func(m *NiasMessage) {
-			serviceHandler(m, sr, dist_ec)
-		})
+		sr := NewServiceRegister()
+		pc := NewSTANProcessChain()
+		ms := NewMessageStore()
+
+		// create storage handler
+		go func(pc STANProcessChain, ms *MessageStore, id int) {
+
+			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *stan.Msg) {
+				ms.StoreMessage(DecodeNiasMessage(m.Data))
+			})
+
+		}(pc, ms, i) //drop ids
+
+		// create service handler
+		go func(pc STANProcessChain, sr *ServiceRegister, ms *MessageStore, id int) {
+
+			pc.srvc_in_conn.Subscribe(pc.srvc_in_subject, func(m *stan.Msg) {
+				msg := DecodeNiasMessage(m.Data)
+				responses := sr.ProcessByRoute(msg)
+				for _, response := range responses {
+					pc.srvc_out_conn.Publish(pc.store_in_subject, EncodeNiasMessage(&response))
+				}
+				ms.IncrementTracker(msg.TxID)
+			})
+
+		}(pc, sr, ms, i)
+
+		// create an inbound handler to multiplex validation requests, create last or will drop messages
+		go func(pc STANProcessChain, id int) {
+
+			pc.dist_in_conn.QueueSubscribe(pc.dist_in_subject, "distributor", func(m *stan.Msg) {
+				pc.dist_out_conn.Publish(pc.dist_out_subject, m.Data)
+			})
+
+		}(pc, i)
+
 	}
 }
+
+// Use regular NATS as message bus
+func (d *Distributor) RunNATSBus(poolsize int) {
+
+	for i := 0; i < poolsize; i++ {
+
+		i := i
+
+		sr := NewServiceRegister()
+		pc := NewNATSProcessChain()
+		ms := NewMessageStore()
+
+		log.Printf("Process Chain %d\n%#v", i, pc)
+
+		// create storage handler
+		go func(pc NATSProcessChain, ms *MessageStore) {
+
+			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *NiasMessage) {
+				ms.StoreMessage(m)
+			})
+
+		}(pc, ms)
+
+		// create service handler
+		go func(pc NATSProcessChain, sr *ServiceRegister, ms *MessageStore) {
+
+			pc.srvc_in_conn.Subscribe(pc.srvc_in_subject, func(m *NiasMessage) {
+				responses := sr.ProcessByRoute(m)
+				for _, response := range responses {
+					pc.srvc_out_conn.Publish(pc.store_in_subject, response)
+				}
+				ms.IncrementTracker(m.TxID)
+			})
+
+		}(pc, sr, ms)
+
+		// create an inbound handler to multiplex validation requests, create last or will drop messages
+		go func(pc NATSProcessChain) {
+
+			pc.dist_in_conn.QueueSubscribe(pc.dist_in_subject, "distributor", func(m *NiasMessage) {
+				pc.dist_out_conn.Publish(pc.dist_out_subject, m)
+			})
+
+		}(pc)
+
+	}
+}
+
+// use internal channels as message bus
+func (d *Distributor) RunMemBus(poolsize int) {
+
+	for i := 0; i < poolsize; i++ {
+
+		i := i
+
+		sr := NewServiceRegister()
+		pc := NewMemProcessChain()
+		ms := NewMessageStore()
+
+		log.Printf("Process Chain %d\n%#v", i, pc)
+
+		// create storage handler
+		go func(pc MemProcessChain, ms *MessageStore) {
+
+			for {
+				msg := <-pc.store_chan
+				ms.StoreMessage(msg)
+			}
+
+		}(pc, ms)
+
+		// create service handler
+		go func(pc MemProcessChain, sr *ServiceRegister, ms *MessageStore) {
+
+			for {
+				msg := <-pc.req_chan
+				responses := sr.ProcessByRoute(msg)
+				for _, response := range responses {
+					pc.store_chan <- &response
+				}
+				ms.IncrementTracker(msg.TxID)
+			}
+
+		}(pc, sr, ms)
+
+	}
+
+}
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//

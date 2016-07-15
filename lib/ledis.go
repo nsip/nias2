@@ -14,8 +14,9 @@ const DEF_ADDRESS = "127.0.0.1:6380"
 
 func CreateLedisConnection() *goredis.Client {
 
-	log.Println("Creating ledis client")
 	c := goredis.NewClient(DEF_ADDRESS, "")
+	// connection pool size within the client
+	c.SetMaxIdleConns(12)
 	return c
 
 }
@@ -26,11 +27,11 @@ func LaunchLedisServer() {
 	cfg.LevelDB.CacheSize = 524288000
 	cfg.LevelDB.WriteBufferSize = 67108864
 
-	// cfg.LevelDB.MaxOpenFiles = 10240
+	cfg.LevelDB.MaxOpenFiles = 10240
 	// log.Println("\tLDB MxOF is: ", cfg.LevelDB.MaxOpenFiles)
 
-	cfg.ConnReadBufferSize = 1024
-	cfg.ConnWriteBufferSize = 1024
+	cfg.ConnReadBufferSize = (1024 * 1024 * 5)
+	cfg.ConnWriteBufferSize = (10240 * 1024 * 5)
 
 	// log.Println("\tRead buffer is", cfg.ConnReadBufferSize)
 	// log.Println("\tWrite buffer is", cfg.ConnWriteBufferSize)
