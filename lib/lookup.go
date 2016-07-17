@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/siddontang/goredis"
-	"log"
+	//"log"
 )
 
 //
@@ -41,16 +41,16 @@ func SimpleIDKeyExists(msg *NiasMessage) bool {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
-	log.Printf("SimpleIDKeyExists %s %v", ID_PREFIX+msg.TxID, k)
-	log.Println("queried")
+	//log.Printf("SimpleIDKeyExists %s %v", ID_PREFIX+msg.TxID, k)
+	//log.Println("queried")
 
 	//if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, k); resp != nil {
 	if resp, _ := id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k), msg.SeqNo); resp == 0 {
-		log.Println("found")
+		//log.Println("found")
 		return true
 	}
 
-	log.Println("not found")
+	//log.Println("not found")
 	return false
 
 }
@@ -66,17 +66,17 @@ func SimpleIDKeySetnx(msg *NiasMessage) bool {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
-	log.Printf("SimpleIDKeySetnx %s %v", ID_PREFIX+msg.TxID, k)
-	log.Println("queried")
+	//log.Printf("SimpleIDKeySetnx %s %v", ID_PREFIX+msg.TxID, k)
+	//log.Println("queried")
 
 	resp, err = goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k), msg.SeqNo))
-	log.Printf(":: %v %v %v", resp, err, msg.SeqNo)
+	//log.Printf(":: %v %v %v", resp, err, msg.SeqNo)
 	if err == nil && resp == 0 {
-		log.Println("set")
+		//log.Println("set")
 		return true
 	}
 
-	log.Printf("found:%v", resp)
+	//log.Printf("found:%v", resp)
 	return false
 
 }
@@ -90,19 +90,19 @@ func SimpleIDKeySeen(msg *NiasMessage) (string, error) {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
-	log.Printf("SimpleIDKeySeen %s %v", ID_PREFIX+msg.TxID, k)
-	log.Println("queried")
+	//log.Printf("SimpleIDKeySeen %s %v", ID_PREFIX+msg.TxID, k)
+	//log.Println("queried")
 
 	resp, err := goredis.String(id_c.Do("get", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k)))
 	if err != nil {
-		log.Println("err")
+		//log.Println("err")
 		return "", err
 	}
 	if resp == msg.SeqNo {
-		log.Println("not found")
+		//log.Println("not found")
 		return "", errors.New("ID not seen")
 	}
-	log.Println("found")
+	//log.Println("found")
 	return fmt.Sprint(resp), nil
 
 }
@@ -122,15 +122,15 @@ func ComplexIDKeyExists(msg *NiasMessage) bool {
 		BirthDate:   rr.BirthDate,
 	}
 
-	log.Printf("ComplexIDKeyExists %s %v", ID_PREFIX+msg.TxID, ek)
-	log.Println("queried")
+	//log.Printf("ComplexIDKeyExists %s %v", ID_PREFIX+msg.TxID, ek)
+	//log.Println("queried")
 	//if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, ek); resp != nil {
 	if resp, _ := id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek)); resp == 0 {
-		log.Println("found")
+		//log.Println("found")
 		return true
 	}
 
-	log.Println("not found")
+	//log.Println("not found")
 	return false
 }
 
@@ -147,14 +147,14 @@ func ComplexIDKeySetnx(msg *NiasMessage) bool {
 		BirthDate:   rr.BirthDate,
 	}
 
-	log.Printf("ComplexIDKeySetnx %s %v", ID_PREFIX+msg.TxID, ek)
-	log.Println("queried")
+	//log.Printf("ComplexIDKeySetnx %s %v", ID_PREFIX+msg.TxID, ek)
+	//log.Println("queried")
 	if resp, err := goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek))); err != nil && resp == 0 {
-		log.Println("set")
+		//log.Println("set")
 		return true
 	}
 
-	log.Println("found")
+	//log.Println("found")
 	return false
 }
 
@@ -171,18 +171,18 @@ func ComplexIDKeySeen(msg *NiasMessage) (string, error) {
 		BirthDate:   rr.BirthDate,
 	}
 
-	log.Printf("ComplexIDKeySeen %s %v", ID_PREFIX+msg.TxID, ek)
-	log.Println("queried")
+	//log.Printf("ComplexIDKeySeen %s %v", ID_PREFIX+msg.TxID, ek)
+	//log.Println("queried")
 	resp, err := goredis.String(id_c.Do("get", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek)))
 	if err != nil {
-		log.Println("err")
+		//log.Println("err")
 		return "", err
 	}
 	if resp == msg.SeqNo {
-		log.Println("not found")
+		//log.Println("not found")
 		return "", errors.New("ID not seen")
 	}
-	log.Println("found")
+	//log.Println("found")
 	return fmt.Sprint(resp), nil
 }
 
@@ -195,14 +195,14 @@ func GetIDValue(msg *NiasMessage) (string, error) {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
-	log.Printf("GetIDValue %s %v", ID_PREFIX+msg.TxID, k)
-	log.Println("queried")
+	//log.Printf("GetIDValue %s %v", ID_PREFIX+msg.TxID, k)
+	//log.Println("queried")
 
 	if ol, err := goredis.String(id_c.Do("hget", ID_PREFIX+msg.TxID, k)); err != nil {
-		log.Println("not found")
+		//log.Println("not found")
 		return "", err
 	} else {
-		log.Println("found")
+		//log.Println("found")
 		return ol, nil
 	}
 
