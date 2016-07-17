@@ -27,6 +27,9 @@ func ASLKeyExists(msg *NiasMessage) bool {
 		return true
 	}
 
+    if(rr.ASLSchoolId == "") {
+        return true
+    }
 	return false
 }
 
@@ -41,16 +44,11 @@ func SimpleIDKeyExists(msg *NiasMessage) bool {
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
-	//log.Printf("SimpleIDKeyExists %s %v", ID_PREFIX+msg.TxID, k)
-	//log.Println("queried")
 
-	//if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, k); resp != nil {
-	if resp, _ := id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k), msg.SeqNo); resp == 0 {
-		//log.Println("found")
+	if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, k); resp != nil {
 		return true
 	}
 
-	//log.Println("not found")
 	return false
 
 }
@@ -99,11 +97,11 @@ func SimpleIDKeySeen(msg *NiasMessage) (string, error) {
 		return "", err
 	}
 	if resp == msg.SeqNo {
-		//log.Println("not found")
-		return "", errors.New("ID not seen")
+	    //log.Println("not found")
+		return "", nil
 	}
 	//log.Println("found")
-	return fmt.Sprint(resp), nil
+	return fmt.Sprint(resp), errors.New("ID already seen")
 
 }
 
@@ -122,15 +120,10 @@ func ComplexIDKeyExists(msg *NiasMessage) bool {
 		BirthDate:   rr.BirthDate,
 	}
 
-	//log.Printf("ComplexIDKeyExists %s %v", ID_PREFIX+msg.TxID, ek)
-	//log.Println("queried")
-	//if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, ek); resp != nil {
-	if resp, _ := id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek)); resp == 0 {
-		//log.Println("found")
+	if resp, _ := id_c.Do("hget", ID_PREFIX+msg.TxID, ek); resp != nil {
 		return true
 	}
 
-	//log.Println("not found")
 	return false
 }
 
@@ -158,6 +151,38 @@ func ComplexIDKeySetnx(msg *NiasMessage) bool {
 	return false
 }
 
+
+// SetNx simple and complex keys; return false if either found
+// SetNx complex key
+func SimpleAndComplexIDKeySetnx(msg *NiasMessage) bool {
+
+	rr := msg.Body.(RegistrationRecord)
+
+	k := IDSimpleKey{
+		LocalId:     rr.LocalId,
+		ASLSchoolId: rr.ASLSchoolId,
+	}
+	ek := IDExtendedKey{
+		LocalId:     rr.LocalId,
+		ASLSchoolId: rr.ASLSchoolId,
+		FamilyName:  rr.FamilyName,
+		GivenName:   rr.GivenName,
+		BirthDate:   rr.BirthDate,
+	}
+
+
+	//log.Printf("ComplexIDKeySetnx %s %v: %v", ID_PREFIX+msg.TxID, ek, msg.SeqNo)
+
+	resp, err := goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek), msg.SeqNo))
+	ret := (err == nil && resp == 1)
+	resp, err = goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k), msg.SeqNo))
+	//log.Printf(":: %v %v %v", resp, err, msg.SeqNo)
+	//log.Printf("%v %v %v\n", ret, err, resp)
+	ret = ret && (err == nil && resp == 1)	
+	return ret
+}
+
+
 // Seen complex key: its value is a msg.SeqNo other than the current one
 func ComplexIDKeySeen(msg *NiasMessage) (string, error) {
 
@@ -180,10 +205,10 @@ func ComplexIDKeySeen(msg *NiasMessage) (string, error) {
 	}
 	if resp == msg.SeqNo {
 		//log.Println("not found")
-		return "", errors.New("ID not seen")
+		return "", nil
 	}
-	//log.Println("found")
-	return fmt.Sprint(resp), nil
+	//log.Println("found: "+resp)
+	return fmt.Sprint(resp), errors.New("ID already seen")
 }
 
 // return the original line (ol) number that holds this identity if a duplicate

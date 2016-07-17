@@ -49,7 +49,7 @@ func TestBirthdateYearLevel(t *testing.T) {
 }
 
 func TestACARAIDandStateMismatch(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsACARAIDandStateMismatch.csv", "ASLSchoolID", "is a valid ID, but not for")
+	test_harness(t, "../unit_test_files/1studentsACARAIDandStateMismatch.csv", "ASLSchoolId", "is a valid ID, but not for")
 }
 
 func TestMissingSurname(t *testing.T) {
@@ -93,7 +93,7 @@ func TestExceedLengthHomeGrp(t *testing.T) {
 }
 
 func TestInvalidAcaraId(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsInvalidAcaraId.csv", "ASLSchoolID", "not found in ASL list of valid IDs")
+	test_harness(t, "../unit_test_files/1studentsInvalidAcaraId.csv", "ASLSchoolId", "not found in ASL list of valid IDs")
 }
 
 func TestInvalidCountryCodes(t *testing.T) {
@@ -277,29 +277,15 @@ func TestYearLevelTestLevelMismatch(t *testing.T) {
 }
 
 func TestDupGivenLastNameDOBCARAId(t *testing.T) {
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
+	for i := 0; i < 20; i++ {
+		test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
+	}
 }
 
 func TestDuplicateStudentOneSchool(t *testing.T) {
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
-	test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "Multiple (see description)", "otential duplicate of record")
+	for i := 0; i < 20; i++ {
+		test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "LocalID/ASL ID", "otential duplicate of record")
+	}
 }
 
 /* if errfield is nil, we expect test to pass */
@@ -329,7 +315,7 @@ func test_harness(t *testing.T, filename string, errfield string, errdescription
 		t.Fatalf("Error %s", err)
 	}
 	txid := dst["TxID"].(string)
-	time.Sleep(1 * time.Second)
+	time.Sleep(100 * time.Millisecond)
 	if err = customClient.Get(&bytebuf, "/naplan/reg/results/"+txid, nil); err != nil {
 		t.Fatalf("Error %s", err)
 	}

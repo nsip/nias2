@@ -39,7 +39,7 @@ func (asls *ASLService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 		desc := "ASL ID " + rr.ASLSchoolId + " not found in ASL list of valid IDs"
 		ve := ValidationError{
 			Description:  desc,
-			Field:        "ASLSchoolID",
+			Field:        "ASLSchoolId",
 			OriginalLine: req.SeqNo,
 			Vtype:        "asl",
 		}
@@ -61,7 +61,7 @@ func (asls *ASLService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 				desc := "ASL ID " + rr.ASLSchoolId + " is a valid ID, but not for " + rr.StateTerritory
 				ve := ValidationError{
 					Description:  desc,
-					Field:        "ASLSchoolID",
+					Field:        "ASLSchoolId",
 					OriginalLine: req.SeqNo,
 					Vtype:        "asl",
 				}

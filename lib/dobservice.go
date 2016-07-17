@@ -3,6 +3,7 @@ package nias2
 
 import (
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -64,6 +65,9 @@ func (dob *DOBService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 		log.Println("IDService received a message that is not a RegistrationRecord, ignoring")
 		return responses, nil
 	}
+	if rr.BirthDate == "" {
+		return responses, nil
+	}
 
 	t, err := time.Parse(dob.layout, rr.BirthDate)
 	// log.Println("Provided birth date is: ", t)
@@ -89,7 +93,11 @@ func (dob *DOBService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 		desc := ""
 		field := "BirthDate"
 		ok := true
+		matched, _ := regexp.MatchString("^([KFP0-9]|1[012]|UG|11MINUS|12PLUS|CC|K[34]|PS|UG(JunSec|Pri|Sec|SnrSec))$", yrlvl)
 		switch {
+		case !matched:
+			// will be rejected in schema
+			ok = true
 		case yrlvl == "P":
 			// log.Println("student is primary")
 			desc = "Year level supplied is P, does not match expected test level " + rr.TestLevel
@@ -112,14 +120,14 @@ func (dob *DOBService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 			ok = false
 		default:
 			field = "BirthDate"
-			if yrlvl != dob.calculateYearLevel(t) {
+			if yrlvl != "" && yrlvl != dob.calculateYearLevel(t) {
 				// log.Println("Student is in wrong yr level: ", yrlvl)
 				desc = "Student Year Level (yr " + yrlvl + ") does not match year level derived from BirthDate (yr " + dob.calculateYearLevel(t) + ")"
 				field = field + "/" + "YearLevel"
 				ok = false
 			}
 			tstlvl := rr.TestLevel
-			if tstlvl != dob.calculateYearLevel(t) {
+			if tstlvl != "" && tstlvl != dob.calculateYearLevel(t) {
 				// log.Println("Student is in wrong test level: ", tstlvl)
 				desc = "Student Test Level (yr " + tstlvl + ") does not match year level derived from BirthDate (yr " + dob.calculateYearLevel(t) + ")"
 				field = field + "/" + "TestLevel"

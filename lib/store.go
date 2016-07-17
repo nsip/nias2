@@ -22,7 +22,7 @@ type MessageStore struct {
 
 func NewMessageStore() *MessageStore {
 	ms := MessageStore{
-		C: CreateLedisConnection(),
+		C: CreateLedisConnection(1024, 1024),
 	}
 	return &ms
 }

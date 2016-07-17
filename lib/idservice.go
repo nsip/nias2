@@ -50,10 +50,11 @@ func (ids *IDService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 	}
 
 	// see if this id has been seen before
-	seen := SimpleIDKeySetnx(req)
-	if !seen {
+	if SimpleAndComplexIDKeySetnx(req) {
+		//seen := SimpleIDKeySetnx(req)
+		//if !seen {
 		// if not save this id and move on
-		ComplexIDKeySetnx(req)
+		//ComplexIDKeySetnx(req)
 		return responses, nil
 	}
 
