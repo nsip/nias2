@@ -3,7 +3,9 @@
 package nias2
 
 import (
+	"github.com/nats-io/go-nats-streaming"
 	"github.com/nats-io/nats"
+	"github.com/nats-io/nuid"
 	"log"
 )
 
@@ -13,7 +15,112 @@ import (
 const REQUEST_TOPIC = "requests"
 const STORE_TOPIC = "store"
 const TRACK_TOPIC = "track"
+const NIAS_CLUSTER_ID = "nias"
 
+var req_chan = make(chan *NiasMessage, 1)
+
+/*
+ProcessChains provide conceptual links between the major
+components of nias:
+
+inbound (distributor/dist) connections
+	represetnitng entry points for data such as a web gateway or file reader
+
+service (srvc) connections
+	multiplexing inbound data to service handlers
+
+storage (store) connections
+	feeding processed data to storage; streams or database
+
+*/
+
+// ProcessChain when running with NATS Streaming Server, known as STAN
+type STANProcessChain struct {
+	dist_in_conn     stan.Conn
+	dist_in_subject  string
+	dist_out_conn    stan.Conn
+	dist_out_subject string
+
+	srvc_in_conn     stan.Conn
+	srvc_in_subject  string
+	srvc_out_conn    stan.Conn
+	srvc_out_subject string
+
+	store_in_conn    stan.Conn
+	store_in_subject string
+}
+
+// ProcessChain for running with standard NATS
+type NATSProcessChain struct {
+	dist_in_conn     *nats.EncodedConn
+	dist_in_subject  string
+	dist_out_conn    *nats.EncodedConn
+	dist_out_subject string
+
+	srvc_in_conn     *nats.EncodedConn
+	srvc_in_subject  string
+	srvc_out_conn    *nats.EncodedConn
+	srvc_out_subject string
+
+	store_in_conn    *nats.EncodedConn
+	store_in_subject string
+}
+
+// ProcessChain for running in memory - useful for standaloe use
+// and for resource constrained enviornments, use of blocking channels accross
+// the chain means solution will balance processing accross the chain based on
+// speed of host
+type MemProcessChain struct {
+	req_chan   chan *NiasMessage
+	srvc_chan  chan *NiasMessage
+	store_chan chan *NiasMessage
+}
+
+func NewMemProcessChain() MemProcessChain {
+	mpc, _ := createMemProcessChain()
+	return mpc
+}
+
+func createMemProcessChain() (MemProcessChain, error) {
+
+	pc := MemProcessChain{}
+
+	pc.req_chan = req_chan
+	pc.srvc_chan = make(chan *NiasMessage, 1)
+	pc.store_chan = make(chan *NiasMessage, 1)
+
+	return pc, nil
+
+}
+
+func NewNATSProcessChain() NATSProcessChain {
+	npc, _ := createNATSProcessChain()
+	return npc
+}
+
+func createNATSProcessChain() (NATSProcessChain, error) {
+
+	pc := NATSProcessChain{}
+
+	distID := nuid.Next()
+	pc.dist_in_conn = CreateNATSConnection()
+	pc.dist_out_conn = CreateNATSConnection()
+	pc.dist_in_subject = REQUEST_TOPIC
+	pc.dist_out_subject = distID
+
+	srvcID := nuid.Next()
+	pc.srvc_in_conn = CreateNATSConnection()
+	pc.srvc_out_conn = CreateNATSConnection()
+	pc.srvc_in_subject = distID
+	pc.srvc_out_subject = srvcID
+
+	pc.store_in_conn = CreateNATSConnection()
+	pc.store_in_subject = srvcID
+
+	return pc, nil
+}
+
+// helper function to provide encoded connections for standard NATA
 func CreateNATSConnection() *nats.EncodedConn {
 	nc, err := nats.Connect(nats.DefaultURL)
 	ec, err := nats.NewEncodedConn(nc, nats.GOB_ENCODER)
@@ -22,4 +129,31 @@ func CreateNATSConnection() *nats.EncodedConn {
 	}
 	return ec
 
+}
+
+func NewSTANProcessChain() STANProcessChain {
+	spc, _ := createSTANProcessChain()
+	return spc
+}
+
+func createSTANProcessChain() (STANProcessChain, error) {
+
+	pc := STANProcessChain{}
+
+	distID := nuid.Next()
+	pc.dist_in_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
+	pc.dist_out_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
+	pc.dist_in_subject = REQUEST_TOPIC
+	pc.dist_out_subject = distID
+
+	srvcID := nuid.Next()
+	pc.srvc_in_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
+	pc.srvc_out_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
+	pc.srvc_in_subject = distID
+	pc.srvc_out_subject = srvcID
+
+	pc.store_in_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
+	pc.store_in_subject = srvcID
+
+	return pc, nil
 }

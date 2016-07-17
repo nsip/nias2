@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo/engine/standard"
 	mw "github.com/labstack/echo/middleware"
 	ms "github.com/mitchellh/mapstructure"
+	"github.com/nats-io/go-nats-streaming"
 	"github.com/nats-io/nats"
 	"github.com/nats-io/nuid"
 	"github.com/twinj/uuid"
@@ -27,7 +28,8 @@ import (
 )
 
 var VALIDATION_ROUTE = NiasConfig.ValidationRoute
-var web_ec *nats.EncodedConn
+var req_ec *nats.EncodedConn
+var req_conn stan.Conn
 
 // rendering template for csv-xml conversion
 var sptmpl *template.Template
@@ -55,6 +57,23 @@ func removeBlanks(m map[string]string) map[string]string {
 	return reducedmap
 }
 
+// generic publish routine that handles different requirements
+// of the 3 possible message infrastrucutres
+func publish(msg *NiasMessage) {
+
+	switch NiasConfig.MsgTransport {
+	case "MEM":
+		req_chan <- msg
+	case "NATS":
+		req_ec.Publish(REQUEST_TOPIC, msg)
+	case "STAN":
+		req_conn.Publish(REQUEST_TOPIC, EncodeNiasMessage(msg))
+	default:
+		req_chan <- msg
+	}
+
+}
+
 // read csv file as stream an post records onto processing queue
 func enqueueCSV(file multipart.File) (IngestResponse, error) {
 
@@ -71,13 +90,10 @@ func enqueueCSV(file multipart.File) (IngestResponse, error) {
 
 		regr := RegistrationRecord{}
 		r := removeBlanks(record.AsMap())
-		// log.Printf("record is:\n%v\n", r)
-		//decode_err := ms.Decode(record.AsMap(), &regr)
 		decode_err := ms.Decode(r, &regr)
 		if decode_err != nil {
 			return ir, decode_err
 		}
-		// log.Printf("regr is:\n%v\n", regr)
 
 		msg := &NiasMessage{}
 		msg.Body = regr
@@ -87,7 +103,8 @@ func enqueueCSV(file multipart.File) (IngestResponse, error) {
 		msg.Target = VALIDATION_PREFIX
 		msg.Route = VALIDATION_ROUTE
 
-		web_ec.Publish(REQUEST_TOPIC, msg)
+		publish(msg)
+
 	}
 
 	ir.Records = i
@@ -132,7 +149,10 @@ func enqueueXML(file multipart.File) (IngestResponse, error) {
 				msg.Target = VALIDATION_PREFIX
 				msg.Route = VALIDATION_ROUTE
 
-				web_ec.Publish(REQUEST_TOPIC, msg)
+				// xml_ec.Publish(REQUEST_TOPIC, msg)
+				// xml_conn.Publish(REQUEST_TOPIC, EncodeNiasMessage(msg))
+				// req_chan <- msg
+				publish(msg)
 
 			}
 		default:
@@ -150,8 +170,13 @@ func enqueueXML(file multipart.File) (IngestResponse, error) {
 // start the server
 func (nws *NIASWebServer) Run() {
 
-	log.Println("Connecting to NATS server")
-	web_ec = CreateNATSConnection()
+	log.Println("Connecting to message bus")
+	switch NiasConfig.MsgTransport {
+	case "NATS":
+		req_ec = CreateNATSConnection()
+	case "STAN":
+		req_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
+	}
 
 	log.Println("Initialising uuid generator")
 	config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}

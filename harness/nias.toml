@@ -9,5 +9,9 @@ ValidationRoute = ["schema", "id", "dob", "asl"]
 # Webserver port
 WebServerPort = "1325"
 
-# Number of validation engines
-PoolSize = 4
+# Performance Parameters
+PoolSize = 10
+# "MEM | NATS" | "STAN" are alternatives depending on deployment model
+MsgTransport = "MEM"      
+
+

@@ -15,11 +15,17 @@ const VALIDATION_PREFIX = "nvr:"
 // MessageStore listens for messages on the store topic and captures them
 // in ledis as lists (persistent qs in effect), messages can be stored on transaction
 // and use case basis - use case being the superset of all transactions of a given type
-type MessageStore struct{}
+type MessageStore struct {
+	C    *goredis.Client
+	trkC *goredis.Client
+}
 
-// MessageTracker listens for progress updates from services and
-// updates progress monitor in ledis
-type MessageTracker struct{}
+func NewMessageStore() *MessageStore {
+	ms := MessageStore{
+		C: CreateLedisConnection(),
+	}
+	return &ms
+}
 
 // track status in simple hash counter; key is transactionid, value is no. records processed
 var status = make(map[string]int)
@@ -27,54 +33,35 @@ var status = make(map[string]int)
 // mutex to protect status hash for concurrent updates
 var mutex = &sync.Mutex{}
 
-// launch a set of storage agents that will listen for messages to store
-func (ms *MessageStore) Run(poolsize int) {
+// put message into ledis store
+// endcode converts nias message to byte array for storage
+func (ms *MessageStore) StoreMessage(m *NiasMessage) {
 
-	ms_ec := CreateNATSConnection()
-	for i := 0; i < poolsize; i++ {
-		c := CreateLedisConnection(1024, 1024)
-		// defer c.Close()
-		ms_ec.QueueSubscribe(STORE_TOPIC, "msg_store", func(m *NiasMessage) {
-			// don't store if no content
-			if m.Body != nil {
-
-				// store for txaction
-				tx_key := m.Target + m.TxID
-				_, err := c.Do("rpush", tx_key, EncodeNiasMessage(m))
-				if err != nil {
-					log.Println("error saving message:tx: - ", err)
-				}
-
-				// store for use case - disabled for now
-				store_usecase := false
-				if store_usecase {
-					uc_key := m.Target
-					_, err := c.Do("rpush", uc_key, EncodeNiasMessage(m))
-					if err != nil {
-						log.Println("error saving message:uc - ", err)
-					}
-				}
-
-			}
-
-		})
+	// store for txaction
+	tx_key := m.Target + m.TxID
+	_, err := ms.C.Do("rpush", tx_key, EncodeNiasMessage(m))
+	if err != nil {
+		log.Println("error saving message:tx: - ", err)
 	}
+
+	// store for use case - disabled for now - in config
+	store_usecase := false
+	if store_usecase {
+		uc_key := m.Target
+		_, err := ms.C.Do("rpush", uc_key, EncodeNiasMessage(m))
+		if err != nil {
+			log.Println("error saving message:uc - ", err)
+		}
+	}
+
 }
 
-// create a set of progress trackers to monitor services' progress
-func (mt *MessageTracker) Run(poolsize int) {
+// update the progress of the validation transaction
+func (ms *MessageStore) IncrementTracker(txid string) {
 
-	mt_ec := CreateNATSConnection()
-	for i := 0; i < poolsize; i++ {
-
-		mt_ec.QueueSubscribe(TRACK_TOPIC, "msg_tracker", func(txid string) {
-
-			mutex.Lock()
-			status[txid]++
-			mutex.Unlock()
-
-		})
-	}
+	mutex.Lock()
+	status[txid]++
+	mutex.Unlock()
 
 }
 
@@ -123,8 +110,7 @@ func GetTrackingData(txid string) map[string]string {
 	return trackmap
 }
 
-// binary encding for messages going to internal q/store, in nats qs this is
-// handled automatically by the use of gob encoder on connection
+// binary encding for messages going to internal q/store.
 func EncodeNiasMessage(msg *NiasMessage) []byte {
 
 	encBuf := new(bytes.Buffer)
@@ -137,8 +123,7 @@ func EncodeNiasMessage(msg *NiasMessage) []byte {
 
 }
 
-// binary encding for messages coming from internal q/store, in nats qs this is
-// handled automatically by the use of gob encoder on connection
+// binary decoding for messages coming from internal q/store.
 func DecodeNiasMessage(bytemsg []uint8) *NiasMessage {
 
 	decBuf := bytes.NewBuffer(bytemsg)

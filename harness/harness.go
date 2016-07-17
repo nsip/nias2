@@ -25,18 +25,17 @@ func main() {
 
 	log.Println("Starting distributor....")
 	dist := nias2.Distributor{}
-	go dist.Run(poolsize)
+	switch nias2.NiasConfig.MsgTransport {
+	case "MEM":
+		go dist.RunMemBus(poolsize)
+	case "NATS":
+		go dist.RunNATSBus(poolsize)
+	case "STAN":
+		go dist.RunSTANBus(poolsize)
+	default:
+		go dist.RunMemBus(poolsize)
+	}
 	log.Println("...Distributor running")
-
-	log.Println("Starting storage agent...")
-	msg_store := &nias2.MessageStore{}
-	go msg_store.Run(poolsize)
-	log.Println("...Storage engine running")
-
-	log.Println("Starting progress tracker...")
-	msg_trk := &nias2.MessageTracker{}
-	go msg_trk.Run(poolsize)
-	log.Println("...progress tracker running")
 
 	log.Println("Starting web services...")
 	ws := &nias2.NIASWebServer{}
