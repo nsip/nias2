@@ -50,15 +50,16 @@ func (ids *IDService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 	}
 
 	// see if this id has been seen before
-	ol, _ := GetIDValue(req)
-	if ol == "" {
+	if SimpleAndComplexIDKeySetnx(req) {
+		//seen := SimpleIDKeySetnx(req)
+		//if !seen {
 		// if not save this id and move on
-		SetIDValue(req)
+		//ComplexIDKeySetnx(req)
 		return responses, nil
 	}
 
 	// if the record exists, check simple & complex matches
-	if ComplexIDKeyExists(req) {
+	if ol, err := ComplexIDKeySeen(req); err != nil {
 		desc := "Potential duplicate of record: " + ol + "\n" +
 			"based on matching: student local id, school asl id, family & given names and birthdate"
 		ve := ValidationError{
@@ -74,9 +75,7 @@ func (ids *IDService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 		r.Body = ve
 		responses = append(responses, r)
 
-	}
-
-	if SimpleIDKeyExists(req) {
+	} else if ol, err := SimpleIDKeySeen(req); err != nil {
 		desc := "LocalID (Student) and ASL ID (School) are potential duplicate of record: " + ol
 
 		ve := ValidationError{

@@ -12,7 +12,7 @@ import (
 
 const DEF_ADDRESS = "127.0.0.1:6380"
 
-func CreateLedisConnection() *goredis.Client {
+func CreateLedisConnection(readBufferSize int, writeBufferSize int) *goredis.Client {
 
 	c := goredis.NewClient(DEF_ADDRESS, "")
 	// connection pool size within the client
