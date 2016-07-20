@@ -1,5 +1,5 @@
 # nias2
-NIAS. golang naplan registration modules.
+NIAS: golang naplan registration modules.
 
 This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components, specific to NAPLAN validation. It uses
 [NATS](http://nats.io) queues. This module is currently limited to NAPLAN registration validation.
@@ -34,69 +34,99 @@ the processes are stored in `nias.pid`.
 
 In Windows, `gonias.bat` launches the required processes for an examination year of 2017, and `gonias.bat` launches the required processes for an examination year of 2016.
 
+The web interface to the validator can be accessed at `http://localhost:1325` by default; you can configure the Web Server Port in `nias.toml`
+
 # Code Structure
 
-`aggregator`
-* Contains the web service coordinating the microservices. Runs on localhost:1234.
-* Paths:
-  * `/validation`: validation page
-  * `/naplan/reg/:stateID`: endpoint to post input CSV files to
-  * `/statusfeed/:txID`: SSE endpoint for status/progress updates for transaction txID
-  * `/readyfeed/:txID`: SEE endpoint to announce when all messages in a transaction have been processed
-  * `/data/:txID`: errors data for a given transaction
+NIAS2 relies on the following infrastructure:
+* [ledis](http://ledisdb.com), a NoSQL database similar to [redis](http://redis.io)
 
-`aslvalidator`
-* Validates the ACARA School IDs against the ASL schools list for the given state
-* Flags:
-  * `-s`: The NATS server URLs (comma-delimited) [Default: `nats.DefaultURL`]
-  * `-t`: Whether to display timestamps [Default: `false`]
-  * `-vtype`: Validation type [Default: `ASL`]
-  * `-topic`: Root topic name to subscribe to [Default: `validation`]
-  * `-qGroup`: The consumer group to join for parallel processing [Default: `aslvalidation`]
-  * `-state`: The state identifier for this service (VIC, SA, NT, WA, ACT, TAS, NSW, QLD) [Default: `naplan`]
+`unit_test_files/`
+* Contains files used in unit/integration testing of the code. Currently restricted to CSV files input into the validation module.
 
-`aslvalidator/schoolslist`
-* The ASL schools list used for validation
+`build.sh`, `build/`, `release.sh`
+* `build.sh` is the script to build NIAS2 executables for the various supported platforms. The builds for each platform are built in `build/PLATFORM/go-nias/`. 
+* The `release.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including those binary files. 
+* The supported platforms are: 
+  * Mac OSX
+  * Windows 32 bit
+  * Windows 64 bit
+  * Linux 32 bit
+  * Linux 64 bit.
 
-`dobvalidator`
-* Validates the Date of Birth of the student for the given examination year
-* Flags:
-  * `-s`: The NATS server URLs (comma-delimited) [Default: `nats.DefaultURL`]
-  * `-t`: Whether to display timestamps [Default: `false`]
-  * `-vtype`: Validation type [Default: `date`]
-  * `-topic`: Root topic name to subscribe to [Default: `validation`]
-  * `-qGroup`: The consumer group to join for parallel processing [Default: `aslvalidation`]
-  * `-state`: The state identifier for this service (VIC, SA, NT, WA, ACT, TAS, NSW, QLD) [Default: `naplan`]
-  * `-tstyr`: The year in which the test will occur; used to baseline the year/test level age range windows [Default: `2017`]
+`bin/`
+Contains the scripts and batch files to start and stop running NIAS. These are copied into the builds for each platform:
+  * `gonias.sh`: launch NIAS (OSX, Linux)
+  * `gonias.bat`: launch NIAS (Windows)
+  * `stopnias.sh`: stop NIAS (OSX, Linux)
+  * `stopnias.bat`: stop NIAS (Windows)
 
-`idvalidator`
-* Validates the identities in the file for possible duplicates
-* Flags:
-  * `-s`: The NATS server URLs (comma-delimited) [Default: `nats.DefaultURL`]
-  * `-t`: Whether to display timestamps [Default: `false`]
-  * `-vtype`: Validation type [Default: `identity`]
-  * `-topic`: Root topic name to subscribe to [Default: `validation`]
-  * `-qGroup`: The consumer group to join for parallel processing [Default: `aslvalidation`]
-  * `-state`: The state identifier for this service (VIC, SA, NT, WA, ACT, TAS, NSW, QLD) [Default: `naplan`]
+`tools/`
+Contains utilities for managing NIAS2
+  * `release.go` creates a new release of the NIAS2 code on github.
 
-`schemavalidator`
-* Validates the data against schemas
-* Flags:
-  * `-s`: The NATS server URLs (comma-delimited) [Default: `nats.DefaultURL`]
-  * `-t`: Whether to display timestamps [Default: `false`]
-  * `-vtype`: Validation type [Default: `ASL`]
-  * `-topic`: Root topic name to subscribe to [Default: `validation`]
-  * `-qGroup`: The consumer group to join for parallel processing [Default: `aslvalidation`]
-  * `-state`: The state identifier for this service (VIC, SA, NT, WA, ACT, TAS, NSW, QLD) [Default: `naplan`]
-  * `-jsonSchema`: The schema file to be used for validation by this instance of the validator [Default: 'core.json`]
+`harness/`
+Contains the code to run NIAS2 as a single piece of software, along with necessary configuration files. The configuration fields are copied into the binary distributions of NIAS.
+  * `harness.go` : launches the base microservices of NIAS:
+    * ledis, the NoSQL database
+    * the ASL lookup service
+    * the distributor service
+    * the web server
+  * `validator_test.go` : runs unit/integration tests for validation
+    
+`harness/nias.toml` 
+Configuration file for NIAS:
+  * TestYear: the baseline year for date of birth validation 
+  * ValidationRoute: the validators to which every incoming message is sent
+      * `schema`: schema validation against `core.json`  
+      * `local`: schema validation against `local.json` 
+      * `id`: identity validation (detection of duplicates)
+      * `dob`: date of birth validation
+      * `asl`: check of validity of ASL school identifers
+  * WebServerPort: the port on which the NIAS web server runs
+  * PoolSize: the number of parallel connections run in the microservice distributor
+  * MsgTransport: the connection mode used for the microservice distributor
+      * `MEM`:
+      * `NATS`: [NATS Server](http://nats.io/documentation/server/gnatsd-intro/)
+      * `STAN`: [NATS Streaming Server](http://nats.io/documentation/streaming/nats-streaming-intro/)
 
-`schemavalidator/schemas`
-Schemas used for validation of registration data
+Configuration files:
+  * `harness/schemas/` : Schemas for validating incoming messages. CSV is converted to JSON, and is validated against JSON Schema:
+    * `core.json`: The schema for NAPLAN registration records.
+    * `local.json`: Dummy schema for local validation of NAPLAN registration records. Can be used to impose more restrictive conditions on validation, to satisfy local requirements.
+  * `harness/schoolslist/` : Contains CSV export of the [Australian Schools List](http://asl.acara.edu.au), using in validation
+  * `harness/templates/` : Contains templates for populating SIF XML
+  * `harness/var/` : Contains ledis database instance
+  * `harness/public/` : Contains web server site, including CSS and Javascript
+  
+`lib/`
+Microservices invoked by NIAS via `harness/harness.go`
+* `ledis.go` : Launch the ledis database
+* `aslservice.go` : Validate the ASL school identifiers in a registration record against the ASL data in `harness/schoolslist/`
+* `webserver.go` : Launch web service to deal with RESTful queries for validation. 
+ 
 
-`schemavalidator/schemas/core.json`
-JSON-Schema of registration data with global applicability
 
-`schemavalidator/schemas/local.json`
-JSON-Schema of registration data specific to the jurisdiction
+#API
+
+## Supported Queries
+* `POST /naplan/reg/validate` : validate the record(s), whether in XML or CSV. This involves publishing the records received onto the microservice bus, with the configured list of validators as the message route. Blank entries are stripped.
+* `POST /naplan/reg/convert` : convert the record(s) from CSV to XML, using the templates in  `harness/templates/`. Response is the XML records.
+* `GET /naplan/reg/status/:txid` : receive a status report for the validation request with transmission identifier `:txid`
+* `GET /naplan/reg/results/:txid` : receive the analysis results for the validation request with transmission identifier `:txid`
+* `GET /naplan/reg/results/:txid/:fname` : receive the analysis results for the validation request with transmission identifier `:txid`, as a CSV file to be named `:fname`
+
+
+## Format
+* Ingest Response: response to `POST /naplan/reg/validate`. JSON object:
+  * record count (`Records`)
+  * transmission identifier (`TxID`). The transmission identifier applies to the specific payload.
+* NIAS Message: metadata for any message sent on the microservice bus:
+  * Body: message content
+  * SeqNo: sequence number of the message within the transmission (corresponding to a single REST payload)
+  * TxID: transmission identifier (GUID) for the REST payload
+  * MsgID: GUID for the message
+  * Target: namespace on ledis under which messages will be stored
+  * Route: sequence of microservices that the message is to be passed to. Assumed to be in parallel
 
 
