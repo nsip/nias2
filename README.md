@@ -86,7 +86,7 @@ Configuration file for NIAS:
   * WebServerPort: the port on which the NIAS web server runs
   * PoolSize: the number of parallel connections run in the microservice distributor
   * MsgTransport: the connection mode used for the microservice distributor
-      * `MEM`:
+      * `MEM`: in-memory processing, no persistent queue
       * `NATS`: [NATS Server](http://nats.io/documentation/server/gnatsd-intro/)
       * `STAN`: [NATS Streaming Server](http://nats.io/documentation/streaming/nats-streaming-intro/)
 
@@ -100,11 +100,28 @@ Configuration files:
   * `harness/public/` : Contains web server site, including CSS and Javascript
   
 `lib/`
-Microservices invoked by NIAS via `harness/harness.go`
-* `ledis.go` : Launch the ledis database
-* `aslservice.go` : Validate the ASL school identifiers in a registration record against the ASL data in `harness/schoolslist/`
-* `webserver.go` : Launch web service to deal with RESTful queries for validation. 
- 
+* Microservices invoked by NIAS directly via `harness/harness.go`
+  * `ledis.go` : Launch the ledis database
+  * `aslservice.go` : Validate the ASL school identifiers in a registration record against the ASL data in `harness/schoolslist/`
+  * `webserver.go` : Launch web service to deal with RESTful queries for validation. 
+  * `distributor.go` : Launch a pool of message handlers to deal with incoming messages, as the microservice bus. 
+    * The pool involves instances of NATS Server, NATS Streaming Server, or internal memory channels. 
+    * The distributor handles incoming requests as a multiplexer (from "requests" subject to the _distID_ subject: a new GUID)
+    * The distributor assigns incoming messages (from the _distID_ subject) for processing by the sequence of microservices named in the message's Route attribute; the output of each named microservice is published to the _srvcID_ subject (a new GUID).
+    * The distributor stores incoming messages to ledis (from the _srvcID_ subject).
+    * This means that all microservice outputs are output to ledis.
+* Microservices invoked by NIAS via the message Route attribute 
+  * `dobservice.go` : Date of Birth validator
+  * `idservice.go` : Check each message in a transmission for uniqueness within the transmission. Check involves two keys: (LocalId, ASLSchoolId), and (LocalId, ASLSchoolId, FamilyName, GivenName, BirthDate).
+  * `schemaservice.go` : Validate a message against either the core JSON schema or the local JSON schema. The service replaces some JSON Schema error messages with custom messages.
+* Support code
+  * `nats.go` : Connector code for NATS, involving connectors to storage (store), service handlers (srv), and inbound distributors from the web gateway (dist).
+  * `niasmessage.go` : NIAS Message wrapper types
+  * `config.go` : read in the NIAS configuration file (`harness/nias.toml`)
+  * `vtypes.go` : common types used for validation. Includes the validation error type, and the registration record type (all fields in NAPLAN).
+  * `store.go` : 
+* service.go
+* serviceregister.go
 
 
 #API
@@ -127,6 +144,11 @@ Microservices invoked by NIAS via `harness/harness.go`
   * TxID: transmission identifier (GUID) for the REST payload
   * MsgID: GUID for the message
   * Target: namespace on ledis under which messages will be stored
-  * Route: sequence of microservices that the message is to be passed to. Assumed to be in parallel
-
+  * Route: sequence of microservices that the message is to be passed to. _(Chaining of microservices is not currently supported)_
+* NIAS Error Message: as for NIAS Message
+  * Body: 
+    * Description: description of the validation error
+    * Field: field in which the validation error was found
+    * OriginalLine: Line of the transmission payload in which the validation error was found
+    * Vtype: Validation error type
 
