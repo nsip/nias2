@@ -1,14 +1,15 @@
 # nias2
 NIAS. golang naplan registration modules.
 
-TODO - Update for nias2
+This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components, specific to NAPLAN validation. It uses
+[NATS](http://nats.io) queues. This module is currently limited to NAPLAN registration validation.
+
+NSIP plans to to expand NIAS2 to cover the full range of functionality of [NIAS](http://github.com/nsip/nias), porting them from Ruby and Kafka to Golang and NATS. This will substantially improve performance and robustness of the code. 
 
 Install
 * go version 1.6+
 * ````go get github.com/pwaller/goupx````
 
-This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components, specific to NAPLAN validation. It uses
-[NATS](http://nats.io) queues. This module is currently limited to NAPLAN registration validation.
 
 # Installation
 
