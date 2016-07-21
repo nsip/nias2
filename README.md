@@ -119,9 +119,9 @@ Configuration files:
   * `niasmessage.go` : NIAS Message wrapper types
   * `config.go` : read in the NIAS configuration file (`harness/nias.toml`)
   * `vtypes.go` : common types used for validation. Includes the validation error type, and the registration record type (all fields in NAPLAN).
-  * `store.go` : 
-* service.go
-* serviceregister.go
+  * `store.go` : code to store messages in ledis. Has mutex support. 
+  * `service.go` : interface to handle message requests: request, response, errors
+  * `serviceregister.go` : registry of microservices, mapping Route keys to service instances, and with code for processing messages according to their Route attribute
 
 
 #API
@@ -133,6 +133,8 @@ Configuration files:
 * `GET /naplan/reg/results/:txid` : receive the analysis results for the validation request with transmission identifier `:txid`
 * `GET /naplan/reg/results/:txid/:fname` : receive the analysis results for the validation request with transmission identifier `:txid`, as a CSV file to be named `:fname`
 
+## Database
+* All messages published to storage as outputs of the distributor are stored in ledis under a list (`rpush`) with the key of `nvr:` followed by the transmission ID. That means that the key for a transmission will access a list of each consecutive microservice output, for each record in that transmission.
 
 ## Format
 * Ingest Response: response to `POST /naplan/reg/validate`. JSON object:
