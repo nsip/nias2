@@ -18,6 +18,9 @@ var asl_c = CreateLedisConnection(1024, 1024)
 const ID_PREFIX = "id:"
 const ASL_KEY = "asl:lookup"
 
+// seconds until key expires, for expirable keys
+const KEY_EXPIRATION = 100000
+
 // asl lookup
 func ASLKeyExists(msg *NiasMessage) bool {
 
@@ -27,9 +30,9 @@ func ASLKeyExists(msg *NiasMessage) bool {
 		return true
 	}
 
-    if(rr.ASLSchoolId == "") {
-        return true
-    }
+	if rr.ASLSchoolId == "" {
+		return true
+	}
 	return false
 }
 
@@ -67,7 +70,7 @@ func SimpleIDKeySetnx(msg *NiasMessage) bool {
 	//log.Printf("SimpleIDKeySetnx %s %v", ID_PREFIX+msg.TxID, k)
 	//log.Println("queried")
 
-	resp, err = goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k), msg.SeqNo))
+	resp, err = goredis.Int(id_c.Do("set", fmt.Sprintf("%s%s::%v NX EX %d", ID_PREFIX, msg.TxID, k, KEY_EXPIRATION), msg.SeqNo))
 	//log.Printf(":: %v %v %v", resp, err, msg.SeqNo)
 	if err == nil && resp == 0 {
 		//log.Println("set")
@@ -97,7 +100,7 @@ func SimpleIDKeySeen(msg *NiasMessage) (string, error) {
 		return "", err
 	}
 	if resp == msg.SeqNo {
-	    //log.Println("not found")
+		//log.Println("not found")
 		return "", nil
 	}
 	//log.Println("found")
@@ -142,7 +145,8 @@ func ComplexIDKeySetnx(msg *NiasMessage) bool {
 
 	//log.Printf("ComplexIDKeySetnx %s %v", ID_PREFIX+msg.TxID, ek)
 	//log.Println("queried")
-	if resp, err := goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek))); err != nil && resp == 0 {
+	//if resp, err := goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek))); err != nil && resp == 0 {
+	if resp, err := goredis.Int(id_c.Do("set", fmt.Sprintf("%s%s::%v NX EX %d", ID_PREFIX, msg.TxID, ek, KEY_EXPIRATION))); err != nil && resp == 0 {
 		//log.Println("set")
 		return true
 	}
@@ -150,7 +154,6 @@ func ComplexIDKeySetnx(msg *NiasMessage) bool {
 	//log.Println("found")
 	return false
 }
-
 
 // SetNx simple and complex keys; return false if either found
 // SetNx complex key
@@ -170,7 +173,6 @@ func SimpleAndComplexIDKeySetnx(msg *NiasMessage) bool {
 		BirthDate:   rr.BirthDate,
 	}
 
-
 	//log.Printf("ComplexIDKeySetnx %s %v: %v", ID_PREFIX+msg.TxID, ek, msg.SeqNo)
 
 	resp, err := goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, ek), msg.SeqNo))
@@ -178,10 +180,9 @@ func SimpleAndComplexIDKeySetnx(msg *NiasMessage) bool {
 	resp, err = goredis.Int(id_c.Do("setnx", fmt.Sprintf("%s%s::%v", ID_PREFIX, msg.TxID, k), msg.SeqNo))
 	//log.Printf(":: %v %v %v", resp, err, msg.SeqNo)
 	//log.Printf("%v %v %v\n", ret, err, resp)
-	ret = ret && (err == nil && resp == 1)	
+	ret = ret && (err == nil && resp == 1)
 	return ret
 }
-
 
 // Seen complex key: its value is a msg.SeqNo other than the current one
 func ComplexIDKeySeen(msg *NiasMessage) (string, error) {

@@ -74,7 +74,7 @@ func publish(msg *NiasMessage) {
 
 }
 
-// read csv file as stream an post records onto processing queue
+// read csv file as stream and post records onto processing queue
 func enqueueCSV(file multipart.File) (IngestResponse, error) {
 
 	ir := IngestResponse{}
@@ -114,7 +114,7 @@ func enqueueCSV(file multipart.File) (IngestResponse, error) {
 
 }
 
-// read xml file as stream an post records onto processing queue
+// read xml file as stream and post records onto processing queue
 func enqueueXML(file multipart.File) (IngestResponse, error) {
 
 	ir := IngestResponse{}
