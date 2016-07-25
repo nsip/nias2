@@ -83,6 +83,7 @@ Configuration file for NIAS:
       * `id`: identity validation (detection of duplicates)
       * `dob`: date of birth validation
       * `asl`: check of validity of ASL school identifers
+      * `psi`: check of validity of Platform Student Identifier checksums
   * WebServerPort: the port on which the NIAS web server runs
   * PoolSize: the number of parallel connections run in the microservice distributor
   * MsgTransport: the connection mode used for the microservice distributor

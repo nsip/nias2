@@ -75,11 +75,17 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create asl service ", err)
 	}
 
+	psi1, err := NewPsiService()
+	if err != nil {
+		log.Fatal("Unable to create psi service ", err)
+	}
+
 	sr.AddService("schema", schema1)
 	sr.AddService("local", schema2)
 	sr.AddService("id", id1)
 	sr.AddService("dob", dob1)
 	sr.AddService("asl", asl1)
+	sr.AddService("psi", psi1)
 
 	log.Println("services created & installed in register")
 

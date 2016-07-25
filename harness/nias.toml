@@ -4,7 +4,7 @@ TestYear = "2017"
 
 # Validations to invoke
 # ValidationRoute = ["schema", "local", "id", "dob", "asl"]
-ValidationRoute = ["schema", "id", "dob", "asl"]
+ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
 
 # Webserver port
 WebServerPort = "1325"

@@ -272,6 +272,14 @@ func TestUnusualLanguageCodes(t *testing.T) {
 	test_harness(t, "../unit_test_files/3studentsUnusualLanguageCodes.csv", "", "")
 }
 
+func TestWrongChecksumPlatformId(t *testing.T) {
+	test_harness(t, "../unit_test_files/1WrongChecksumPlatformId.csv", "PlatformId", "Platform ID has incorrect checksum")
+}
+
+func TestWrongChecksumPreviousPlatformId(t *testing.T) {
+	test_harness(t, "../unit_test_files/1WrongChecksumPrevPlatformId.csv", "PreviousPlatformId", "Previous Platform ID has incorrect checksum")
+}
+
 func TestYearLevelTestLevelMismatch(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
 }
