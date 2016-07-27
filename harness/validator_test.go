@@ -16,13 +16,6 @@ import (
 
 var customClient *rest.Client
 
-/*
-func TestPrivacy(t *testing.T) {
-	test_harness_xml(t, "../unit_test_files/5students.xml", "Sex", "Sex is required")
-}
-*/
-
-/*
 func TestSexMissingMandatory(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsMissingMandatorySex.csv", "Sex", "Sex is required")
 }
@@ -302,7 +295,7 @@ func TestDuplicateStudentOneSchool(t *testing.T) {
 		test_harness(t, "../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "LocalID/ASL ID", "otential duplicate of record")
 	}
 }
-*/
+
 /* if errfield is nil, we expect test to pass */
 func test_harness(t *testing.T, filename string, errfield string, errdescription string) {
 	var f *os.File

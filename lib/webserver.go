@@ -435,6 +435,34 @@ func (nws *NIASWebServer) Run() {
 		}
 		return c.JSON(http.StatusOK, msgs)
 	})
+	e.Get("/sifxml/ingest/low", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"low::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/medium", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"medium::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/high", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"high::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/extreme", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"extreme::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
 
 	// get the validation errors data for a given transaction as a downloadable csv file
 	e.Get("/naplan/reg/report/:txID/:fname", func(c echo.Context) error {

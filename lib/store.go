@@ -47,7 +47,8 @@ func (ms *MessageStore) StoreMessage(m *NiasMessage) {
 	//log.Printf("Storing under %s\n", tx_key)
 
 	// store for use case - disabled for now - in config
-	store_usecase := false
+	//store_usecase := false
+	store_usecase := true
 	if store_usecase {
 		uc_key := m.Target
 		_, err := ms.C.Do("rpush", uc_key, EncodeNiasMessage(m))
@@ -70,6 +71,7 @@ func (ms *MessageStore) IncrementTracker(txid string) {
 // Retrieve the data for this transaction - txid
 // fulldata if true returns all data in the transaction, if false then return
 // is capped at 10,000 records
+// If txid is empty, retrieves all records in the use case stream
 func GetTxData(txid string, prefix string, fulldata bool) ([]interface{}, error) {
 
 	data := make([]interface{}, 0)
