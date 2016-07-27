@@ -11,6 +11,7 @@ import (
 )
 
 const VALIDATION_PREFIX = "nvr:"
+const STORE_AND_FORWARD_PREFIX = "ssf:"
 
 // MessageStore listens for messages on the store topic and captures them
 // in ledis as lists (persistent qs in effect), messages can be stored on transaction
@@ -43,6 +44,7 @@ func (ms *MessageStore) StoreMessage(m *NiasMessage) {
 	if err != nil {
 		log.Println("error saving message:tx: - ", err)
 	}
+	//log.Printf("Storing under %s\n", tx_key)
 
 	// store for use case - disabled for now - in config
 	store_usecase := false
@@ -68,7 +70,7 @@ func (ms *MessageStore) IncrementTracker(txid string) {
 // Retrieve the data for this transaction - txid
 // fulldata if true returns all data in the transaction, if false then return
 // is capped at 10,000 records
-func GetTxData(txid string, fulldata bool) ([]interface{}, error) {
+func GetTxData(txid string, prefix string, fulldata bool) ([]interface{}, error) {
 
 	data := make([]interface{}, 0)
 	c := CreateLedisConnection(1024, 1024)
@@ -81,7 +83,8 @@ func GetTxData(txid string, fulldata bool) ([]interface{}, error) {
 		endpoint = (10000 - 1)
 	}
 
-	results, err := goredis.Values(c.Do("lrange", VALIDATION_PREFIX+txid, 0, endpoint))
+	//log.Printf("retrieving from %s\n", prefix+txid)
+	results, err := goredis.Values(c.Do("lrange", prefix+txid, 0, endpoint))
 	if err != nil {
 		log.Println("Error fetching tx data for: ", txid)
 		return data, err

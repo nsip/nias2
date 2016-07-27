@@ -80,12 +80,18 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create psi service ", err)
 	}
 
+	priv1, err := NewPrivacyService()
+	if err != nil {
+		log.Fatal("Unable to create privacy service ", err)
+	}
+
 	sr.AddService("schema", schema1)
 	sr.AddService("local", schema2)
 	sr.AddService("id", id1)
 	sr.AddService("dob", dob1)
 	sr.AddService("asl", asl1)
 	sr.AddService("psi", psi1)
+	sr.AddService("privacy", priv1)
 
 	log.Println("services created & installed in register")
 
@@ -114,6 +120,29 @@ func (sr *ServiceRegister) ProcessByRoute(m *NiasMessage) []NiasMessage {
 				response.Source = sname
 				response_msgs = append(response_msgs, response)
 			}
+		}
+	}
+
+	return response_msgs
+
+}
+
+func (sr *ServiceRegister) ProcessByPrivacy(m *NiasMessage) []NiasMessage {
+
+	response_msgs := make([]NiasMessage, 0)
+
+	// retrieve service from registry & execute
+	srvc := sr.FindService("privacy")
+	responses, err := srvc.HandleMessage(m)
+	if err != nil {
+		log.Println("\t *** got an error on service handler privacy ***")
+		log.Println("\t", err)
+	} else {
+		// pass the responses to the message store
+		for _, r := range responses {
+			response := r
+			response.Source = "privacy"
+			response_msgs = append(response_msgs, response)
 		}
 	}
 
