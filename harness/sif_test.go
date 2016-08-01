@@ -10,20 +10,25 @@ import (
 	//"errors"
 	"bytes"
 	"fmt"
+	"github.com/nats-io/nuid"
 	"io/ioutil"
+	"reflect"
 	"regexp"
 	"strings"
 	"testing"
 	"time"
 
-	// Nias2 "github.com/nsip/nias2/lib"
+	Nias2 "github.com/nsip/nias2/lib"
 	"menteslibres.net/gosexy/rest"
 )
 
-//var customClient *rest.Client
-
+/*
 func TestPrivacy(t *testing.T) {
 	test_harness_filecomp_privacy_xml(t, "../unit_test_files/1students.xml")
+}
+*/
+func TestSif2Graph_StudentPersonal(t *testing.T) {
+	sif2graph_harness(t, "../unit_test_files/StudentPersonal.xml", "../unit_test_files/1StudentPersonal_Graph.json")
 }
 
 /* compare two files */
@@ -91,4 +96,37 @@ func compare_files(retvalue string, filename string) error {
 		return fmt.Errorf("output does not match file %s:\n=====\n%s\n====\n%s\n====\n", filename, string(dat1), string(retvalue1))
 	}
 	return nil
+}
+
+func sif2graph_harness(t *testing.T, filename string, json_filename string) {
+	s2g, err := Nias2.NewSif2GraphService()
+	if err != nil {
+		t.Fatalf("Error %s", err)
+	}
+	dat, err := ioutil.ReadFile(filename)
+	if err != nil {
+		t.Fatalf("Error %s", err)
+	}
+	r := Nias2.NiasMessage{}
+	r.TxID = nuid.Next()
+	r.SeqNo = "1"
+	dat1 := strings.Split(string(dat), "\n")
+	r.Body = strings.Join(dat1[1:len(dat1)-2], "\n")
+	ret, err := s2g.HandleMessage(&r)
+	if err != nil || len(ret) < 1 {
+		t.Fatalf("Error %s", err)
+	}
+	jsondat, err := ioutil.ReadFile(json_filename)
+	if err != nil {
+		t.Fatalf("Error %s", err)
+	}
+	graphstruct := Nias2.GraphStruct{}
+	err = json.Unmarshal(jsondat, &graphstruct)
+	if err != nil {
+		t.Fatalf("Error %s", err)
+	}
+	if !reflect.DeepEqual(graphstruct, ret[0].Body.(Nias2.GraphStruct)) {
+		t.Fatalf("Mapping of %s to SMS graph format did not match %s", filename, json_filename)
+	}
+
 }

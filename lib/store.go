@@ -12,6 +12,7 @@ import (
 
 const VALIDATION_PREFIX = "nvr:"
 const STORE_AND_FORWARD_PREFIX = "ssf:"
+const SIF_MEMORY_STORE_PREFIX = "sms:"
 
 // MessageStore listens for messages on the store topic and captures them
 // in ledis as lists (persistent qs in effect), messages can be stored on transaction

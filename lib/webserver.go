@@ -174,7 +174,7 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 }
 
 // read xml file as stream and post records onto processing queue
-func enqueueXML(file multipart.File) (IngestResponse, error) {
+func enqueueXML(file multipart.File, usecase string) (IngestResponse, error) {
 
 	ir := IngestResponse{}
 	v := XMLContainer{"none"}
@@ -213,7 +213,7 @@ func enqueueXML(file multipart.File) (IngestResponse, error) {
 				msg.SeqNo = strconv.Itoa(total)
 				msg.TxID = txid
 				msg.MsgID = nuid.Next()
-				msg.Target = STORE_AND_FORWARD_PREFIX
+				msg.Target = usecase
 				msg.Route = nil
 
 				publish(msg)
@@ -260,8 +260,6 @@ func (nws *NIASWebServer) Run() {
 
 	// handler for data file ingest
 	e.Post("/sifxml/ingest", func(c echo.Context) error {
-		log.Println("SIFXML")
-
 		// get the file from the input form
 		file, err := c.FormFile("validationFile")
 		if err != nil {
@@ -276,7 +274,7 @@ func (nws *NIASWebServer) Run() {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
-			if ir, err = enqueueXML(src); err != nil {
+			if ir, err = enqueueXML(src, STORE_AND_FORWARD_PREFIX); err != nil {
 				return err
 			}
 		} else {
@@ -285,7 +283,33 @@ func (nws *NIASWebServer) Run() {
 
 		log.Println("ir: ", ir)
 		return c.JSON(http.StatusAccepted, ir)
+	})
 
+	// handler for data file store as graph
+	e.Post("/sifxml/store", func(c echo.Context) error {
+		// get the file from the input form
+		file, err := c.FormFile("validationFile")
+		if err != nil {
+			return err
+		}
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		// read onto qs with appropriate handler
+		var ir IngestResponse
+		if strings.Contains(file.Filename, ".xml") {
+			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX); err != nil {
+				return err
+			}
+		} else {
+			return c.String(http.StatusBadRequest, "File submitted is not .xml")
+		}
+
+		log.Println("ir: ", ir)
+		return c.JSON(http.StatusAccepted, ir)
 	})
 
 	// handler for validation of NAPLAN
