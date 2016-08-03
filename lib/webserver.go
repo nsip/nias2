@@ -29,6 +29,8 @@ import (
 )
 
 var VALIDATION_ROUTE = NiasConfig.ValidationRoute
+var SSF_ROUTE = NiasConfig.SSFRoute
+var SMS_ROUTE = NiasConfig.SMSRoute
 var req_ec *nats.EncodedConn
 var req_conn stan.Conn
 
@@ -240,9 +242,6 @@ func (nws *NIASWebServer) Run() {
 	case "STAN":
 		req_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
 	}
-	sms_route := make([]string, 1)
-	sms_route[0] = "sif2graph"
-
 	log.Println("Initialising uuid generator")
 	config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
 	uuid.SetupFileSystemStateSaver(config)
@@ -276,7 +275,7 @@ func (nws *NIASWebServer) Run() {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
-			if ir, err = enqueueXML(src, STORE_AND_FORWARD_PREFIX, nil); err != nil {
+			if ir, err = enqueueXML(src, STORE_AND_FORWARD_PREFIX, SSF_ROUTE); err != nil {
 				return err
 			}
 		} else {
@@ -303,7 +302,7 @@ func (nws *NIASWebServer) Run() {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
-			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX, sms_route); err != nil {
+			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX, SMS_ROUTE); err != nil {
 				return err
 			}
 		} else {
@@ -433,6 +432,13 @@ func (nws *NIASWebServer) Run() {
 	})
 
 	// get filtered text
+	e.Get("/sifxml/ingest/none/:txid", func(c echo.Context) error {
+		msgs, err := GetTxData(c.Param("txid"), STORE_AND_FORWARD_PREFIX+"none::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
 	e.Get("/sifxml/ingest/low/:txid", func(c echo.Context) error {
 		msgs, err := GetTxData(c.Param("txid"), STORE_AND_FORWARD_PREFIX+"low::", false)
 		if err != nil {
@@ -456,6 +462,13 @@ func (nws *NIASWebServer) Run() {
 	})
 	e.Get("/sifxml/ingest/extreme/:txid", func(c echo.Context) error {
 		msgs, err := GetTxData(c.Param("txid"), STORE_AND_FORWARD_PREFIX+"extreme::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/none", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"none::", false)
 		if err != nil {
 			return err
 		}

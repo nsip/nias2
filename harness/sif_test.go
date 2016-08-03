@@ -67,7 +67,7 @@ func post_file(filename string, endpoint string) (string, error) {
 /* compare two files */
 func test_harness_filecomp_privacy_xml(t *testing.T, filename string) {
 	var err error
-	var sensitivities = [4]string{"low", "medium", "high", "extreme"}
+	var sensitivities = [5]string{"none", "low", "medium", "high", "extreme"}
 
 	bytebuf := []byte{}
 	dat := []string{}
@@ -82,7 +82,7 @@ func test_harness_filecomp_privacy_xml(t *testing.T, filename string) {
 		// we are getting back a JSON array
 		err = json.Unmarshal(bytebuf, &dat)
 		errcheck(t, err)
-		log.Println(dat)
+		log.Println(strings.Split(dat[0], "\n")[0])
 		err = compare_files(strings.Join(dat, "\n"), filename+"."+sensitivities[i])
 		errcheck(t, err)
 	}
@@ -171,6 +171,7 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 	graphstruct := Nias2.GraphStruct{}
 	err = json.Unmarshal(jsondat, &graphstruct)
 	errcheck(t, err)
+	Nias2.PrefixGraphStruct(&graphstruct, Nias2.SIF_MEMORY_STORE_PREFIX)
 	clear_redis(t, graphstruct, ms)
 
 	_, err = post_file(filename, "/sifxml/store")

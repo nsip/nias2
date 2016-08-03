@@ -94,9 +94,24 @@ func SliceDiff(xs []string, ys []string) []string {
 	return ret
 }
 
+// prefix all ids in graphstruct with prefix
+func PrefixGraphStruct(s *GraphStruct, prefix string) {
+	s.Guid = prefix + s.Guid
+	for i := range s.EquivalentIds {
+		s.EquivalentIds[i] = prefix + s.EquivalentIds[i]
+	}
+	for i := range s.Links {
+		s.Links[i] = prefix + s.Links[i]
+	}
+	for k, _ := range s.OtherIds {
+		s.OtherIds[k] = prefix + s.OtherIds[k]
+	}
+}
+
 // parse GraphStruct, and store sets in SMS
 func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 	graphstruct := m.Body.(GraphStruct)
+	PrefixGraphStruct(&graphstruct, m.Target)
 	// get the nodes equivalent to the current node
 	prev_equivalents, err := goredis.Strings(ms.C.Do("smembers", "equivalent:ids:"+graphstruct.Guid))
 	if err != nil {

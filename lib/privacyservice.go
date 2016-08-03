@@ -20,7 +20,7 @@ type PrivacyService struct {
 	filters [][]PrivacyFilter
 }
 
-var sensitivities = [4]string{"low", "medium", "high", "extreme"}
+var sensitivities = [5]string{"none", "low", "medium", "high", "extreme"}
 
 // create a new psi service instance
 func NewPrivacyService() (*PrivacyService, error) {
@@ -61,7 +61,8 @@ func filter(xml string, filters [][]PrivacyFilter) ([]string, error) {
 	if err := doc.ReadFromString(xml); err != nil {
 		return nil, err
 	}
-	ret := make([]string, len(filters))
+	ret := make([]string, len(filters)+1)
+	ret[0] = xml
 	for i, filterslice := range filters {
 		for _, filter := range filterslice {
 			for _, elem := range doc.FindElementsPath(filter.Path) {
@@ -78,7 +79,7 @@ func filter(xml string, filters [][]PrivacyFilter) ([]string, error) {
 		if err != nil {
 			return nil, err
 		} else {
-			ret[i] = out
+			ret[i+1] = out
 		}
 	}
 	return ret, nil
@@ -132,38 +133,6 @@ func parse_filters(filter_txt [][]string) [][]PrivacyFilter {
 	}
 	return ret
 }
-
-/*
-func main() {
-	xml := `<?xml version="1.0" encoding="UTF-8"?>
-	<People>
-	<!--These are all known people-->
-	  <Person name="Jon O&apos;Reilly"/>
-	  <Person name="Sally"/>
-	  <Pay>
-	    <Adult>10</Adult>
-	    <Kid>10</Kid>
-	  </Pay>
-	  <Sell>
-	    <Sell1>XY</Sell1>
-	    <Sell2><Sell3>BZ</Sell3></Sell2>
-	 </People>`
-
-	paths := make([][]string, 3)
-	paths[0] = make([]string, 1)
-	paths[1] = make([]string, 2)
-	paths[2] = make([]string, 1)
-	paths[0][0] = "//People/Person@name"
-	paths[1][0] = "//Pay/Adult:-10"
-	paths[1][1] = "//Pay/Kid:-5"
-	paths[2][0] = "//Sell"
-
-	out, _ := filter(xml, parse_filters(paths))
-	for _, out1 := range out {
-		fmt.Println(out1)
-	}
-}
-*/
 
 // implement the nias Service interface
 func (pri *PrivacyService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {

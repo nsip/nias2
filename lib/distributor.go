@@ -44,12 +44,14 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 
 			pc.srvc_in_conn.Subscribe(pc.srvc_in_subject, func(m *stan.Msg) {
 				msg := DecodeNiasMessage(m.Data)
-				if msg.Target == STORE_AND_FORWARD_PREFIX {
-					responses1 := sr.ProcessByPrivacy(msg)
-					for _, response1 := range responses1 {
-						pc.srvc_out_conn.Publish(pc.store_in_subject, EncodeNiasMessage(&response1))
+				/*
+					if msg.Target == STORE_AND_FORWARD_PREFIX {
+						responses1 := sr.ProcessByPrivacy(msg)
+						for _, response1 := range responses1 {
+							pc.srvc_out_conn.Publish(pc.store_in_subject, EncodeNiasMessage(&response1))
+						}
 					}
-				}
+				*/
 				responses := sr.ProcessByRoute(msg)
 				for _, response := range responses {
 					pc.srvc_out_conn.Publish(pc.store_in_subject, EncodeNiasMessage(&response))
@@ -101,12 +103,14 @@ func (d *Distributor) RunNATSBus(poolsize int) {
 		go func(pc NATSProcessChain, sr *ServiceRegister, ms *MessageStore) {
 
 			pc.srvc_in_conn.Subscribe(pc.srvc_in_subject, func(m *NiasMessage) {
-				if m.Target == STORE_AND_FORWARD_PREFIX {
-					responses1 := sr.ProcessByPrivacy(m)
-					for _, response1 := range responses1 {
-						pc.srvc_out_conn.Publish(pc.store_in_subject, response1)
+				/*
+					if m.Target == STORE_AND_FORWARD_PREFIX {
+						responses1 := sr.ProcessByPrivacy(m)
+						for _, response1 := range responses1 {
+							pc.srvc_out_conn.Publish(pc.store_in_subject, response1)
+						}
 					}
-				}
+				*/
 				responses := sr.ProcessByRoute(m)
 				for _, response := range responses {
 					pc.srvc_out_conn.Publish(pc.store_in_subject, response)
@@ -162,14 +166,16 @@ func (d *Distributor) RunMemBus(poolsize int) {
 
 			for {
 				msg := <-pc.req_chan
-				if msg.Target == STORE_AND_FORWARD_PREFIX {
-					//log.Printf("#%v %s %s\n", msg.Target, msg.MsgID, msg.SeqNo)
-					responses1 := sr.ProcessByPrivacy(&msg)
-					for _, response1 := range responses1 {
-						pc.store_chan <- response1
-						//log.Printf("<%v %d %s %s\n", response1.Target, i, response1.MsgID, response1.SeqNo)
+				/*
+					if msg.Target == STORE_AND_FORWARD_PREFIX {
+						//log.Printf("#%v %s %s\n", msg.Target, msg.MsgID, msg.SeqNo)
+						responses1 := sr.ProcessByPrivacy(&msg)
+						for _, response1 := range responses1 {
+							pc.store_chan <- response1
+							//log.Printf("<%v %d %s %s\n", response1.Target, i, response1.MsgID, response1.SeqNo)
+						}
 					}
-				}
+				*/
 				responses := sr.ProcessByRoute(&msg)
 				for _, response := range responses {
 					pc.store_chan <- response

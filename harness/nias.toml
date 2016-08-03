@@ -5,6 +5,8 @@ TestYear = "2017"
 # Validations to invoke
 # ValidationRoute = ["schema", "local", "id", "dob", "asl"]
 ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
+SSFRoute = ["privacy"]
+SMSRoute = ["sif2graph"]
 
 # Webserver port
 WebServerPort = "1325"

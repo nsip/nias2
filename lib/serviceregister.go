@@ -132,26 +132,3 @@ func (sr *ServiceRegister) ProcessByRoute(m *NiasMessage) []NiasMessage {
 	return response_msgs
 
 }
-
-func (sr *ServiceRegister) ProcessByPrivacy(m *NiasMessage) []NiasMessage {
-
-	response_msgs := make([]NiasMessage, 0)
-
-	// retrieve service from registry & execute
-	srvc := sr.FindService("privacy")
-	responses, err := srvc.HandleMessage(m)
-	if err != nil {
-		log.Println("\t *** got an error on service handler privacy ***")
-		log.Println("\t", err)
-	} else {
-		// pass the responses to the message store
-		for _, r := range responses {
-			response := r
-			response.Source = "privacy"
-			response_msgs = append(response_msgs, response)
-		}
-	}
-
-	return response_msgs
-
-}
