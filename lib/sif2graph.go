@@ -1,10 +1,8 @@
 package nias2
 
 import (
-	"github.com/beevik/etree"
-	//"log"
 	"errors"
-	"fmt"
+	"github.com/beevik/etree"
 	"strings"
 )
 
@@ -163,15 +161,16 @@ func parseSIF(s2g *Sif2GraphService, xml string) (*GraphStruct, error) {
 	if err != nil {
 		return nil, err
 	}
+	guid := root.SelectAttrValue("RefId", "")
 	ret := GraphStruct{
-		Guid:          root.SelectAttrValue("RefId", ""),
+		Guid:          guid,
 		EquivalentIds: make([]string, 0),
 		OtherIds:      make(map[string]string),
 		Type:          root.Tag,
 		Links:         make([]string, 0),
 		Label:         label,
 	}
-	extractLinks(ret.Links, root)
+	ret.Links = extractLinks(ret.Links, root, guid)
 	ids := doc.FindElementsPath(s2g.Paths["LocalId"])
 	for _, elem := range ids {
 		ret.OtherIds["LocalId"] = elem.Text()
@@ -197,183 +196,33 @@ func parseSIF(s2g *Sif2GraphService, xml string) (*GraphStruct, error) {
 }
 
 // recursively extract links from xml: elements suffixed with RefId, attributes suffixed with RefId,
-// and SIF_RefObject attributes
-func extractLinks(links []string, root *etree.Element) {
+// and SIF_RefObject attributes. Do not append a RefId if it equals guid
+func extractLinks(links []string, root *etree.Element, guid string) []string {
 	for _, attr := range root.Attr {
 		if strings.HasSuffix(attr.Key, "RefId") {
-			links = append(links, attr.Value)
+			links = conditional_append(links, attr.Value, guid)
 		}
 		if attr.Key == "SIF_RefObject" {
-			links = append(links, root.Text())
+			links = conditional_append(links, root.Text(), guid)
 		}
 	}
 	if strings.HasSuffix(root.Tag, "RefId") {
-		links = append(links, root.Text())
+		links = conditional_append(links, root.Text(), guid)
 	}
 	children := root.ChildElements()
 	for _, elem := range children {
-		extractLinks(links, elem)
+		links = extractLinks(links, elem, guid)
 	}
+	return links
 }
 
-/*
-func main() {
-	xml := `<?xml version="1.0" encoding="UTF-8"?>
-<StudentPersonal RefId="7C834EA9EDA12090347F83297E1C290C">
-  <AlertMessages>
-      <AlertMessage Type="Legal">Mother is legal guardian</AlertMessage>
-        </AlertMessages>
-  <MedicalAlertMessages>
-      <MedicalAlertMessage Severity="Severe">Student has Peanut Allergy</MedicalAlertMessage>
-          <MedicalAlertMessage Severity="Moderate">Student has Diabetes</MedicalAlertMessage>
-    </MedicalAlertMessages>
-      <LocalId>S1234567</LocalId>
-        <StateProvinceId>ABC1234</StateProvinceId>
-  <ElectronicIdList>
-      <ElectronicId Type="03">ZZZZZZ21</ElectronicId>
-          <ElectronicId Type="03">ZZZZZZ22</ElectronicId>
-    </ElectronicIdList>
-      <OtherIdList>
-          <OtherId Type="PreviousNAPPlatformStudentId">888rdgf</OtherId>
-      <OtherId Type="DiocesanStudentId">1234</OtherId>
-        </OtherIdList>
-  <PersonInfo>
-      <Name Type="LGL">
-            <FamilyName>Smith</FamilyName>
-          <GivenName>Fred</GivenName>
-        <FullName>Fred Smith</FullName>
-    </Name>
-        <OtherNames>
-      <Name Type="AKA">
-              <FamilyName>Anderson</FamilyName>
-              <GivenName>Samuel</GivenName>
-              <FullName>Samuel Anderson</FullName>
-            </Name>
-          <Name Type="PRF">
-          <FamilyName>Rowinski</FamilyName>
-          <GivenName>Sam</GivenName>
-          <FullName>Sam Rowinski </FullName>
-        </Name>
-    </OtherNames>
-        <Demographics>
-      <IndigenousStatus>3</IndigenousStatus>
-            <Sex>1</Sex>
-          <BirthDate>1990-09-26</BirthDate>
-        <BirthDateVerification>1004</BirthDateVerification>
-      <PlaceOfBirth>Clayton</PlaceOfBirth>
-            <StateOfBirth>VIC</StateOfBirth>
-          <CountryOfBirth>1101</CountryOfBirth>
-        <CountriesOfCitizenship>
-        <CountryOfCitizenship>8104</CountryOfCitizenship>
-        <CountryOfCitizenship>1101</CountryOfCitizenship>
-      </CountriesOfCitizenship>
-            <CountriesOfResidency>
-            <CountryOfResidency>8104</CountryOfResidency>
-            <CountryOfResidency>1101</CountryOfResidency>
-          </CountriesOfResidency>
-        <CountryArrivalDate>1990-09-26</CountryArrivalDate>
-      <AustralianCitizenshipStatus>1</AustralianCitizenshipStatus>
-            <EnglishProficiency>
-            <Code>1</Code>
-          </EnglishProficiency>
-        <LanguageList>
-        <Language>
-          <Code>0001</Code>
-            <LanguageType>1</LanguageType>
-            </Language>
-          </LanguageList>
-        <DwellingArrangement>
-        <Code>1671</Code>
-      </DwellingArrangement>
-            <Religion>
-            <Code>2013</Code>
-          </Religion>
-        <ReligiousEventList>
-        <ReligiousEvent>
-          <Type>Baptism</Type>
-            <Date>2000-09-01</Date>
-            </ReligiousEvent>
-            <ReligiousEvent>
-              <Type>Christmas</Type>
-                <Date>2009-12-24</Date>
-        </ReligiousEvent>
-      </ReligiousEventList>
-            <ReligiousRegion>The Religion Region</ReligiousRegion>
-          <PermanentResident>P</PermanentResident>
-        <VisaSubClass>101</VisaSubClass>
-      <VisaStatisticalCode>05</VisaStatisticalCode>
-          </Demographics>
-      <AddressList>
-            <Address Type="0123" Role="2382">
-            <Street>
-              <Line1>Unit1/10</Line1>
-                <Line2>Barkley Street</Line2>
-        </Street>
-        <City>Yarra Glenn</City>
-        <StateProvince>VIC</StateProvince>
-        <Country>1101</Country>
-        <PostalCode>9999</PostalCode>
-      </Address>
-            <Address Type="0123A" Role="013A">
-            <Street>
-              <Line1>34 Term Address Street</Line1>
-              </Street>
-              <City>Home Town</City>
-              <StateProvince>WA</StateProvince>
-              <Country>1101</Country>
-              <PostalCode>9999</PostalCode>
-            </Address>
-        </AddressList>
-    <PhoneNumberList>
-          <PhoneNumber Type="0096">
-          <Number>03 9637-2289</Number>
-          <Extension>72289</Extension>
-          <ListedStatus>Y</ListedStatus>
-        </PhoneNumber>
-      <PhoneNumber Type="0888">
-              <Number>0437-765-234</Number>
-              <ListedStatus>N</ListedStatus>
-            </PhoneNumber>
-        </PhoneNumberList>
-    <EmailList>
-          <Email Type="01">fsmith@yahoo.com</Email>
-        <Email Type="02">freddy@gmail.com</Email>
-    </EmailList>
-      </PersonInfo>
-        <ProjectedGraduationYear>2014</ProjectedGraduationYear>
-  <OnTimeGraduationYear>2012</OnTimeGraduationYear>
-    <MostRecent>
-        <SchoolLocalId>S1234567</SchoolLocalId>
-    <HomeroomLocalId>hr12345</HomeroomLocalId>
-        <YearLevel>
-      <Code>P</Code>
-          </YearLevel>
-      <FTE>0.5</FTE>
-          <Parent1Language>1201</Parent1Language>
-      <Parent2Language>1201</Parent2Language>
-          <LocalCampusId>D</LocalCampusId>
-      <SchoolACARAId>VIC687</SchoolACARAId>
-          <Homegroup>7A</Homegroup>
-      <ClassCode>English 7D</ClassCode>
-          <MembershipType>02</MembershipType>
-      <FFPOS>2</FFPOS>
-          <ReportingSchoolId>VIC670</ReportingSchoolId>
-      <OtherEnrollmentSchoolACARAId>VIC6273</OtherEnrollmentSchoolACARAId>
-        </MostRecent>
-  <AcceptableUsePolicy>Y</AcceptableUsePolicy>
-    <EconomicDisadvantage>N</EconomicDisadvantage>
-      <ESL>U</ESL>
-        <YoungCarersRole>N</YoungCarersRole>
-  <Disability>N</Disability>
-    <IntegrationAide>N</IntegrationAide>
-      <EducationSupport>N</EducationSupport>
-        <HomeSchooledStudent>N</HomeSchooledStudent>
-  <Sensitive>N</Sensitive>
-  </StudentPersonal>`
-	s2g, _ := NewSif2GraphService()
-	fmt.Println(parseSIF(s2g, xml))
+// append
+func conditional_append(slice []string, element string, skip string) []string {
+	if element != skip {
+		slice = append(slice, element)
+	}
+	return slice
 }
-*/
 
 // implement the nias Service interface
 func (s2g *Sif2GraphService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
@@ -386,7 +235,7 @@ func (s2g *Sif2GraphService) HandleMessage(req *NiasMessage) ([]NiasMessage, err
 	r := NiasMessage{}
 	r.TxID = req.TxID
 	r.SeqNo = req.SeqNo
-	r.Target = SIF_MEMORY_STORE_PREFIX + "::"
+	r.Target = SIF_MEMORY_STORE_PREFIX
 	r.Body = *out
 	responses = append(responses, r)
 	return responses, nil

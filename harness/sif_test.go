@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	//"log"
+	"log"
 	"net/url"
 	"os"
 	"path"
@@ -19,29 +19,30 @@ import (
 	"time"
 
 	Nias2 "github.com/nsip/nias2/lib"
+	"github.com/siddontang/goredis"
 	"menteslibres.net/gosexy/rest"
 )
 
-/*
 func TestPrivacy(t *testing.T) {
 	test_harness_filecomp_privacy_xml(t, "../unit_test_files/1students.xml")
 }
-*/
+func TestSMS(t *testing.T) {
+	test_harness_sms(t, "../unit_test_files/StudentPersonal.xml", "../unit_test_files/1StudentPersonal_Graph.json")
+	test_harness_sms(t, "../unit_test_files/Sif3AssessmentRegistration.xml", "../unit_test_files/1Sif3AssessmentRegistration_Graph.json")
+}
 func TestSif2Graph_StudentPersonal(t *testing.T) {
 	sif2graph_harness(t, "../unit_test_files/StudentPersonal.xml", "../unit_test_files/1StudentPersonal_Graph.json")
 }
 
-/* compare two files */
-func test_harness_filecomp_privacy_xml(t *testing.T, filename string) {
+func TestSif2Graph_Sif3AssessmentRegistration(t *testing.T) {
+	sif2graph_harness(t, "../unit_test_files/Sif3AssessmentRegistration.xml", "../unit_test_files/1Sif3AssessmentRegistration_Graph.json")
+}
+
+func post_file(filename string, endpoint string) (string, error) {
 	var f *os.File
 	var err error
-	var sensitivities = [4]string{"low", "medium", "high", "extreme"}
-
-	bytebuf := []byte{}
-	dat := []string{}
-
 	if f, err = os.Open(filename); err != nil {
-		t.Fatalf("Error %s", err)
+		return "", err
 	}
 	defer f.Close()
 	files := rest.FileMap{
@@ -53,26 +54,37 @@ func test_harness_filecomp_privacy_xml(t *testing.T, filename string) {
 	requestVariables := url.Values{"name": {path.Base(f.Name())}}
 	msg, err := rest.NewMultipartMessage(requestVariables, files)
 	if err != nil {
-		t.Fatalf("Error %s", err)
+		return "", err
 	}
 	dst := map[string]interface{}{}
-	if err = customClient.PostMultipart(&dst, "/sifxml/ingest", msg); err != nil {
-		t.Fatalf("Error %s", err)
+	if err = customClient.PostMultipart(&dst, endpoint, msg); err != nil {
+		return "", err
 	}
 	txid := dst["TxID"].(string)
-	time.Sleep(200 * time.Millisecond)
+	return txid, nil
+}
 
+/* compare two files */
+func test_harness_filecomp_privacy_xml(t *testing.T, filename string) {
+	var err error
+	var sensitivities = [4]string{"low", "medium", "high", "extreme"}
+
+	bytebuf := []byte{}
+	dat := []string{}
+
+	txid, err := post_file(filename, "/sifxml/ingest")
+	errcheck(t, err)
+	log.Printf("txid: %s", txid)
+	time.Sleep(200 * time.Millisecond)
 	for i := 0; i < len(sensitivities); i++ {
-		if err = customClient.Get(&bytebuf, "/sifxml/ingest/"+sensitivities[i]+"/"+txid, nil); err != nil {
-			t.Fatalf("Error %s", err)
-		}
+		err = customClient.Get(&bytebuf, "/sifxml/ingest/"+sensitivities[i]+"/"+txid, nil)
+		errcheck(t, err)
 		// we are getting back a JSON array
-		if err = json.Unmarshal(bytebuf, &dat); err != nil {
-			t.Fatalf("Error %s", err)
-		}
-		if err = compare_files(strings.Join(dat, "\n"), filename+"."+sensitivities[i]); err != nil {
-			t.Fatalf("Error %s", err)
-		}
+		err = json.Unmarshal(bytebuf, &dat)
+		errcheck(t, err)
+		log.Println(dat)
+		err = compare_files(strings.Join(dat, "\n"), filename+"."+sensitivities[i])
+		errcheck(t, err)
 	}
 
 }
@@ -100,33 +112,107 @@ func compare_files(retvalue string, filename string) error {
 
 func sif2graph_harness(t *testing.T, filename string, json_filename string) {
 	s2g, err := Nias2.NewSif2GraphService()
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
+	errcheck(t, err)
 	dat, err := ioutil.ReadFile(filename)
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
+	errcheck(t, err)
 	r := Nias2.NiasMessage{}
 	r.TxID = nuid.Next()
 	r.SeqNo = "1"
 	dat1 := strings.Split(string(dat), "\n")
 	r.Body = strings.Join(dat1[1:len(dat1)-2], "\n")
 	ret, err := s2g.HandleMessage(&r)
-	if err != nil || len(ret) < 1 {
+	errcheck(t, err)
+	if len(ret) < 1 {
 		t.Fatalf("Error %s", err)
 	}
 	jsondat, err := ioutil.ReadFile(json_filename)
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
+	errcheck(t, err)
 	graphstruct := Nias2.GraphStruct{}
 	err = json.Unmarshal(jsondat, &graphstruct)
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
+	errcheck(t, err)
+	log.Println(ret[0].Body.(Nias2.GraphStruct))
 	if !reflect.DeepEqual(graphstruct, ret[0].Body.(Nias2.GraphStruct)) {
-		t.Fatalf("Mapping of %s to SMS graph format did not match %s", filename, json_filename)
+		t.Fatalf("Mapping of %s to SMS graph format did not match %s:\n%s", filename, json_filename, ret[0].Body.(Nias2.GraphStruct))
 	}
 
+}
+
+// clear keys to be interrogated from redis, for preexisting runs
+func clear_redis(t *testing.T, graphstruct Nias2.GraphStruct, ms *Nias2.MessageStore) {
+	_, err := ms.C.Do("hdel", "labels", graphstruct.Guid)
+	errcheck(t, err)
+	_, err = ms.C.Do("srem", graphstruct.Type, graphstruct.Guid)
+	errcheck(t, err)
+	if localid, ok := graphstruct.OtherIds["LocalId"]; ok {
+		_, err := ms.C.Do("hdel", "oid:"+localid, "LocalId")
+		errcheck(t, err)
+		_, err = ms.C.Do("srem", "other:ids", "oid:"+localid)
+		errcheck(t, err)
+	}
+	if len(graphstruct.EquivalentIds) > 0 {
+		_, err := ms.C.Do("srem", "equivalent:id"+graphstruct.EquivalentIds[0], graphstruct.Guid)
+		errcheck(t, err)
+	}
+	if len(graphstruct.Links) > 0 {
+		_, err := ms.C.Do("srem", graphstruct.Links[0], graphstruct.Guid)
+		errcheck(t, err)
+	}
+}
+
+func test_harness_sms(t *testing.T, filename string, json_filename string) {
+	var err error
+
+	//bytebuf := []byte{}
+	//dat := []string{}
+
+	ms := Nias2.NewMessageStore()
+	jsondat, err := ioutil.ReadFile(json_filename)
+	errcheck(t, err)
+	graphstruct := Nias2.GraphStruct{}
+	err = json.Unmarshal(jsondat, &graphstruct)
+	errcheck(t, err)
+	clear_redis(t, graphstruct, ms)
+
+	_, err = post_file(filename, "/sifxml/store")
+	errcheck(t, err)
+	time.Sleep(200 * time.Millisecond)
+
+	label, err := goredis.String(ms.C.Do("hget", "labels", graphstruct.Guid))
+	errcheck(t, err)
+	if label != graphstruct.Label {
+		t.Fatalf("Label retrieved for %s is not expected %s, but %s", graphstruct.Guid, graphstruct.Label, label)
+	}
+	log.Printf("Label retrieved for %s is expected %s", graphstruct.Guid, label)
+
+	membership, err := goredis.Bool(ms.C.Do("sismember", graphstruct.Type, graphstruct.Guid))
+	errcheck(t, err)
+	if !membership {
+		t.Fatalf("Guid %s is not member of set %s", graphstruct.Guid, graphstruct.Type)
+	}
+	log.Printf("Guid %s is member of set %s", graphstruct.Guid, graphstruct.Type)
+
+	if otherid, ok := graphstruct.OtherIds["LocalId"]; ok {
+		localid, err := goredis.String(ms.C.Do("hget", "oid:"+otherid, "LocalId"))
+		errcheck(t, err)
+		if localid != graphstruct.Guid {
+			t.Fatalf("oid:(%s){LocalId} does not map to %s", otherid, graphstruct.Guid)
+		}
+		log.Printf("oid:(%s){LocalId} does map to %s", otherid, graphstruct.Guid)
+
+		membership, err = goredis.Bool(ms.C.Do("sismember", "other:ids", "oid:"+otherid))
+		errcheck(t, err)
+		if !membership {
+			t.Fatalf("Local Id %s is not a member of set %s", otherid, "other:ids")
+		}
+		log.Printf("Local Id %s is a member of set %s", otherid, "other:ids")
+	}
+
+	if len(graphstruct.Links) > 0 {
+		membership, err = goredis.Bool(ms.C.Do("sismember", graphstruct.Links[0], graphstruct.Guid))
+		errcheck(t, err)
+		if !membership {
+			t.Fatalf("Guid %s is not a member of set %s", graphstruct.Guid, graphstruct.Links[0])
+		}
+		log.Printf("Guid %s is not a member of set %s", graphstruct.Guid, graphstruct.Links[0])
+	}
 }

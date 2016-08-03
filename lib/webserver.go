@@ -174,7 +174,7 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 }
 
 // read xml file as stream and post records onto processing queue
-func enqueueXML(file multipart.File, usecase string) (IngestResponse, error) {
+func enqueueXML(file multipart.File, usecase string, route []string) (IngestResponse, error) {
 
 	ir := IngestResponse{}
 	v := XMLContainer{"none"}
@@ -214,7 +214,7 @@ func enqueueXML(file multipart.File, usecase string) (IngestResponse, error) {
 				msg.TxID = txid
 				msg.MsgID = nuid.Next()
 				msg.Target = usecase
-				msg.Route = nil
+				msg.Route = route
 
 				publish(msg)
 			}
@@ -240,6 +240,8 @@ func (nws *NIASWebServer) Run() {
 	case "STAN":
 		req_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
 	}
+	sms_route := make([]string, 1)
+	sms_route[0] = "sif2graph"
 
 	log.Println("Initialising uuid generator")
 	config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
@@ -274,7 +276,7 @@ func (nws *NIASWebServer) Run() {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
-			if ir, err = enqueueXML(src, STORE_AND_FORWARD_PREFIX); err != nil {
+			if ir, err = enqueueXML(src, STORE_AND_FORWARD_PREFIX, nil); err != nil {
 				return err
 			}
 		} else {
@@ -301,7 +303,7 @@ func (nws *NIASWebServer) Run() {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
-			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX); err != nil {
+			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX, sms_route); err != nil {
 				return err
 			}
 		} else {

@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"net/url"
 	"os"
-	"path"
 	"strings"
 	"testing"
 	"time"
@@ -298,41 +296,27 @@ func TestDuplicateStudentOneSchool(t *testing.T) {
 }
 */
 
+func errcheck(t *testing.T, err error) {
+	if err != nil {
+		t.Fatalf("Error %s", err)
+	}
+}
+
 /* if errfield is nil, we expect test to pass */
 func test_harness(t *testing.T, filename string, errfield string, errdescription string) {
-	var f *os.File
 	var err error
 	bytebuf := []byte{}
 	dat := []map[string]string{}
 
-	if f, err = os.Open(filename); err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	defer f.Close()
-	files := rest.FileMap{
-		"validationFile": []rest.File{{
-			Name:   path.Base(f.Name()),
-			Reader: f},
-		},
-	}
-	requestVariables := url.Values{"name": {path.Base(f.Name())}}
-	msg, err := rest.NewMultipartMessage(requestVariables, files)
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	dst := map[string]interface{}{}
-	if err = customClient.PostMultipart(&dst, "/naplan/reg/validate", msg); err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	txid := dst["TxID"].(string)
+	txid, err := post_file(filename, "/naplan/reg/validate")
+	errcheck(t, err)
 	time.Sleep(100 * time.Millisecond)
-	if err = customClient.Get(&bytebuf, "/naplan/reg/results/"+txid, nil); err != nil {
-		t.Fatalf("Error %s", err)
-	}
+
+	err = customClient.Get(&bytebuf, "/naplan/reg/results/"+txid, nil)
+	errcheck(t, err)
 	// we are getting back a JSON array
-	if err = json.Unmarshal(bytebuf, &dat); err != nil {
-		t.Fatalf("Error %s", err)
-	}
+	err = json.Unmarshal(bytebuf, &dat)
+	errcheck(t, err)
 	log.Println(dat)
 	if errfield == "" {
 		if len(dat) > 0 {

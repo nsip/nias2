@@ -29,7 +29,12 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 		go func(pc STANProcessChain, ms *MessageStore, id int) {
 
 			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *stan.Msg) {
-				ms.StoreMessage(DecodeNiasMessage(m.Data))
+				msg := DecodeNiasMessage(m.Data)
+				if msg.Target == SIF_MEMORY_STORE_PREFIX {
+					ms.StoreGraph(msg)
+				} else {
+					ms.StoreMessage(msg)
+				}
 			})
 
 		}(pc, ms, i) //drop ids
@@ -83,7 +88,11 @@ func (d *Distributor) RunNATSBus(poolsize int) {
 		go func(pc NATSProcessChain, ms *MessageStore) {
 
 			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *NiasMessage) {
-				ms.StoreMessage(m)
+				if m.Target == SIF_MEMORY_STORE_PREFIX {
+					ms.StoreGraph(m)
+				} else {
+					ms.StoreMessage(m)
+				}
 			})
 
 		}(pc, ms)
@@ -137,16 +146,12 @@ func (d *Distributor) RunMemBus(poolsize int) {
 
 			var msg NiasMessage
 			for {
-				/*
-					select {
-					case msg = <-pc.store_chan:
-						ms.StoreMessage(&msg)
-					default:
-						//msg = new(NiasMessage)
-					}
-				*/
 				msg = <-pc.store_chan
-				ms.StoreMessage(&msg)
+				if msg.Target == SIF_MEMORY_STORE_PREFIX {
+					ms.StoreGraph(&msg)
+				} else {
+					ms.StoreMessage(&msg)
+				}
 				//log.Printf("\t>%v %s %s\n", msg.Target, msg.MsgID, msg.SeqNo)
 			}
 
