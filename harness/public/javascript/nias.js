@@ -224,7 +224,7 @@ function renderAnalysis() {
         errorsBarChart.dimension(lineDim);
 
         errorsByTypeChart
-            .width(350)
+            .width(600) 
             .height(190)
             .margins({
                 top: 20,

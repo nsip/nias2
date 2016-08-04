@@ -11,7 +11,7 @@ WebServerPort = "1325"
 
 # Performance Parameters
 PoolSize = 10
-# "MEM | NATS" | "STAN" are alternatives depending on deployment model
+# "MEM" | "NATS" | "STAN" are alternatives depending on deployment model
 MsgTransport = "MEM"      
 
 

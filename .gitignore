@@ -30,8 +30,12 @@ _testmain.go
 harness/harness
 tools/release
 
-harness/var
+harness/var/
 
 harness/var/goleveldb_data/CURRENT
 
 harness/var/goleveldb_data/LOG
+
+harness/schemas/core.json
+
+harness/schemas/core.json
