@@ -75,6 +75,7 @@ build_windows64() {
 	HARNESS=harness.exe
 	ZIP=go-nias-Win64.zip
 	do_build
+	do_upx
 	do_bats
 	do_zip
 	echo "...all Windows64 binaries built..."
@@ -120,7 +121,7 @@ build_linux32() {
 	GOOS=linux
 	GOARCH=386
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Linux64/go-nias
+	OUTPUT=$CWD/build/Linux32/go-nias
 	GNATS=gnatsd
 	HARNESS=harness
 	ZIP=go-nias-Linux32.zip
