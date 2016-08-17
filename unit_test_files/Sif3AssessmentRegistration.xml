@@ -1,0 +1,42 @@
+<Sif3AssessmentRegistrations>
+<Sif3AssessmentRegistration RefId="84243B2716EA4A68889B57A07E3707C9" StudentPersonalRefId="0D015F74DAB645FD92EFA8F43F2D79C3" AssessmentRefId="80E298F70E094EE2B8B52DFD88006AF2">
+  <AssessmentAdministrationRefId>90E298F70E094EE2B8B52DFD88006AF3</AssessmentAdministrationRefId>
+    <AssessmentSessionRefId>20E298F70E094EE2B8B52DFD88006AD4</AssessmentSessionRefId>
+      <AssessmentFormRefId>80E298F70E094EE2B8B52DFD88006AF4</AssessmentFormRefId>
+        <CreationDateTime>2011-12-31T15:23:01</CreationDateTime>
+  <StartDateTime>2011-12-31T09:35:01</StartDateTime>
+    <EndDateTime>2011-12-31T10:23:01</EndDateTime>
+      <AssessmentPlatform>computer</AssessmentPlatform>
+        <DaysOfInstruction>80</DaysOfInstruction>
+  <RetestIndicator>n</RetestIndicator>
+    <TestAttemptIdentifier>594800385</TestAttemptIdentifier>
+      <StudentSpecialEvents>
+          <StudentSpecialEvent Code="45C">Student became ill during test.</StudentSpecialEvent>
+    </StudentSpecialEvents>
+      <TestingStatuses>
+          <TestingStatus>
+        <TestingStatusCode>15</TestingStatusCode>
+      <TestingStatusDescription>Do not report</TestingStatusDescription>
+          </TestingStatus>
+    </TestingStatuses>
+      <StudentGradeLevel>
+          <Code>4</Code>
+    </StudentGradeLevel>
+      <AssessmentGradeLevel>
+          <Code>3</Code>
+    </AssessmentGradeLevel>
+      <AssessmentStudentSnapshot>
+    <Sex>2</Sex>
+    <BirthDate>1996-09-12</BirthDate>
+    <HomeEnrollment>
+	    <Homeroom SIF_RefObject="RoomInfo">109451F5E928406BAD373997E282C55C</Homeroom>
+    </HomeEnrollment>
+    <!--<Title1>Yes</Title1>
+         <ELL>No</ELL>-->
+  </AssessmentStudentSnapshot>
+    <LEAInfoRefId>325335F330A24BCD85E263E5C1EAAF89</LEAInfoRefId>
+      <SchoolInfoRefId>0578B825250649DE930BF8916175BBAB</SchoolInfoRefId>
+        <StaffPersonalRefId>3CD4A20CE2D64C27AE977F02D2CE24B3</StaffPersonalRefId>
+  <SectionInfoRefId>CE38829615A74E0E9D37CDBFB9F93295</SectionInfoRefId>
+</Sif3AssessmentRegistration>
+</Sif3AssessmentRegistrations>

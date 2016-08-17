@@ -17,7 +17,7 @@ const STORE_TOPIC = "store"
 const TRACK_TOPIC = "track"
 const NIAS_CLUSTER_ID = "nias"
 
-var req_chan = make(chan *NiasMessage, 1)
+var req_chan = make(chan NiasMessage, 1)
 
 /*
 ProcessChains provide conceptual links between the major
@@ -70,10 +70,12 @@ type NATSProcessChain struct {
 // and for resource constrained enviornments, use of blocking channels accross
 // the chain means solution will balance processing accross the chain based on
 // speed of host
+// Channel of struct rather than of pointers to struct: pointer channel was not
+// updating properly when read out
 type MemProcessChain struct {
-	req_chan   chan *NiasMessage
-	srvc_chan  chan *NiasMessage
-	store_chan chan *NiasMessage
+	req_chan   chan NiasMessage
+	srvc_chan  chan NiasMessage
+	store_chan chan NiasMessage
 }
 
 func NewMemProcessChain() MemProcessChain {
@@ -86,8 +88,8 @@ func createMemProcessChain() (MemProcessChain, error) {
 	pc := MemProcessChain{}
 
 	pc.req_chan = req_chan
-	pc.srvc_chan = make(chan *NiasMessage, 1)
-	pc.store_chan = make(chan *NiasMessage, 1)
+	pc.srvc_chan = make(chan NiasMessage, 1)
+	pc.store_chan = make(chan NiasMessage, 1)
 
 	return pc, nil
 
