@@ -9,6 +9,8 @@ TestYear = "2017"
 # Validations to invoke
 # ValidationRoute = ["schema", "local", "id", "dob", "asl"]
 ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
+SSFRoute = ["privacy"]
+SMSRoute = ["sif2graph"]
 
 # Webserver port
 WebServerPort = "1325"
@@ -44,5 +46,5 @@ PoolSize = 10
 # STAN streaming server is issued as sperate tool, please contact NSIP if required.
 # Remember to set -cluster_id of streaming server to 'nias' if used.
 
-MsgTransport = "MEM"
+MsgTransport = "NATS"
 # ============================================================================

@@ -1,0 +1,14 @@
+{ 
+	"Guid": "7C834EA9EDA12090347F83297E1C290C",
+	"EquivalentIds": [],
+	"OtherIds" : {
+		"DiocesanStudentId": "1234",
+		"LocalId": "S1234567",
+		"StateProvinceId": "ABC1234",
+		"ElectronicId:03": "ZZZZZZ22",
+		"PreviousNAPPlatformStudentId": "888rdgf"
+	},
+	"Type": "StudentPersonal",
+	"Links": [],
+	"Label": "Fred Smith"
+}

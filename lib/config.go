@@ -12,6 +12,8 @@ type NIASConfig struct {
 	TestYear        string
 	WebServerPort   string
 	ValidationRoute []string
+	SSFRoute        []string
+	SMSRoute        []string
 	PoolSize        int // number of service processors
 	MsgTransport    string
 }

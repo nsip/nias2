@@ -1,0 +1,82 @@
+<StudentPersonal xmlns="http://www.sifassociation.org/au/datamodel/3.4" RefId="00000000-0000-0000-0000-000000000000">
+		<LocalId>ZZREDACTED</LocalId>
+		<StateProvinceId/>
+		<OtherIdList>
+		<OtherId Type="SectorStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="DiocesanStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="OtherStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="TAAStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="NationalStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="NAPPlatformStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="PreviousLocalSchoolStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="PreviousSectorStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="PreviousDiocesanStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="PreviousOtherStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="PreviousTAAStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="PreviousStateProvinceId">ZZREDACTED</OtherId>
+		<OtherId Type="PreviousNationalStudentId">ZZREDACTED</OtherId>
+		<OtherId Type="PreviousNAPPlatformStudentId">ZZREDACTED</OtherId>
+		</OtherIdList>
+		<PersonInfo>
+		<Name Type="LGL">
+		<FamilyName>ZZREDACTED</FamilyName>
+		<GivenName>ZZREDACTED</GivenName>
+		<MiddleName>ZZREDACTED</MiddleName>
+		<PreferredGivenName>ZZREDACTED</PreferredGivenName>
+		</Name>
+		<Demographics>
+		<IndigenousStatus>ZZREDACTED</IndigenousStatus>
+		<Sex>ZZREDACTED</Sex>
+		<BirthDate>2009-08-01</BirthDate>
+		<CountryOfBirth>ZZREDACTED</CountryOfBirth>
+		<LanguageList>
+		<Language>
+		<Code>ZZREDACTED</Code>
+		<LanguageType>ZZREDACTED</LanguageType>
+		</Language>
+		</LanguageList>
+		<VisaSubClass>500</VisaSubClass>
+		<LBOTE>Y</LBOTE>
+		</Demographics>
+		<AddressList>
+		<Address Type="0765" Role="012B">
+		<Street>
+		<Line1>634 Frenchmen Street asdfgfdnbdjhgtghdujhasdfg</Line1>
+		<Line2/>
+		</Street>
+		<City>CORNELIA CREEK</City>
+		<StateProvince>VIC</StateProvince>
+		<Country>1101</Country>
+		<PostalCode>3622</PostalCode>
+		</Address>
+		</AddressList>
+		</PersonInfo>
+		<MostRecent>
+		<SchoolLocalId>ZZREDACTED</SchoolLocalId>
+		<YearLevel>
+		<Code>ZZREDACTED</Code>
+		</YearLevel>
+		<FTE>0.63</FTE>
+		<Parent1Language>ZZREDACTED</Parent1Language>
+		<Parent2Language>ZZREDACTED</Parent2Language>
+		<Parent1EmploymentType>ZZREDACTED</Parent1EmploymentType>
+		<Parent2EmploymentType>ZZREDACTED</Parent2EmploymentType>
+		<Parent1SchoolEducationLevel>ZZREDACTED</Parent1SchoolEducationLevel>
+		<Parent2SchoolEducationLevel>ZZREDACTED</Parent2SchoolEducationLevel>
+		<Parent1NonSchoolEducation>ZZREDACTED</Parent1NonSchoolEducation>
+		<Parent2NonSchoolEducation>ZZREDACTED</Parent2NonSchoolEducation>
+		<LocalCampusId>1</LocalCampusId>
+		<SchoolACARAId>44370</SchoolACARAId>
+		<TestLevel><Code>3</Code></TestLevel>
+		<Homegroup/>
+		<ClassCode>3E</ClassCode>
+		<MembershipType>1</MembershipType>
+		<FFPOS>2</FFPOS>
+		<ReportingSchoolId>lxwnp178</ReportingSchoolId>
+		<OtherEnrollmentSchoolACARAId>tjtzi844</OtherEnrollmentSchoolACARAId>
+		</MostRecent>
+		<EducationSupport>X</EducationSupport>
+		<HomeSchooledStudent>Y</HomeSchooledStudent>
+		<Sensitive>Y</Sensitive>
+		<OfflineDelivery>N</OfflineDelivery>
+		</StudentPersonal>
