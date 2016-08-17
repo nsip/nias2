@@ -8,7 +8,7 @@ package nias2
 
 import (
 	"github.com/nats-io/go-nats-streaming"
-	"log"
+	// "log"
 )
 
 type Distributor struct{}
@@ -41,7 +41,8 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 				msg := DecodeNiasMessage(m.Data)
 				responses := sr.ProcessByRoute(msg)
 				for _, response := range responses {
-					pc.srvc_out_conn.Publish(pc.store_in_subject, EncodeNiasMessage(&response))
+					r := response
+					pc.srvc_out_conn.Publish(pc.store_in_subject, EncodeNiasMessage(&r))
 				}
 				ms.IncrementTracker(msg.TxID)
 			})
@@ -65,13 +66,9 @@ func (d *Distributor) RunNATSBus(poolsize int) {
 
 	for i := 0; i < poolsize; i++ {
 
-		i := i
-
 		sr := NewServiceRegister()
 		pc := NewNATSProcessChain()
 		ms := NewMessageStore()
-
-		log.Printf("Process Chain %d\n%#v", i, pc)
 
 		// create storage handler
 		go func(pc NATSProcessChain, ms *MessageStore) {
@@ -88,7 +85,8 @@ func (d *Distributor) RunNATSBus(poolsize int) {
 			pc.srvc_in_conn.Subscribe(pc.srvc_in_subject, func(m *NiasMessage) {
 				responses := sr.ProcessByRoute(m)
 				for _, response := range responses {
-					pc.srvc_out_conn.Publish(pc.store_in_subject, response)
+					r := response
+					pc.srvc_out_conn.Publish(pc.store_in_subject, r)
 				}
 				ms.IncrementTracker(m.TxID)
 			})
@@ -112,13 +110,9 @@ func (d *Distributor) RunMemBus(poolsize int) {
 
 	for i := 0; i < poolsize; i++ {
 
-		i := i
-
 		sr := NewServiceRegister()
 		pc := NewMemProcessChain()
 		ms := NewMessageStore()
-
-		log.Printf("Process Chain %d\n%#v", i, pc)
 
 		// create storage handler
 		go func(pc MemProcessChain, ms *MessageStore) {
@@ -135,9 +129,11 @@ func (d *Distributor) RunMemBus(poolsize int) {
 
 			for {
 				msg := <-pc.req_chan
+				// log.Printf("\t\tservice handler recieved msg: %+v", msg)
 				responses := sr.ProcessByRoute(msg)
 				for _, response := range responses {
-					pc.store_chan <- &response
+					r := response
+					pc.store_chan <- &r
 				}
 				ms.IncrementTracker(msg.TxID)
 			}

@@ -1,3 +1,7 @@
+# ============================================================================
+# Basic Config
+# 
+# ============================================================================
 
 # Baseline year for DOB checks
 TestYear = "2017"
@@ -9,9 +13,36 @@ ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
 # Webserver port
 WebServerPort = "1325"
 
-# Performance Parameters
+
+
+# ============================================================================
+# Advanced parameters
+# 
+# ============================================================================
+
+# ============================================================================
+# Poolsize; number of worker processes to run concurrently
 PoolSize = 10
-# "MEM | NATS" | "STAN" are alternatives depending on deployment model
-MsgTransport = "MEM"      
+# ============================================================================
 
+# ============================================================================
+# Memory Bus model
+# "MEM | NATS" | "STAN" are alternatives depending on deployment type
+#
+# Use "MEM" for standalone low capacity machines and most Windows machines
+# which have caps on tcp traffic
+#
+# Use NATS on capable machines and servers, and is preferred bus for Mac & Linux
+# is also used as default bus for clustered installations
+#
+# Use STAN on same machines as NATS, but when persistent message streams are 
+# required - i.e. clients may connect after work has completed
+#
+# Default build from NSIP is issued with "MEM" selected as majority of standalone
+# users are on Windows. If  on Mac/Linux change to NATS for better performance.
+#
+# STAN streaming server is issued as sperate tool, please contact NSIP if required.
+# Remember to set -cluster_id of streaming server to 'nias' if used.
 
+MsgTransport = "MEM"
+# ============================================================================
