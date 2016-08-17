@@ -99,6 +99,8 @@ func (sr *ServiceRegister) ProcessByRoute(m *NiasMessage) []NiasMessage {
 
 	route := m.Route
 
+	// log.Printf("\t\tservice register recieved msg: %+v", m)
+
 	for _, sname := range route {
 
 		// retrieve service from registry & execute
@@ -109,6 +111,7 @@ func (sr *ServiceRegister) ProcessByRoute(m *NiasMessage) []NiasMessage {
 			log.Println("\t", err)
 		} else {
 			// pass the responses to the message store
+			// log.Printf("\t\tservice %s returned %d responses: %+v", sname, len(responses), responses)
 			for _, r := range responses {
 				response := r
 				response.Source = sname
@@ -117,6 +120,7 @@ func (sr *ServiceRegister) ProcessByRoute(m *NiasMessage) []NiasMessage {
 		}
 	}
 
+	// log.Printf("\t\tresponse messages: %+v", response_msgs)
 	return response_msgs
 
 }

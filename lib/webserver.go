@@ -149,9 +149,6 @@ func enqueueXML(file multipart.File) (IngestResponse, error) {
 				msg.Target = VALIDATION_PREFIX
 				msg.Route = VALIDATION_ROUTE
 
-				// xml_ec.Publish(REQUEST_TOPIC, msg)
-				// xml_conn.Publish(REQUEST_TOPIC, EncodeNiasMessage(msg))
-				// req_chan <- msg
 				publish(msg)
 
 			}
@@ -175,7 +172,11 @@ func (nws *NIASWebServer) Run() {
 	case "NATS":
 		req_ec = CreateNATSConnection()
 	case "STAN":
-		req_conn, _ = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
+		var stan_err error
+		req_conn, stan_err = stan.Connect(NIAS_CLUSTER_ID, nuid.Next())
+		if stan_err != nil {
+			log.Fatalf("Unable to connect to STAN server with cluster id: %s\nError:%s\nService aborting...", NIAS_CLUSTER_ID, stan_err)
+		}
 	}
 
 	log.Println("Initialising uuid generator")
