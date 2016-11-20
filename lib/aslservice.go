@@ -2,25 +2,28 @@
 package nias2
 
 // validation service to check acara school ids in registration records
+//
+//
+// uses a threadsafe set-filter seeded with the ASL data to avoid calls to db
+// which makes significant perfromance differece for large datasets
 
 import (
+	// "fmt"
 	"github.com/wildducktheories/go-csv"
+	"gopkg.in/fatih/set.v0"
 	"log"
 	"os"
 )
 
 type ASLService struct{}
 
-// lookup structure
-type ASLSearchTerms struct {
-	AcaraID string
-	State   string
-}
+// create set-filter instances, set thread-safe
+var ibf_aslid = set.New()
+var ibf_aslstateid = set.New()
 
 // create a new id service instance
 func NewASLService() (*ASLService, error) {
 	asls := ASLService{}
-
 	return &asls, nil
 }
 
@@ -35,7 +38,7 @@ func (asls *ASLService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 		return responses, nil
 	}
 
-	if !ASLKeyExists(req) {
+	if !ASLKeyExists(rr.ASLSchoolId) {
 		desc := "ASL ID " + rr.ASLSchoolId + " not found in ASL list of valid IDs"
 		ve := ValidationError{
 			Description:  desc,
@@ -53,11 +56,7 @@ func (asls *ASLService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 	} else {
 
 		if rr.StateTerritory != "" {
-			stateid, err := GetASLValue(req)
-			if err != nil {
-				return responses, err
-			}
-			if stateid != rr.StateTerritory {
+			if !ASLStateKeyExists(rr.ASLSchoolId, rr.StateTerritory) {
 				desc := "ASL ID " + rr.ASLSchoolId + " is a valid ID, but not for " + rr.StateTerritory
 				ve := ValidationError{
 					Description:  desc,
@@ -73,6 +72,7 @@ func (asls *ASLService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 				responses = append(responses, r)
 
 			}
+
 		}
 
 	}
@@ -80,10 +80,23 @@ func (asls *ASLService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
 	return responses, nil
 }
 
-// utility function to add ASL data to lookup database,
-// only needs to be invoked once at application startup
-func LoadASLLookupData() {
+// see if this ASLid is in the known list
+func ASLKeyExists(aslid string) bool {
 
+	return ibf_aslid.Has(aslid)
+
+}
+
+// see if this ASLid is identified with the correct state/territory
+func ASLStateKeyExists(aslid, stateid string) bool {
+
+	id := aslid + stateid
+	return ibf_aslstateid.Has(id)
+
+}
+
+// load ASL data into the set filters
+func LoadASLLookupData() {
 	f, err := os.Open("./schoolslist/asl_schools_20160321.csv")
 	reader := csv.WithIoReader(f)
 	records, err := csv.ReadAll(reader)
@@ -96,12 +109,15 @@ func LoadASLLookupData() {
 
 		r := r.AsMap()
 
-		s := ASLSearchTerms{
-			AcaraID: r["ACARA ID"],
-			State:   r["State"],
-		}
-		SetASLValue(s)
+		id := r["ACARA ID"]
+		id_state := id + r["State"]
+
+		// log.Println("ASLID:", id, "ASL_STATE:", id_state)
+
+		ibf_aslid.Add(id)
+		ibf_aslstateid.Add(id_state)
+
 	}
-	log.Println("...all ASL records loaded for validation")
+	log.Println("...all ASL records loaded into filter for validation")
 
 }

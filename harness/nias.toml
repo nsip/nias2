@@ -8,7 +8,8 @@ TestYear = "2017"
 
 # Validations to invoke
 # ValidationRoute = ["schema", "local", "id", "dob", "asl"]
-ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
+# ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
+ValidationRoute = ["schema", "asl", "dob", "psi", "id"]
 
 # Webserver port
 WebServerPort = "1325"
@@ -22,7 +23,17 @@ WebServerPort = "1325"
 
 # ============================================================================
 # Poolsize; number of worker processes to run concurrently
-PoolSize = 10
+PoolSize = 3
+# notes:
+# 
+# best initial sizing is number of cores on machine -1; each core gets a 
+# processor chain, with one left for database processes.
+# 
+# only run large poolsizes (> 30 workers) on mac/linux, tcp will throttle on
+# windows. 
+# also note above poolsize 50 on mac increase ulimits from default (256) e.g.
+# $ ulimit -n 2048
+# otherwise tcp will run out of aviailable file handles
 # ============================================================================
 
 # ============================================================================
@@ -44,5 +55,5 @@ PoolSize = 10
 # STAN streaming server is issued as sperate tool, please contact NSIP if required.
 # Remember to set -cluster_id of streaming server to 'nias' if used.
 
-MsgTransport = "MEM"
+MsgTransport = "NATS"
 # ============================================================================

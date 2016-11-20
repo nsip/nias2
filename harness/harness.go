@@ -5,20 +5,29 @@ package main
 
 import (
 	"github.com/nsip/nias2/lib"
+	// "github.com/pkg/profile"
 	"log"
 	"runtime"
 )
 
 func main() {
 
+	// uncomment line (and import) below to invoke code profiler when running
+	// note: macs must be running osx El Capitan for this to report correctly
+	// defer profile.Start(profile.ProfilePath(".")).Stop()
+
 	log.Println("Loading default config")
 	log.Println("Config values are: ", nias2.NiasConfig)
 
 	poolsize := nias2.NiasConfig.PoolSize
 
-	log.Println("Starting ledis server...")
-	go nias2.LaunchLedisServer()
-	log.Println("...ledis service running")
+	log.Println("Starting ledis storage server...")
+	go nias2.LaunchStorageServer()
+	log.Println("...ledis storage service running")
+
+	log.Println("Starting ledis lookup server...")
+	go nias2.LaunchLookupServer()
+	log.Println("...ledis lookup service running")
 
 	log.Println("Loading ASL Lookup data")
 	nias2.LoadASLLookupData()
@@ -29,7 +38,7 @@ func main() {
 	case "MEM":
 		go dist.RunMemBus(poolsize)
 	case "NATS":
-		go dist.RunNATSBus(poolsize)
+		go dist.RunNATSBus2(poolsize)
 	case "STAN":
 		go dist.RunSTANBus(poolsize)
 	default:

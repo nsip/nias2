@@ -22,7 +22,7 @@ type MessageStore struct {
 
 func NewMessageStore() *MessageStore {
 	ms := MessageStore{
-		C: CreateLedisConnection(1024, 1024),
+		C: CreateStorageConnection(),
 	}
 	return &ms
 }
@@ -71,7 +71,7 @@ func (ms *MessageStore) IncrementTracker(txid string) {
 func GetTxData(txid string, fulldata bool) ([]interface{}, error) {
 
 	data := make([]interface{}, 0)
-	c := CreateLedisConnection(1024, 1024)
+	c := CreateStorageConnection()
 	defer c.Close()
 
 	var endpoint int

@@ -378,6 +378,6 @@ func (nws *NIASWebServer) Run() {
 	log.Println("Service is listening on localhost:" + port)
 
 	//e.Run(fasthttp.New(":" + port))
-	e.Run(standard.New(":1325"))
+	e.Run(standard.New(":" + port))
 
 }
