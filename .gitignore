@@ -35,3 +35,9 @@ harness/var
 harness/var/goleveldb_data/CURRENT
 
 harness/var/goleveldb_data/LOG
+
+harness/var/*.*
+
+harness/redis/*.*
+
+*.pprof
