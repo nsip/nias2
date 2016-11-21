@@ -72,11 +72,12 @@ func generateControlDigit(luhnString string) int {
 	return controlDigit
 }
 
+// checksum of characters 2 through 9 of the PSI (minus initial letter, state digit, final digit)
 func calculateChecksum(luhnString string, double bool) int {
 	source := strings.Split(luhnString, "")
 	checksum := 0
 
-	for i := len(source) - 1; i > -1; i-- {
+	for i := len(source) - 1; i > 1; i-- {
 		t, _ := strconv.ParseInt(source[i], 10, 8)
 		n := int(t)
 
