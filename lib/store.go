@@ -24,15 +24,13 @@ type MyGoRedisClient struct {
 // in ledis as lists (persistent qs in effect), messages can be stored on transaction
 // and use case basis - use case being the superset of all transactions of a given type
 type MessageStore struct {
-	//C    *goredis.Client
-	//trkC *goredis.Client
 	C    MyGoRedisClient
 	trkC MyGoRedisClient
 }
 
 func NewMessageStore() *MessageStore {
 	ms := MessageStore{
-		C: MyGoRedisClient{CreateLedisConnection(1024, 1024)},
+		C: MyGoRedisClient{CreateStorageConnection()},
 	}
 	return &ms
 }
@@ -110,6 +108,7 @@ func PrefixGraphStruct(s *GraphStruct, prefix string) {
 
 // parse GraphStruct, and store sets in SMS
 func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
+	log.Println("STORING")
 	graphstruct := m.Body.(GraphStruct)
 	PrefixGraphStruct(&graphstruct, m.Target)
 	// get the nodes equivalent to the current node
@@ -148,8 +147,10 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 	// no responses needed from redis so pipeline for speed
 	// siddontag does not implement pipelining on the client, only on the connection. Will need to supplement
 	// his client's .Do() with a .Send(), which uses .Send() not .Do() on the connection, then issues a final .Do("EXEC")
+	log.Printf("LABEL1: %s %s", graphstruct.Guid, graphstruct.Label)
 	if graphstruct.Label != "" {
 		_, err := ms.C.Do("hset", "labels", graphstruct.Guid, graphstruct.Label)
+		log.Printf("LABEL: %s %s", graphstruct.Guid, graphstruct.Label)
 		if err != nil {
 			log.Printf("hset labels %s %s", graphstruct.Guid, graphstruct.Label)
 			log.Println("error saving message:storegraph:3 - ", err)
@@ -272,7 +273,7 @@ func (ms *MessageStore) IncrementTracker(txid string) {
 func GetTxData(txid string, prefix string, fulldata bool) ([]interface{}, error) {
 
 	data := make([]interface{}, 0)
-	c := CreateLedisConnection(1024, 1024)
+	c := CreateStorageConnection()
 	defer c.Close()
 
 	var endpoint int
