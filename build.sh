@@ -6,6 +6,7 @@ CWD=`pwd`
 
 echo "Downloading CORE.json"
 curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > harness/schemas/core.json
+curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > harness/schemas/core_parent2.json
 echo "Downloading gnatsd"
 go get github.com/nats-io/gnatsd
 

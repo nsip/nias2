@@ -8,7 +8,7 @@ TestYear = "2017"
 
 # Validations to invoke
 # ValidationRoute = ["schema", "local", "id", "dob", "asl"]
-ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
+ValidationRoute = ["schema", "schema2", "id", "dob", "asl", "psi"]
 SSFRoute = ["privacy"]
 SMSRoute = ["sif2graph"]
 

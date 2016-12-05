@@ -26,6 +26,7 @@ import (
 func TestPrivacy(t *testing.T) {
 	test_harness_filecomp_privacy_xml(t, "../unit_test_files/1students.xml")
 }
+
 func TestSMS(t *testing.T) {
 	test_harness_sms(t, "../unit_test_files/StudentPersonal.xml", "../unit_test_files/1StudentPersonal_Graph.json")
 }
@@ -39,7 +40,6 @@ func TestSif2Graph_StudentPersonal(t *testing.T) {
 func TestSif2Graph_Sif3AssessmentRegistration(t *testing.T) {
 	sif2graph_harness(t, "../unit_test_files/Sif3AssessmentRegistration.xml", "../unit_test_files/1Sif3AssessmentRegistration_Graph.json")
 }
-
 func post_file(filename string, endpoint string) (string, error) {
 	var f *os.File
 	var err error

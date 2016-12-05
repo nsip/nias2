@@ -35,7 +35,7 @@ func TestFutureBirthdate(t *testing.T) {
 }
 
 func TestMissingParent2LOTE(t *testing.T) {
-	test_harness(t, "../unit_test_files/1students2MissingParent2LOTE.csv", "Parent2LOTE", "Parent2LOTE is required")
+	test_harness(t, "../unit_test_files/1students2MissingParent2LOTE.csv", "Parent2LOTE", "Must be present if other Parent2 fields are present")
 }
 
 func TestACARAIDandStateBlank(t *testing.T) {
@@ -84,10 +84,6 @@ func TestExceedCharLengthsAddress(t *testing.T) {
 
 func TestExceedCharLengthsGivenName(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsExceedCharLengthsGivenName.csv", "GivenName", "String length must be less than or equal to 40")
-}
-
-func TestExceedLengthHomeGrp(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsExceedLengthHomeGrp.csv", "Homegroup", "String length must be less than or equal to 10")
 }
 
 func TestInvalidAcaraId(t *testing.T) {
@@ -187,19 +183,19 @@ func TestMissingMandatoryParent1Occupation(t *testing.T) {
 }
 
 func TestMissingMandatoryParent2LOTE(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2LOTE.csv", "Parent2LOTE", "Parent2LOTE is required")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2LOTE.csv", "Parent2LOTE", "Must be present if other Parent2 fields are present")
 }
 
 func TestMissingMandatoryParent2NonSchoolEducation(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2NonSchoolEduc.csv", "Parent2NonSchoolEducation", "Parent2NonSchoolEducation is required")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2NonSchoolEduc.csv", "Parent2NonSchoolEducation", "Must be present if other Parent2 fields are present")
 }
 
 func TestMissingMandatoryParent2Occupation(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2Occupation.csv", "Parent2Occupation", "Parent2Occupation is required")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2Occupation.csv", "Parent2Occupation", "Must be present if other Parent2 fields are present")
 }
 
 func TestMissingMandatoryParent2SchoolEducation(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2SchlEduc.csv", "Parent2SchoolEducation", "Parent2SchoolEducation is required")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2SchlEduc.csv", "Parent2SchoolEducation", "Must be present if other Parent2 fields are present")
 }
 
 func TestMissingMandatoryCountryOfBirth(t *testing.T) {

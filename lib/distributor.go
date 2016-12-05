@@ -8,7 +8,7 @@ package nias2
 
 import (
 	"github.com/nats-io/go-nats-streaming"
-	"log"
+	//"log"
 	"strings"
 )
 
@@ -84,30 +84,30 @@ func (d *Distributor) RunNATSBus2(poolsize int) {
 	ec := CreateNATSConnection()
 	ms := NewMessageStore()
 
-	//for i := 0; i < poolsize; i++ {
+	for i := 0; i < poolsize; i++ {
 
-	// create service handler
-	go func(ms *MessageStore) {
-		sr := NewServiceRegister()
-		ec.QueueSubscribe(REQUEST_TOPIC, "distributor", func(m *NiasMessage) {
-			responses := sr.ProcessByRoute(m)
-			for _, response := range responses {
-				r := response
-				log.Printf("%s %s", r.Target, "out")
-				ec.Publish(STORE_TOPIC, r)
-			}
-			ms.IncrementTracker(m.TxID)
-		})
+		// create service handler
+		go func(ms *MessageStore) {
+			sr := NewServiceRegister()
+			ec.QueueSubscribe(REQUEST_TOPIC, "distributor", func(m *NiasMessage) {
+				responses := sr.ProcessByRoute(m)
+				for _, response := range responses {
+					r := response
+					//log.Printf("%s %s", r.Target, "out")
+					ec.Publish(STORE_TOPIC, r)
+				}
+				ms.IncrementTracker(m.TxID)
+			})
 
-	}(ms)
+		}(ms)
 
-	//}
+	}
 
 	// create storage handler
 	go func(ms *MessageStore) {
 
 		ec.Subscribe(STORE_TOPIC, func(m *NiasMessage) {
-			log.Printf("%s %s", m.Target, "in")
+			//log.Printf("%s %s", m.Target, "in")
 			if strings.HasPrefix(m.Target, SIF_MEMORY_STORE_PREFIX) {
 				ms.StoreGraph(m)
 			} else {
