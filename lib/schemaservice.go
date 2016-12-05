@@ -78,6 +78,27 @@ func (ss *SchemaService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) 
 	if !result.Valid() {
 
 		for _, desc := range result.Errors() {
+			field := desc.Field()
+
+			// Handle dependencies  errors
+			if desc.Field() == "(root)" {
+				if desc.Description() == "Has a dependency on Parent2NonSchoolEducation" {
+					field = "Parent2NonSchoolEducation"
+					desc.SetDescription("Must be present if other Parent2 fields are present")
+				}
+				if desc.Description() == "Has a dependency on Parent2SchoolEducation" {
+					field = "Parent2SchoolEducation"
+					desc.SetDescription("Must be present if other Parent2 fields are present")
+				}
+				if desc.Description() == "Has a dependency on Parent2Occupation" {
+					field = "Parent2Occupation"
+					desc.SetDescription("Must be present if other Parent2 fields are present")
+				}
+				if desc.Description() == "Has a dependency on Parent2LOTE" {
+					field = "Parent2LOTE"
+					desc.SetDescription("Must be present if other Parent2 fields are present")
+				}
+			}
 
 			// trap enum errors for large enums such as country code
 			// and truncate the message to prevent unwieldy message
@@ -101,7 +122,7 @@ func (ss *SchemaService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) 
 
 			ve := ValidationError{
 				Description:  desc.Description(),
-				Field:        desc.Field(),
+				Field:        field,
 				OriginalLine: req.SeqNo,
 				Vtype:        "content",
 			}

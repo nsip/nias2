@@ -44,7 +44,7 @@
             "id": "http://naplan.edu.au/ClassCode",
             "type": "string",
             "title": "ClassCode schema.",
-            "maxLength": 10,
+            "maxLength": 40,
             "description": "Description",
             "name": "ClassCode"
         },
@@ -95,6 +95,7 @@
             "id": "http://naplan.edu.au/FamilyName",
             "type": "string",
             "title": "FamilyName schema.",
+            "minLength": 1,
             "maxLength": 40,
             "description": "Description",
             "name": "FamilyName"
@@ -104,6 +105,7 @@
             "type": "string",
             "title": "GivenName schema.",
             "description": "Description",
+            "minLength": 1,
             "maxLength": 40,
             "name": "GivenName"
         },
@@ -114,14 +116,6 @@
             "description": "Description",
             "enum":["Y","N","U","X"],
             "name": "HomeSchooledStudent"
-        },
-        "Homegroup": {
-            "id": "http://naplan.edu.au/Homegroup",
-            "type": "string",
-            "title": "Homegroup schema.",
-            "maxLength": 10,
-            "description": "Description",
-            "name": "Homegroup"
         },
         "IndigenousStatus": {
             "id": "http://naplan.edu.au/IndigenousStatus",
@@ -160,6 +154,7 @@
             "type": "string",
             "title": "LocalId schema.",
             "description": "The student id assigned by and used by local school administrative system. Ideally a persistent Local Student Identifier from source system.  Assumed this will be local per school Student Information System.",
+            "minLength": 1,
             "maxLength": 36,
             "name": "LocalId"
         },
@@ -484,7 +479,7 @@
             "name": "YearLevel"
         }
     },
-    "required": ["LocalId","FamilyName","GivenName","BirthDate","Sex","CountryOfBirth","FFPOS","IndigenousStatus","StudentLOTE","YearLevel","TestLevel","ASLSchoolId","Parent1SchoolEducation","Parent1NonSchoolEducation","Parent1Occupation","Parent1LOTE","Parent2SchoolEducation","Parent2NonSchoolEducation","Parent2Occupation","Parent2LOTE"]
+    "required": ["LocalId","FamilyName","GivenName","BirthDate","Sex","CountryOfBirth","FFPOS","IndigenousStatus","StudentLOTE","YearLevel","TestLevel","ASLSchoolId","Parent1SchoolEducation","Parent1NonSchoolEducation","Parent1Occupation","Parent1LOTE"]
 }
 
 

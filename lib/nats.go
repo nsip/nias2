@@ -104,19 +104,21 @@ func createNATSProcessChain() (NATSProcessChain, error) {
 
 	pc := NATSProcessChain{}
 
+	ec := CreateNATSConnection()
+
 	distID := nuid.Next()
-	pc.dist_in_conn = CreateNATSConnection()
-	pc.dist_out_conn = CreateNATSConnection()
+	pc.dist_in_conn = ec
+	pc.dist_out_conn = ec
 	pc.dist_in_subject = REQUEST_TOPIC
 	pc.dist_out_subject = distID
 
 	srvcID := nuid.Next()
-	pc.srvc_in_conn = CreateNATSConnection()
-	pc.srvc_out_conn = CreateNATSConnection()
+	pc.srvc_in_conn = ec
+	pc.srvc_out_conn = ec
 	pc.srvc_in_subject = distID
 	pc.srvc_out_subject = srvcID
 
-	pc.store_in_conn = CreateNATSConnection()
+	pc.store_in_conn = ec
 	pc.store_in_subject = srvcID
 
 	return pc, nil
@@ -124,10 +126,17 @@ func createNATSProcessChain() (NATSProcessChain, error) {
 
 // helper function to provide encoded connections for standard NATA
 func CreateNATSConnection() *nats.EncodedConn {
-	nc, err := nats.Connect(nats.DefaultURL)
+
+	// var servers = "nats://localhost:4222, nats://localhost:5222, nats://localhost:6222" //cluster
+	var servers = "nats://localhost:4222" // standalone
+
+	nc, err := nats.Connect(servers)
+	if err != nil {
+		log.Fatalln("Unable to connect to gnatsd, services aborting...\n", err)
+	}
 	ec, err := nats.NewEncodedConn(nc, nats.GOB_ENCODER)
 	if err != nil {
-		log.Fatalln("Unable to connect to gnatsd, services aborting...\n")
+		log.Fatalln("Unable to connect to gnatsd, services aborting...\n", err)
 	}
 	return ec
 

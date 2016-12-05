@@ -8,13 +8,13 @@ package nias2
 
 import (
 	"github.com/nats-io/go-nats-streaming"
-	// "log"
+	//"log"
+	"strings"
 )
-
-type Distributor struct{}
 
 // creates a pool of message handlers which process the
 // routing slip of each message thru the listed services
+type Distributor struct{}
 
 // Use STAN as message bus
 func (d *Distributor) RunSTANBus(poolsize int) {
@@ -30,14 +30,14 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 
 			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *stan.Msg) {
 				msg := DecodeNiasMessage(m.Data)
-				if msg.Target == SIF_MEMORY_STORE_PREFIX {
+				if strings.HasPrefix(msg.Target, SIF_MEMORY_STORE_PREFIX) {
 					ms.StoreGraph(msg)
 				} else {
 					ms.StoreMessage(msg)
 				}
 			})
 
-		}(pc, ms, i) //drop ids
+		}(pc, ms, i)
 
 		// create service handler
 		go func(pc STANProcessChain, sr *ServiceRegister, ms *MessageStore, id int) {
@@ -66,6 +66,51 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 	}
 }
 
+// alternate NATS Bus
+// uses single process for all database updates
+// given the write-heavy nature of storage activities
+// this is significantly faster than shared read/write
+// services in parallel
+func (d *Distributor) RunNATSBus2(poolsize int) {
+
+	ec := CreateNATSConnection()
+	ms := NewMessageStore()
+
+	for i := 0; i < poolsize; i++ {
+
+		// create service handler
+		go func(ms *MessageStore) {
+			sr := NewServiceRegister()
+			ec.QueueSubscribe(REQUEST_TOPIC, "distributor", func(m *NiasMessage) {
+				responses := sr.ProcessByRoute(m)
+				for _, response := range responses {
+					r := response
+					//log.Printf("%s %s", r.Target, "out")
+					ec.Publish(STORE_TOPIC, r)
+				}
+				ms.IncrementTracker(m.TxID)
+			})
+
+		}(ms)
+
+	}
+
+	// create storage handler
+	go func(ms *MessageStore) {
+
+		ec.Subscribe(STORE_TOPIC, func(m *NiasMessage) {
+			//log.Printf("%s %s", m.Target, "in")
+			if strings.HasPrefix(m.Target, SIF_MEMORY_STORE_PREFIX) {
+				ms.StoreGraph(m)
+			} else {
+				ms.StoreMessage(m)
+			}
+		})
+
+	}(ms)
+
+}
+
 // Use regular NATS as message bus
 func (d *Distributor) RunNATSBus(poolsize int) {
 
@@ -79,7 +124,7 @@ func (d *Distributor) RunNATSBus(poolsize int) {
 		go func(pc NATSProcessChain, ms *MessageStore) {
 
 			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *NiasMessage) {
-				if m.Target == SIF_MEMORY_STORE_PREFIX {
+				if strings.HasPrefix(m.Target, SIF_MEMORY_STORE_PREFIX) {
 					ms.StoreGraph(m)
 				} else {
 					ms.StoreMessage(m)

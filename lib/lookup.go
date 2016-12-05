@@ -12,29 +12,14 @@ import (
 // encapsulation of all hash-based ledis lookups
 //
 
-var id_c = CreateLedisConnection(64, 64)
-var asl_c = CreateLedisConnection(1024, 1024)
+var id_c = CreateLookupConnection()
+var asl_c = CreateLookupConnection()
 
 const ID_PREFIX = "id:"
 const ASL_KEY = "asl:lookup"
 
 // seconds until key expires, for expirable keys
 const KEY_EXPIRATION = 100000
-
-// asl lookup
-func ASLKeyExists(msg *NiasMessage) bool {
-
-	rr := msg.Body.(RegistrationRecord)
-
-	if resp, _ := asl_c.Do("hget", ASL_KEY, rr.ASLSchoolId); resp != nil {
-		return true
-	}
-
-	if rr.ASLSchoolId == "" {
-		return true
-	}
-	return false
-}
 
 //
 // ID Lookup Handler - simple key
@@ -266,31 +251,6 @@ func SetIDValue(msg *NiasMessage) error {
 		log.Println(ek)
 		log.Println("set")
 	*/
-	return nil
-
-}
-
-// for a given message returns the state is associated with the given asl id.
-func GetASLValue(msg *NiasMessage) (string, error) {
-
-	rr := msg.Body.(RegistrationRecord)
-
-	if stateid, err := goredis.String(asl_c.Do("hget", ASL_KEY, rr.ASLSchoolId)); err != nil {
-		return "", err
-	} else {
-		return stateid, nil
-	}
-
-}
-
-// store an ASL record
-// only minimal data - key of acaraid to determine if record exists
-// value is the state associated with the acara id for extended checking
-func SetASLValue(st ASLSearchTerms) error {
-
-	if _, err := asl_c.Do("hset", ASL_KEY, st.AcaraID, st.State); err != nil {
-		return err
-	}
 	return nil
 
 }

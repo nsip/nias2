@@ -26,8 +26,11 @@ import (
 func TestPrivacy(t *testing.T) {
 	test_harness_filecomp_privacy_xml(t, "../unit_test_files/1students.xml")
 }
+
 func TestSMS(t *testing.T) {
 	test_harness_sms(t, "../unit_test_files/StudentPersonal.xml", "../unit_test_files/1StudentPersonal_Graph.json")
+}
+func TestSMS1(t *testing.T) {
 	test_harness_sms(t, "../unit_test_files/Sif3AssessmentRegistration.xml", "../unit_test_files/1Sif3AssessmentRegistration_Graph.json")
 }
 func TestSif2Graph_StudentPersonal(t *testing.T) {
@@ -37,7 +40,6 @@ func TestSif2Graph_StudentPersonal(t *testing.T) {
 func TestSif2Graph_Sif3AssessmentRegistration(t *testing.T) {
 	sif2graph_harness(t, "../unit_test_files/Sif3AssessmentRegistration.xml", "../unit_test_files/1Sif3AssessmentRegistration_Graph.json")
 }
-
 func post_file(filename string, endpoint string) (string, error) {
 	var f *os.File
 	var err error
@@ -165,6 +167,7 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 	//bytebuf := []byte{}
 	//dat := []string{}
 
+	log.Println("Starting")
 	ms := Nias2.NewMessageStore()
 	jsondat, err := ioutil.ReadFile(json_filename)
 	errcheck(t, err)
@@ -174,17 +177,22 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 	Nias2.PrefixGraphStruct(&graphstruct, Nias2.SIF_MEMORY_STORE_PREFIX)
 	clear_redis(t, graphstruct, ms)
 
+	log.Println("Stage 1")
 	_, err = post_file(filename, "/sifxml/store")
 	errcheck(t, err)
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
+	log.Println("Stage 1a")
 
 	label, err := goredis.String(ms.C.Do("hget", "labels", graphstruct.Guid))
-	errcheck(t, err)
+	//errcheck(t, err)
+	log.Println("Stage 1b")
 	if label != graphstruct.Label {
 		t.Fatalf("Label retrieved for %s is not expected %s, but %s", graphstruct.Guid, graphstruct.Label, label)
 	}
 	log.Printf("Label retrieved for %s is expected %s", graphstruct.Guid, label)
 
+	log.Println("Stage 2")
+	_, err = post_file(filename, "/sifxml/store")
 	membership, err := goredis.Bool(ms.C.Do("sismember", graphstruct.Type, graphstruct.Guid))
 	errcheck(t, err)
 	if !membership {
@@ -192,6 +200,7 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 	}
 	log.Printf("Guid %s is member of set %s", graphstruct.Guid, graphstruct.Type)
 
+	log.Println("Stage 3")
 	if otherid, ok := graphstruct.OtherIds["LocalId"]; ok {
 		localid, err := goredis.String(ms.C.Do("hget", "oid:"+otherid, "LocalId"))
 		errcheck(t, err)
@@ -208,6 +217,7 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 		log.Printf("Local Id %s is a member of set %s", otherid, "other:ids")
 	}
 
+	log.Println("Stage 4")
 	if len(graphstruct.Links) > 0 {
 		membership, err = goredis.Bool(ms.C.Do("sismember", graphstruct.Links[0], graphstruct.Guid))
 		errcheck(t, err)
@@ -216,4 +226,5 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 		}
 		log.Printf("Guid %s is not a member of set %s", graphstruct.Guid, graphstruct.Links[0])
 	}
+	log.Println("No error")
 }

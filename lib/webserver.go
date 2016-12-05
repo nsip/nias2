@@ -300,9 +300,11 @@ func (nws *NIASWebServer) Run() {
 		}
 		defer src.Close()
 
+		log.Println("Kazaa")
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
+			log.Println("Kazoo")
 			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX, SMS_ROUTE); err != nil {
 				return err
 			}
@@ -568,6 +570,6 @@ func (nws *NIASWebServer) Run() {
 	log.Println("Service is listening on localhost:" + port)
 
 	//e.Run(fasthttp.New(":" + port))
-	e.Run(standard.New(":1325"))
+	e.Run(standard.New(":" + port))
 
 }

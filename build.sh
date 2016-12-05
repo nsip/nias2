@@ -6,6 +6,7 @@ CWD=`pwd`
 
 echo "Downloading CORE.json"
 curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > harness/schemas/core.json
+curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > harness/schemas/core_parent2.json
 echo "Downloading gnatsd"
 go get github.com/nats-io/gnatsd
 
@@ -51,13 +52,15 @@ do_zip() {
 build_mac64() {
 	# MAC OS X (64 only)
 	echo "Building Mac binaries..."
+	GOOS=darwin
+	GOARCH=amd64
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Mac/go-nias
 	GNATS=gnatsd
 	HARNESS=harness
 	ZIP=go-nias-Mac.zip
 	do_build
-	do_upx
+	#do_upx
 	do_shells
 	do_zip
 	echo "...all Mac binaries built..."

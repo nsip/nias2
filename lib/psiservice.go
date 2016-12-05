@@ -25,7 +25,7 @@ func checksumok(psi string) bool {
 	if psi == "" || len(psi) != 11 {
 		return true
 	}
-	idnumber := psi[1 : len(psi)-1]
+	idnumber := psi[2 : len(psi)-1]
 	if _, err := strconv.Atoi(idnumber); err != nil {
 		return true
 	}
@@ -33,6 +33,7 @@ func checksumok(psi string) bool {
 	if checksum == -1 {
 		return true
 	}
+	//log.Printf("%s %s %d %d", psi, idnumber, checksum, generateControlDigit(idnumber))
 	return generateControlDigit(idnumber) == checksum
 }
 
@@ -72,11 +73,12 @@ func generateControlDigit(luhnString string) int {
 	return controlDigit
 }
 
+// checksum of characters 2 through 9 of the PSI (minus initial letter, state digit, final digit)
 func calculateChecksum(luhnString string, double bool) int {
 	source := strings.Split(luhnString, "")
 	checksum := 0
 
-	for i := len(source) - 1; i > -1; i-- {
+	for i := len(source) - 1; i > 1; i-- {
 		t, _ := strconv.ParseInt(source[i], 10, 8)
 		n := int(t)
 
