@@ -22,7 +22,7 @@ type RegistrationRecord struct {
 	AddressLine1              string `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line1"`
 	AddressLine2              string `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line2"`
 	BirthDate                 string `json:",omitempty" xml:"PersonInfo>Demographics>BirthDate"`
-	ClassCode                 string `json:",omitempty" xml:"MostRecent>ClassCode"`
+	ClassGroup                string `json:",omitempty" xml:"MostRecent>ClassCode"`
 	CountryOfBirth            string `json:",omitempty" xml:"PersonInfo>Demographics>CountryOfBirth"`
 	DiocesanId                string `json:",omitempty"`
 	EducationSupport          string `json:",omitempty" xml:"EducationSupport"`
@@ -31,7 +31,6 @@ type RegistrationRecord struct {
 	FamilyName                string `json:",omitempty" xml:"PersonInfo>Name>FamilyName"`
 	GivenName                 string `json:",omitempty" xml:"PersonInfo>Name>GivenName"`
 	HomeSchooledStudent       string `json:",omitempty" xml:"HomeSchooledStudent"`
-	Homegroup                 string `json:",omitempty" xml:"MostRecent>Homegroup"`
 	IndigenousStatus          string `json:",omitempty" xml:"PersonInfo>Demographics>IndigenousStatus"`
 	JurisdictionId            string `json:",omitempty"`
 	LBOTE                     string `json:",omitempty" xml:"PersonInfo>Demographics>LBOTE"`
@@ -62,14 +61,12 @@ type RegistrationRecord struct {
 	PreviousOtherId           string `json:",omitempty"`
 	PreviousPlatformId        string `json:",omitempty"`
 	PreviousSectorId          string `json:",omitempty"`
-	PreviousStateProvinceId   string `json:",omitempty"`
 	PreviousTAAId             string `json:",omitempty"`
 	ReportingSchoolId         string `json:",omitempty" xml:"MostRecent>ReportingSchoolId"`
 	SchoolLocalId             string `json:",omitempty" xml:"MostRecent>SchoolLocalId"`
 	SectorId                  string `json:",omitempty"`
 	Sensitive                 string `json:",omitempty" xml:"Sensitive"`
 	Sex                       string `json:",omitempty" xml:"PersonInfo>Demographics>Sex"`
-	StateProvinceId           string `json:",omitempty"`
 	StateTerritory            string `json:",omitempty" xml:"PersonInfo>AddressList>Address>StateProvince"`
 	StudentLOTE               string `json:",omitempty" xml:"PersonInfo>Demographics>LanguageList>Language>Code"`
 	TAAId                     string `json:",omitempty"`

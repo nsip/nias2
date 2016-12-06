@@ -83,7 +83,7 @@ func publish(msg *NiasMessage) {
 }
 
 // read csv file as stream and post records onto processing queue
-func enqueueCSV(file multipart.File) (IngestResponse, error) {
+func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) {
 
 	ir := IngestResponse{}
 
@@ -300,11 +300,9 @@ func (nws *NIASWebServer) Run() {
 		}
 		defer src.Close()
 
-		log.Println("Kazaa")
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
-			log.Println("Kazoo")
 			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX, SMS_ROUTE); err != nil {
 				return err
 			}
@@ -333,7 +331,7 @@ func (nws *NIASWebServer) Run() {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".csv") {
-			if ir, err = enqueueCSV(src); err != nil {
+			if ir, err = enqueueCSVforNAPLANValidation(src); err != nil {
 				return err
 			}
 		} else if strings.Contains(file.Filename, ".xml") {

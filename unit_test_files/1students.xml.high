@@ -69,7 +69,7 @@
 		<SchoolACARAId>44370</SchoolACARAId>
 		<TestLevel><Code>3</Code></TestLevel>
 		<Homegroup/>
-		<ClassCode>3E</ClassCode>
+		<ClassGroup>3E</ClassGroup>
 		<MembershipType>1</MembershipType>
 		<FFPOS>2</FFPOS>
 		<ReportingSchoolId>lxwnp178</ReportingSchoolId>
