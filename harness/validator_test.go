@@ -30,6 +30,10 @@ func TestYearLevelF(t *testing.T) {
 	test_harness(t, "../unit_test_files/1students2YearLevelF.csv", "BirthDate/YearLevel", "Student Year Level (yr F) does not match year level derived from BirthDate")
 }
 
+func TestYearLevelP(t *testing.T) {
+	test_harness(t, "../unit_test_files/1students1YearLevelP.csv", "BirthDate/YearLevel", "")
+}
+
 func TestFutureBirthdate(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsFutureBirthDates.csv", "BirthDate/YearLevel", "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges")
 }
@@ -276,6 +280,14 @@ func TestWrongChecksumPreviousPlatformId(t *testing.T) {
 
 func TestYearLevelTestLevelMismatch(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
+}
+
+func TestMaximumFTE(t *testing.T) {
+	test_harness(t, "../unit_test_files/1MaximumFTE.csv", "FTE", "Year level supplied is UG, will result in SRM warning flag for test level")
+}
+
+func TestMinimumFTE(t *testing.T) {
+	test_harness(t, "../unit_test_files/1MinimumFTE.csv", "FTE", "Year level supplied is UG, will result in SRM warning flag for test level")
 }
 
 func TestDupGivenLastNameDOBCARAId(t *testing.T) {

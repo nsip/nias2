@@ -59,7 +59,7 @@ func removeBlanks(m map[string]string) map[string]string {
 	reducedmap := make(map[string]string)
 	for key, val := range m {
 		if val != "" {
-			reducedmap[key] = val
+			reducedmap[key] = strings.TrimSpace(val)
 		}
 	}
 	return reducedmap
@@ -383,9 +383,9 @@ func (nws *NIASWebServer) Run() {
 		sprsnls := make([]map[string]string, 0)
 		for _, r := range records {
 			r := r.AsMap()
-			r = removeBlanks(r)
-			r["SIFuuid"] = uuid.NewV4().String()
-			sprsnls = append(sprsnls, r)
+			r1 := removeBlanks(r)
+			r1["SIFuuid"] = uuid.NewV4().String()
+			sprsnls = append(sprsnls, r1)
 		}
 
 		// set headers to 'force' file download where appropriate
