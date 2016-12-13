@@ -90,3 +90,13 @@ func (ve *ValidationError) ToSlice() []string {
 
 	return []string{ve.OriginalLine, ve.Vtype, ve.Field, ve.Description}
 }
+
+// information extracted out of SIF for graph
+type GraphStruct struct {
+	Guid          string            // RefID of object
+	EquivalentIds []string          // equivalent Ids
+	OtherIds      map[string]string // map of OtherId type to OtherId
+	Type          string            // object type
+	Links         []string          // list of related ids
+	Label         string            // human readable label
+}

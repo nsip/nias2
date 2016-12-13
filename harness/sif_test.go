@@ -132,8 +132,9 @@ func sif2graph_harness(t *testing.T, filename string, json_filename string) {
 	graphstruct := Nias2.GraphStruct{}
 	err = json.Unmarshal(jsondat, &graphstruct)
 	errcheck(t, err)
-	log.Println(ret[0].Body.(Nias2.GraphStruct))
-	if !reflect.DeepEqual(graphstruct, ret[0].Body.(Nias2.GraphStruct)) {
+	graphstruct1 := Nias2.GraphStruct{}
+	err = json.Unmarshal(ret[0].Body.([]byte), &graphstruct1)
+	if !reflect.DeepEqual(graphstruct, graphstruct1) {
 		t.Fatalf("Mapping of %s to SMS graph format did not match %s:\n%s", filename, json_filename, ret[0].Body.(Nias2.GraphStruct))
 	}
 
@@ -167,7 +168,6 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 	//bytebuf := []byte{}
 	//dat := []string{}
 
-	log.Println("Starting")
 	ms := Nias2.NewMessageStore()
 	jsondat, err := ioutil.ReadFile(json_filename)
 	errcheck(t, err)
@@ -177,21 +177,17 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 	Nias2.PrefixGraphStruct(&graphstruct, Nias2.SIF_MEMORY_STORE_PREFIX)
 	clear_redis(t, graphstruct, ms)
 
-	log.Println("Stage 1")
 	_, err = post_file(filename, "/sifxml/store")
 	errcheck(t, err)
-	time.Sleep(2000 * time.Millisecond)
-	log.Println("Stage 1a")
+	time.Sleep(300 * time.Millisecond)
 
 	label, err := goredis.String(ms.C.Do("hget", "labels", graphstruct.Guid))
 	//errcheck(t, err)
-	log.Println("Stage 1b")
 	if label != graphstruct.Label {
 		t.Fatalf("Label retrieved for %s is not expected %s, but %s", graphstruct.Guid, graphstruct.Label, label)
 	}
 	log.Printf("Label retrieved for %s is expected %s", graphstruct.Guid, label)
 
-	log.Println("Stage 2")
 	_, err = post_file(filename, "/sifxml/store")
 	membership, err := goredis.Bool(ms.C.Do("sismember", graphstruct.Type, graphstruct.Guid))
 	errcheck(t, err)
@@ -200,7 +196,6 @@ func test_harness_sms(t *testing.T, filename string, json_filename string) {
 	}
 	log.Printf("Guid %s is member of set %s", graphstruct.Guid, graphstruct.Type)
 
-	log.Println("Stage 3")
 	if otherid, ok := graphstruct.OtherIds["LocalId"]; ok {
 		localid, err := goredis.String(ms.C.Do("hget", "oid:"+otherid, "LocalId"))
 		errcheck(t, err)

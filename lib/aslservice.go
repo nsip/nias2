@@ -97,7 +97,7 @@ func ASLStateKeyExists(aslid, stateid string) bool {
 
 // load ASL data into the set filters
 func LoadASLLookupData() {
-	f, err := os.Open("./schoolslist/asl_schools_20160321.csv")
+	f, err := os.Open("./schoolslist/asl_schools_20161213.csv")
 	reader := csv.WithIoReader(f)
 	records, err := csv.ReadAll(reader)
 	log.Printf("ASL records read: %v", len(records))

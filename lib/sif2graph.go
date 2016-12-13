@@ -1,22 +1,13 @@
 package nias2
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/beevik/etree"
 	"strings"
 )
 
-// information extracted out of SIF for graph
-type GraphStruct struct {
-	Guid          string            // RefID of object
-	EquivalentIds []string          // equivalent Ids
-	OtherIds      map[string]string // map of OtherId type to OtherId
-	Type          string            // object type
-	Links         []string          // list of related ids
-	Label         string            // human readable label
-}
-
-// implementation of the psi service
+// implementation of the sif2graph service
 type Sif2GraphService struct {
 	Paths map[string]etree.Path // map of paths to search
 }
@@ -148,18 +139,18 @@ func extract_label(doc *etree.Document, root *etree.Element) (string, error) {
 	return ret, nil
 }
 
-func parseSIF(s2g *Sif2GraphService, xml string) (*GraphStruct, error) {
+func parseSIF(s2g *Sif2GraphService, xml string) (GraphStruct, error) {
 	doc := etree.NewDocument()
 	if err := doc.ReadFromString(xml); err != nil {
-		return nil, err
+		return GraphStruct{}, err
 	}
 	root := doc.Root()
 	if root == nil {
-		return nil, errors.New("XML has no root")
+		return GraphStruct{}, errors.New("XML has no root")
 	}
 	label, err := extract_label(doc, root)
 	if err != nil {
-		return nil, err
+		return GraphStruct{}, err
 	}
 	guid := root.SelectAttrValue("RefId", "")
 	ret := GraphStruct{
@@ -192,7 +183,7 @@ func parseSIF(s2g *Sif2GraphService, xml string) (*GraphStruct, error) {
 		ret.OtherIds[elem.SelectAttrValue("Type", "")] = elem.Text()
 	}
 
-	return &ret, nil
+	return ret, nil
 }
 
 // recursively extract links from xml: elements suffixed with RefId, attributes suffixed with RefId,
@@ -236,7 +227,9 @@ func (s2g *Sif2GraphService) HandleMessage(req *NiasMessage) ([]NiasMessage, err
 	r.TxID = req.TxID
 	r.SeqNo = req.SeqNo
 	r.Target = SIF_MEMORY_STORE_PREFIX
-	r.Body = *out
+	//r.Body = out
+	// having to JSON marshal this: the struct is blocking NATS2 from proccessing it
+	r.Body, _ = json.Marshal(out)
 	responses = append(responses, r)
 	return responses, nil
 }

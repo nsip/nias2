@@ -79,19 +79,19 @@ func (d *Distributor) RunNATSBus2(poolsize int) {
 	for i := 0; i < poolsize; i++ {
 
 		// create service handler
-		go func(ms *MessageStore) {
-			sr := NewServiceRegister()
+		go func(ms *MessageStore, sr *ServiceRegister) {
+			//sr := NewServiceRegister()
 			ec.QueueSubscribe(REQUEST_TOPIC, "distributor", func(m *NiasMessage) {
 				responses := sr.ProcessByRoute(m)
 				for _, response := range responses {
 					r := response
-					//log.Printf("%s %s", r.Target, "out")
+					//log.Printf("%s %s %v", r.Target, "out", r)
 					ec.Publish(STORE_TOPIC, r)
 				}
 				ms.IncrementTracker(m.TxID)
 			})
 
-		}(ms)
+		}(ms, NewServiceRegister())
 
 	}
 
@@ -101,8 +101,10 @@ func (d *Distributor) RunNATSBus2(poolsize int) {
 		ec.Subscribe(STORE_TOPIC, func(m *NiasMessage) {
 			//log.Printf("%s %s", m.Target, "in")
 			if strings.HasPrefix(m.Target, SIF_MEMORY_STORE_PREFIX) {
+				//log.Println("Store Graph")
 				ms.StoreGraph(m)
 			} else {
+				//log.Println("Store Message")
 				ms.StoreMessage(m)
 			}
 		})
