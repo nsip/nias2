@@ -95,6 +95,11 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create sif2graph service ", err)
 	}
 
+	num, err := NewNumericValidService()
+	if err != nil {
+		log.Fatal("Unable to create numeric validation service ", err)
+	}
+
 	sr.AddService("schema", schema1)
 	sr.AddService("schema2", schema11)
 	sr.AddService("local", schema2)
@@ -104,6 +109,7 @@ func createDefaultServiceRegister() *ServiceRegister {
 	sr.AddService("psi", psi1)
 	sr.AddService("privacy", priv1)
 	sr.AddService("sif2graph", s2g1)
+	sr.AddService("numericvalid", num)
 
 	log.Println("services created & installed in register")
 

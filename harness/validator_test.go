@@ -283,11 +283,11 @@ func TestYearLevelTestLevelMismatch(t *testing.T) {
 }
 
 func TestMaximumFTE(t *testing.T) {
-	test_harness(t, "../unit_test_files/1MaximumFTE.csv", "FTE", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../unit_test_files/1MaximumFTE.csv", "FTE", "FTE is greater than 1")
 }
 
 func TestMinimumFTE(t *testing.T) {
-	test_harness(t, "../unit_test_files/1MinimumFTE.csv", "FTE", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../unit_test_files/1MinimumFTE.csv", "FTE", "FTE is less than 0")
 }
 
 func TestDupGivenLastNameDOBCARAId(t *testing.T) {
