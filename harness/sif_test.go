@@ -132,8 +132,11 @@ func sif2graph_harness(t *testing.T, filename string, json_filename string) {
 	graphstruct := Nias2.GraphStruct{}
 	err = json.Unmarshal(jsondat, &graphstruct)
 	errcheck(t, err)
-	graphstruct1 := Nias2.GraphStruct{}
-	err = json.Unmarshal(ret[0].Body.([]byte), &graphstruct1)
+	/*
+		graphstruct1 := Nias2.GraphStruct{}
+		err = json.Unmarshal(ret[0].Body.([]byte), &graphstruct1)
+	*/
+	graphstruct1 := ret[0].Body.(Nias2.GraphStruct)
 	if !reflect.DeepEqual(graphstruct, graphstruct1) {
 		t.Fatalf("Mapping of %s to SMS graph format did not match %s:\n%s", filename, json_filename, ret[0].Body.(Nias2.GraphStruct))
 	}

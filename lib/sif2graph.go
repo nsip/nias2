@@ -1,7 +1,7 @@
 package nias2
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"errors"
 	"github.com/beevik/etree"
 	"strings"
@@ -227,9 +227,9 @@ func (s2g *Sif2GraphService) HandleMessage(req *NiasMessage) ([]NiasMessage, err
 	r.TxID = req.TxID
 	r.SeqNo = req.SeqNo
 	r.Target = SIF_MEMORY_STORE_PREFIX
-	//r.Body = out
+	r.Body = out
 	// having to JSON marshal this: the struct is blocking NATS2 from proccessing it
-	r.Body, _ = json.Marshal(out)
+	//r.Body, _ = json.Marshal(out)
 	responses = append(responses, r)
 	return responses, nil
 }

@@ -2,6 +2,9 @@
 // shared types for passing validation errors
 // between services
 
+// All types to be encoded directly onto NATS as message bodies must be defined here, and registered
+// with the gob encode in the init() routine
+
 package nias2
 
 import (
@@ -12,6 +15,7 @@ func init() {
 	// make gob encoder aware of local types
 	gob.Register(ValidationError{})
 	gob.Register(RegistrationRecord{})
+	gob.Register(GraphStruct{})
 }
 
 type RegistrationRecord struct {

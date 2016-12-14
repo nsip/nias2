@@ -4,7 +4,7 @@ package nias2
 import (
 	"bytes"
 	"encoding/gob"
-	"encoding/json"
+	//"encoding/json"
 	"github.com/siddontang/goredis"
 	"log"
 	"net"
@@ -110,9 +110,9 @@ func PrefixGraphStruct(s *GraphStruct, prefix string) {
 // parse GraphStruct, and store sets in SMS
 func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 	log.Println("STORING")
-	//graphstruct := m.Body.(GraphStruct)
 	var graphstruct GraphStruct
-	err := json.Unmarshal(m.Body.([]byte), &graphstruct)
+	graphstruct = m.Body.(GraphStruct)
+	//err := json.Unmarshal(m.Body.([]byte), &graphstruct)
 	PrefixGraphStruct(&graphstruct, m.Target)
 	// get the nodes equivalent to the current node
 	prev_equivalents, err := goredis.Strings(ms.C.Do("smembers", "equivalent:ids:"+graphstruct.Guid))
