@@ -31,7 +31,7 @@ func TestYearLevelF(t *testing.T) {
 }
 
 func TestYearLevelP(t *testing.T) {
-	test_harness(t, "../unit_test_files/1students1YearLevelP.csv", "BirthDate/YearLevel", "")
+	test_harness(t, "../unit_test_files/1students1YearLevelP.csv", "BirthDate/TestLevel", "")
 }
 
 func TestFutureBirthdate(t *testing.T) {
@@ -280,6 +280,14 @@ func TestWrongChecksumPreviousPlatformId(t *testing.T) {
 
 func TestYearLevelTestLevelMismatch(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
+}
+
+func TestExtraneousNotPermittedField(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsExtraneousNotPermittedField.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
+}
+
+func TestExtraneousPermittedField(t *testing.T) {
+	test_harness(t, "../unit_test_files/1studentsExtraneousPermittedField.csv", "", "")
 }
 
 func TestMaximumFTE(t *testing.T) {

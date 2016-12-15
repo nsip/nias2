@@ -60,6 +60,11 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create schema service ", err)
 	}
 
+	schema12, err := NewCustomSchemaService("core.returnfields.json")
+	if err != nil {
+		log.Fatal("Unable to create schema service ", err)
+	}
+
 	schema2, err := NewCustomSchemaService("local.json")
 	if err != nil {
 		log.Fatal("Unable to create schema service ", err)
@@ -102,6 +107,7 @@ func createDefaultServiceRegister() *ServiceRegister {
 
 	sr.AddService("schema", schema1)
 	sr.AddService("schema2", schema11)
+	sr.AddService("schema3", schema12)
 	sr.AddService("local", schema2)
 	sr.AddService("id", id1)
 	sr.AddService("dob", dob1)
