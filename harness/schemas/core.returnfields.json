@@ -2,7 +2,6 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "id": "http://naplan.edu.au/fields",
     "type": "object",
-    "additionalProperties": false,
     "title": "NAPLAN validation schema",
     "description": "Schema for validating fields returned  from Platform",
     "name": "/",

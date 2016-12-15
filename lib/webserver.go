@@ -4,10 +4,13 @@ package nias2
 // handles all web interactions with users
 
 import (
+	"bufio"
 	gcsv "encoding/csv"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"github.com/labstack/echo"
+	"io/ioutil"
 	//"github.com/labstack/echo/engine/fasthttp"
 	"bytes"
 	"github.com/labstack/echo/engine/standard"
@@ -82,6 +85,35 @@ func publish(msg *NiasMessage) {
 
 }
 
+// check header of csv file for plausibility
+func checkHeaderCSVforNAPLANValidation(s string) error {
+	// we have grabbed the first 1000 bytes of the csv file.
+	// Grab its first line, and split by comma
+	var lines []string
+
+	scanner := bufio.NewScanner(strings.NewReader(s))
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	jsondat, _ := ioutil.ReadFile("schemas/core.json")
+	var jsonschema map[string]interface{}
+	jsonschema = nil
+	json.Unmarshal(jsondat, &jsonschema)
+	errfields := ""
+	//log.Printf("%v\n", jsonschema)
+	for _, field := range strings.Split(lines[0], ",") {
+		_, prs := jsonschema["properties"].(map[string]interface{})[field]
+		if !prs {
+			errfields = errfields + " " + field
+		}
+	}
+	if len(errfields) > 0 {
+		return fmt.Errorf("%s is not an expected registration field", errfields)
+	}
+	return nil
+}
+
 // read csv file as stream and post records onto processing queue
 func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) {
 
@@ -91,6 +123,7 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 	defer reader.Close()
 
 	i := 0
+
 	txid := nuid.Next()
 	for record := range reader.C() {
 
@@ -311,6 +344,19 @@ func (nws *NIASWebServer) Run() {
 		}
 
 		log.Println("ir: ", ir)
+		return c.JSON(http.StatusAccepted, ir)
+	})
+
+	// sanity check CSV files only
+	e.Post("/naplan/reg/sanityCSV", func(c echo.Context) error {
+		// get the file from the input form
+		parammap := c.FormParams()
+		header := parammap["file"][0]
+
+		ir := IngestResponse{}
+		if err = checkHeaderCSVforNAPLANValidation(header); err != nil {
+			return c.JSON(http.StatusAccepted, map[string]string{"Error": err.Error()})
+		}
 		return c.JSON(http.StatusAccepted, ir)
 	})
 

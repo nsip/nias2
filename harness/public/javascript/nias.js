@@ -64,6 +64,22 @@ $(function() {
             // Append the file name and file size
             tpl.find('p').text(data.files[0].name)
                 .append('<i>' + formatFileSize(data.files[0].size) + '</i>');
+            fName = data.files[0].name;
+	    // csv? then Get first line of the file, to retrieve its header
+	    if(fName.endsWith(".csv") || fName.endsWith(".CSV")) {
+	    var reader = new FileReader();
+	    var blob = data.files[0].slice(0, 1000);
+	    reader.readAsText(blob);
+	    reader.onloadend = function(evt) {
+		    alert(evt.target.result);
+		    $.post("/naplan/reg/sanityCSV", {file : evt.target.result}, function(data1, status){
+			    if(data1["Error"]){
+			            alert("Data: " + data1["Error"] );
+			    }
+				        });
+					    }
+
+	    }
 
             // Add the HTML to the UL element
             data.context = tpl.appendTo(ul);
@@ -111,12 +127,12 @@ $(function() {
 
         done: function(e, data) {
             // console.log(data)
-            fName = data.files[0].name
-                // console.log(fName)
-            txTotal = data.result.Records
-            txID = data.result.TxID
-            $("#progress").html("<h5>Number of records: " + txTotal + "</h5>")
-            monitorProgress()
+            fName = data.files[0].name;
+
+            txTotal = data.result.Records;
+            txID = data.result.TxID;
+            $("#progress").html("<h5>Number of records: " + txTotal + "</h5>");
+            monitorProgress();
         }
 
     });
