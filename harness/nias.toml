@@ -8,14 +8,11 @@ TestYear = "2017"
 
 # Validations to invoke
 # ValidationRoute = ["schema", "local", "id", "dob", "asl"]
-<<<<<<< HEAD
 # ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
-ValidationRoute = ["schema", "asl", "dob", "id"]
-=======
+# ValidationRoute = ["schema", "asl", "dob", "id"]
 ValidationRoute = ["schema", "schema2", "id", "dob", "asl", "psi", "numericvalid"]
 SSFRoute = ["privacy"]
 SMSRoute = ["sif2graph"]
->>>>>>> master
 
 # Webserver port
 WebServerPort = "1325"
