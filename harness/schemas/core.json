@@ -40,13 +40,13 @@
             "description": "Date of Birth for this student.",
             "name": "BirthDate"
         },
-        "ClassCode": {
-            "id": "http://naplan.edu.au/ClassCode",
+        "ClassGroup": {
+            "id": "http://naplan.edu.au/ClassGroup",
             "type": "string",
-            "title": "ClassCode schema.",
-            "maxLength": 10,
+            "title": "ClassGroup schema.",
+            "maxLength": 255,
             "description": "Description",
-            "name": "ClassCode"
+            "name": "ClassGroup"
         },
         "CountryOfBirth": {
             "id": "http://naplan.edu.au/CountryOfBirth",
@@ -85,7 +85,6 @@
             "id": "http://naplan.edu.au/FTE",
             "type": "string",
             "title": "FTE schema.",
-            "maxLength": 4,
             "maximum": 1,
             "minimum": 0,
             "description": "Description",
@@ -95,6 +94,7 @@
             "id": "http://naplan.edu.au/FamilyName",
             "type": "string",
             "title": "FamilyName schema.",
+            "minLength": 1,
             "maxLength": 40,
             "description": "Description",
             "name": "FamilyName"
@@ -104,6 +104,7 @@
             "type": "string",
             "title": "GivenName schema.",
             "description": "Description",
+            "minLength": 1,
             "maxLength": 40,
             "name": "GivenName"
         },
@@ -114,14 +115,6 @@
             "description": "Description",
             "enum":["Y","N","U","X"],
             "name": "HomeSchooledStudent"
-        },
-        "Homegroup": {
-            "id": "http://naplan.edu.au/Homegroup",
-            "type": "string",
-            "title": "Homegroup schema.",
-            "maxLength": 10,
-            "description": "Description",
-            "name": "Homegroup"
         },
         "IndigenousStatus": {
             "id": "http://naplan.edu.au/IndigenousStatus",
@@ -160,6 +153,7 @@
             "type": "string",
             "title": "LocalId schema.",
             "description": "The student id assigned by and used by local school administrative system. Ideally a persistent Local Student Identifier from source system.  Assumed this will be local per school Student Information System.",
+            "minLength": 1,
             "maxLength": 36,
             "name": "LocalId"
         },
@@ -437,7 +431,7 @@
             "id": "http://naplan.edu.au/StateTerritory",
             "type": "string",
             "title": "StateTerritory schema.",
-            "enum":["VIC","TAS","NSW","NT","QLD","WA","ACT","SA","XXX"],
+            "enum":["VIC","TAS","NSW","NT","QLD","WA","ACT","SA","XXX","Other"],
             "description": "Description",
             "name": "StateTerritory"
         },
@@ -484,7 +478,7 @@
             "name": "YearLevel"
         }
     },
-    "required": ["LocalId","FamilyName","GivenName","BirthDate","Sex","CountryOfBirth","FFPOS","IndigenousStatus","StudentLOTE","YearLevel","TestLevel","ASLSchoolId","Parent1SchoolEducation","Parent1NonSchoolEducation","Parent1Occupation","Parent1LOTE","Parent2SchoolEducation","Parent2NonSchoolEducation","Parent2Occupation","Parent2LOTE"]
+    "required": ["LocalId","FamilyName","GivenName","BirthDate","Sex","CountryOfBirth","FFPOS","IndigenousStatus","StudentLOTE","YearLevel","TestLevel","ASLSchoolId","Parent1SchoolEducation","Parent1NonSchoolEducation","Parent1Occupation","Parent1LOTE"]
 }
 
 

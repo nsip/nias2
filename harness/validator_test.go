@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"net/url"
 	"os"
-	"path"
 	"strings"
 	"testing"
 	"time"
@@ -32,12 +30,16 @@ func TestYearLevelF(t *testing.T) {
 	test_harness(t, "../unit_test_files/1students2YearLevelF.csv", "BirthDate/YearLevel", "Student Year Level (yr F) does not match year level derived from BirthDate")
 }
 
+func TestYearLevelP(t *testing.T) {
+	test_harness(t, "../unit_test_files/1students1YearLevelP.csv", "BirthDate/YearLevel", "")
+}
+
 func TestFutureBirthdate(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsFutureBirthDates.csv", "BirthDate/YearLevel", "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges")
 }
 
 func TestMissingParent2LOTE(t *testing.T) {
-	test_harness(t, "../unit_test_files/1students2MissingParent2LOTE.csv", "Parent2LOTE", "Parent2LOTE is required")
+	test_harness(t, "../unit_test_files/1students2MissingParent2LOTE.csv", "Parent2LOTE", "Must be present if other Parent2 fields are present")
 }
 
 func TestACARAIDandStateBlank(t *testing.T) {
@@ -86,10 +88,6 @@ func TestExceedCharLengthsAddress(t *testing.T) {
 
 func TestExceedCharLengthsGivenName(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsExceedCharLengthsGivenName.csv", "GivenName", "String length must be less than or equal to 40")
-}
-
-func TestExceedLengthHomeGrp(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsExceedLengthHomeGrp.csv", "Homegroup", "String length must be less than or equal to 10")
 }
 
 func TestInvalidAcaraId(t *testing.T) {
@@ -189,19 +187,19 @@ func TestMissingMandatoryParent1Occupation(t *testing.T) {
 }
 
 func TestMissingMandatoryParent2LOTE(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2LOTE.csv", "Parent2LOTE", "Parent2LOTE is required")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2LOTE.csv", "Parent2LOTE", "Must be present if other Parent2 fields are present")
 }
 
 func TestMissingMandatoryParent2NonSchoolEducation(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2NonSchoolEduc.csv", "Parent2NonSchoolEducation", "Parent2NonSchoolEducation is required")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2NonSchoolEduc.csv", "Parent2NonSchoolEducation", "Must be present if other Parent2 fields are present")
 }
 
 func TestMissingMandatoryParent2Occupation(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2Occupation.csv", "Parent2Occupation", "Parent2Occupation is required")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2Occupation.csv", "Parent2Occupation", "Must be present if other Parent2 fields are present")
 }
 
 func TestMissingMandatoryParent2SchoolEducation(t *testing.T) {
-	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2SchlEduc.csv", "Parent2SchoolEducation", "Parent2SchoolEducation is required")
+	test_harness(t, "../unit_test_files/1studentsMissingMandatoryParent2SchlEduc.csv", "Parent2SchoolEducation", "Must be present if other Parent2 fields are present")
 }
 
 func TestMissingMandatoryCountryOfBirth(t *testing.T) {
@@ -284,6 +282,14 @@ func TestYearLevelTestLevelMismatch(t *testing.T) {
 	test_harness(t, "../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
 }
 
+func TestMaximumFTE(t *testing.T) {
+	test_harness(t, "../unit_test_files/1MaximumFTE.csv", "FTE", "FTE is greater than 1")
+}
+
+func TestMinimumFTE(t *testing.T) {
+	test_harness(t, "../unit_test_files/1MinimumFTE.csv", "FTE", "FTE is less than 0")
+}
+
 func TestDupGivenLastNameDOBCARAId(t *testing.T) {
 	for i := 0; i < 20; i++ {
 		test_harness(t, "../unit_test_files/2studentsDupGivenLastNameDOBSchool.csv", "Multiple (see description)", "otential duplicate of record")
@@ -296,41 +302,27 @@ func TestDuplicateStudentOneSchool(t *testing.T) {
 	}
 }
 
+func errcheck(t *testing.T, err error) {
+	if err != nil {
+		t.Fatalf("Error %s", err)
+	}
+}
+
 /* if errfield is nil, we expect test to pass */
 func test_harness(t *testing.T, filename string, errfield string, errdescription string) {
-	var f *os.File
 	var err error
 	bytebuf := []byte{}
 	dat := []map[string]string{}
 
-	if f, err = os.Open(filename); err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	defer f.Close()
-	files := rest.FileMap{
-		"validationFile": []rest.File{{
-			Name:   path.Base(f.Name()),
-			Reader: f},
-		},
-	}
-	requestVariables := url.Values{"name": {path.Base(f.Name())}}
-	msg, err := rest.NewMultipartMessage(requestVariables, files)
-	if err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	dst := map[string]interface{}{}
-	if err = customClient.PostMultipart(&dst, "/naplan/reg/validate", msg); err != nil {
-		t.Fatalf("Error %s", err)
-	}
-	txid := dst["TxID"].(string)
+	txid, err := post_file(filename, "/naplan/reg/validate")
+	errcheck(t, err)
 	time.Sleep(100 * time.Millisecond)
-	if err = customClient.Get(&bytebuf, "/naplan/reg/results/"+txid, nil); err != nil {
-		t.Fatalf("Error %s", err)
-	}
+
+	err = customClient.Get(&bytebuf, "/naplan/reg/results/"+txid, nil)
+	errcheck(t, err)
 	// we are getting back a JSON array
-	if err = json.Unmarshal(bytebuf, &dat); err != nil {
-		t.Fatalf("Error %s", err)
-	}
+	err = json.Unmarshal(bytebuf, &dat)
+	errcheck(t, err)
 	log.Println(dat)
 	if errfield == "" {
 		if len(dat) > 0 {

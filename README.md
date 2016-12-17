@@ -79,11 +79,13 @@ Configuration file for NIAS:
   * TestYear: the baseline year for date of birth validation 
   * ValidationRoute: the validators to which every incoming message is sent
       * `schema`: schema validation against `core.json`  
+      * `schema2`: schema validation against `core_parent2.json` (ensures that if one Parent2 field is present, all such fields are present)
       * `local`: schema validation against `local.json` 
       * `id`: identity validation (detection of duplicates)
       * `dob`: date of birth validation
       * `asl`: check of validity of ASL school identifers
       * `psi`: check of validity of Platform Student Identifier checksums
+      * `numericvalid`: does number validation on contents of schema (currently restricted to FTE maximum and minimum for NAPLAN)
   * WebServerPort: the port on which the NIAS web server runs
   * PoolSize: the number of parallel connections run in the microservice distributor
   * MsgTransport: the connection mode used for the microservice distributor
@@ -94,6 +96,7 @@ Configuration file for NIAS:
 Configuration files:
   * `harness/schemas/` : Schemas for validating incoming messages. CSV is converted to JSON, and is validated against JSON Schema:
     * `core.json`: The schema for NAPLAN registration records.
+    * `core_parent2.json`: The schema ensuring that if one Parent2 field is present, all such fields are present.
     * `local.json`: Dummy schema for local validation of NAPLAN registration records. Can be used to impose more restrictive conditions on validation, to satisfy local requirements.
   * `harness/schoolslist/` : Contains CSV export of the [Australian Schools List](http://asl.acara.edu.au), using in validation
   * `harness/templates/` : Contains templates for populating SIF XML
@@ -113,6 +116,8 @@ Configuration files:
     * This means that all microservice outputs are output to ledis.
 * Microservices invoked by NIAS via the message Route attribute 
   * `dobservice.go` : Date of Birth validator
+  * `psiservice.go`: Checksum validator for Platform Student Identifiers
+  * `numericvalidservice.go`: Validator of numeric values in NAPLAN registration
   * `idservice.go` : Check each message in a transmission for uniqueness within the transmission. Check involves two keys: (LocalId, ASLSchoolId), and (LocalId, ASLSchoolId, FamilyName, GivenName, BirthDate).
   * `schemaservice.go` : Validate a message against either the core JSON schema or the local JSON schema. The service replaces some JSON Schema error messages with custom messages.
 * Support code

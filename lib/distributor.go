@@ -8,7 +8,8 @@ package nias2
 
 import (
 	"github.com/nats-io/go-nats-streaming"
-	// "log"
+	//"log"
+	"strings"
 )
 
 // creates a pool of message handlers which process the
@@ -28,7 +29,12 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 		go func(pc STANProcessChain, ms *MessageStore, id int) {
 
 			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *stan.Msg) {
-				ms.StoreMessage(DecodeNiasMessage(m.Data))
+				msg := DecodeNiasMessage(m.Data)
+				if strings.HasPrefix(msg.Target, SIF_MEMORY_STORE_PREFIX) {
+					ms.StoreGraph(msg)
+				} else {
+					ms.StoreMessage(msg)
+				}
 			})
 
 		}(pc, ms, i)
@@ -79,6 +85,7 @@ func (d *Distributor) RunNATSBus2(poolsize int) {
 				responses := sr.ProcessByRoute(m)
 				for _, response := range responses {
 					r := response
+					//log.Printf("%s %s", r.Target, "out")
 					ec.Publish(STORE_TOPIC, r)
 				}
 				ms.IncrementTracker(m.TxID)
@@ -92,7 +99,12 @@ func (d *Distributor) RunNATSBus2(poolsize int) {
 	go func(ms *MessageStore) {
 
 		ec.Subscribe(STORE_TOPIC, func(m *NiasMessage) {
-			ms.StoreMessage(m)
+			//log.Printf("%s %s", m.Target, "in")
+			if strings.HasPrefix(m.Target, SIF_MEMORY_STORE_PREFIX) {
+				ms.StoreGraph(m)
+			} else {
+				ms.StoreMessage(m)
+			}
 		})
 
 	}(ms)
@@ -112,7 +124,11 @@ func (d *Distributor) RunNATSBus(poolsize int) {
 		go func(pc NATSProcessChain, ms *MessageStore) {
 
 			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *NiasMessage) {
-				ms.StoreMessage(m)
+				if strings.HasPrefix(m.Target, SIF_MEMORY_STORE_PREFIX) {
+					ms.StoreGraph(m)
+				} else {
+					ms.StoreMessage(m)
+				}
 			})
 
 		}(pc, ms)
@@ -155,9 +171,15 @@ func (d *Distributor) RunMemBus(poolsize int) {
 		// create storage handler
 		go func(pc MemProcessChain, ms *MessageStore) {
 
+			var msg NiasMessage
 			for {
-				msg := <-pc.store_chan
-				ms.StoreMessage(msg)
+				msg = <-pc.store_chan
+				if msg.Target == SIF_MEMORY_STORE_PREFIX {
+					ms.StoreGraph(&msg)
+				} else {
+					ms.StoreMessage(&msg)
+				}
+				//log.Printf("\t>%v %s %s\n", msg.Target, msg.MsgID, msg.SeqNo)
 			}
 
 		}(pc, ms)
@@ -168,10 +190,10 @@ func (d *Distributor) RunMemBus(poolsize int) {
 			for {
 				msg := <-pc.req_chan
 				// log.Printf("\t\tservice handler recieved msg: %+v", msg)
-				responses := sr.ProcessByRoute(msg)
+				responses := sr.ProcessByRoute(&msg)
 				for _, response := range responses {
 					r := response
-					pc.store_chan <- &r
+					pc.store_chan <- r
 				}
 				ms.IncrementTracker(msg.TxID)
 			}

@@ -9,6 +9,7 @@ import (
 	"encoding/xml"
 	"github.com/labstack/echo"
 	//"github.com/labstack/echo/engine/fasthttp"
+	"bytes"
 	"github.com/labstack/echo/engine/standard"
 	mw "github.com/labstack/echo/middleware"
 	ms "github.com/mitchellh/mapstructure"
@@ -28,6 +29,8 @@ import (
 )
 
 var VALIDATION_ROUTE = NiasConfig.ValidationRoute
+var SSF_ROUTE = NiasConfig.SSFRoute
+var SMS_ROUTE = NiasConfig.SMSRoute
 var req_ec *nats.EncodedConn
 var req_conn stan.Conn
 
@@ -42,6 +45,11 @@ type IngestResponse struct {
 	Records int
 }
 
+// Struct to contain single XML record
+type XMLContainer struct {
+	Value string `xml:",innerxml"`
+}
+
 // truncate the record by removing items that have blank entries.
 // this prevents the validation from throwing validation exceptions
 // for fields that are not mandatory but included as empty in the
@@ -51,7 +59,7 @@ func removeBlanks(m map[string]string) map[string]string {
 	reducedmap := make(map[string]string)
 	for key, val := range m {
 		if val != "" {
-			reducedmap[key] = val
+			reducedmap[key] = strings.TrimSpace(val)
 		}
 	}
 	return reducedmap
@@ -63,19 +71,19 @@ func publish(msg *NiasMessage) {
 
 	switch NiasConfig.MsgTransport {
 	case "MEM":
-		req_chan <- msg
+		req_chan <- *msg
 	case "NATS":
 		req_ec.Publish(REQUEST_TOPIC, msg)
 	case "STAN":
 		req_conn.Publish(REQUEST_TOPIC, EncodeNiasMessage(msg))
 	default:
-		req_chan <- msg
+		req_chan <- *msg
 	}
 
 }
 
 // read csv file as stream and post records onto processing queue
-func enqueueCSV(file multipart.File) (IngestResponse, error) {
+func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) {
 
 	ir := IngestResponse{}
 
@@ -115,7 +123,7 @@ func enqueueCSV(file multipart.File) (IngestResponse, error) {
 }
 
 // read xml file as stream and post records onto processing queue
-func enqueueXML(file multipart.File) (IngestResponse, error) {
+func enqueueXMLforNAPLANValidation(file multipart.File) (IngestResponse, error) {
 
 	ir := IngestResponse{}
 
@@ -164,6 +172,63 @@ func enqueueXML(file multipart.File) (IngestResponse, error) {
 
 }
 
+// read xml file as stream and post records onto processing queue
+func enqueueXML(file multipart.File, usecase string, route []string) (IngestResponse, error) {
+
+	ir := IngestResponse{}
+	v := XMLContainer{"none"}
+
+	var b bytes.Buffer
+	decoder := xml.NewDecoder(file)
+	encoder := xml.NewEncoder(&b)
+	child := false
+	total := 0
+	txid := nuid.Next()
+	for {
+		t, _ := decoder.Token()
+		if t == nil {
+			break
+		}
+		switch se := t.(type) {
+		case xml.StartElement:
+			if child {
+				total++
+
+				decode_err := decoder.DecodeElement(&v, &se)
+				if decode_err != nil {
+					return ir, decode_err
+				}
+				end := se.End()
+				b.Reset()
+				encoder.EncodeToken(t)
+				encoder.Flush()
+
+				msg := &NiasMessage{}
+				msg.Body = b.String() + v.Value
+				b.Reset()
+				encoder.EncodeToken(end)
+				encoder.Flush()
+				msg.Body = msg.Body.(string) + b.String()
+				msg.SeqNo = strconv.Itoa(total)
+				msg.TxID = txid
+				msg.MsgID = nuid.Next()
+				msg.Target = usecase
+				msg.Route = route
+
+				publish(msg)
+			}
+			child = true
+
+		default:
+		}
+	}
+
+	ir.Records = total
+	ir.TxID = txid
+	return ir, nil
+
+}
+
 // start the server
 func (nws *NIASWebServer) Run() {
 
@@ -178,7 +243,6 @@ func (nws *NIASWebServer) Run() {
 			log.Fatalf("Unable to connect to STAN server with cluster id: %s\nError:%s\nService aborting...", NIAS_CLUSTER_ID, stan_err)
 		}
 	}
-
 	log.Println("Initialising uuid generator")
 	config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
 	uuid.SetupFileSystemStateSaver(config)
@@ -197,6 +261,60 @@ func (nws *NIASWebServer) Run() {
 	e := echo.New()
 
 	// handler for data file ingest
+	e.Post("/sifxml/ingest", func(c echo.Context) error {
+		// get the file from the input form
+		file, err := c.FormFile("validationFile")
+		if err != nil {
+			return err
+		}
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		// read onto qs with appropriate handler
+		var ir IngestResponse
+		if strings.Contains(file.Filename, ".xml") {
+			if ir, err = enqueueXML(src, STORE_AND_FORWARD_PREFIX, SSF_ROUTE); err != nil {
+				return err
+			}
+		} else {
+			return c.String(http.StatusBadRequest, "File submitted is not .xml")
+		}
+
+		log.Println("ir: ", ir)
+		return c.JSON(http.StatusAccepted, ir)
+	})
+
+	// handler for data file store as graph
+	e.Post("/sifxml/store", func(c echo.Context) error {
+		// get the file from the input form
+		file, err := c.FormFile("validationFile")
+		if err != nil {
+			return err
+		}
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		// read onto qs with appropriate handler
+		var ir IngestResponse
+		if strings.Contains(file.Filename, ".xml") {
+			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX, SMS_ROUTE); err != nil {
+				return err
+			}
+		} else {
+			return c.String(http.StatusBadRequest, "File submitted is not .xml")
+		}
+
+		log.Println("ir: ", ir)
+		return c.JSON(http.StatusAccepted, ir)
+	})
+
+	// handler for validation of NAPLAN
 	e.Post("/naplan/reg/validate", func(c echo.Context) error {
 
 		// get the file from the input form
@@ -213,11 +331,11 @@ func (nws *NIASWebServer) Run() {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".csv") {
-			if ir, err = enqueueCSV(src); err != nil {
+			if ir, err = enqueueCSVforNAPLANValidation(src); err != nil {
 				return err
 			}
 		} else if strings.Contains(file.Filename, ".xml") {
-			if ir, err = enqueueXML(src); err != nil {
+			if ir, err = enqueueXMLforNAPLANValidation(src); err != nil {
 				return err
 			}
 		} else {
@@ -265,9 +383,9 @@ func (nws *NIASWebServer) Run() {
 		sprsnls := make([]map[string]string, 0)
 		for _, r := range records {
 			r := r.AsMap()
-			r = removeBlanks(r)
-			r["SIFuuid"] = uuid.NewV4().String()
-			sprsnls = append(sprsnls, r)
+			r1 := removeBlanks(r)
+			r1["SIFuuid"] = uuid.NewV4().String()
+			sprsnls = append(sprsnls, r1)
 		}
 
 		// set headers to 'force' file download where appropriate
@@ -305,13 +423,85 @@ func (nws *NIASWebServer) Run() {
 	// get validation analysis results
 	e.Get("/naplan/reg/results/:txid", func(c echo.Context) error {
 
-		msgs, err := GetTxData(c.Param("txid"), false)
+		msgs, err := GetTxData(c.Param("txid"), VALIDATION_PREFIX, false)
 		if err != nil {
 			return err
 		}
 
 		return c.JSON(http.StatusOK, msgs)
 
+	})
+
+	// get filtered text
+	e.Get("/sifxml/ingest/none/:txid", func(c echo.Context) error {
+		msgs, err := GetTxData(c.Param("txid"), STORE_AND_FORWARD_PREFIX+"none::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/low/:txid", func(c echo.Context) error {
+		msgs, err := GetTxData(c.Param("txid"), STORE_AND_FORWARD_PREFIX+"low::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/medium/:txid", func(c echo.Context) error {
+		msgs, err := GetTxData(c.Param("txid"), STORE_AND_FORWARD_PREFIX+"medium::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/high/:txid", func(c echo.Context) error {
+		msgs, err := GetTxData(c.Param("txid"), STORE_AND_FORWARD_PREFIX+"high::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/extreme/:txid", func(c echo.Context) error {
+		msgs, err := GetTxData(c.Param("txid"), STORE_AND_FORWARD_PREFIX+"extreme::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/none", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"none::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/low", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"low::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/medium", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"medium::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/high", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"high::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
+	})
+	e.Get("/sifxml/ingest/extreme", func(c echo.Context) error {
+		msgs, err := GetTxData("", STORE_AND_FORWARD_PREFIX+"extreme::", false)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, msgs)
 	})
 
 	// get the validation errors data for a given transaction as a downloadable csv file
@@ -339,7 +529,7 @@ func (nws *NIASWebServer) Run() {
 			log.Println("error writing headers to csv:", err)
 		}
 
-		data, err := GetTxData(txID, true)
+		data, err := GetTxData(txID, VALIDATION_PREFIX, true)
 		if err != nil {
 			log.Println("Error fetching report data: ", err)
 			return err

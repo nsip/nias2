@@ -42,3 +42,35 @@
 13:50:40.349996 version@stat F·[1 2] S·92MiB[40MiB 51MiB] Sc·[0.25 0.51]
 13:50:40.354542 db@janitor F·5 G·0
 13:50:40.354569 db@open done T·778.830299ms
+=============== Jun 30, 2016 (AEST) ===============
+14:51:38.055164 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:51:38.056086 db@open opening
+14:51:38.057531 version@stat F·[] S·0B[] Sc·[]
+14:51:38.057767 db@janitor F·2 G·0
+14:51:38.057803 db@open done T·1.702801ms
+=============== Jun 30, 2016 (AEST) ===============
+14:53:29.354126 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:53:29.354833 version@stat F·[] S·0B[] Sc·[]
+14:53:29.354854 db@open opening
+14:53:29.354920 journal@recovery F·1
+14:53:29.356368 journal@recovery recovering @1
+14:53:29.817750 memdb@flush created L0@2 N·164732 S·26MiB "\x00\x02\x00..000,v7234":"\x00\x05n..35Q,v20108"
+14:53:29.820321 version@stat F·[1] S·26MiB[26MiB] Sc·[0.25]
+14:53:29.823026 db@janitor F·3 G·0
+14:53:29.823047 db@open done T·468.185521ms
+=============== Jun 30, 2016 (AEST) ===============
+15:42:23.549700 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+15:42:23.557462 version@stat F·[1] S·26MiB[26MiB] Sc·[0.25]
+15:42:23.557614 db@open opening
+15:42:23.558690 journal@recovery F·1
+15:42:23.560274 journal@recovery recovering @3
+15:42:23.590977 memdb@flush created L0@5 N·10068 S·177KiB "\x00\x02\x00..000,v168350":"\x00\x05n..6BS,v174799"
+15:42:23.592440 version@stat F·[2] S·26MiB[26MiB] Sc·[0.50]
+15:42:23.595806 db@janitor F·4 G·0
+15:42:23.595991 db@open done T·38.187757ms
+15:42:23.613154 table@compaction L0·2 -> L1·0 S·26MiB Q·174902
+15:42:23.790815 table@build created L1@8 N·82381 S·25MiB "\x00\x02\x00..000,v168350":"\x00\x05n..6BS,v174801"
+15:42:23.791977 version@stat F·[0 1] S·25MiB[0B 25MiB] Sc·[0.00 0.25]
+15:42:23.793473 table@compaction committed F-1 S-1MiB Ke·0 D·92419 T·178.725489ms
+15:42:23.793596 table@remove removed @5
+15:42:23.797018 table@remove removed @2

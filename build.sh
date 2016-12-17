@@ -6,6 +6,7 @@ CWD=`pwd`
 
 echo "Downloading CORE.json"
 curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > harness/schemas/core.json
+curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > harness/schemas/core_parent2.json
 echo "Downloading gnatsd"
 go get github.com/nats-io/gnatsd
 
@@ -18,7 +19,7 @@ do_build() {
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
-	rsync -a harness/nias.toml harness/public harness/schemas harness/schoolslist harness/templates $OUTPUT/
+	rsync -a harness/nias.toml harness/public harness/schemas harness/schoolslist harness/templates harness/privacyfilters $OUTPUT/
 }
 
 do_shells() {
@@ -51,13 +52,15 @@ do_zip() {
 build_mac64() {
 	# MAC OS X (64 only)
 	echo "Building Mac binaries..."
+	GOOS=darwin
+	GOARCH=amd64
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Mac/go-nias
 	GNATS=gnatsd
 	HARNESS=harness
 	ZIP=go-nias-Mac.zip
 	do_build
-	do_upx
+	#do_upx
 	do_shells
 	do_zip
 	echo "...all Mac binaries built..."
@@ -75,7 +78,7 @@ build_windows64() {
 	HARNESS=harness.exe
 	ZIP=go-nias-Win64.zip
 	do_build
-	do_upx
+	#do_upx
 	do_bats
 	do_zip
 	echo "...all Windows64 binaries built..."
@@ -92,7 +95,7 @@ build_windows32() {
 	HARNESS=harness.exe
 	ZIP=go-nias-Win32.zip
 	do_build
-	do_upx
+	#do_upx
 	do_bats
 	do_zip
 	echo "...all Windows32 binaries built..."
@@ -109,7 +112,7 @@ build_linux64() {
 	HARNESS=harness
 	ZIP=go-nias-Linux64.zip
 	do_build
-	do_goupx
+	#do_goupx
 	do_shells
 	do_zip
 	echo "...all Linux64 binaries built..."
@@ -126,7 +129,7 @@ build_linux32() {
 	HARNESS=harness
 	ZIP=go-nias-Linux32.zip
 	do_build
-	do_goupx
+	#do_goupx
 	do_shells
 	do_zip
 	echo "...all Linux32 binaries built..."

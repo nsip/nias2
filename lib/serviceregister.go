@@ -55,6 +55,11 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create schema service ", err)
 	}
 
+	schema11, err := NewCustomSchemaService("core_parent2.json")
+	if err != nil {
+		log.Fatal("Unable to create schema service ", err)
+	}
+
 	schema2, err := NewCustomSchemaService("local.json")
 	if err != nil {
 		log.Fatal("Unable to create schema service ", err)
@@ -80,12 +85,31 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create psi service ", err)
 	}
 
+	priv1, err := NewPrivacyService()
+	if err != nil {
+		log.Fatal("Unable to create privacy service ", err)
+	}
+
+	s2g1, err := NewSif2GraphService()
+	if err != nil {
+		log.Fatal("Unable to create sif2graph service ", err)
+	}
+
+	num, err := NewNumericValidService()
+	if err != nil {
+		log.Fatal("Unable to create numeric validation service ", err)
+	}
+
 	sr.AddService("schema", schema1)
+	sr.AddService("schema2", schema11)
 	sr.AddService("local", schema2)
 	sr.AddService("id", id1)
 	sr.AddService("dob", dob1)
 	sr.AddService("asl", asl1)
 	sr.AddService("psi", psi1)
+	sr.AddService("privacy", priv1)
+	sr.AddService("sif2graph", s2g1)
+	sr.AddService("numericvalid", num)
 
 	log.Println("services created & installed in register")
 

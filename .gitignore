@@ -41,3 +41,16 @@ harness/var/*.*
 harness/redis/*.*
 
 *.pprof
+
+harness/var/goleveldb_data/CURRENT
+
+harness/var/goleveldb_data/CURRENT
+
+harness/var/goleveldb_data/CURRENT
+
+harness/var/goleveldb_data/CURRENT
+
+harness/var/goleveldb_data/LOCK
+
+harness/var/goleveldb_data/LOG
+
