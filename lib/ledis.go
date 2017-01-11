@@ -10,10 +10,10 @@ import (
 	"log"
 )
 
-const DEF_STORAGE_DB_ADDRESS = "127.0.0.1:6379"
-const DEF_STORAGE_DB_PROXY_ADDRESS = "127.0.0.1:6379"
-const DEF_LOOKUP_DB_ADDRESS = "127.0.0.1:6380"
-const DEF_LOOKUP_DB_PROXY_ADDRESS = "127.0.0.1:6380"
+const DEF_STORAGE_DB_ADDRESS = "127.0.0.1:6397"
+const DEF_STORAGE_DB_PROXY_ADDRESS = "127.0.0.1:6397"
+const DEF_LOOKUP_DB_ADDRESS = "127.0.0.1:6399"
+const DEF_LOOKUP_DB_PROXY_ADDRESS = "127.0.0.1:6399"
 
 // alternative ports for db clustering; twemproxy, xcodis etc.
 // const DEF_DB_ADDRESS = "127.0.0.1:6379"

@@ -57,4 +57,5 @@ PoolSize = 3
 # Remember to set -cluster_id of streaming server to 'nias' if used.
 
 MsgTransport = "NATS"
+# MsgTransport = "MEM"
 # ============================================================================
