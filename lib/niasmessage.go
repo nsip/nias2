@@ -2,7 +2,7 @@
 
 // Message wrapper types to embed metadata for nias
 // service handlers
-package nias2
+package lib
 
 // meta-data for all messages
 type NiasContext struct {
