@@ -9,6 +9,8 @@ package nias2
 
 import (
 	"encoding/gob"
+	"encoding/xml"
+	"github.com/nsip/nias2/go_SifMessage"
 )
 
 func init() {
@@ -16,6 +18,7 @@ func init() {
 	gob.Register(ValidationError{})
 	gob.Register(RegistrationRecord{})
 	gob.Register(GraphStruct{})
+	gob.Register(SifStudentPersonal{})
 }
 
 type RegistrationRecord struct {
@@ -103,4 +106,10 @@ type GraphStruct struct {
 	Type          string            // object type
 	Links         []string          // list of related ids
 	Label         string            // human readable label
+}
+
+// from metaleap/go-xsd conversion
+type SifStudentPersonal struct {
+	XMLName xml.Name `xml:"StudentPersonal"`
+	go_SifMessage.TStudentPersonalType
 }

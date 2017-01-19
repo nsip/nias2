@@ -8,8 +8,8 @@ TestYear = "2017"
 
 # Validations to invoke
 # ValidationRoute = ["schema", "local", "id", "dob", "asl"]
-ValidationRoute = ["schema", "schema2", "schema3", "id", "dob", "asl", "psi", "numericvalid"]
-SSFRoute = ["privacy"]
+ValidationRoute = ["schema", "NAPLANdependencyschema", "NAPLANreturnschema", "noextraneouselements", "id", "dob", "asl", "psi", "numericvalid"]
+SSFRoute = ["sifvalidation", "privacy"]
 SMSRoute = ["sif2graph"]
 
 # Webserver port

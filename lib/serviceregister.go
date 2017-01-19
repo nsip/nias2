@@ -70,6 +70,11 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create schema service ", err)
 	}
 
+	schema3, err := NewCustomSchemaService("core.noextraneous.json")
+	if err != nil {
+		log.Fatal("Unable to create schema service ", err)
+	}
+
 	id1, err := NewIDService()
 	if err != nil {
 		log.Fatal("Unable to create id service ", err)
@@ -105,9 +110,15 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create numeric validation service ", err)
 	}
 
+	sif, err := NewSifValidationService()
+	if err != nil {
+		log.Fatal("Unable to create numeric validation service ", err)
+	}
+
 	sr.AddService("schema", schema1)
-	sr.AddService("schema2", schema11)
-	sr.AddService("schema3", schema12)
+	sr.AddService("NAPLANdependencyschema", schema11)
+	sr.AddService("NAPLANreturnschema", schema12)
+	sr.AddService("noextraneouselements", schema3)
 	sr.AddService("local", schema2)
 	sr.AddService("id", id1)
 	sr.AddService("dob", dob1)
@@ -116,6 +127,7 @@ func createDefaultServiceRegister() *ServiceRegister {
 	sr.AddService("privacy", priv1)
 	sr.AddService("sif2graph", s2g1)
 	sr.AddService("numericvalid", num)
+	sr.AddService("sifvalidation", sif)
 
 	log.Println("services created & installed in register")
 
