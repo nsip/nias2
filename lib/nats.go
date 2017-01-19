@@ -1,10 +1,10 @@
 // nats.go
 
-package nias2
+package lib
 
 import (
+	"github.com/nats-io/go-nats"
 	"github.com/nats-io/go-nats-streaming"
-	"github.com/nats-io/nats"
 	"github.com/nats-io/nuid"
 	"log"
 )
@@ -16,6 +16,7 @@ const REQUEST_TOPIC = "requests"
 const STORE_TOPIC = "store"
 const TRACK_TOPIC = "track"
 const NIAS_CLUSTER_ID = "nias"
+const NAP_VAL_CID = "nap-val"
 
 var req_chan = make(chan NiasMessage, 1)
 

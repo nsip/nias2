@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Import Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- jquery support -->
+    <script src="javascript/jquery-2.1.4.min.js"></script>
+    <!-- jQuery File Upload Dependencies -->
+    <script src="javascript/jquery.ui.widget.js"></script>
+    <script src="javascript/jquery.iframe-transport.js"></script>
+    <script src="javascript/jquery.fileupload.js"></script>
+    <!-- charting support -->
+    <script src="javascript/d3.min.js" charset="utf-8"></script>
+    <!-- <script src="javascript/dimple.v2.1.6.min.js"></script> -->
+    <script src="javascript/crossfilter.min.js"></script>
+    <script src="javascript/dc.min.js"></script>
+    <link rel="stylesheet" href="css/dc.min.css">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+    <!-- material-ui suport -->
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- The app js file -->
+    <script type="text/javascript" src="js/nias2.js"></script>
+</head>
+
+<body class="grey lighten-4">
+    <!--  -->
+    <!-- Navigation Bar -->
+    <!--  -->
+    <!--  -->
+    <nav class="top-nav blue darken-1">
+        <div class="container">
+            <div class="nav-wrapper"><a class="brand-logo right" target="_blank" href="http://www.nsip.edu.au">NSIP NIAS</a></div>
+        </div>
+    </nav>
+    <!--  -->
+    <!--  -->
+    <!--  -->
+    <div class="divider"></div>
+    <!-- content header section -->
+    <div class="blue darken-1">
+        <div class="container">
+            <div class="section">
+                <div class="row">
+                    <div class="col s12 center">
+                        <h3><i class="mdi-content-send brown-text"></i></h3>
+                        <h4 class="header light left-align white-text">Validate NAPLAN Registration Data</h4>
+                        <p class="left-align light white-text">
+                            Select a CSV or XML file containing NAPLAN registration data with the File selctor below, or by dragging file from your desktop onto the grey line. Press the green arrow button to run the validation analysis. For access to the user guide and resource links click on the floating blue menu button in the lower right hand corner of the page.
+                        </p>
+                    </div>
+                </div>
+                <div class="row>">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <!--  -->
+    <!-- File chooser & validate action -->
+    <!--  -->
+    <!--  -->
+    <div class="container">
+        <div class="section">
+            <div class="row">
+                <div class="col s11 center">
+                    <form method="post" action="/naplan/reg/validate" enctype="multipart/form-data">
+                        <div class="file-field input-field">
+                            <div class="btn green">
+                                <span>File</span>
+                                <input id="upload" type="file" name="validationFile" multiple="false">
+                            </div>
+                            <div class="file-path-wrapper" id="fname">
+                                <input class="file-path validate" type="text">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!--  -->
+                <!--  -->
+                <!-- Validate Action -->
+                <!--  -->
+                <!--  -->
+                <div class="col s1 center">
+                    <a class="btn-floating btn-large waves-effect waves-light green" id="validate"><i class="material-icons">play_arrow</i></a>
+                </div>
+                <!--  -->
+                <!-- FAB for extra actions -->
+                <!--  -->
+                <!--  -->
+                <div class="col s2 center">
+                    <div class="fixed-action-btn horizontal click-to-toggle">
+                        <a class="btn-floating btn-large blue">
+                            <i class="material-icons">menu</i>
+                        </a>
+                        <ul>
+                            <!-- links to other useful resources -->
+                            <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="registration data set specification" href="https://github.com/nsip/registration-data-set" target="_blank"><i class="material-icons">web</i></a></li>
+                            <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="registration data privacy" href="#modal1"><i class="material-icons">fingerprint</i></a></li>
+                            <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="registration validation help" href="/nias8help.pdf" target="_blank"><i class="material-icons">help</i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Modal Privacy Dialog -->
+                <div id="modal1" class="modal">
+                    <div class="modal-content">
+                        <h4>Conditions of Data Use</h4>
+                        <p>Please use any NAPLAN data in accordance with your local privacy and data usage policies. </p>
+                        <p>Usage should comply with the Privacy Act 1988 (Cth) to maintain the privacy of personal information contained within each data extract or report. </p>
+                        <p>Data controls on the assessment platform are unable to be applied to data outside of the Assessment platform and therefore treat all data with care. </p>
+                        <p>In order to maintain the privacy of the data after you have validated it, users must confirm and agree that:
+                        </p>
+                        <ol>
+                            <li>you are authorised to access and store the Data;</li>
+                            <li>your organisation has privacy and security controls in place in order to protect the privacy and security of the Data; and</li>
+                            <li>you will take all reasonable steps to ensure that the Data will not be misused, interfered with, lost, modified or disclosed to unauthorised personnel.</li>
+                        </ol>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Accept</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end of file chooser container -->
+    <!--  -->
+    <!--  -->
+    <!--  -->
+    <!-- Display Analysis progress -->
+    <div class="container">
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Progress</span>
+                        <div id="progress" class="progress">
+                            <div class="indeterminate"></div>
+                        </div>
+                        <p id="upload-message"></p>
+                        <p id="progress-message"></p>
+                        <p id="results-message"></p>
+                    </div>
+                    <!-- Enable downoad of results / convert to sif-xnl from here -->
+                    <div class="card-action">
+                        <a href="#" id="csv-download">Download results as CSV File</a>
+                        <a href="#" id="xml-convert">Convert this file to SIF-XML</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <!--  -->
+    <!-- Results Display -->
+    <!--  -->
+    <div class="container" id="results_container">
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Validation Results</span>
+                        <!--  -->
+                        <!-- Results navigation Graphs -->
+                        <!--  -->
+                        <div class="row">
+                            <div class="col s6">
+                                <div id="errors-chart">
+                                    <p>Validation Errors by Record Order</p>
+                                    <!-- <span class="reset" style="display: none;"></span> -->
+                                    <a class="" href="javascript:dc.filterAll(); dc.renderAll();" style="display: none;">reset</a>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col s6">
+                                <div id="errors-by-type-chart">
+                                    <p>Errors By Validation Type</p>
+                                    <a class="" href="javascript:dc.filterAll(); dc.renderAll();" style="display: none;">reset</a>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12 valign-wrapper">
+                                <div class="dc-data-count">
+                                    <span class="filter-count"></span> selected out of <span class="total-count"></span> records | <a href="javascript:dc.filterAll(); dc.renderAll();">reset</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <!--  Results Data Table -->
+                        <!--  -->
+                        <div class="row">
+                            <div class="col s12">
+                                <table class="table table-hover dc-data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Original Line No.</th>
+                                            <th>Error Type</th>
+                                            <th>Error Field</th>
+                                            <th>Error Description</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- This is the end of the results content area -->
+                    <!--  -->
+                    <!--  Card footer -->
+                    <!-- Enable downoad of results / convert to sif-xnl from here -->
+                    <div class="card-action">
+                        <a href="#" id="csv-download2">Download results as CSV File</a>
+                        <a href="#" id="xml-convert2">Convert this file to SIF-XML</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <!--  -->
+    <!--  -->
+    <!-- End of results container -->
+    <!--  -->
+    <!--  -->
+    <!--  -->
+    <!-- hidden form for csv-xml conversion -->
+    <!--  -->
+    <div class="hide">
+        <form action="/naplan/reg/convert" method="post" enctype="multipart/form-data" id="convForm">
+            <input type="file" name="conversionFile" id="fileConvert">
+        </form>
+    </div>
+</body>
+
+</html>

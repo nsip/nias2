@@ -1,7 +1,7 @@
 // service.go
 
 // service interface to handle message requests
-package nias2
+package lib
 
 import ()
 
