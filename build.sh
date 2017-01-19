@@ -16,7 +16,7 @@ do_build() {
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
 	cd $CWD
 	cd ./harness
-	go get
+	go get 
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
 	rsync -a harness/nias.toml harness/public harness/schemas harness/schoolslist harness/templates harness/privacyfilters $OUTPUT/

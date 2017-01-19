@@ -26,7 +26,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
+	//"time"
 )
 
 var VALIDATION_ROUTE = lib.DefaultConfig.ValidationRoute
@@ -182,8 +182,9 @@ func (vws *ValidationWebServer) Run() {
 	req_ec = lib.CreateNATSConnection()
 
 	log.Println("Initialising uuid generator")
-	config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
-	uuid.SetupFileSystemStateSaver(config)
+	// config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
+	// uuid.SetupFileSystemStateSaver(config)
+	uuid.Init()
 	log.Println("UUID generator initialised.")
 
 	log.Println("Loading xml conversion templates")
