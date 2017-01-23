@@ -1,0 +1,412 @@
+<StudentPersonals  xmlns="http://www.sifassociation.org/au/datamodel/3.4">
+    <StudentPersonal RefId="0b0c3c0e-1a79-4330-bed4-fec30945fa36">
+      <LocalId>gqhvy514</LocalId>
+      <StateProvinceId></StateProvinceId>
+      <OtherIdList>
+        <OtherId Type="SectorStudentId">75346</OtherId>
+        <OtherId Type="DiocesanStudentId">84945</OtherId>
+        <OtherId Type="OtherStudentId">55629</OtherId>
+        <OtherId Type="TAAStudentId">24653</OtherId>
+        <OtherId Type="NationalStudentId">33999</OtherId>
+        <OtherId Type="NAPPlatformStudentId">540</OtherId>
+        <OtherId Type="PreviousLocalSchoolStudentId">3374</OtherId>
+        <OtherId Type="PreviousSectorStudentId">75911</OtherId>
+        <OtherId Type="PreviousDiocesanStudentId">44624</OtherId>
+        <OtherId Type="PreviousOtherStudentId">29026</OtherId>
+        <OtherId Type="PreviousTAAStudentId">83755</OtherId>
+        <OtherId Type="PreviousStateProvinceId"></OtherId>
+        <OtherId Type="PreviousNationalStudentId">38284</OtherId>
+        <OtherId Type="PreviousNAPPlatformStudentId">55807</OtherId>
+      </OtherIdList>
+      <PersonInfo>
+        <Name Type="LGL">
+          <FamilyName>Baker</FamilyName>
+          <GivenName>Cynthia</GivenName>
+          <MiddleName>C</MiddleName>
+          <PreferredGivenName>Cynthia</PreferredGivenName>
+        </Name>
+        <Demographics>
+          <IndigenousStatus>2</IndigenousStatus>
+          <Sex>2</Sex>
+          <BirthDate>2009-08-01</BirthDate>
+          <CountryOfBirth>118</CountryOfBirth>
+          <LanguageList>
+            <Language>
+              <Code>118</Code>
+              <LanguageType>4</LanguageType>
+            </Language>
+          </LanguageList>
+          <VisaSubClass>500</VisaSubClass>
+          <LBOTE>Y</LBOTE>
+        </Demographics>
+        <AddressList>
+          <Address Type="0765" Role="012B">
+            <Street>
+              <Line1>634 Frenchmen Street asdfgfdnbdjhgtghdujhasdfg</Line1>
+              <Line2></Line2>
+            </Street>
+            <City>CORNELIA CREEK</City>
+            <StateProvince>VIC</StateProvince>
+            <Country>1101</Country>
+            <PostalCode>3622</PostalCode>
+          </Address>
+        </AddressList>
+      </PersonInfo>
+      <MostRecent>
+        <SchoolLocalId>37298</SchoolLocalId>
+        <YearLevel>
+          <Code>3</Code>
+        </YearLevel>
+        <FTE>0.63</FTE>
+        <Parent1Language>6199</Parent1Language>
+        <Parent2Language>118</Parent2Language>
+        <Parent1EmploymentType>4</Parent1EmploymentType>
+        <Parent2EmploymentType>1</Parent2EmploymentType>
+        <Parent1SchoolEducationLevel>4</Parent1SchoolEducationLevel>
+        <Parent2SchoolEducationLevel>1</Parent2SchoolEducationLevel>
+        <Parent1NonSchoolEducation>7</Parent1NonSchoolEducation>
+        <Parent2NonSchoolEducation>6</Parent2NonSchoolEducation>
+        <LocalCampusId>1</LocalCampusId>
+        <SchoolACARAId>44370</SchoolACARAId>
+        <TestLevel><Code>3</Code></TestLevel>
+        <Homegroup></Homegroup>
+        <ClassGroup>3E</ClassGroup>
+        <MembershipType>1</MembershipType>
+        <FFPOS>2</FFPOS>
+        <ReportingSchoolId>lxwnp178</ReportingSchoolId>
+        <OtherEnrollmentSchoolACARAId>tjtzi844</OtherEnrollmentSchoolACARAId>
+      </MostRecent>
+      <EducationSupport>X</EducationSupport>
+      <HomeSchooledStudent>Y</HomeSchooledStudent>
+      <Sensitive>Y</Sensitive>
+      <OfflineDelivery>N</OfflineDelivery>
+    </StudentPersonal>
+    <StudentPersonal RefId="e561697d-a3be-4ff2-9e93-da88778d8197">
+      <LocalId>mbmrr089</LocalId>
+      <StateProvinceId></StateProvinceId>
+      <OtherIdList>
+        <OtherId Type="SectorStudentId">84222</OtherId>
+        <OtherId Type="DiocesanStudentId">57416</OtherId>
+        <OtherId Type="OtherStudentId">2038</OtherId>
+        <OtherId Type="TAAStudentId">89834</OtherId>
+        <OtherId Type="NationalStudentId">33971</OtherId>
+        <OtherId Type="NAPPlatformStudentId">17531</OtherId>
+        <OtherId Type="PreviousLocalSchoolStudentId">75960</OtherId>
+        <OtherId Type="PreviousSectorStudentId">52801</OtherId>
+        <OtherId Type="PreviousDiocesanStudentId">42003</OtherId>
+        <OtherId Type="PreviousOtherStudentId">18339</OtherId>
+        <OtherId Type="PreviousTAAStudentId">34292</OtherId>
+        <OtherId Type="PreviousStateProvinceId"></OtherId>
+        <OtherId Type="PreviousNationalStudentId">26703</OtherId>
+        <OtherId Type="PreviousNAPPlatformStudentId">66477</OtherId>
+      </OtherIdList>
+      <PersonInfo>
+        <Name Type="LGL">
+          <FamilyName>Collins</FamilyName>
+          <GivenName>Rosalyn</GivenName>
+          <MiddleName>P</MiddleName>
+          <PreferredGivenName>Rosalyn</PreferredGivenName>
+        </Name>
+        <Demographics>
+          <IndigenousStatus>1</IndigenousStatus>
+          <Sex>2</Sex>
+          <BirthDate>2008-07-17</BirthDate>
+          <CountryOfBirth>1101</CountryOfBirth>
+          <LanguageList>
+            <Language>
+              <Code>1201</Code>
+              <LanguageType>4</LanguageType>
+            </Language>
+          </LanguageList>
+          <VisaSubClass>101</VisaSubClass>
+          <LBOTE>N</LBOTE>
+        </Demographics>
+        <AddressList>
+          <Address Type="0765" Role="012B">
+            <Street>
+              <Line1>6810 N. Ridge East</Line1>
+              <Line2></Line2>
+            </Street>
+            <City>MAMBOURIN</City>
+            <StateProvince>VIC</StateProvince>
+            <Country>1101</Country>
+            <PostalCode>3024</PostalCode>
+          </Address>
+        </AddressList>
+      </PersonInfo>
+      <MostRecent>
+        <SchoolLocalId>37298</SchoolLocalId>
+        <YearLevel>
+          <Code>5</Code>
+        </YearLevel>
+        <FTE>0.28</FTE>
+        <Parent1Language></Parent1Language>
+        <Parent2Language>5203</Parent2Language>
+        <Parent1EmploymentType>1</Parent1EmploymentType>
+        <Parent2EmploymentType>3</Parent2EmploymentType>
+        <Parent1SchoolEducationLevel>2</Parent1SchoolEducationLevel>
+        <Parent2SchoolEducationLevel>3</Parent2SchoolEducationLevel>
+        <Parent1NonSchoolEducation>5</Parent1NonSchoolEducation>
+        <Parent2NonSchoolEducation>5</Parent2NonSchoolEducation>
+        <LocalCampusId>1</LocalCampusId>
+        <SchoolACARAId>40987</SchoolACARAId>
+        <TestLevel><Code>5</Code></TestLevel>
+        <Homegroup></Homegroup>
+        <ClassGroup>5D</ClassGroup>
+        <MembershipType>1</MembershipType>
+        <FFPOS>2</FFPOS>
+        <ReportingSchoolId>lxwnp178</ReportingSchoolId>
+        <OtherEnrollmentSchoolACARAId>blreg274</OtherEnrollmentSchoolACARAId>
+      </MostRecent>
+      <EducationSupport>Y</EducationSupport>
+      <HomeSchooledStudent>Y</HomeSchooledStudent>
+      <Sensitive>Y</Sensitive>
+      <OfflineDelivery>N</OfflineDelivery>
+    </StudentPersonal>
+    <StudentPersonal RefId="11b8d737-7f48-4255-9a13-e140b6381918">
+      <LocalId>wiqbk222</LocalId>
+      <StateProvinceId></StateProvinceId>
+      <OtherIdList>
+        <OtherId Type="SectorStudentId">13289</OtherId>
+        <OtherId Type="DiocesanStudentId">5488</OtherId>
+        <OtherId Type="OtherStudentId">39873</OtherId>
+        <OtherId Type="TAAStudentId">79430</OtherId>
+        <OtherId Type="NationalStudentId">74250</OtherId>
+        <OtherId Type="NAPPlatformStudentId">62763</OtherId>
+        <OtherId Type="PreviousLocalSchoolStudentId">82743</OtherId>
+        <OtherId Type="PreviousSectorStudentId">59832</OtherId>
+        <OtherId Type="PreviousDiocesanStudentId">8256</OtherId>
+        <OtherId Type="PreviousOtherStudentId">90632</OtherId>
+        <OtherId Type="PreviousTAAStudentId">8660</OtherId>
+        <OtherId Type="PreviousStateProvinceId"></OtherId>
+        <OtherId Type="PreviousNationalStudentId">83351</OtherId>
+        <OtherId Type="PreviousNAPPlatformStudentId">48378</OtherId>
+      </OtherIdList>
+      <PersonInfo>
+        <Name Type="LGL">
+          <FamilyName>White</FamilyName>
+          <GivenName>Clifford</GivenName>
+          <MiddleName></MiddleName>
+          <PreferredGivenName>Clifford</PreferredGivenName>
+        </Name>
+        <Demographics>
+          <IndigenousStatus>2</IndigenousStatus>
+          <Sex>1</Sex>
+          <BirthDate>2007-09-08</BirthDate>
+          <CountryOfBirth>1101</CountryOfBirth>
+          <LanguageList>
+            <Language>
+              <Code>1201</Code>
+              <LanguageType>4</LanguageType>
+            </Language>
+          </LanguageList>
+          <VisaSubClass>101</VisaSubClass>
+          <LBOTE>N</LBOTE>
+        </Demographics>
+        <AddressList>
+          <Address Type="0765" Role="012B">
+            <Street>
+              <Line1>834 W. Lancaster Ave.</Line1>
+              <Line2></Line2>
+            </Street>
+            <City>CLAYTON</City>
+            <StateProvince>VIC</StateProvince>
+            <Country>1101</Country>
+            <PostalCode>3168</PostalCode>
+          </Address>
+        </AddressList>
+      </PersonInfo>
+      <MostRecent>
+        <SchoolLocalId>37298</SchoolLocalId>
+        <YearLevel>
+          <Code>UG</Code>
+        </YearLevel>
+        <FTE>0.69</FTE>
+        <Parent1Language>1201</Parent1Language>
+        <Parent2Language>1201</Parent2Language>
+        <Parent1EmploymentType>2</Parent1EmploymentType>
+        <Parent2EmploymentType>2</Parent2EmploymentType>
+        <Parent1SchoolEducationLevel>2</Parent1SchoolEducationLevel>
+        <Parent2SchoolEducationLevel>3</Parent2SchoolEducationLevel>
+        <Parent1NonSchoolEducation>6</Parent1NonSchoolEducation>
+        <Parent2NonSchoolEducation>6</Parent2NonSchoolEducation>
+        <LocalCampusId>1</LocalCampusId>
+        <SchoolACARAId>44727</SchoolACARAId>
+        <TestLevel><Code>7</Code></TestLevel>
+        <Homegroup></Homegroup>
+        <ClassGroup>7F</ClassGroup>
+        <MembershipType>1</MembershipType>
+        <FFPOS>1</FFPOS>
+        <ReportingSchoolId>lxwnp178</ReportingSchoolId>
+        <OtherEnrollmentSchoolACARAId>xhcyu890</OtherEnrollmentSchoolACARAId>
+      </MostRecent>
+      <EducationSupport>Y</EducationSupport>
+      <HomeSchooledStudent>Y</HomeSchooledStudent>
+      <Sensitive>Y</Sensitive>
+      <OfflineDelivery>Y</OfflineDelivery>
+    </StudentPersonal>
+    <StudentPersonal RefId="726045d4-866c-4b5a-9977-19142d2c766b">
+      <LocalId></LocalId>
+      <StateProvinceId></StateProvinceId>
+      <OtherIdList>
+        <OtherId Type="SectorStudentId">26592</OtherId>
+        <OtherId Type="DiocesanStudentId">33679</OtherId>
+        <OtherId Type="OtherStudentId">16534</OtherId>
+        <OtherId Type="TAAStudentId">87308</OtherId>
+        <OtherId Type="NationalStudentId">14762</OtherId>
+        <OtherId Type="NAPPlatformStudentId">7021</OtherId>
+        <OtherId Type="PreviousLocalSchoolStudentId">46904</OtherId>
+        <OtherId Type="PreviousSectorStudentId">58939</OtherId>
+        <OtherId Type="PreviousDiocesanStudentId">2125</OtherId>
+        <OtherId Type="PreviousOtherStudentId">40492</OtherId>
+        <OtherId Type="PreviousTAAStudentId">34334</OtherId>
+        <OtherId Type="PreviousStateProvinceId"></OtherId>
+        <OtherId Type="PreviousNationalStudentId">76003</OtherId>
+        <OtherId Type="PreviousNAPPlatformStudentId">32679</OtherId>
+      </OtherIdList>
+      <PersonInfo>
+        <Name Type="LGL">
+          <FamilyName>Jansen</FamilyName>
+          <GivenName>Buddy</GivenName>
+          <MiddleName>R</MiddleName>
+          <PreferredGivenName>Buddy</PreferredGivenName>
+        </Name>
+        <Demographics>
+          <IndigenousStatus>1</IndigenousStatus>
+          <Sex>1</Sex>
+          <BirthDate>2009-09-10</BirthDate>
+          <CountryOfBirth>1101</CountryOfBirth>
+          <LanguageList>
+            <Language>
+              <Code>1201</Code>
+              <LanguageType>4</LanguageType>
+            </Language>
+          </LanguageList>
+          <VisaSubClass>101</VisaSubClass>
+          <LBOTE>Y</LBOTE>
+        </Demographics>
+        <AddressList>
+          <Address Type="0765" Role="012B">
+            <Street>
+              <Line1>25 E. Crystal Lake Ave.</Line1>
+              <Line2></Line2>
+            </Street>
+            <City></City>
+            <StateProvince>VIC</StateProvince>
+            <Country>1101</Country>
+            <PostalCode>3940</PostalCode>
+          </Address>
+        </AddressList>
+      </PersonInfo>
+      <MostRecent>
+        <SchoolLocalId>37298</SchoolLocalId>
+        <YearLevel>
+          <Code>0</Code>
+        </YearLevel>
+        <FTE>0.16</FTE>
+        <Parent1Language>1201</Parent1Language>
+        <Parent2Language>1201</Parent2Language>
+        <Parent1EmploymentType>2</Parent1EmploymentType>
+        <Parent2EmploymentType>2</Parent2EmploymentType>
+        <Parent1SchoolEducationLevel>2</Parent1SchoolEducationLevel>
+        <Parent2SchoolEducationLevel>1</Parent2SchoolEducationLevel>
+        <Parent1NonSchoolEducation>8</Parent1NonSchoolEducation>
+        <Parent2NonSchoolEducation>5</Parent2NonSchoolEducation>
+        <LocalCampusId>1</LocalCampusId>
+        <SchoolACARAId>49360</SchoolACARAId>
+        <TestLevel><Code>7</Code></TestLevel>
+        <Homegroup></Homegroup>
+        <ClassGroup>7F</ClassGroup>
+        <MembershipType>1</MembershipType>
+        <FFPOS>1</FFPOS>
+        <ReportingSchoolId>lxwnp178</ReportingSchoolId>
+        <OtherEnrollmentSchoolACARAId>jrlvx540</OtherEnrollmentSchoolACARAId>
+      </MostRecent>
+      <EducationSupport>N</EducationSupport>
+      <HomeSchooledStudent>Y</HomeSchooledStudent>
+      <Sensitive>N</Sensitive>
+      <OfflineDelivery>U</OfflineDelivery>
+    </StudentPersonal>
+    <StudentPersonal RefId="1d71ccba-488e-4f2d-b874-af78cf496096">
+      <LocalId>wiqbk222</LocalId>
+      <StateProvinceId></StateProvinceId>
+      <OtherIdList>
+        <OtherId Type="SectorStudentId">13289</OtherId>
+        <OtherId Type="DiocesanStudentId">5488</OtherId>
+        <OtherId Type="OtherStudentId">39873</OtherId>
+        <OtherId Type="TAAStudentId">79430</OtherId>
+        <OtherId Type="NationalStudentId">74250</OtherId>
+        <OtherId Type="NAPPlatformStudentId">62763</OtherId>
+        <OtherId Type="PreviousLocalSchoolStudentId">82743</OtherId>
+        <OtherId Type="PreviousSectorStudentId">59832</OtherId>
+        <OtherId Type="PreviousDiocesanStudentId">8256</OtherId>
+        <OtherId Type="PreviousOtherStudentId">90632</OtherId>
+        <OtherId Type="PreviousTAAStudentId">8660</OtherId>
+        <OtherId Type="PreviousStateProvinceId"></OtherId>
+        <OtherId Type="PreviousNationalStudentId">83351</OtherId>
+        <OtherId Type="PreviousNAPPlatformStudentId">48378</OtherId>
+      </OtherIdList>
+      <PersonInfo>
+        <Name Type="LGL">
+          <FamilyName>White</FamilyName>
+          <GivenName>Clifford</GivenName>
+          <MiddleName></MiddleName>
+          <PreferredGivenName>Clifford</PreferredGivenName>
+        </Name>
+        <Demographics>
+          <IndigenousStatus>2</IndigenousStatus>
+          <Sex>1</Sex>
+          <BirthDate>2008-06-14</BirthDate>
+          <CountryOfBirth>1101</CountryOfBirth>
+          <LanguageList>
+            <Language>
+              <Code>1201</Code>
+              <LanguageType>4</LanguageType>
+            </Language>
+          </LanguageList>
+          <VisaSubClass>101</VisaSubClass>
+          <LBOTE>N</LBOTE>
+        </Demographics>
+        <AddressList>
+          <Address Type="0765" Role="012B">
+            <Street>
+              <Line1>834 W. Lancaster Ave.</Line1>
+              <Line2></Line2>
+            </Street>
+            <City>CLAYTON</City>
+            <StateProvince>VIC</StateProvince>
+            <Country>1101</Country>
+            <PostalCode>3168</PostalCode>
+          </Address>
+        </AddressList>
+      </PersonInfo>
+      <MostRecent>
+        <SchoolLocalId>37298</SchoolLocalId>
+        <YearLevel>
+          <Code>P</Code>
+        </YearLevel>
+        <FTE>0.69</FTE>
+        <Parent1Language>1201</Parent1Language>
+        <Parent2Language>1201</Parent2Language>
+        <Parent1EmploymentType>2</Parent1EmploymentType>
+        <Parent2EmploymentType>2</Parent2EmploymentType>
+        <Parent1SchoolEducationLevel>2</Parent1SchoolEducationLevel>
+        <Parent2SchoolEducationLevel>3</Parent2SchoolEducationLevel>
+        <Parent1NonSchoolEducation>6</Parent1NonSchoolEducation>
+        <Parent2NonSchoolEducation>6</Parent2NonSchoolEducation>
+        <LocalCampusId>1</LocalCampusId>
+        <SchoolACARAId>144370</SchoolACARAId>
+        <TestLevel><Code>7</Code></TestLevel>
+        <Homegroup></Homegroup>
+        <ClassGroup>7F</ClassGroup>
+        <MembershipType>1</MembershipType>
+        <FFPOS>1</FFPOS>
+        <ReportingSchoolId>lxwnp178</ReportingSchoolId>
+        <OtherEnrollmentSchoolACARAId>xhcyu890</OtherEnrollmentSchoolACARAId>
+      </MostRecent>
+      <EducationSupport>Y</EducationSupport>
+      <HomeSchooledStudent>Y</HomeSchooledStudent>
+      <Sensitive>Y</Sensitive>
+      <OfflineDelivery>Y</OfflineDelivery>
+    </StudentPersonal>
+</StudentPersonals>
