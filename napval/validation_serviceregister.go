@@ -135,7 +135,7 @@ func (sr *ServiceRegister) ProcessByRoute(m *lib.NiasMessage) []lib.NiasMessage 
 		}
 	}
 
-	log.Printf("\t\tresponse messages: %+v", response_msgs)
+	//log.Printf("\t\tresponse messages: %+v", response_msgs)
 	return response_msgs
 
 }

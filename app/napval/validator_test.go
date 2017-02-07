@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"log"
+	//"log"
 	"net/url"
 	"os"
 	"path"
@@ -41,6 +41,10 @@ func post_file(filename string, endpoint string) (string, error) {
 	}
 	txid := dst["TxID"].(string)
 	return txid, nil
+}
+
+func TestRepeatPSIwithinSchool(t *testing.T) {
+	test_harness(t, "../../unit_test_files/5StudentsDuplicatePlatformID.csv", "PSI/ASL ID", "Platform Student ID (Student) and ASL ID (School) are potential duplicate")
 }
 
 func TestSexMissingMandatory(t *testing.T) {
@@ -372,7 +376,12 @@ func test_harness(t *testing.T, filename string, errfield string, errdescription
 	}
 	errcheck(t, err)
 	// we are getting back a JSON array
-	log.Println(dat)
+	/*
+		for i := 0; i < len(lines); i++ {
+			log.Println("\t" + string(lines[i]))
+		}
+		log.Println(dat)
+	*/
 	if errfield == "" {
 		if len(dat) > 0 {
 			t.Fatalf("Expected no error, got error in %s: %s", dat["errfield"], dat["description"])

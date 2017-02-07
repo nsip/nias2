@@ -26,6 +26,12 @@ type ID3SimpleKey struct {
 	ASLSchoolId string
 }
 
+// second simple duplicate check: have we seen this PSI for this school before
+type ID3SimpleKey2 struct {
+	PSI         string
+	ASLSchoolId string
+}
+
 // this checks the user against a set of likely colliding matches
 type ID3ExtendedKey struct {
 	LocalId     string
@@ -43,9 +49,10 @@ type IDService3 struct {
 
 // transaction id lookups
 type TransactionIDs struct {
-	Locations    cmap.ConcurrentMap
-	SimpleKeys   *set.Set
-	ExtendedKeys *set.Set
+	Locations         cmap.ConcurrentMap
+	SimpleKeysLocalId *set.Set
+	SimpleKeysPSI     *set.Set
+	ExtendedKeys      *set.Set
 }
 
 // create a new id service instance
@@ -83,8 +90,9 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	// see if dataset exists for this transaction, create if not
 	ids.Transactions.SetIfAbsent(req.TxID,
 		TransactionIDs{Locations: cmap.New(),
-			SimpleKeys:   set.New(),
-			ExtendedKeys: set.New()})
+			SimpleKeysLocalId: set.New(),
+			SimpleKeysPSI:     set.New(),
+			ExtendedKeys:      set.New()})
 
 	// retrieve the transaction dataset from the store
 	tdata, ok := ids.Transactions.Get(req.TxID)
@@ -99,8 +107,12 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	}
 
 	// perform lookups
-	k1 := ID3SimpleKey{
+	k11 := ID3SimpleKey{
 		LocalId:     rr.LocalId,
+		ASLSchoolId: rr.ASLSchoolId,
+	}
+	k12 := ID3SimpleKey2{
+		PSI:         rr.PlatformId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
 	k2 := ID3ExtendedKey{
@@ -111,23 +123,28 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		BirthDate:   rr.BirthDate,
 	}
 
-	simpleKey := fmt.Sprintf("%v", k1)
+	simpleKey1 := fmt.Sprintf("%v", k11)
+	simpleKey2 := fmt.Sprintf("%v", k12)
 	complexKey := fmt.Sprintf("%v", k2)
-	// log.Printf("simplekey: %s\ncompllexkey: %s", simpleKey, complexKey)
-	var simpleRecordExists, complexRecordExists bool
+	//log.Printf("simplekey: %s\nsimplekey2: %s\ncompllexkey: %s", simpleKey1, simpleKey2, complexKey)
+	var simpleRecordExists1, simpleRecordExists2, complexRecordExists bool
 
-	if simpleRecordExists = tids.SimpleKeys.Has(simpleKey); !simpleRecordExists {
-		tids.SimpleKeys.Add(simpleKey)
+	if simpleRecordExists1 = tids.SimpleKeysLocalId.Has(simpleKey1); !simpleRecordExists1 {
+		tids.SimpleKeysLocalId.Add(simpleKey1)
+	}
+	if simpleRecordExists2 = tids.SimpleKeysPSI.Has(simpleKey2); !simpleRecordExists2 {
+		tids.SimpleKeysPSI.Add(simpleKey2)
 	}
 
 	if complexRecordExists = tids.ExtendedKeys.Has(complexKey); !complexRecordExists {
 		tids.ExtendedKeys.Add(complexKey)
 	}
-	tids.Locations.SetIfAbsent(simpleKey, req.SeqNo)
+	tids.Locations.SetIfAbsent(simpleKey1, req.SeqNo)
+	tids.Locations.SetIfAbsent(simpleKey2, req.SeqNo)
 	tids.Locations.SetIfAbsent(complexKey, req.SeqNo)
 
 	// if record is new then just return
-	if !complexRecordExists && !simpleRecordExists {
+	if !complexRecordExists && !simpleRecordExists1 && !simpleRecordExists2 {
 		return responses, nil
 	}
 
@@ -150,13 +167,30 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		r.Body = ve
 		responses = append(responses, r)
 
-	} else if simpleRecordExists {
-		loc, _ := tids.Locations.Get(simpleKey)
+	} else if simpleRecordExists1 {
+		loc, _ := tids.Locations.Get(simpleKey1)
 		ol, _ := loc.(string)
 		desc := "LocalID (Student) and ASL ID (School) are potential duplicate of record: " + ol
 		ve := ValidationError{
 			Description:  desc,
 			Field:        "LocalID/ASL ID",
+			OriginalLine: req.SeqNo,
+			Vtype:        "identity",
+		}
+		r := lib.NiasMessage{}
+		r.TxID = req.TxID
+		r.SeqNo = req.SeqNo
+		// r.Target = VALIDATION_PREFIX
+		r.Body = ve
+		responses = append(responses, r)
+
+	} else if simpleRecordExists2 {
+		loc, _ := tids.Locations.Get(simpleKey2)
+		ol, _ := loc.(string)
+		desc := "Platform Student ID (Student) and ASL ID (School) are potential duplicate of record: " + ol
+		ve := ValidationError{
+			Description:  desc,
+			Field:        "PSI/ASL ID",
 			OriginalLine: req.SeqNo,
 			Vtype:        "identity",
 		}
