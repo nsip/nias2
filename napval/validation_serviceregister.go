@@ -10,6 +10,8 @@ import (
 	"sync"
 )
 
+var config = lib.LoadNAPLANConfig()
+
 // simple thread-safe container for group of services that will be available
 // to process messages passed from a distributor node
 type ServiceRegister struct {
@@ -19,8 +21,8 @@ type ServiceRegister struct {
 
 // creates a ServiceRegister with properly initilaised internal map
 // processing services are stored with a name and the referenced NiasService
-func NewServiceRegister() *ServiceRegister {
-	return createDefaultServiceRegister()
+func NewServiceRegister(nats_cfg lib.NATSConfig) *ServiceRegister {
+	return createDefaultServiceRegister(nats_cfg)
 }
 
 // add a service to the registry with a name
@@ -45,7 +47,7 @@ func (sr *ServiceRegister) FindService(servicename string) lib.NiasService {
 }
 
 // build register with default set of services
-func createDefaultServiceRegister() *ServiceRegister {
+func createDefaultServiceRegister(nats_cfg lib.NATSConfig) *ServiceRegister {
 
 	log.Println("Creating services & register")
 	sr := ServiceRegister{}
@@ -66,12 +68,12 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create schema service ", err)
 	}
 
-	id1, err := NewIDService3()
+	id1, err := NewIDService3(nats_cfg)
 	if err != nil {
 		log.Fatal("Unable to create id service ", err)
 	}
 
-	dob1, err := NewDOBService(lib.DefaultConfig.TestYear)
+	dob1, err := NewDOBService(config.TestYear)
 	if err != nil {
 		log.Fatal("Unable to create dob service ", err)
 	}
@@ -133,7 +135,7 @@ func (sr *ServiceRegister) ProcessByRoute(m *lib.NiasMessage) []lib.NiasMessage 
 		}
 	}
 
-	// log.Printf("\t\tresponse messages: %+v", response_msgs)
+	log.Printf("\t\tresponse messages: %+v", response_msgs)
 	return response_msgs
 
 }

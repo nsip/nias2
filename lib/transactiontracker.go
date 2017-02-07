@@ -16,7 +16,7 @@ func init() {
 
 // interval for status reporting: every n items processed
 // to avoid flooding clients with update messages
-var report_interval = DefaultConfig.TxReportInterval
+var report_interval int
 
 // track status in simple hash counter; key is transactionid, value is no. records processed
 var txStatus = make(map[string]int)
@@ -37,9 +37,9 @@ type TransactionTracker struct {
 }
 
 // create a TransactionTracker
-func NewTransactionTracker() *TransactionTracker {
-
-	return &TransactionTracker{C: CreateNATSConnection()}
+func NewTransactionTracker(TxReportInterval int, cfg NATSConfig) *TransactionTracker {
+	report_interval = TxReportInterval
+	return &TransactionTracker{C: CreateNATSConnection(cfg)}
 
 }
 
@@ -112,6 +112,7 @@ func (tt *TransactionTracker) GetStatusReport(txID string) (significantChange bo
 	report := NiasMessage{}
 	report.TxID = txID
 	report.Body = txu
+	report.Target = "Status Report"
 
 	// otherwise cahnge is small, no update
 	return sigChange, &report

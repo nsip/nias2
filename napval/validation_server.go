@@ -29,10 +29,12 @@ import (
 	//"time"
 )
 
-var VALIDATION_ROUTE = lib.DefaultConfig.ValidationRoute
+var naplanconfig = lib.LoadNAPLANConfig()
+var VALIDATION_ROUTE = naplanconfig.ValidationRoute
+
 var req_ec *nats.EncodedConn
 var req_conn stan.Conn
-var tt = lib.NewTransactionTracker()
+var tt *lib.TransactionTracker //= lib.NewTransactionTracker(naplanconfig.TxReportInterval, NAPLAN_NATS_CFG)
 var stan_conn stan.Conn
 
 var UI_LIMIT int
@@ -176,25 +178,27 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 //
 // start the server
 //
-func (vws *ValidationWebServer) Run() {
+func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 
-	log.Println("Connecting to message bus")
-	req_ec = lib.CreateNATSConnection()
+	log.Println("NAPLAN: Connecting to message bus")
+	req_ec = lib.CreateNATSConnection(nats_cfg)
 
-	log.Println("Initialising uuid generator")
+	log.Println("NAPLAN: Initialising uuid generator")
 	// config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
 	// uuid.SetupFileSystemStateSaver(config)
 	uuid.Init()
-	log.Println("UUID generator initialised.")
+	log.Println("NAPLAN: UUID generator initialised.")
 
-	log.Println("Loading xml conversion templates")
+	tt = lib.NewTransactionTracker(naplanconfig.TxReportInterval, nats_cfg)
+
+	log.Println("NAPLAN: Loading xml conversion templates")
 	fp := path.Join("templates", "studentpersonals.tmpl")
 	tmpl, err := template.ParseFiles(fp)
 	if err != nil {
 		log.Fatalf("Unable to parse xml conversion template, service aborting...")
 	}
 	sptmpl = tmpl
-	log.Println("XML conversion template loaded ok.")
+	log.Println("NAPLAN: XML conversion template loaded ok.")
 
 	//setup stan connection
 	stan_conn, _ = stan.Connect(lib.NAP_VAL_CID, nuid.Next())
@@ -406,6 +410,8 @@ func (vws *ValidationWebServer) Run() {
 		// signal channel to notify asynch stan stream read is complete
 		txComplete := make(chan bool)
 
+		//enc := json.NewEncoder(c.Response())
+
 		// main message handling callback for the stan stream
 		mcb := func(m *stan.Msg) {
 
@@ -422,6 +428,7 @@ func (vws *ValidationWebServer) Run() {
 			case ValidationError:
 				ve := msg.Body.(ValidationError)
 				if err := json.NewEncoder(c.Response()).Encode(ve); err != nil {
+					//if err := enc.Encode(ve); err != nil {
 					log.Println("error encoding json validationerror: ", err)
 				}
 				c.Response().Flush()
@@ -437,7 +444,7 @@ func (vws *ValidationWebServer) Run() {
 				log.Printf("unknown message type in handler: %v", vmsg)
 			}
 
-			// log.Printf("message decoded from stan is:\n\n %+v\n\n", msg)
+			//log.Printf("message decoded from stan is:\n\n %+v\n\n", msg)
 
 		}
 
@@ -547,12 +554,12 @@ func (vws *ValidationWebServer) Run() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	log.Println("Starting web-ui services...")
-	port := lib.DefaultConfig.WebServerPort
-	log.Println("Service is listening on localhost:" + port)
+	log.Println("NAPLAN: Starting web-ui services...")
+	port := naplanconfig.WebServerPort
+	log.Println("NAPLAN: Service is listening on localhost:" + port)
 
 	// set upper bound for no. messages sent to web clients
-	UI_LIMIT = lib.DefaultConfig.UIMessageLimit
+	UI_LIMIT = naplanconfig.UIMessageLimit
 
 	//e.Run(fasthttp.New(":" + port))
 	// e.Run(standard.New(":" + port))

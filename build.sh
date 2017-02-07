@@ -5,47 +5,56 @@ set -e
 CWD=`pwd`
 
 echo "Downloading CORE.json"
-curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > harness/schemas/core.json
-curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > harness/schemas/core_parent2.json
-echo "Downloading gnatsd"
-go get github.com/nats-io/gnatsd
+curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > app/napval/schemas/core.json
+curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > app/napval/schemas/core_parent2.json
+echo "Downloading nats-streaming-server"
+go get github.com/nats-io/nats-streaming-server
 
 do_build() {
 	mkdir -p $OUTPUT
-	cd ../../nats-io/gnatsd
-	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
+	cd ../../nats-io/nats-streaming-server
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
 	cd $CWD
-	cd ./harness
+	cd ./app/napval
 	go get 
-	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
-	cd ..
-	rsync -a harness/nias.toml harness/public harness/schemas harness/schoolslist harness/templates harness/privacyfilters $OUTPUT/
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUT/$NAPVALHARNESS
+	cd $CWD
+	cd ./app/sms
+	go get
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUT/$SMSHARNESS
+	cd $CWD
+	cd ./app
+	rsync -a ../test_data napval/nias8help.pdf napval/napval.toml sms/nias.toml napval/napval_nss.cfg sms/nias_nss.cfg napval/public napval/schemas napval/schoolslist napval/templates sms/privacyfilters $OUTPUT/
 }
 
 do_shells() {
+	cd $CWD
 	cp bin/gonias.sh $OUTPUT/
 	cp bin/stopnias.sh $OUTPUT/
 }
 
 do_bats() {
+	cd $CWD
 	cp bin/gonias.bat $OUTPUT/
 	cp bin/stopnias.bat $OUTPUT/
 }
 
 do_upx() {
 	upx $OUTPUT/$GNATS
-	upx $OUTPUT/$HARNESS
+	upx $OUTPUT/$NAPVALHARNESS
+	upx $OUTPUT/$SMSHARNESS
 }
 
 do_goupx() {
 	goupx $OUTPUT/$GNATS
-	goupx $OUTPUT/$HARNESS
+	goupx $OUTPUT/$SMSHARNESS
+	goupx $OUTPUT/$NAPVALHARNESS
 }
 
 do_zip() {
 	cd $OUTPUT
 	cd ..
-	zip -qr ../$ZIP go-nias
+	zip -qr ../$ZIP go-nias8
 	cd $CWD
 }
 
@@ -55,9 +64,10 @@ build_mac64() {
 	GOOS=darwin
 	GOARCH=amd64
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Mac/go-nias
-	GNATS=gnatsd
-	HARNESS=harness
+	OUTPUT=$CWD/build/Mac/go-nias8
+	GNATS=nats-streaming-server
+	NAPVALHARNESS=napval
+	SMSHARNESS=sms
 	ZIP=go-nias-Mac.zip
 	do_build
 	#do_upx
@@ -73,9 +83,10 @@ build_windows64() {
 	GOOS=windows
 	GOARCH=amd64
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Win64/go-nias
-	GNATS=gnatsd.exe
-	HARNESS=harness.exe
+	OUTPUT=$CWD/build/Win64/go-nias8
+	GNATS=nats-streaming-server.exe
+	NAPVALHARNESS=napval.exe
+	SMSHARNESS=sms.exe
 	ZIP=go-nias-Win64.zip
 	do_build
 	#do_upx
@@ -90,9 +101,10 @@ build_windows32() {
 	GOOS=windows
 	GOARCH=386
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Win32/go-nias
-	GNATS=gnatsd.exe
-	HARNESS=harness.exe
+	OUTPUT=$CWD/build/Win32/go-nias8
+	GNATS=nats-streaming-server.exe
+	NAPVALHARNESS=napval.exe
+	SMSHARNESS=sms.exe
 	ZIP=go-nias-Win32.zip
 	do_build
 	#do_upx
@@ -107,9 +119,10 @@ build_linux64() {
 	GOOS=linux
 	GOARCH=amd64
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Linux64/go-nias
-	GNATS=gnatsd
-	HARNESS=harness
+	OUTPUT=$CWD/build/Linux64/go-nias8
+	GNATS=nats-streaming-server
+	NAPVALHARNESS=napval
+	SMSHARNESS=sms
 	ZIP=go-nias-Linux64.zip
 	do_build
 	#do_goupx
@@ -124,9 +137,10 @@ build_linux32() {
 	GOOS=linux
 	GOARCH=386
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Linux32/go-nias
-	GNATS=gnatsd
-	HARNESS=harness
+	OUTPUT=$CWD/build/Linux32/go-nias8
+	GNATS=nats-streaming-server
+	NAPVALHARNESS=napval
+	SMSHARNESS=sms
 	ZIP=go-nias-Linux32.zip
 	do_build
 	#do_goupx

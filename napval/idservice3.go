@@ -49,9 +49,9 @@ type TransactionIDs struct {
 }
 
 // create a new id service instance
-func NewIDService3() (*IDService3, error) {
+func NewIDService3(nats_config lib.NATSConfig) (*IDService3, error) {
 	ids := IDService3{Transactions: transactionStore,
-		C: lib.CreateNATSConnection()}
+		C: lib.CreateNATSConnection(nats_config)}
 	ids.txMonitor()
 	return &ids, nil
 }

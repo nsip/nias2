@@ -3,6 +3,7 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/nats-io/go-nats"
 	"github.com/nats-io/go-nats-streaming"
 	"github.com/nats-io/nuid"
@@ -67,6 +68,10 @@ type NATSProcessChain struct {
 	store_in_subject string
 }
 
+type NATSConfig struct {
+	Port string
+}
+
 // ProcessChain for running in memory - useful for standaloe use
 // and for resource constrained enviornments, use of blocking channels accross
 // the chain means solution will balance processing accross the chain based on
@@ -96,16 +101,16 @@ func createMemProcessChain() (MemProcessChain, error) {
 
 }
 
-func NewNATSProcessChain() NATSProcessChain {
-	npc, _ := createNATSProcessChain()
+func NewNATSProcessChain(cfg NATSConfig) NATSProcessChain {
+	npc, _ := createNATSProcessChain(cfg)
 	return npc
 }
 
-func createNATSProcessChain() (NATSProcessChain, error) {
+func createNATSProcessChain(cfg NATSConfig) (NATSProcessChain, error) {
 
 	pc := NATSProcessChain{}
 
-	ec := CreateNATSConnection()
+	ec := CreateNATSConnection(cfg)
 
 	distID := nuid.Next()
 	pc.dist_in_conn = ec
@@ -126,10 +131,10 @@ func createNATSProcessChain() (NATSProcessChain, error) {
 }
 
 // helper function to provide encoded connections for standard NATA
-func CreateNATSConnection() *nats.EncodedConn {
+func CreateNATSConnection(cfg NATSConfig) *nats.EncodedConn {
 
 	// var servers = "nats://localhost:4222, nats://localhost:5222, nats://localhost:6222" //cluster
-	var servers = "nats://localhost:4222" // standalone
+	var servers = fmt.Sprintf("nats://localhost:%s", cfg.Port) // standalone
 
 	nc, err := nats.Connect(servers)
 	if err != nil {

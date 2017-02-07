@@ -3,6 +3,9 @@ package sms
 
 import (
 	"github.com/nats-io/go-nats-streaming"
+	"github.com/nats-io/nuid"
+	"github.com/nsip/nias2/lib"
+	"github.com/nsip/nias2/xml"
 	"github.com/siddontang/goredis"
 	"log"
 	"net"
@@ -15,12 +18,20 @@ const VALIDATION_PREFIX = "nvr:"
 const STORE_AND_FORWARD_PREFIX = "ssf:"
 const SIF_MEMORY_STORE_PREFIX = "sms:"
 
-// create a stan connection for storage
-var sc, err = stan.Connect("test-cluster", "store")
-
 type MyGoRedisClient struct {
 	*goredis.Client
 }
+
+// track status in simple hash counter; key is transactionid, value is no. records processed
+var status = make(map[string]int)
+
+// mutex to protect status hash for concurrent updates
+var mutex = &sync.Mutex{}
+
+// LEGACY
+/*
+// create a stan connection for storage
+var sc, err = stan.Connect("test-cluster", "store")
 
 // MessageStore listens for messages on the store topic and captures them
 // in ledis as lists (persistent qs in effect), messages can be stored on transaction
@@ -37,15 +48,9 @@ func NewMessageStore() *MessageStore {
 	return &ms
 }
 
-// track status in simple hash counter; key is transactionid, value is no. records processed
-var status = make(map[string]int)
-
-// mutex to protect status hash for concurrent updates
-var mutex = &sync.Mutex{}
-
 // put message into ledis store
 // endcode converts nias message to byte array for storage
-func (ms *MessageStore) StoreMessage(m *NiasMessage) {
+func (ms *MessageStore) StoreMessage(m *lib.NiasMessage) {
 
 	// store for txaction
 	store_transaction := false
@@ -66,6 +71,92 @@ func (ms *MessageStore) StoreMessage(m *NiasMessage) {
 	if store_usecase {
 		uc_key := m.Target
 		_, err := ms.C.Do("rpush", uc_key, EncodeNiasMessage(m))
+		if err != nil {
+			log.Println("error saving message:uc - ", err)
+		}
+	}
+}
+*/
+
+// amount of error reports to store for any given input file
+var cfg = lib.LoadDefaultConfig()
+var STORE_LIMIT = cfg.TxStorageLimit
+
+// Store assigns messages to output streams for retrieval by clients
+// C is an output stream; Ledis is a Redis instance, used for the graph
+type Store struct {
+	C         stan.Conn
+	Ledis     MyGoRedisClient
+	TxCounter map[string]int
+	TxLimit   map[string]bool
+}
+
+// Returns a Store with an active connection
+// to the stan server.
+func NewStore() *Store {
+	sc, err := stan.Connect(lib.NAP_VAL_CID, nuid.Next())
+	if err != nil {
+		log.Fatalln("Unable to establish storage connection to STAN server, aborting.", err)
+	}
+	log.Println("creating store connnection")
+	vs := Store{
+		C:         sc,
+		Ledis:     MyGoRedisClient{CreateStorageConnection()},
+		TxCounter: make(map[string]int),
+		TxLimit:   make(map[string]bool)}
+	log.Println("created store connnection")
+	return &vs
+}
+
+// put message into stan store/stream
+// endcode converts nias message to byte array for storage
+func (ms *Store) StreamMessage(msg *lib.NiasMessage) {
+
+	// store for txaction
+	// respecting limits of no. error reports for any
+	// transaction
+
+	// var storage_limit_reached bool
+
+	switch t := msg.Body.(type) {
+	case string:
+		ms.TxCounter[msg.TxID]++
+		if !ms.TxLimit[msg.TxID] {
+			err := ms.C.Publish(msg.TxID, lib.EncodeNiasMessage(msg))
+			if err != nil {
+				log.Println("publish to store error: ", err)
+			}
+		}
+		if ms.TxCounter[msg.TxID] >= STORE_LIMIT {
+			ms.TxLimit[msg.TxID] = true
+		}
+	case lib.TxStatusUpdate:
+		err := ms.C.Publish(msg.TxID, lib.EncodeNiasMessage(msg))
+		if err != nil {
+			log.Println("publish to store error: ", err)
+		}
+	default:
+		_ = t
+		log.Printf("unknown message type in storage handler: %v", msg)
+	}
+}
+
+// put message into ledis store
+// endcode converts nias message to byte array for storage
+func (ms *Store) StoreMessage(m *lib.NiasMessage) {
+
+	// store for txaction
+	tx_key := m.Target + m.TxID
+	_, err := ms.Ledis.Do("rpush", tx_key, lib.EncodeNiasMessage(m))
+	if err != nil {
+		log.Println("error saving message:tx: - ", err)
+	}
+	//log.Printf("Storing under %s\n", tx_key)
+
+	store_usecase := true
+	if store_usecase {
+		uc_key := m.Target
+		_, err := ms.Ledis.Do("rpush", uc_key, EncodeNiasMessage(m))
 		if err != nil {
 			log.Println("error saving message:uc - ", err)
 		}
@@ -100,7 +191,7 @@ func SliceDiff(xs []string, ys []string) []string {
 }
 
 // prefix all ids in graphstruct with prefix
-func PrefixGraphStruct(s *GraphStruct, prefix string) {
+func PrefixGraphStruct(s *xml.GraphStruct, prefix string) {
 	s.Guid = prefix + s.Guid
 	for i := range s.EquivalentIds {
 		s.EquivalentIds[i] = prefix + s.EquivalentIds[i]
@@ -114,14 +205,13 @@ func PrefixGraphStruct(s *GraphStruct, prefix string) {
 }
 
 // parse GraphStruct, and store sets in SMS
-func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
-	log.Println("STORING")
-	var graphstruct GraphStruct
-	graphstruct = m.Body.(GraphStruct)
+func (ms *Store) StoreGraph(m *lib.NiasMessage) error {
+	var graphstruct xml.GraphStruct
+	graphstruct = m.Body.(xml.GraphStruct)
 	//err := json.Unmarshal(m.Body.([]byte), &graphstruct)
 	PrefixGraphStruct(&graphstruct, m.Target)
 	// get the nodes equivalent to the current node
-	prev_equivalents, err := goredis.Strings(ms.C.Do("smembers", "equivalent:ids:"+graphstruct.Guid))
+	prev_equivalents, err := goredis.Strings(ms.Ledis.Do("smembers", "equivalent:ids:"+graphstruct.Guid))
 	if err != nil {
 		log.Println("error saving message:storegraph:1 - ", err)
 		return err
@@ -142,10 +232,10 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 					continue
 				}
 				if new_equivalents[i] != new_equivalents[j] {
-					_, err := ms.C.Do("sunionstore", new_equivalents[i], new_equivalents[i], new_equivalents[j])
+					_, err := ms.Ledis.Do("sunionstore", new_equivalents[i], new_equivalents[i], new_equivalents[j])
 					if err != nil {
 						log.Println("error saving message:storegraph:2 - ", err)
-						log.Printf("sunionstore %s %s %s", new_equivalents[i], new_equivalents[i], new_equivalents[j])
+						//log.Printf("sunionstore %s %s %s", new_equivalents[i], new_equivalents[i], new_equivalents[j])
 						return err
 					}
 				}
@@ -158,21 +248,21 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 	// his client's .Do() with a .Send(), which uses .Send() not .Do() on the connection, then issues a final .Do("EXEC")
 	//log.Printf("LABEL1: %s %s", graphstruct.Guid, graphstruct.Label)
 	if graphstruct.Label != "" {
-		_, err := ms.C.Do("hset", "labels", graphstruct.Guid, graphstruct.Label)
+		_, err := ms.Ledis.Do("hset", "labels", graphstruct.Guid, graphstruct.Label)
 		//log.Printf("LABEL: %s %s", graphstruct.Guid, graphstruct.Label)
 		if err != nil {
-			log.Printf("hset labels %s %s", graphstruct.Guid, graphstruct.Label)
+			//log.Printf("hset labels %s %s", graphstruct.Guid, graphstruct.Label)
 			log.Println("error saving message:storegraph:3 - ", err)
 			return err
 		}
 	}
 	if graphstruct.Type != "" {
-		_, err := ms.C.Do("sadd", "known:collections", graphstruct.Type)
+		_, err := ms.Ledis.Do("sadd", "known:collections", graphstruct.Type)
 		if err != nil {
 			log.Println("error saving message:storegraph:4 - ", err)
 			return err
 		}
-		_, err = ms.C.Do("sadd", graphstruct.Type, graphstruct.Guid)
+		_, err = ms.Ledis.Do("sadd", graphstruct.Type, graphstruct.Guid)
 		if err != nil {
 			log.Println("error saving message:storegraph:5 - ", err)
 			return err
@@ -186,8 +276,8 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 			args = append(args, link)
 		}
 
-		//_, err := ms.C.Do("sadd", graphstruct.Guid, graphstruct.Links)
-		_, err := ms.C.Do("sadd", args...)
+		//_, err := ms.Ledis.Do("sadd", graphstruct.Guid, graphstruct.Links)
+		_, err := ms.Ledis.Do("sadd", args...)
 		if err != nil {
 			log.Println("error saving message:storegraph:6 - ", err)
 			return err
@@ -198,8 +288,8 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 			for _, link := range graphstruct.Links {
 				args = append(args, link)
 			}
-			//_, err := ms.C.Do("sadd", id, graphstruct.Links)
-			_, err := ms.C.Do("sadd", args...)
+			//_, err := ms.Ledis.Do("sadd", id, graphstruct.Links)
+			_, err := ms.Ledis.Do("sadd", args...)
 			if err != nil {
 				log.Println("error saving message:storegraph:7 - ", err)
 				return err
@@ -207,12 +297,12 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 		}
 	}
 	for key, value := range graphstruct.OtherIds {
-		_, err := ms.C.Do("hset", "oid:"+value, key, graphstruct.Guid)
+		_, err := ms.Ledis.Do("hset", "oid:"+value, key, graphstruct.Guid)
 		if err != nil {
 			log.Println("error saving message:storegraph:8 - ", err)
 			return err
 		}
-		_, err = ms.C.Do("sadd", "other:ids", "oid:"+value)
+		_, err = ms.Ledis.Do("sadd", "other:ids", "oid:"+value)
 		if err != nil {
 			log.Println("error saving message:storegraph:9 - ", err)
 			return err
@@ -229,8 +319,8 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 			}
 		}
 		refs = append(refs, graphstruct.Guid)
-		//_, err := ms.C.Do("sadd", "equivalent:ids:"+equiv, refs...)
-		_, err := ms.C.Do("sadd", refs...)
+		//_, err := ms.Ledis.Do("sadd", "equivalent:ids:"+equiv, refs...)
+		_, err := ms.Ledis.Do("sadd", refs...)
 		if err != nil {
 			log.Println("error saving message:storegraph:10 - ", err)
 			return err
@@ -250,14 +340,14 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 		for _, equiv := range equivalents {
 			refs = append(refs, equiv)
 		}
-		//_, err := ms.C.Do("sadd", link, refs...)
-		_, err := ms.C.Do("sadd", refs...)
+		//_, err := ms.Ledis.Do("sadd", link, refs...)
+		_, err := ms.Ledis.Do("sadd", refs...)
 		if err != nil {
 			log.Println("error saving message:storegraph:11 - ", err)
 			return err
 		}
 	}
-	//_, err = ms.C.Do("exec")
+	//_, err = ms.Ledis.Do("exec")
 	if err != nil {
 		log.Println("error saving message:storegraph:12 - ", err)
 		return err
@@ -266,6 +356,7 @@ func (ms *MessageStore) StoreGraph(m *NiasMessage) error {
 	return nil
 }
 
+/*
 // update the progress of the validation transaction
 func (ms *MessageStore) IncrementTracker(txid string) {
 
@@ -274,6 +365,7 @@ func (ms *MessageStore) IncrementTracker(txid string) {
 	mutex.Unlock()
 
 }
+*/
 
 // Retrieve the data for this transaction - txid
 // fulldata if true returns all data in the transaction, if false then return
@@ -292,7 +384,6 @@ func GetTxData(txid string, prefix string, fulldata bool) ([]interface{}, error)
 		endpoint = (10000 - 1)
 	}
 
-	//log.Printf("retrieving from %s\n", prefix+txid)
 	results, err := goredis.Values(c.Do("lrange", prefix+txid, 0, endpoint))
 	if err != nil {
 		log.Println("Error fetching tx data for: ", txid)

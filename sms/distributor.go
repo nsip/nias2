@@ -7,7 +7,8 @@
 package sms
 
 import (
-	"github.com/nats-io/go-nats-streaming"
+	//"github.com/nats-io/go-nats-streaming"
+	"github.com/nsip/nias2/lib"
 	//"log"
 	"strings"
 )
@@ -16,17 +17,68 @@ import (
 // routing slip of each message thru the listed services
 type Distributor struct{}
 
+// uses single process for all streaming updates
+// given the write-heavy nature of storage activities
+// this is significantly faster than shared read/write
+// services in parallel
+func (vd *Distributor) Run(poolsize int, nats_cfg lib.NATSConfig) {
+
+	config := lib.LoadDefaultConfig()
+	ec := lib.CreateNATSConnection(nats_cfg)
+	vs := NewStore()
+	tt := lib.NewTransactionTracker(config.TxReportInterval, nats_cfg)
+
+	for i := 0; i < poolsize; i++ {
+
+		// create service handler
+		go func(vs *Store, tt *lib.TransactionTracker) {
+			sr := NewServiceRegister()
+			ec.QueueSubscribe(lib.REQUEST_TOPIC, "distributor", func(m *lib.NiasMessage) {
+				responses := sr.ProcessByRoute(m)
+				for _, response := range responses {
+					r := response
+					ec.Publish(lib.STORE_TOPIC, r)
+				}
+				tt.IncrementTracker(m.TxID)
+				// get status of transaction and add message to stream
+				// if a notable status change has occurred
+				sigChange, msg := tt.GetStatusReport(m.TxID)
+				if sigChange {
+					ec.Publish(lib.STORE_TOPIC, msg)
+				}
+			})
+
+		}(vs, tt)
+
+	}
+
+	// create storage handler
+	go func(vs *Store) {
+		ec.Subscribe(lib.STORE_TOPIC, func(m *lib.NiasMessage) {
+			if strings.HasPrefix(m.Target, SIF_MEMORY_STORE_PREFIX) {
+				vs.StoreGraph(m)
+			} else {
+				vs.StoreMessage(m)
+			}
+		})
+
+	}(vs)
+
+}
+
+// Following methods are all legacy
+/*
 // Use STAN as message bus
 func (d *Distributor) RunSTANBus(poolsize int) {
 
 	for i := 0; i < poolsize; i++ {
 
 		sr := NewServiceRegister()
-		pc := NewSTANProcessChain()
+		pc := lib.NewSTANProcessChain()
 		ms := NewMessageStore()
 
 		// create storage handler
-		go func(pc STANProcessChain, ms *MessageStore, id int) {
+		go func(pc lib.STANProcessChain, ms *MessageStore, id int) {
 
 			pc.store_in_conn.Subscribe(pc.store_in_subject, func(m *stan.Msg) {
 				msg := DecodeNiasMessage(m.Data)
@@ -40,7 +92,7 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 		}(pc, ms, i)
 
 		// create service handler
-		go func(pc STANProcessChain, sr *ServiceRegister, ms *MessageStore, id int) {
+		go func(pc lib.STANProcessChain, sr *ServiceRegister, ms *MessageStore, id int) {
 
 			pc.srvc_in_conn.Subscribe(pc.srvc_in_subject, func(m *stan.Msg) {
 				msg := DecodeNiasMessage(m.Data)
@@ -55,7 +107,7 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 		}(pc, sr, ms, i)
 
 		// create an inbound handler to multiplex validation requests, create last or will drop messages
-		go func(pc STANProcessChain, id int) {
+		go func(pc lib.STANProcessChain, id int) {
 
 			pc.dist_in_conn.QueueSubscribe(pc.dist_in_subject, "distributor", func(m *stan.Msg) {
 				pc.dist_out_conn.Publish(pc.dist_out_subject, m.Data)
@@ -73,7 +125,7 @@ func (d *Distributor) RunSTANBus(poolsize int) {
 // services in parallel
 func (d *Distributor) RunNATSBus2(poolsize int) {
 
-	ec := CreateNATSConnection()
+	ec := lib.CreateNATSConnection()
 	vs := NewValidationStore()
 	tt := NewTransactionTracker()
 
@@ -209,6 +261,7 @@ func (d *Distributor) RunMemBus(poolsize int) {
 	}
 
 }
+*/
 
 //
 //

@@ -3,7 +3,7 @@ package sms
 import (
 	"bufio"
 	"github.com/beevik/etree"
-	//"log"
+	"github.com/nsip/nias2/lib"
 	"os"
 	"regexp"
 	"strings"
@@ -135,15 +135,15 @@ func parse_filters(filter_txt [][]string) [][]PrivacyFilter {
 }
 
 // implement the nias Service interface
-func (pri *PrivacyService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
+func (pri *PrivacyService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, error) {
 
-	responses := make([]NiasMessage, 0)
+	responses := make([]lib.NiasMessage, 0)
 	out, err := filter(req.Body.(string), pri.filters)
 	if err != nil {
 		return nil, err
 	}
 	for i, out1 := range out {
-		r := NiasMessage{}
+		r := lib.NiasMessage{}
 		r.TxID = req.TxID
 		r.SeqNo = req.SeqNo
 		r.Target = STORE_AND_FORWARD_PREFIX + sensitivities[i] + "::"

@@ -12,6 +12,7 @@ ValidationRoute = ["schema", "schema2", "dob", "id","asl", "psi", "numericvalid"
 # Webserver port
 WebServerPort = "1325"
 
+NATSPort = "4223"
 
 
 

@@ -4,6 +4,8 @@ import (
 	//"encoding/json"
 	"errors"
 	"github.com/beevik/etree"
+	"github.com/nsip/nias2/lib"
+	"github.com/nsip/nias2/xml"
 	"strings"
 )
 
@@ -139,21 +141,21 @@ func extract_label(doc *etree.Document, root *etree.Element) (string, error) {
 	return ret, nil
 }
 
-func parseSIF(s2g *Sif2GraphService, xml string) (GraphStruct, error) {
+func parseSIF(s2g *Sif2GraphService, xmldoc string) (xml.GraphStruct, error) {
 	doc := etree.NewDocument()
-	if err := doc.ReadFromString(xml); err != nil {
-		return GraphStruct{}, err
+	if err := doc.ReadFromString(xmldoc); err != nil {
+		return xml.GraphStruct{}, err
 	}
 	root := doc.Root()
 	if root == nil {
-		return GraphStruct{}, errors.New("XML has no root")
+		return xml.GraphStruct{}, errors.New("XML has no root")
 	}
 	label, err := extract_label(doc, root)
 	if err != nil {
-		return GraphStruct{}, err
+		return xml.GraphStruct{}, err
 	}
 	guid := root.SelectAttrValue("RefId", "")
-	ret := GraphStruct{
+	ret := xml.GraphStruct{
 		Guid:          guid,
 		EquivalentIds: make([]string, 0),
 		OtherIds:      make(map[string]string),
@@ -216,14 +218,14 @@ func conditional_append(slice []string, element string, skip string) []string {
 }
 
 // implement the nias Service interface
-func (s2g *Sif2GraphService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
+func (s2g *Sif2GraphService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, error) {
 
-	responses := make([]NiasMessage, 0)
+	responses := make([]lib.NiasMessage, 0)
 	out, err := parseSIF(s2g, req.Body.(string))
 	if err != nil {
 		return nil, err
 	}
-	r := NiasMessage{}
+	r := lib.NiasMessage{}
 	r.TxID = req.TxID
 	r.SeqNo = req.SeqNo
 	r.Target = SIF_MEMORY_STORE_PREFIX

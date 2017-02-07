@@ -11,14 +11,16 @@ TestYear = "2017"
 # ValidationRoute = ["schema", "id", "dob", "asl", "psi"]
 # ValidationRoute = ["schema", "asl", "dob", "id"]
 
-ValidationRoute = ["schema", "schema2", "dob", "id","asl", "psi", "numericvalid"]
+ValidationRoute = []
 # ValidationRoute = ["schema"]
 
 SSFRoute = ["privacy"]
 SMSRoute = ["sif2graph"]
 
 # Webserver port
-WebServerPort = "1325"
+WebServerPort = "1326"
+
+NATSPort = "4222"
 
 TxReportInterval = 500
 UIMessageLimit = 1000
