@@ -1,0 +1,7 @@
+{{ printf "\"%s\"" .Test.TestContent.TestName}},
+{{- .Response.PSI}},
+{{- .Response.DomainScore.ScaledScoreValue}},
+{{- .Response.DomainScore.RawScore}},
+{{- .Response.DomainScore.ScaledScoreStandardError}},
+{{- .Response.DomainScore.StudentDomainBand}},
+{{- .Response.DomainScore.StudentProficiency}}

@@ -29,10 +29,10 @@ import (
 	"time"
 )
 
-var VALIDATION_ROUTE = lib.DefaultConfig.ValidationRoute
+var VALIDATION_ROUTE = DefaultValidationConfig.ValidationRoute
 var req_ec *nats.EncodedConn
 var req_conn stan.Conn
-var tt = lib.NewTransactionTracker()
+var tt = lib.NewTransactionTracker(DefaultValidationConfig.TxReportInterval)
 var stan_conn stan.Conn
 
 var UI_LIMIT int
@@ -547,11 +547,11 @@ func (vws *ValidationWebServer) Run() {
 	e.Use(middleware.Recover())
 
 	log.Println("Starting web-ui services...")
-	port := lib.DefaultConfig.WebServerPort
+	port := DefaultValidationConfig.WebServerPort
 	log.Println("Service is listening on localhost:" + port)
 
 	// set upper bound for no. messages sent to web clients
-	UI_LIMIT = lib.DefaultConfig.UIMessageLimit
+	UI_LIMIT = DefaultValidationConfig.UIMessageLimit
 
 	//e.Run(fasthttp.New(":" + port))
 	// e.Run(standard.New(":" + port))

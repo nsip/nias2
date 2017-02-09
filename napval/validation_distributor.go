@@ -22,7 +22,7 @@ func (vd *ValidationDistributor) Run(poolsize int) {
 
 	ec := lib.CreateNATSConnection()
 	vs := NewValidationStore()
-	tt := lib.NewTransactionTracker()
+	tt := lib.NewTransactionTracker(DefaultValidationConfig.TxReportInterval)
 
 	for i := 0; i < poolsize; i++ {
 

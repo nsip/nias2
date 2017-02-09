@@ -14,10 +14,6 @@ func init() {
 	gob.Register(TxStatusUpdate{})
 }
 
-// interval for status reporting: every n items processed
-// to avoid flooding clients with update messages
-var report_interval = DefaultConfig.TxReportInterval
-
 // track status in simple hash counter; key is transactionid, value is no. records processed
 var txStatus = make(map[string]int)
 
@@ -33,13 +29,16 @@ var sizeMutex = &sync.Mutex{}
 // TransactionTracker simple strucuture to capture details of
 // transactions in system: tx size and tx progress
 type TransactionTracker struct {
-	C *nats.EncodedConn
+	C              *nats.EncodedConn
+	ReportInterval int
 }
 
 // create a TransactionTracker
-func NewTransactionTracker() *TransactionTracker {
+// progress interval is how many messages between status updates
+// eg. report status every 500 messages
+func NewTransactionTracker(report_interval int) *TransactionTracker {
 
-	return &TransactionTracker{C: CreateNATSConnection()}
+	return &TransactionTracker{C: CreateNATSConnection(), ReportInterval: report_interval}
 
 }
 
@@ -94,7 +93,7 @@ func (tt *TransactionTracker) GetStatusReport(txID string) (significantChange bo
 		Size:     size}
 
 	// if progress < size but mod interval
-	if (progress % report_interval) == 0 {
+	if (progress % tt.ReportInterval) == 0 {
 		sigChange = true
 	}
 

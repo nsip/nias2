@@ -71,7 +71,7 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create id service ", err)
 	}
 
-	dob1, err := NewDOBService(lib.DefaultConfig.TestYear)
+	dob1, err := NewDOBService(DefaultValidationConfig.TestYear)
 	if err != nil {
 		log.Fatal("Unable to create dob service ", err)
 	}

@@ -2,7 +2,6 @@
 package main
 
 import (
-	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/napval"
 	"log"
 	"runtime"
@@ -11,9 +10,9 @@ import (
 func main() {
 
 	log.Println("Loading default config")
-	log.Println("Config values are: ", lib.DefaultConfig)
+	log.Printf("Config values are: \n%v\n\n", napval.DefaultValidationConfig)
 
-	poolsize := lib.DefaultConfig.PoolSize
+	poolsize := napval.DefaultValidationConfig.PoolSize
 
 	log.Println("Loading ASL Lookup data")
 	napval.LoadASLLookupData()

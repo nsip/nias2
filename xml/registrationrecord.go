@@ -4,7 +4,6 @@ import (
 	"encoding/gob"
 )
 
-// ensures transmissable types are registered for binary encoding
 func init() {
 	// make gob encoder aware of local types
 	gob.Register(RegistrationRecord{})
@@ -15,32 +14,37 @@ type RegistrationRecord struct {
 	// XML Configuration
 	// XMLName            xml.Name `xml:"StudentPersonal"`
 	// Important fields
-	RefId                     string `json:",omitempty" xml:"RefId,attr"`
-	ASLSchoolId               string `json:",omitempty" xml:"MostRecent>SchoolACARAId"`
-	AddressLine1              string `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line1"`
-	AddressLine2              string `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line2"`
-	BirthDate                 string `json:",omitempty" xml:"PersonInfo>Demographics>BirthDate"`
-	ClassCode                 string `json:",omitempty" xml:"MostRecent>ClassCode"`
-	CountryOfBirth            string `json:",omitempty" xml:"PersonInfo>Demographics>CountryOfBirth"`
-	DiocesanId                string `json:",omitempty"`
-	EducationSupport          string `json:",omitempty" xml:"EducationSupport"`
-	FFPOS                     string `json:",omitempty" xml:"MostRecent>FFPOS"`
-	FTE                       string `json:",omitempty" xml:"MostRecent>FTE"`
-	FamilyName                string `json:",omitempty" xml:"PersonInfo>Name>FamilyName"`
-	GivenName                 string `json:",omitempty" xml:"PersonInfo>Name>GivenName"`
-	HomeSchooledStudent       string `json:",omitempty" xml:"HomeSchooledStudent"`
-	Homegroup                 string `json:",omitempty" xml:"MostRecent>Homegroup"`
-	IndigenousStatus          string `json:",omitempty" xml:"PersonInfo>Demographics>IndigenousStatus"`
-	JurisdictionId            string `json:",omitempty"`
-	LBOTE                     string `json:",omitempty" xml:"PersonInfo>Demographics>LBOTE"`
-	LocalCampusId             string `json:",omitempty" xml:"MostRecent>LocalCampusId"`
-	LocalId                   string `json:",omitempty" xml:"LocalId"`
-	Locality                  string `json:",omitempty" xml:"PersonInfo>AddressList>Address>City"`
-	MainSchoolFlag            string `json:",omitempty" xml:"MostRecent>MembershipType"`
-	MiddleName                string `json:",omitempty" xml:"PersonInfo>Name>MiddleName"`
-	NationalId                string `json:",omitempty"`
-	OfflineDelivery           string `json:",omitempty" xml:"OfflineDelivery"`
-	OtherId                   string `json:",omitempty"`
+	RefId               string `json:",omitempty" xml:"RefId,attr"`
+	ASLSchoolId         string `json:",omitempty" xml:"MostRecent>SchoolACARAId"`
+	AddressLine1        string `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line1"`
+	AddressLine2        string `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line2"`
+	BirthDate           string `json:",omitempty" xml:"PersonInfo>Demographics>BirthDate"`
+	ClassCode           string `json:",omitempty" xml:"MostRecent>ClassCode"`
+	CountryOfBirth      string `json:",omitempty" xml:"PersonInfo>Demographics>CountryOfBirth"`
+	DiocesanId          string `json:",omitempty"`
+	EducationSupport    string `json:",omitempty" xml:"EducationSupport"`
+	FFPOS               string `json:",omitempty" xml:"MostRecent>FFPOS"`
+	FTE                 string `json:",omitempty" xml:"MostRecent>FTE"`
+	FamilyName          string `json:",omitempty" xml:"PersonInfo>Name>FamilyName"`
+	GivenName           string `json:",omitempty" xml:"PersonInfo>Name>GivenName"`
+	HomeSchooledStudent string `json:",omitempty" xml:"HomeSchooledStudent"`
+	Homegroup           string `json:",omitempty" xml:"MostRecent>Homegroup"`
+	IndigenousStatus    string `json:",omitempty" xml:"PersonInfo>Demographics>IndigenousStatus"`
+	JurisdictionId      string `json:",omitempty"`
+	LBOTE               string `json:",omitempty" xml:"PersonInfo>Demographics>LBOTE"`
+	LocalCampusId       string `json:",omitempty" xml:"MostRecent>LocalCampusId"`
+	LocalId             string `json:",omitempty" xml:"LocalId"`
+	Locality            string `json:",omitempty" xml:"PersonInfo>AddressList>Address>City"`
+	MainSchoolFlag      string `json:",omitempty" xml:"MostRecent>MembershipType"`
+	MiddleName          string `json:",omitempty" xml:"PersonInfo>Name>MiddleName"`
+	NationalId          string `json:",omitempty"`
+	OfflineDelivery     string `json:",omitempty" xml:"OfflineDelivery"`
+	OtherIdList         struct {
+		OtherId []struct {
+			Type  string `xml:"Type,attr"`
+			Value string `xml:",chardata"`
+		} `xml:"OtherId"`
+	} `xml:OtherIdList`
 	OtherSchoolId             string `json:",omitempty" xml:"MostRecent>OtherEnrollmentSchoolACARAId"`
 	Parent1LOTE               string `json:",omitempty" xml:"MostRecent>Parent1Language"`
 	Parent1NonSchoolEducation string `json:",omitempty" xml:"MostRecent>Parent1NonSchoolEducation"`
@@ -74,6 +78,18 @@ type RegistrationRecord struct {
 	TestLevel                 string `json:",omitempty" xml:"MostRecent>TestLevel>Code"`
 	VisaCode                  string `json:",omitempty" xml:"PersonInfo>Demographics>VisaSubClass"`
 	YearLevel                 string `json:",omitempty" xml:"MostRecent>YearLevel>Code"`
+}
+
+// convenience method to return otherid by type
+func (r RegistrationRecord) GetOtherId(idtype string) string {
+
+	for _, id := range r.OtherIdList.OtherId {
+		if id.Type == idtype {
+			return id.Value
+		}
+	}
+
+	return idtype
 }
 
 // convenience method for writing to csv
@@ -164,7 +180,7 @@ func (r RegistrationRecord) GetSlice() []string {
 		r.MiddleName,
 		r.NationalId,
 		r.OfflineDelivery,
-		r.OtherId,
+		r.GetOtherId("OtherStudentId"),
 		r.OtherSchoolId,
 		r.Parent1LOTE,
 		r.Parent1NonSchoolEducation,
