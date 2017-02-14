@@ -56,7 +56,7 @@ type RegistrationRecord struct {
 	OtherIdList         struct {
 		OtherId []XMLAttributeStruct `xml:"OtherId"`
 	} `xml:OtherIdList`
-	OtherStudentId            string `json:",omitempty"`
+	OtherId                   string `json:",omitempty"`
 	OtherSchoolId             string `json:",omitempty" xml:"MostRecent>OtherEnrollmentSchoolACARAId"`
 	Parent1LOTE               string `json:",omitempty" xml:"MostRecent>Parent1Language"`
 	Parent1NonSchoolEducation string `json:",omitempty" xml:"MostRecent>Parent1NonSchoolEducation"`
