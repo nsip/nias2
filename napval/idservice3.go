@@ -106,13 +106,15 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		return responses, nil
 	}
 
+	platformid := rr.GetOtherId("NAPPlatformStudentId")
+
 	// perform lookups
 	k11 := ID3SimpleKey{
 		LocalId:     rr.LocalId,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
 	k12 := ID3SimpleKey2{
-		PSI:         rr.PlatformId,
+		PSI:         platformid,
 		ASLSchoolId: rr.ASLSchoolId,
 	}
 	k2 := ID3ExtendedKey{

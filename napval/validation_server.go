@@ -89,15 +89,16 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 
 		i = i + 1
 
-		regr := nxml.RegistrationRecord{}
+		regr := &nxml.RegistrationRecord{}
 		r := removeBlanks(record.AsMap())
-		decode_err := ms.Decode(r, &regr)
+		decode_err := ms.Decode(r, regr)
+		regr.Unflatten()
 		if decode_err != nil {
 			return ir, decode_err
 		}
 
 		msg := &lib.NiasMessage{}
-		msg.Body = regr
+		msg.Body = *regr
 		msg.SeqNo = strconv.Itoa(i)
 		msg.TxID = txid
 		msg.MsgID = nuid.Next()
@@ -389,6 +390,7 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 		c.Response().Header().Set("Content-Type", "application/xml")
 
 		// apply the template & write results to the client
+		/* note that this does not currently go via the RegistrationRecord, so no need for .Unflatten() */
 		if err := sptmpl.Execute(c.Response().Writer, sprsnls); err != nil {
 			return err
 		}

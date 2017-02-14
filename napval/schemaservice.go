@@ -65,7 +65,10 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 	responses := make([]lib.NiasMessage, 0)
 
 	// extract reg data from message as json
-	data, err := json.Marshal(req.Body.(xml.RegistrationRecord))
+	r := req.Body.(xml.RegistrationRecord)
+	var r_ptr = &r
+	r_ptr.Flatten()
+	data, err := json.Marshal(*r_ptr)
 	if err != nil {
 		return responses, err
 	}
