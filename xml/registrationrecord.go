@@ -33,7 +33,7 @@ type RegistrationRecord struct {
 	AddressLine1        string `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line1"`
 	AddressLine2        string `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line2"`
 	BirthDate           string `json:",omitempty" xml:"PersonInfo>Demographics>BirthDate"`
-	ClassCode           string `json:",omitempty" xml:"MostRecent>ClassCode"`
+	ClassGroup          string `json:",omitempty" xml:"MostRecent>ClassCode"`
 	CountryOfBirth      string `json:",omitempty" xml:"PersonInfo>Demographics>CountryOfBirth"`
 	DiocesanId          string `json:",omitempty"`
 	EducationSupport    string `json:",omitempty" xml:"EducationSupport"`
@@ -207,7 +207,7 @@ func (r RegistrationRecord) GetHeaders() []string {
 		"AddressLine1",
 		"AddressLine2",
 		"BirthDate",
-		"ClassCode",
+		"ClassGroup",
 		"CountryOfBirth",
 		"DiocesanId",
 		"EducationSupport",
@@ -268,7 +268,7 @@ func (r RegistrationRecord) GetSlice() []string {
 		r.AddressLine1,
 		r.AddressLine2,
 		r.BirthDate,
-		r.ClassCode,
+		r.ClassGroup,
 		r.CountryOfBirth,
 		//r.DiocesanId,
 		r.GetOtherId("DiocesanId"),
