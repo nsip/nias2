@@ -51,6 +51,7 @@ type NAPTestItem struct {
 		NAPWritingRubricList struct {
 			NAPWritingRubric []struct {
 				RubricType string `xml:"RubricType"`
+				Descriptor string `xml:"Descriptor"`
 				ScoreList  struct {
 					Score []struct {
 						MaxScoreValue        string `xml:"MaxScoreValue"`
@@ -62,7 +63,6 @@ type NAPTestItem struct {
 						} `xml:"ScoreDescriptionList"`
 					} `xml:"Score"`
 				} `xml:"ScoreList"`
-				Descriptor string `xml:"Descriptor"`
 			} `xml:"NAPWritingRubric"`
 		} `xml:"NAPWritingRubricList"`
 	} `xml:"TestItemContent"`

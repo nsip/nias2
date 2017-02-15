@@ -3,6 +3,7 @@ package naprr
 import (
 	"encoding/gob"
 	"github.com/nsip/nias2/xml"
+	"strings"
 )
 
 func init() {
@@ -11,7 +12,7 @@ func init() {
 	gob.Register(SchoolDetails{})
 	gob.Register(ScoreSummaryDataSet{})
 	gob.Register(ResponseDataSet{})
-	gob.Register(CodeframeDataSet{})
+	gob.Register(CodeFrameDataSet{})
 }
 
 // convenience types for aggregating response information sets
@@ -89,7 +90,7 @@ type SchoolDetails struct {
 }
 
 // summary object from codeframe
-type CodeframeDataSet struct {
+type CodeFrameDataSet struct {
 	Test    xml.NAPTest
 	Testlet xml.NAPTestlet
 	Item    xml.NAPTestItem
@@ -98,7 +99,7 @@ type CodeframeDataSet struct {
 //
 // helper method that walks the structure to find location
 //
-func (cfd CodeframeDataSet) GetItemLocationInTestlet(itemrefid string) string {
+func (cfd CodeFrameDataSet) GetItemLocationInTestlet(itemrefid string) string {
 
 	// check if the sequence no. is known
 	for _, item := range cfd.Testlet.TestItemList.TestItem {
@@ -118,7 +119,36 @@ func (cfd CodeframeDataSet) GetItemLocationInTestlet(itemrefid string) string {
 		}
 	}
 
-	return "not found"
+	return "unknown"
+}
+
+//
+// helpers for deeply nested writing rubric details
+//
+func (cfd CodeFrameDataSet) GetWritingRubricDescriptor(rubrictype string) string {
+
+	for _, rubric := range cfd.Item.TestItemContent.NAPWritingRubricList.NAPWritingRubric {
+		if strings.EqualFold(rubric.RubricType, rubrictype) {
+			return rubric.Descriptor
+		}
+	}
+
+	return "unknown"
+}
+
+//
+// helpers for deeply nested writing rubric details
+//
+func (cfd CodeFrameDataSet) GetWritingRubricMax(rubrictype string) string {
+
+	for _, rubric := range cfd.Item.TestItemContent.NAPWritingRubricList.NAPWritingRubric {
+		if strings.EqualFold(rubric.RubricType, rubrictype) {
+			return rubric.ScoreList.Score[0].MaxScoreValue
+		}
+	}
+
+	return "unknown"
+
 }
 
 //

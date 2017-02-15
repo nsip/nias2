@@ -7,12 +7,6 @@ import (
 	"log"
 )
 
-// connection to the stan server
-var sc = CreateSTANConnection()
-
-// byte decoder/encoder
-var gobenc = GobEncoder{}
-
 type ReportGenerator struct {
 	sc stan.Conn
 	ge GobEncoder
@@ -32,10 +26,10 @@ func NewReportGenerator() *ReportGenerator {
 
 // generate codeframe objects (currently as per VCAA requirements)
 // generated only once as represents strucure of test not school-level data
-func (rg *ReportGenerator) GenerateCodeframeData(nd *NAPLANData) {
+func (rg *ReportGenerator) GenerateCodeFrameData(nd *NAPLANData) {
 
 	count := 0
-	cfds := make([]CodeframeDataSet, 0)
+	cfds := make([]CodeFrameDataSet, 0)
 
 	for _, codeframe := range nd.Codeframes {
 		for _, cf_testlet := range codeframe.TestletList.Testlet {
@@ -44,7 +38,7 @@ func (rg *ReportGenerator) GenerateCodeframeData(nd *NAPLANData) {
 			for _, cf_item := range cf_testlet.TestItemList.TestItem {
 				ti := nd.Items[cf_item.TestItemRefId]
 				// log.Printf("\t\t%s", ti.TestItemContent.ItemName)
-				cfd := CodeframeDataSet{
+				cfd := CodeFrameDataSet{
 					Test:    nd.Tests[codeframe.NAPTestRefId],
 					Testlet: tl,
 					Item:    ti,
@@ -58,22 +52,22 @@ func (rg *ReportGenerator) GenerateCodeframeData(nd *NAPLANData) {
 
 	// publish the records
 	for _, cfd := range cfds {
-		payload, err := gobenc.Encode(cfd)
+		payload, err := rg.ge.Encode(cfd)
 		if err != nil {
 			log.Println("unable to encode codeframe: ", err)
 		}
 		// log.Printf("\t%s - %s - %s", cfd.Test.TestContent.TestDomain,
 		// 	cfd.Testlet.TestletContent.TestletName, cfd.Item.TestItemContent.ItemName)
-		sc.Publish("reports.cframe", payload)
+		rg.sc.Publish("reports.cframe", payload)
 	}
 
 	// finish the transaction - completion msg
 	txu := lib.TxStatusUpdate{TxComplete: true}
-	gtxu, err := gobenc.Encode(txu)
+	gtxu, err := rg.ge.Encode(txu)
 	if err != nil {
 		log.Println("unable to encode txu codeframe report: ", err)
 	}
-	sc.Publish("reports.cframe", gtxu)
+	rg.sc.Publish("reports.cframe", gtxu)
 
 	log.Printf("codeframe records %d: ", count)
 
@@ -91,22 +85,22 @@ func (rg *ReportGenerator) GenerateDomainScoreData(nd *NAPLANData, sd *SchoolDat
 		}
 		// log.Printf("sc_score_summ:\n\n%v\n\n%v\n\n", rds.Test, rds.Response)
 
-		payload, err := gobenc.Encode(rds)
+		payload, err := rg.ge.Encode(rds)
 		if err != nil {
 			log.Println("unable to encode domain scores: ", err)
 		}
-		sc.Publish("reports."+sd.ACARAId+".dscores", payload)
+		rg.sc.Publish("reports."+sd.ACARAId+".dscores", payload)
 
 		count++
 	}
 
 	// finish the transaction - completion msg
 	txu := lib.TxStatusUpdate{TxComplete: true}
-	gtxu, err := gobenc.Encode(txu)
+	gtxu, err := rg.ge.Encode(txu)
 	if err != nil {
 		log.Println("unable to encode txu domain scores report: ", err)
 	}
-	sc.Publish("reports."+sd.ACARAId+".dscores", gtxu)
+	rg.sc.Publish("reports."+sd.ACARAId+".dscores", gtxu)
 
 	log.Printf("domain score records %d: ", count)
 
@@ -124,22 +118,22 @@ func (rg *ReportGenerator) GenerateSchoolScoreSummaryData(nd *NAPLANData, sd *Sc
 		}
 		// log.Printf("sc_score_summ:\n\n%v\n\n%v\n\n", scsumm.Test, scsumm.Summ)
 
-		payload, err := gobenc.Encode(scsumm)
+		payload, err := rg.ge.Encode(scsumm)
 		if err != nil {
 			log.Println("unable to encode sch. summ: ", err)
 		}
-		sc.Publish("reports."+sd.ACARAId+".scsumm", payload)
+		rg.sc.Publish("reports."+sd.ACARAId+".scsumm", payload)
 
 		count++
 	}
 
 	// finish the transaction - completion msg
 	txu := lib.TxStatusUpdate{TxComplete: true}
-	gtxu, err := gobenc.Encode(txu)
+	gtxu, err := rg.ge.Encode(txu)
 	if err != nil {
 		log.Println("unable to encode txu score summary report: ", err)
 	}
-	sc.Publish("reports."+sd.ACARAId+".scsumm", gtxu)
+	rg.sc.Publish("reports."+sd.ACARAId+".scsumm", gtxu)
 
 	log.Printf("score summary records %d: ", count)
 
@@ -171,22 +165,22 @@ func (rg *ReportGenerator) GenerateParticipationData(nd *NAPLANData, sd *SchoolD
 		for _, ei := range pds.EventInfos {
 			pds.Summary[ei.Test.TestContent.TestDomain] = ei.Event.ParticipationCode
 		}
-		payload, err := gobenc.Encode(pds)
+		payload, err := rg.ge.Encode(pds)
 		if err != nil {
 			log.Println("unable to encode pds: ", err)
 		}
-		sc.Publish("reports."+sd.ACARAId+".particip", payload)
+		rg.sc.Publish("reports."+sd.ACARAId+".particip", payload)
 
 		count++
 	}
 
 	// finish the transaction - completion msg
 	txu := lib.TxStatusUpdate{TxComplete: true}
-	gtxu, err := gobenc.Encode(txu)
+	gtxu, err := rg.ge.Encode(txu)
 	if err != nil {
 		log.Println("unable to encode txu particip. report: ", err)
 	}
-	sc.Publish("reports."+sd.ACARAId+".particip", gtxu)
+	rg.sc.Publish("reports."+sd.ACARAId+".particip", gtxu)
 
 	log.Printf("particpation records %d: ", count)
 }

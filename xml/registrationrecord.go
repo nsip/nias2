@@ -2,6 +2,7 @@ package xml
 
 import (
 	"encoding/gob"
+	"strings"
 )
 
 func init() {
@@ -84,7 +85,7 @@ type RegistrationRecord struct {
 func (r RegistrationRecord) GetOtherId(idtype string) string {
 
 	for _, id := range r.OtherIdList.OtherId {
-		if id.Type == idtype {
+		if strings.EqualFold(id.Type, idtype) {
 			return id.Value
 		}
 	}

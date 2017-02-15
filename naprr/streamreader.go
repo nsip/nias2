@@ -26,9 +26,9 @@ func NewStreamReader() *StreamReader {
 	return &sr
 }
 
-func (sr *StreamReader) GetCodeFrameData() []CodeframeDataSet {
+func (sr *StreamReader) GetCodeFrameData() []CodeFrameDataSet {
 
-	cfds := make([]CodeframeDataSet, 0)
+	cfds := make([]CodeFrameDataSet, 0)
 
 	// signal channel to notify asynch stan stream read is complete
 	txComplete := make(chan bool)
@@ -41,15 +41,15 @@ func (sr *StreamReader) GetCodeFrameData() []CodeframeDataSet {
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
-		err := gobenc.Decode(m.Data, &m_if)
+		err := sr.ge.Decode(m.Data, &m_if)
 		if err != nil {
 			log.Println("streamreader codeframe message decoding error: ", err)
 			txComplete <- true
 		}
 
 		switch t := m_if.(type) {
-		case CodeframeDataSet:
-			cfd := m_if.(CodeframeDataSet)
+		case CodeFrameDataSet:
+			cfd := m_if.(CodeFrameDataSet)
 			cfds = append(cfds, cfd)
 		case lib.TxStatusUpdate:
 			txComplete <- true
@@ -59,7 +59,7 @@ func (sr *StreamReader) GetCodeFrameData() []CodeframeDataSet {
 		}
 	}
 
-	sub, err := sc.Subscribe("reports.cframe", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe("reports.cframe", mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error get codeframe data: ", err)
@@ -88,7 +88,7 @@ func (sr *StreamReader) GetDomainScoreData(acaraid string) []ResponseDataSet {
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
-		err := gobenc.Decode(m.Data, &m_if)
+		err := sr.ge.Decode(m.Data, &m_if)
 		if err != nil {
 			log.Println("streamreader domain score message decoding error: ", err)
 			txComplete <- true
@@ -106,7 +106,7 @@ func (sr *StreamReader) GetDomainScoreData(acaraid string) []ResponseDataSet {
 		}
 	}
 
-	sub, err := sc.Subscribe("reports."+acaraid+".dscores", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe("reports."+acaraid+".dscores", mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error get domain scores data: ", err)
@@ -136,7 +136,7 @@ func (sr *StreamReader) GetScoreSummaryData(acaraid string) []ScoreSummaryDataSe
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
-		err := gobenc.Decode(m.Data, &m_if)
+		err := sr.ge.Decode(m.Data, &m_if)
 		if err != nil {
 			log.Println("streamreader score summ message decoding error: ", err)
 			txComplete <- true
@@ -154,7 +154,7 @@ func (sr *StreamReader) GetScoreSummaryData(acaraid string) []ScoreSummaryDataSe
 		}
 	}
 
-	sub, err := sc.Subscribe("reports."+acaraid+".scsumm", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe("reports."+acaraid+".scsumm", mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error get score summary data: ", err)
@@ -184,7 +184,7 @@ func (sr *StreamReader) GetParticipationData(acaraid string) []ParticipationData
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
-		err := gobenc.Decode(m.Data, &m_if)
+		err := sr.ge.Decode(m.Data, &m_if)
 		if err != nil {
 			log.Println("streamreader participation message decoding error: ", err)
 			txComplete <- true
@@ -202,7 +202,7 @@ func (sr *StreamReader) GetParticipationData(acaraid string) []ParticipationData
 		}
 	}
 
-	sub, err := sc.Subscribe("reports."+acaraid+".particip", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe("reports."+acaraid+".particip", mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error get participation data: ", err)
@@ -236,7 +236,7 @@ func (sr *StreamReader) GetSchoolDetails() [][]SchoolDetails {
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
-		err := gobenc.Decode(m.Data, &m_if)
+		err := sr.ge.Decode(m.Data, &m_if)
 		if err != nil {
 			log.Println("message decoding error: ", err)
 			txComplete <- true
@@ -254,7 +254,7 @@ func (sr *StreamReader) GetSchoolDetails() [][]SchoolDetails {
 		}
 	}
 
-	sub, err := sc.Subscribe("schools", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe("schools", mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error get school details: ", err)
@@ -294,7 +294,7 @@ func (sr *StreamReader) GetNAPLANData() *NAPLANData {
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
-		err := gobenc.Decode(m.Data, &m_if)
+		err := sr.ge.Decode(m.Data, &m_if)
 		if err != nil {
 			log.Println("streamreader: schooldata message decoding error: ", err)
 			txComplete <- true
@@ -322,7 +322,7 @@ func (sr *StreamReader) GetNAPLANData() *NAPLANData {
 
 	}
 
-	sub, err := sc.Subscribe("meta", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe("meta", mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error meta channel: ", err)
@@ -349,7 +349,7 @@ func (sr *StreamReader) GetSchoolData(acaraid string) *SchoolData {
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
-		err := gobenc.Decode(m.Data, &m_if)
+		err := sr.ge.Decode(m.Data, &m_if)
 		if err != nil {
 			log.Println("message decoding error: ", err)
 			txComplete <- true
@@ -380,7 +380,7 @@ func (sr *StreamReader) GetSchoolData(acaraid string) *SchoolData {
 
 	}
 
-	sub, err := sc.Subscribe(sd.ACARAId, mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe(sd.ACARAId, mcb, stan.DeliverAllAvailable())
 	if err != nil {
 		log.Println("streamreader: stan subsciption error school data channel: ", err)
 	}

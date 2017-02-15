@@ -17,7 +17,7 @@ func CreateSTANConnection() stan.Conn {
 
 	sc, err := stan.Connect(clusterID, clientID)
 	if err != nil {
-		log.Fatalln("Cannot connect to NATS server: ", err)
+		log.Fatalln("Cannot connect to STAN server: ", err)
 	}
 
 	return sc
