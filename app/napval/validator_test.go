@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"log"
+	//"log"
 	"net/url"
 	"os"
 	"path"
@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	Nias2 "github.com/nsip/nias2/lib"
+	"github.com/nsip/nias2/napval"
 	"menteslibres.net/gosexy/rest"
 )
 
@@ -375,11 +375,12 @@ func test_harness(t *testing.T, filename string, errfield string, errdescription
 		err = json.Unmarshal(lines[0], &dat)
 	}
 	errcheck(t, err)
-	// we are getting back a JSON array
-	for i := 0; i < len(lines); i++ {
-		log.Println("\t" + string(lines[i]))
-	}
-	log.Println(dat)
+	/*
+		// we are getting back a JSON array
+		for i := 0; i < len(lines); i++ {
+			log.Println("\t" + string(lines[i]))
+		log.Println(dat)
+	*/
 	if errfield == "" {
 		if len(dat) > 0 {
 			t.Fatalf("Expected no error, got error in %s: %s", dat["errfield"], dat["description"])
@@ -399,7 +400,7 @@ func test_harness(t *testing.T, filename string, errfield string, errdescription
 }
 
 func TestMain(m *testing.M) {
-	config := Nias2.LoadNAPLANConfig()
+	config := napval.LoadNAPLANConfig()
 	customClient, _ = rest.New("http://localhost:" + config.WebServerPort + "/")
 	os.Exit(m.Run())
 }

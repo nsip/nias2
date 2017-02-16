@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"encoding/xml"
 	"github.com/nsip/nias2/go_SifMessage"
+	"strings"
 )
 
 func init() {
@@ -90,18 +91,6 @@ type RegistrationRecord struct {
 	YearLevel               string `json:",omitempty" xml:"MostRecent>YearLevel>Code"`
 }
 
-// convenience method to return otherid by type
-func (r RegistrationRecord) GetOtherId(idtype string) string {
-
-	for _, id := range r.OtherIdList.OtherId {
-		if id.Type == idtype {
-			return id.Value
-		}
-	}
-
-	return idtype
-}
-
 // Flatten out Other IDs from XML into JSON/CSV flat structure
 func (r *RegistrationRecord) Flatten() RegistrationRecord {
 	for _, id := range r.OtherIdList.OtherId {
@@ -111,8 +100,8 @@ func (r *RegistrationRecord) Flatten() RegistrationRecord {
 		if id.Type == "NationalStudentId" {
 			r.NationalId = id.Value
 		}
-		if id.Type == "OtherStudentId" {
-			r.OtherStudentId = id.Value
+		if id.Type == "OtherId" {
+			r.OtherId = id.Value
 		}
 		if id.Type == "NAPPlatformStudentId" {
 			r.PlatformId = id.Value
@@ -126,7 +115,7 @@ func (r *RegistrationRecord) Flatten() RegistrationRecord {
 		if id.Type == "PreviousNationalStudentId" {
 			r.PreviousNationalId = id.Value
 		}
-		if id.Type == "PreviousOtherStudentId" {
+		if id.Type == "PreviousOtherId" {
 			r.PreviousOtherId = id.Value
 		}
 		if id.Type == "PreviousNAPPlatformStudentId" {
@@ -160,8 +149,8 @@ func (r *RegistrationRecord) Unflatten() RegistrationRecord {
 	if r.NationalId != "" {
 		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"NationalStudentId", r.NationalId})
 	}
-	if r.OtherStudentId != "" {
-		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"OtherStudentId", r.OtherStudentId})
+	if r.OtherId != "" {
+		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"OtherStudentId", r.OtherId})
 	}
 	if r.PlatformId != "" {
 		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"NAPPlatformStudentId", r.PlatformId})
@@ -176,7 +165,7 @@ func (r *RegistrationRecord) Unflatten() RegistrationRecord {
 		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"PreviousNationalStudentId", r.PreviousNationalId})
 	}
 	if r.PreviousOtherId != "" {
-		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"PreviousOtherStudentId", r.PreviousOtherId})
+		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"PreviousOtherId", r.PreviousOtherId})
 	}
 	if r.PreviousPlatformId != "" {
 		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"PreviousNAPPlatformStudentId", r.PreviousPlatformId})

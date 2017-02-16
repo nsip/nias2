@@ -29,7 +29,7 @@ import (
 	//"time"
 )
 
-var naplanconfig = lib.LoadNAPLANConfig()
+var naplanconfig = LoadNAPLANConfig()
 var VALIDATION_ROUTE = naplanconfig.ValidationRoute
 
 var req_ec *nats.EncodedConn

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/napval"
 	"log"
 	"runtime"
@@ -9,7 +10,7 @@ import (
 
 func main() {
 
-	config := lib.LoadNAPLANConfig()
+	config := napval.LoadNAPLANConfig()
 	NAPLAN_NATS_CFG := lib.NATSConfig{Port: config.NATSPort}
 	log.Println("NAPVAL: Loading default config")
 	log.Println("NAPVAL: Config values are: ", config)

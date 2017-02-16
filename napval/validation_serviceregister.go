@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-var config = lib.LoadNAPLANConfig()
+var config = LoadNAPLANConfig()
 
 // simple thread-safe container for group of services that will be available
 // to process messages passed from a distributor node

@@ -3,32 +3,17 @@ package napval
 
 import (
 	"github.com/BurntSushi/toml"
+	"github.com/nsip/nias2/lib"
 	"log"
 )
 
 // utility object to manage configurable parameters
 
-type NIASConfig struct {
-	TestYear         string
-	WebServerPort    string
-	NATSPort         string
-	ValidationRoute  []string
-	SSFRoute         []string
-	SMSRoute         []string
-	PoolSize         int // number of service processors
-	MsgTransport     string
-	TxReportInterval int // progress report after every n records
-	UIMessageLimit   int //how many messages to send to web ui
-	TxStorageLimit   int
-	Loaded           bool
-}
+var nAPLANConfig lib.NIASConfig = lib.NIASConfig{}
 
-var defaultConfig NIASConfig = NIASConfig{}
-var nAPLANConfig NIASConfig = NIASConfig{}
-
-func LoadNAPLANConfig() NIASConfig {
+func LoadNAPLANConfig() lib.NIASConfig {
 	if !nAPLANConfig.Loaded {
-		ncfg := NIASConfig{}
+		ncfg := lib.NIASConfig{}
 		if _, err := toml.DecodeFile("napval.toml", &ncfg); err != nil {
 			log.Fatalln("Unable to read NAPLAN config, aborting.", err)
 		}
@@ -36,16 +21,4 @@ func LoadNAPLANConfig() NIASConfig {
 		nAPLANConfig.Loaded = true
 	}
 	return nAPLANConfig
-}
-
-func LoadDefaultConfig() NIASConfig {
-	if !defaultConfig.Loaded {
-		ncfg := NIASConfig{}
-		if _, err := toml.DecodeFile("nias.toml", &ncfg); err != nil {
-			log.Fatalln("Unable to read default config, aborting.", err)
-		}
-		defaultConfig = ncfg
-		defaultConfig.Loaded = true
-	}
-	return defaultConfig
 }

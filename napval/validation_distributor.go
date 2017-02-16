@@ -20,7 +20,7 @@ type ValidationDistributor struct{}
 // services in parallel
 func (vd *ValidationDistributor) Run(poolsize int, nats_cfg lib.NATSConfig) {
 
-	config := lib.LoadNAPLANConfig()
+	config := LoadNAPLANConfig()
 	ec := lib.CreateNATSConnection(nats_cfg)
 	vs := NewValidationStore()
 	tt := lib.NewTransactionTracker(config.TxReportInterval, nats_cfg)
