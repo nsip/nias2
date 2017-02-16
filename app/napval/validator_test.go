@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	//"log"
+	"log"
 	"net/url"
 	"os"
 	"path"
@@ -376,12 +376,10 @@ func test_harness(t *testing.T, filename string, errfield string, errdescription
 	}
 	errcheck(t, err)
 	// we are getting back a JSON array
-	/*
-		for i := 0; i < len(lines); i++ {
-			log.Println("\t" + string(lines[i]))
-		}
-		log.Println(dat)
-	*/
+	for i := 0; i < len(lines); i++ {
+		log.Println("\t" + string(lines[i]))
+	}
+	log.Println(dat)
 	if errfield == "" {
 		if len(dat) > 0 {
 			t.Fatalf("Expected no error, got error in %s: %s", dat["errfield"], dat["description"])
