@@ -9,6 +9,7 @@ type NAPTest struct {
 		TestDomain  string `xml:"Domain"`
 		TestYear    string `xml:"TestYear"`
 		StagesCount string `xml:"StagesCount"`
+		TestType    string `xml:"TestType"`
 		DomainBands struct {
 			Band1Lower  string `xml:"Band1Lower"`
 			Band1Upper  string `xml:"Band1Upper"`

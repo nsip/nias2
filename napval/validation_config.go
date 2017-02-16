@@ -1,5 +1,5 @@
 // configmanager.go
-package lib
+package napval
 
 import (
 	"github.com/BurntSushi/toml"

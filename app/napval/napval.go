@@ -2,7 +2,6 @@
 package main
 
 import (
-	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/napval"
 	"log"
 	"runtime"

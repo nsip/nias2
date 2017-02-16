@@ -4,10 +4,8 @@ import (
 	"encoding/gob"
 	"encoding/xml"
 	"github.com/nsip/nias2/go_SifMessage"
-	//"log"
 )
 
-// ensures transmissable types are registered for binary encoding
 func init() {
 	// make gob encoder aware of local types
 	gob.Register(RegistrationRecord{})
@@ -199,6 +197,18 @@ func (r *RegistrationRecord) Unflatten() RegistrationRecord {
 		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"TAAStudentId", r.TAAId})
 	}
 	return *r
+}
+
+// convenience method to return otherid by type
+func (r RegistrationRecord) GetOtherId(idtype string) string {
+
+	for _, id := range r.OtherIdList.OtherId {
+		if strings.EqualFold(id.Type, idtype) {
+			return id.Value
+		}
+	}
+
+	return idtype
 }
 
 // convenience method for writing to csv

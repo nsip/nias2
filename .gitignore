@@ -54,3 +54,5 @@ harness/var/goleveldb_data/LOCK
 
 harness/var/goleveldb_data/LOG
 
+
+*.zip

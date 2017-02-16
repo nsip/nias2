@@ -11,6 +11,8 @@ import (
 // amount of error reports to store for any given input file
 var STORE_LIMIT = config.TxStorageLimit
 
+//var STORE_LIMIT = DefaultValidationConfig.TxStorageLimit
+
 // ValidationStore assigns messages (validation results) to
 // output streams for retrieval by clients
 type ValidationStore struct {

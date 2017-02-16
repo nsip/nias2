@@ -33,13 +33,16 @@ var sizeMutex = &sync.Mutex{}
 // TransactionTracker simple strucuture to capture details of
 // transactions in system: tx size and tx progress
 type TransactionTracker struct {
-	C *nats.EncodedConn
+	C              *nats.EncodedConn
+	ReportInterval int
 }
 
 // create a TransactionTracker
-func NewTransactionTracker(TxReportInterval int, cfg NATSConfig) *TransactionTracker {
-	report_interval = TxReportInterval
-	return &TransactionTracker{C: CreateNATSConnection(cfg)}
+// progress interval is how many messages between status updates
+// eg. report status every 500 messages
+func NewTransactionTracker(report_interval int, cfg NATSConfig) *TransactionTracker {
+
+	return &TransactionTracker{C: CreateNATSConnection(cfg), ReportInterval: report_interval}
 
 }
 
@@ -94,7 +97,7 @@ func (tt *TransactionTracker) GetStatusReport(txID string) (significantChange bo
 		Size:     size}
 
 	// if progress < size but mod interval
-	if (progress % report_interval) == 0 {
+	if (progress % tt.ReportInterval) == 0 {
 		sigChange = true
 	}
 
