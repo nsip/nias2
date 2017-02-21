@@ -41,6 +41,12 @@ func (di *DataIngest) Run() {
 	log.Println("All data files read, ingest complete.")
 }
 
+func (di *DataIngest) RunSynchronous(FilePath string) {
+	di.ingestResultsFile(FilePath, nil)
+	di.finaliseTransactions()
+	di.sc.Close()
+}
+
 func parseXMLFileDirectory() []string {
 
 	files, _ := filepath.Glob("./in/*.zip")
@@ -231,7 +237,9 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 
 	log.Printf("ingestion complete for %s", resultsFilePath)
 
-	wg.Done()
+	if wg != nil {
+		wg.Done()
+	}
 
 }
 
