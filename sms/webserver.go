@@ -23,9 +23,12 @@ import (
 	"github.com/twinj/uuid"
 	//"github.com/wildducktheories/go-csv"
 	"html/template"
+	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
+	"os"
+	"os/exec"
 	"path"
 	"strconv"
 	"strings"
@@ -120,6 +123,31 @@ func checkHeaderCSVforNAPLANValidation(s string) error {
 	if len(errfields) > 0 {
 		return fmt.Errorf("%s is not an expected registration field", errfields)
 	}
+	return nil
+}
+
+func validateSIFXML(file multipart.File) error {
+	log.Println("Validating data file...")
+	tmp_xmlfile := "/tmp/" + string(uuid.NewV4()) + ".tmp.xml"
+	outfile, err := os.Create(tmp_xmlfile)
+	if err != nil {
+		return err
+	}
+	defer outfile.Close()
+	_, err = io.Copy(outfile, file)
+	if err != nil {
+		return err
+	}
+
+	subProcess := exec.Command("xmllint", "--noout", "--schema", "SIF_Message.xsd", tmp_xmlfile)
+	if err != nil {
+		return err
+	}
+	out, err := subProcess.CombinedOutput()
+	if err != nil {
+		return err
+	}
+	log.Println(string(out))
 	return nil
 }
 
@@ -224,6 +252,9 @@ func (nws *NIASWebServer) Run(nats_cfg lib.NATSConfig) {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
+			if err = validateSIFXML(src); err != nil {
+				return c.String(http.StatusBadRequest, err.Error())
+			}
 			if ir, err = enqueueXML(src, STORE_AND_FORWARD_PREFIX, SSF_ROUTE); err != nil {
 				return err
 			}
@@ -251,6 +282,9 @@ func (nws *NIASWebServer) Run(nats_cfg lib.NATSConfig) {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
+			if err = validateSIFXML(src); err != nil {
+				return c.String(http.StatusBadRequest, err.Error())
+			}
 			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX, SMS_ROUTE); err != nil {
 				return err
 			}
