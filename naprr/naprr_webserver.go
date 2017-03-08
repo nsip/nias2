@@ -88,6 +88,9 @@ func (rrs *ResultsReportingServer) Run() {
 
 	})
 
+	//
+	// download the requested pre-generated csv file.
+	//
 	e.GET("/naprr/downloadreport/:acaraid/:filename", func(c echo.Context) error {
 
 		acaraID := c.Param("acaraid")
@@ -106,9 +109,21 @@ func (rrs *ResultsReportingServer) Run() {
 
 	})
 
+	//
+	// get the schoolinfo object for the given acaraid
+	//
+	e.GET("/naprr/schoolinfo/:acaraid", func(c echo.Context) error {
+
+		acaraID := c.Param("acaraid")
+		sd := rrs.sr.GetSchoolData(acaraID)
+
+		return c.JSON(http.StatusAccepted, sd.SchoolInfos[acaraID])
+
+	})
+
 	// static resources
 	e.Static("/", "public")
-	e.Static("/reports", "out")
+	e.Static("/reports", "out") // access to pre-generated reports
 
 	// homepage
 	e.File("/", "public/index.html")
