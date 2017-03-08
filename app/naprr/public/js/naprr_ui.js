@@ -297,7 +297,7 @@ function createDomainFilter()
 
     // all domains selector
     var input = $("<p>" +
-        "<input name='group2' type='radio' id='all-domains' domain='all' />" +
+        "<input name='domainFilter' type='radio' id='all-domains' domain='all' />" +
         "<label for='all-domains'>All</label>" +
         "</p>"
     );
