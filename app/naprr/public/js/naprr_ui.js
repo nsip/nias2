@@ -7,22 +7,25 @@
 // 
 // gets schoolinfo 1-line summary for given acaraid
 // 
-function getSchoolInfoSummaryLine(acaraid) {
+function getSchoolInfoSummaryLine(acaraid)
+{
 
-	var sinfo = {};
+    var sinfo = {};
 
-	// data can be found in participation info
-	$.each(participationData, function(index, pds) {
-		var school = pds.School;
+    // data can be found in participation info
+    $.each(participationData, function(index, pds)
+    {
+        var school = pds.School;
 
-		if(school.ACARAId == acaraid) {
-			sinfo = school;
-			return false;
-		}
+        if (school.ACARAId == acaraid)
+        {
+            sinfo = school;
+            return false;
+        }
 
-	});
+    });
 
-	return $("<p>" +
+    return $("<p>" +
         "School: " + sinfo.SchoolName +
         ", Sector: " + sinfo.SchoolSector +
         ", Type: " + sinfo.SchoolType +
@@ -35,24 +38,27 @@ function getSchoolInfoSummaryLine(acaraid) {
 // 
 // get student info 1-line summary for given psi
 // 
-function getStudentInfoSummaryLine(psi) {
+function getStudentInfoSummaryLine(psi)
+{
 
-	var sp = {};
-	var ei = {};
+    var sp = {};
+    var ei = {};
 
-	// data can be found in participation info
-	$.each(participationData, function(index, pds) {
-		ei = pds.EventInfos[0];
+    // data can be found in participation info
+    $.each(participationData, function(index, pds)
+    {
+        ei = pds.EventInfos[0];
 
-		if(ei.Event.PSI == psi) {
-			var student = pds.Student;
-			sp = student;
-			return false;
-		}
+        if (ei.Event.PSI == psi)
+        {
+            var student = pds.Student;
+            sp = student;
+            return false;
+        }
 
-	});
+    });
 
-	return $("<p>" +
+    return $("<p>" +
         "Student: " + sp.GivenName + " " + sp.FamilyName +
         ", PSI: " + ei.Event.PSI +
         ", Homegroup: " + sp.Homegroup +
@@ -159,6 +165,13 @@ function initSchoolChooserHandler()
                 " elements: " + participationData.length);
         });
 
+        $.get("/naprr/schoolinfo/" + acaraid, function(data, status)
+        {
+            schoolinfoData = {};
+            schoolinfoData = data;
+            console.log("school info data downloaded for " + acaraid);
+
+        });
 
     });
 

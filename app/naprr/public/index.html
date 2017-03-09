@@ -37,6 +37,7 @@
     <!--  -->
     <!-- The naprr app js files -->
     <!--  -->
+    <script type="text/javascript" src="js/naprr_schoolinfo.js"></script>
     <script type="text/javascript" src="js/naprr_codeframe.js"></script>
     <script type="text/javascript" src="js/naprr_graphs.js"></script>
     <script type="text/javascript" src="js/naprr_participation.js"></script>
@@ -68,19 +69,12 @@
             <div class="section">
                 <div class="row">
                     <div class="col s12 center">
-                        <h3><i class="mdi-content-send brown-text"></i></h3>
                         <h4 class="header light left-align white-text">NAPLAN Results Reporting Data</h4>
                         <p class="left-align light white-text">
                             Select a school to review by typing letters from the school name or numbers from the school ACARA ID (ASL number) in the search box.
-                        </p>
-                        <p class="left-align light white-text">
-                            Once a school is selected choose the report type you are interested in.
-                        </p>
-                        <p class="left-align light white-text">
-                            Each report type presents a summary table. Use the radio buttons at the top of the table to filter the results.
-                        </p>
-                        <p class="left-align light white-text">
-                            Click on a table row to see the extended data set for that row.
+                            <br/> Once a school is selcted choose the report type you are interested in.
+                            <br/> Each report type presents a summary table. Use the radio buttons at the top of the table to filter the results.
+                            <br/> Click on a table row to see the extended data set for that row.
                         </p>
                     </div>
                 </div>
@@ -99,16 +93,14 @@
             <div class="row">
                 <div class="col s12">
                     <div class="row">
-                        <div class="col s1">
-                        </div>
-                        <div class="input-field col s10">
+                        <div class="input-field col s11">
                             <i class="material-icons prefix">search</i>
                             <input type="text" id="autocomplete-input" class="autocomplete">
                             <label for="autocomplete-input">Choose A School</label>
                         </div>
-                        <!-- <div class="col s1"> -->
-                        <!-- <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons">info</i></a> -->
-                        <!-- </div> -->
+                        <div class="col s1">
+                            <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons">info_outline</i></a>
+                        </div>
                     </div>
                 </div>
                 <!-- FAB for extra actions -->
@@ -230,21 +222,17 @@
     <!--  -->
     <!--  -->
     <!-- optional slide-in for eg. school details / student info -->
-    <!-- currently not used -->
     <!--  -->
-    <!-- <ul id="slide-out" class="side-nav"> -->
-        <!-- <li> -->
-            <!-- <div class="userView"> -->
-                <!-- <div class="background"> -->
-                    <!-- <img src="images/connect1.svg"> -->
-                <!-- </div> -->
-                <!-- <img class="circle" src="images/clock.png"> -->
-                <!-- <span class="white-text name">John Doe</span> -->
-                <!-- <span class="white-text email">jdandturk@gmail.com</span> -->
-            <!-- </div> -->
-        <!-- </li> -->
-        <!-- <li>Second Sidebar Link</li> -->
-    <!-- </ul> -->
+    <ul id="slide-out" class="side-nav card-panel teal">
+        <div id="si-header" class="white-text">
+        </div>
+        <div id="si-contact" class="white-text">
+        </div>
+        <div id="si-establishment" class="white-text">
+        </div>        
+        <div id="si-extended" class="white-text">
+        </div>                
+    </ul>
 </body>
 
 </html>

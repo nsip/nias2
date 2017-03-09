@@ -81,7 +81,10 @@ func launchNatsStreamingServer() *server.StanServer {
 	stanOpts.FilestoreDir = "nss"
 	// stanOpts.Debug = true
 
-	ss := server.RunServerWithOpts(stanOpts, nil)
+	nOpts := server.DefaultNatsServerOptions
+	nOpts.Port = 5222
+
+	ss := server.RunServerWithOpts(stanOpts, &nOpts)
 
 	return ss
 
