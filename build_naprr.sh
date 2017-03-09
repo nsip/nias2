@@ -16,7 +16,7 @@ do_build() {
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
-	rsync -a naprr/in naprr/templates $OUTPUT/
+	rsync -a naprr/in naprr/templates naprr/public $OUTPUT/
 }
 
 # do_shells() {
