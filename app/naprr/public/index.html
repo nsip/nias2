@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--  -->
+    <!--Import Google Icon Font-->
+    <!--  -->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--  -->
+    <!-- jquery support -->
+    <!--  -->
+    <script src="javascript/jquery-2.1.4.min.js"></script>
+    <!-- jQuery File Upload Dependencies -->
+    <!-- <script src="javascript/jquery.ui.widget.js"></script> -->
+    <!-- <script src="javascript/jquery.iframe-transport.js"></script> -->
+    <!-- <script src="javascript/jquery.fileupload.js"></script> -->
+    <!--  -->
+    <!-- charting support -->
+    <!--  -->
+    <script src="javascript/d3.min.js" charset="utf-8"></script>
+    <script src="javascript/dimple.v2.1.6.min.js"></script>
+    <!-- <script src="javascript/crossfilter.min.js"></script> -->
+    <!-- <script src="javascript/dc.min.js"></script> -->
+    <!-- <link rel="stylesheet" href="css/dc.min.css"> -->
+    <!--  -->
+    <!--Import materialize.css-->
+    <!--  -->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+    <!--  -->
+    <!-- material-ui suport -->
+    <!--  -->
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+    <!--  -->
+    <!--Let browser know website is optimized for mobile-->
+    <!--  -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--  -->
+    <!-- The naprr app js files -->
+    <!--  -->
+    <script type="text/javascript" src="js/naprr_codeframe.js"></script>
+    <script type="text/javascript" src="js/naprr_graphs.js"></script>
+    <script type="text/javascript" src="js/naprr_participation.js"></script>
+    <script type="text/javascript" src="js/naprr_domainscores.js"></script>
+    <script type="text/javascript" src="js/naprr_score_summary.js"></script>
+    <script type="text/javascript" src="js/naprr_ui.js"></script>
+    <script type="text/javascript" src="js/naprr.js"></script>
+</head>
+
+<body class="grey lighten-4">
+    <!--  -->
+    <!-- Navigation Bar -->
+    <!--  -->
+    <!--  -->
+    <nav class="top-nav blue darken-1 nav-extended">
+        <div class="container">
+            <div class="nav-wrapper">
+                <a class="brand-logo right" target="_blank" href="http://www.nsip.edu.au">NSIP NIAS</a>
+            </div>
+        </div>
+    </nav>
+    <!--  -->
+    <!--  -->
+    <!--  -->
+    <div class="divider"></div>
+    <!-- content header section -->
+    <div class="blue darken-1">
+        <div class="container">
+            <div class="section">
+                <div class="row">
+                    <div class="col s12 center">
+                        <h3><i class="mdi-content-send brown-text"></i></h3>
+                        <h4 class="header light left-align white-text">NAPLAN Results Reporting Data</h4>
+                        <p class="left-align light white-text">
+                            Select a school to review by typing letters from the school name or numbers from the school ACARA ID (ASL number) in the search box.
+                        </p>
+                        <p class="left-align light white-text">
+                            Once a school is selected choose the report type you are interested in.
+                        </p>
+                        <p class="left-align light white-text">
+                            Each report type presents a summary table. Use the radio buttons at the top of the table to filter the results.
+                        </p>
+                        <p class="left-align light white-text">
+                            Click on a table row to see the extended data set for that row.
+                        </p>
+                    </div>
+                </div>
+                <div class="row>">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <!--  -->
+    <!-- School chooser -->
+    <!--  -->
+    <!--  -->
+    <div class="container">
+        <div class="section">
+            <div class="row">
+                <div class="col s12">
+                    <div class="row">
+                        <div class="col s1">
+                        </div>
+                        <div class="input-field col s10">
+                            <i class="material-icons prefix">search</i>
+                            <input type="text" id="autocomplete-input" class="autocomplete">
+                            <label for="autocomplete-input">Choose A School</label>
+                        </div>
+                        <!-- <div class="col s1"> -->
+                        <!-- <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons">info</i></a> -->
+                        <!-- </div> -->
+                    </div>
+                </div>
+                <!-- FAB for extra actions -->
+                <!--  -->
+                <!--  -->
+                <div class="col s2 center">
+                    <div class="fixed-action-btn horizontal click-to-toggle">
+                        <a class="btn-floating btn-large blue">
+                            <i class="material-icons">menu</i>
+                        </a>
+                        <ul>
+                            <!-- links to other useful resources -->
+                            <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="results-reporting data set specification" href="https://github.com/nsip/naplan-results-reporting" target="_blank"><i class="material-icons">web</i></a></li>
+                            <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="results-reporting data privacy" href="#modal1"><i class="material-icons">fingerprint</i></a></li>
+                            <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="results-reporting help" href="/nias8help.pdf" target="_blank"><i class="material-icons">help</i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Modal Privacy Dialog -->
+                <div id="modal1" class="modal">
+                    <div class="modal-content">
+                        <h4>Conditions of Data Use</h4>
+                        <p>Please use any NAPLAN data in accordance with your local privacy and data usage policies. </p>
+                        <p>Usage should comply with the Privacy Act 1988 (Cth) to maintain the privacy of personal information contained within each data extract or report. </p>
+                        <p>Data controls on the assessment platform are unable to be applied to data outside of the Assessment platform and therefore treat all data with care. </p>
+                        <p>In order to maintain the privacy of the data after you have validated it, users must confirm and agree that:
+                        </p>
+                        <ol>
+                            <li>you are authorised to access and store the Data;</li>
+                            <li>your organisation has privacy and security controls in place in order to protect the privacy and security of the Data; and</li>
+                            <li>you will take all reasonable steps to ensure that the Data will not be misused, interfered with, lost, modified or disclosed to unauthorised personnel.</li>
+                        </ol>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Accept</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end of file chooser container -->
+    <!--  -->
+    <!--  -->
+    <!-- Report Type Selector Buttons -->
+    <!--  -->
+    <div class="container" id="report-buttons">
+        <div class="row">
+            <div class="col s3">
+                <a class="waves-effect waves-teal btn-flat" id="btn-scoresummary">Score Summary</a>
+            </div>
+            <div class="col s3">
+                <a class="waves-effect waves-teal btn-flat" id="btn-domainscores">Domain Scores</a>
+            </div>
+            <div class="col s3">
+                <a class="waves-effect waves-teal btn-flat" id="btn-participation">Participation</a>
+            </div>
+            <div class="col s3">
+                <a class="waves-effect waves-teal btn-flat" id="btn-codeframe">Codeframe</a>
+            </div>
+            <!-- <div class="col s2"> -->
+            <!-- <a class="waves-effect waves-teal btn-flat" id="btn-schoolinfo">School Info</a> -->
+            <!-- </div> -->
+            <!-- <div class="col s2"> -->
+            <!-- <a class="waves-effect waves-teal btn-flat" id="btn-schoolinfo">Student Info</a> -->
+            <!-- </div>             -->
+            <!-- <div class="col s2"> -->
+            <!-- <a class="waves-effect waves-teal btn-flat" id="btn-schoolinfo">Responses</a> -->
+            <!-- </div>             -->
+            <!-- <div class="col s2"> -->
+            <!-- <a class="waves-effect waves-teal btn-flat" id="btn-schoolinfo">QA summary</a> -->
+            <!-- </div>             -->
+            <!-- <div class="col s2"> -->
+            <!-- <a class="waves-effect waves-teal btn-flat" id="btn-schoolinfo">VAR</a> -->
+            <!-- </div>             -->
+        </div>
+    </div>
+    <!--  -->
+    <!--  -->
+    <!-- Display Chosen Report -->
+    <!--  -->
+    <div class="container" id="report-container">
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title" id="report-title"></span>
+                        <div id="report-content">
+                            <div id="report-filters">
+                            </div>
+                            <table class="bordered highlight">
+                                <thead id="report-table-hdr">
+                                </thead>
+                                <tbody id="report-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Enable downoad of results / convert to sif-xnl from here -->
+                    <div class="card-action" id="download-report">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <!--  -->
+    <!-- Modal for extended info display -->
+    <!--  -->
+    <div id="ed-modal" class="modal bottom-sheet">
+        <div class="modal-content" id="extended-data">
+            <h5 id="ed-title">Modal Header</h5>
+            <div id="ed-content">
+            </div>
+        </div>
+        <div class="modal-footer" id="ed-modal-footer">
+            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+        </div>
+    </div>
+    <!--  -->
+    <!--  -->
+    <!-- optional slide-in for eg. school details / student info -->
+    <!-- currently not used -->
+    <!--  -->
+    <!-- <ul id="slide-out" class="side-nav"> -->
+        <!-- <li> -->
+            <!-- <div class="userView"> -->
+                <!-- <div class="background"> -->
+                    <!-- <img src="images/connect1.svg"> -->
+                <!-- </div> -->
+                <!-- <img class="circle" src="images/clock.png"> -->
+                <!-- <span class="white-text name">John Doe</span> -->
+                <!-- <span class="white-text email">jdandturk@gmail.com</span> -->
+            <!-- </div> -->
+        <!-- </li> -->
+        <!-- <li>Second Sidebar Link</li> -->
+    <!-- </ul> -->
+</body>
+
+</html>

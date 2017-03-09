@@ -9,11 +9,12 @@ import (
 	"os"
 	// "os/exec"
 	// "os/signal"
-	// "runtime"
+	"runtime"
 	// "time"
 )
 
 var rewrite = flag.Bool("rewrite", false, "rewrite regenerates all reports without re-loading data")
+var webonly = flag.Bool("webonly", false, "just launch web data explorer")
 
 func main() {
 
@@ -46,9 +47,14 @@ func main() {
 	rw := naprr.NewReportWriter()
 	rw.Run()
 
-	log.Println("Done.")
+	log.Println("Ingest and report writing complete.")
 
-	// runtime.Goexit()
+	log.Println("Starting web data browser server.")
+
+	rrs := naprr.NewResultsReportingServer()
+	rrs.Run()
+
+	runtime.Goexit()
 }
 
 func clearNSSWorkingDirectory() {

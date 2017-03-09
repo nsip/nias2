@@ -3,6 +3,8 @@ package naprr
 import (
 	"encoding/gob"
 	"github.com/nsip/nias2/xml"
+	"log"
+	"strconv"
 	"strings"
 )
 
@@ -143,7 +145,15 @@ func (cfd CodeFrameDataSet) GetWritingRubricMax(rubrictype string) string {
 
 	for _, rubric := range cfd.Item.TestItemContent.NAPWritingRubricList.NAPWritingRubric {
 		if strings.EqualFold(rubric.RubricType, rubrictype) {
-			return rubric.ScoreList.Score[0].MaxScoreValue
+			var max_score int
+			for _, score := range rubric.ScoreList.Score {
+				score_int, err := strconv.Atoi(score.MaxScoreValue)
+				if err != nil {
+					log.Println("Score for ", rubrictype, " cannot be converted to int: ", err)
+				}
+				max_score += score_int
+			}
+			return strconv.Itoa(max_score)
 		}
 	}
 
