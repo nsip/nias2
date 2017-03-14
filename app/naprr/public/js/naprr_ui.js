@@ -70,6 +70,20 @@ function getStudentInfoSummaryLine(psi)
 
 }
 
+// 
+// builds singl line descriptor for a tetlet
+// 
+function getTestletSummaryLine(testlet)
+{
+
+    return "Testlet: " + testlet.TestletContent.TestletName +
+        ", Location in Stage: " + testlet.TestletContent.LocationInStage +
+        ", Node: " + testlet.TestletContent.Node +
+        ", Max. Score: " + testlet.TestletContent.TestletMaximumScore;
+
+
+}
+
 
 // 
 // set up the main school selector
@@ -173,6 +187,13 @@ function initSchoolChooserHandler()
 
         });
 
+        $.get("/naprr/codeframe", function(data, status)
+        {
+            codeframeData = {};
+            codeframeData = data;
+            console.log("codeframe data downloaded.");
+        });
+
     });
 
 }
@@ -217,7 +238,7 @@ function unpackList(list)
                 if (jQuery.isPlainObject(val))
                 {
 
-                    console.log("isObject: ", val);
+                    // console.log("isObject: ", val);
 
                     $.each(val, function(k, v)
                     {
@@ -235,6 +256,47 @@ function unpackList(list)
 
 
     return content;
+}
+
+// 
+// helper to render item stimuli
+// 
+function unpackStimulusList(stimList)
+{
+    console.log(stimList);
+
+    var null_response = $("<p>not supplied</p>");
+
+    if (stimList == null)
+    {
+        return null_response;
+    }
+
+    if (stimList.Stimulus == null || stimList.Stimulus.length < 1)
+    {
+        return null_response;
+    }
+
+    var response = $("<p></p>");
+
+    jQuery.each(stimList.Stimulus, function(index, stimulus)
+    {
+        if (stimulus == null)
+        {
+            return false;
+        }
+
+        console.log(stimulus);
+
+        response.append("Genre: " + stimulus.TextGenre + "<br/>");
+        response.append("Type: " + stimulus.TextType + "<br/>");
+        response.append("Words: " + stimulus.WordCount + "<br/>");
+        response.append("Descriptor: " + stimulus.TextDescriptor + "<br/>");
+        response.append("Content: " + stimulus.Content + "<br/>");
+    });
+
+    return response;
+
 }
 
 // 
@@ -466,4 +528,13 @@ function createTestBandsDisplay(data)
     bottomRow.append(brTable);
 
     return bottomRow;
+}
+
+// 
+// open examplars in a new window
+// 
+function openExemplarLink(url)
+{
+    window.open(url, '_blank');
+    window.focus();
 }

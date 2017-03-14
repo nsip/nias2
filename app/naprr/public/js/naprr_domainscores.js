@@ -188,7 +188,7 @@ function createExtendedDataDomainScores(rdsdata)
 
     $("#ed-content").append(topRow);
 
-    var twocol = $("<div class='row'></div>");
+    var threecol = $("<div class='row'></div>");
     var col1 = $("<div id='ed-col1' class='col s6'></div>");
     col1.append("<h5>Graph</h5>");
 
@@ -227,11 +227,11 @@ function createExtendedDataDomainScores(rdsdata)
         rdsdata.Response.DomainScore.StudentProficiency + "</p>");
 
 
-    twocol.append(col1);
-    twocol.append(col2);
-    twocol.append(col3);
+    threecol.append(col1);
+    threecol.append(col2);
+    threecol.append(col3);
 
-    $("#ed-content").append(twocol);
+    $("#ed-content").append(threecol);
 
     col1.append("<div id='graphContainer'></div>");
     createDomainScoreGraph(rdsdata);

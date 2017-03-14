@@ -2,6 +2,7 @@
 var scoresummaryData = [];
 var participationData = [];
 var domainscoresData = [];
+var codeframeData = [];
 var schoolinfoData = {};
 
 var currentASLId;
