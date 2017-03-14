@@ -1,4 +1,4 @@
-<StudentPersonals  xmlns="http://www.sifassociation.org/au/datamodel/3.4">
+<StudentPersonals  xmlns="http://www.sifassociation.org/datamodel/au/3.4">
     <StudentPersonal RefId="0b0c3c0e-1a79-4330-bed4-fec30945fa36">
       <LocalId>gqhvy514</LocalId>
       <StateProvinceId></StateProvinceId>
@@ -29,10 +29,10 @@
           <IndigenousStatus>2</IndigenousStatus>
           <Sex>2</Sex>
           <BirthDate>2009-08-01</BirthDate>
-          <CountryOfBirth>118</CountryOfBirth>
+          <CountryOfBirth>1300</CountryOfBirth>
           <LanguageList>
             <Language>
-              <Code>118</Code>
+              <Code>1101</Code>
               <LanguageType>4</LanguageType>
             </Language>
           </LanguageList>
@@ -59,7 +59,7 @@
         </YearLevel>
         <FTE>0.63</FTE>
         <Parent1Language>6199</Parent1Language>
-        <Parent2Language>118</Parent2Language>
+        <Parent2Language>1101</Parent2Language>
         <Parent1EmploymentType>4</Parent1EmploymentType>
         <Parent2EmploymentType>1</Parent2EmploymentType>
         <Parent1SchoolEducationLevel>4</Parent1SchoolEducationLevel>
@@ -70,8 +70,8 @@
         <SchoolACARAId>44370</SchoolACARAId>
         <TestLevel><Code>3</Code></TestLevel>
         <Homegroup></Homegroup>
-        <ClassGroup>3E</ClassGroup>
-        <MembershipType>1</MembershipType>
+        <ClassCode>3E</ClassCode>
+        <MembershipType>01</MembershipType>
         <FFPOS>2</FFPOS>
         <ReportingSchoolId>lxwnp178</ReportingSchoolId>
         <OtherEnrollmentSchoolACARAId>tjtzi844</OtherEnrollmentSchoolACARAId>

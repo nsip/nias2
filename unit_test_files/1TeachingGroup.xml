@@ -1,0 +1,67 @@
+<TeachingGroups   xmlns="http://www.sifassociation.org/datamodel/au/3.4">
+<TeachingGroup RefId="64A309DA-063A-2E35-B359-D75101A8C3D1">
+  <SchoolYear>2008</SchoolYear>
+  <LocalId>20087ASPN</LocalId>
+  <ShortName>7A SPN</ShortName>
+  <LongName>Year 7A Maths – Space and Numbers</LongName>
+  <Set>4</Set>
+  <Block>6</Block>
+  <CurriculumLevel>VELS Level 5</CurriculumLevel>
+  <StudentList>
+    <TeachingGroupStudent>
+      <StudentPersonalRefId>9897466F-200E-4BC1-B9AE-D1507DA15CEF</StudentPersonalRefId>
+      <StudentLocalId>SMI001</StudentLocalId>
+      <Name Type="LGL">
+        <FamilyName>Smith</FamilyName>
+        <GivenName>Peter</GivenName>
+      </Name>
+    </TeachingGroupStudent>
+    <TeachingGroupStudent>
+      <StudentPersonalRefId>7C834EA9-EDA1-2090-347F-83297E1C290D</StudentPersonalRefId>
+      <StudentLocalId>SMI002</StudentLocalId>
+      <Name Type="LGL">
+        <FamilyName>Smith</FamilyName>
+        <GivenName>Jennifer</GivenName>
+      </Name>
+    </TeachingGroupStudent>
+    <TeachingGroupStudent>
+      <StudentPersonalRefId>7C834EA9-EDA1-2090-347F-83297E1C290E</StudentPersonalRefId>
+      <StudentLocalId>SMI003</StudentLocalId>
+      <Name Type="LGL">
+        <FamilyName>Smith</FamilyName>
+        <GivenName>Terence</GivenName>
+      </Name>
+    </TeachingGroupStudent>
+  </StudentList>
+  <TeacherList>
+    <TeachingGroupTeacher>
+      <StaffPersonalRefId>A8C3A2E3-5B35-9D75-101D-00AA001A0000</StaffPersonalRefId>
+      <StaffLocalId>SMI1</StaffLocalId>
+      <Name Type="LGL">
+        <FamilyName>Smith</FamilyName>
+        <GivenName>Thomas</GivenName>
+      </Name>
+      <Association>Class Teacher</Association>
+    </TeachingGroupTeacher>
+    <TeachingGroupTeacher>
+      <StaffPersonalRefId>A8CCCCE3-5B35-9D75-101D-00AA001A0000</StaffPersonalRefId>
+      <StaffLocalId>LONG2</StaffLocalId>
+      <Name Type="LGL">
+        <FamilyName>Long</FamilyName>
+        <GivenName>Tamara</GivenName>
+      </Name>
+      <Association>Integration Aide</Association>
+    </TeachingGroupTeacher>
+  </TeacherList>
+  <TeachingGroupPeriodList>
+    <TeachingGroupPeriod>
+      <DayId>M</DayId>
+      <PeriodId>2</PeriodId>
+    </TeachingGroupPeriod>
+    <TeachingGroupPeriod>
+      <DayId>F</DayId>
+      <PeriodId>6</PeriodId>
+    </TeachingGroupPeriod>
+  </TeachingGroupPeriodList>
+</TeachingGroup>
+</TeachingGroups>

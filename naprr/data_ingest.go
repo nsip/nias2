@@ -1,15 +1,12 @@
 package naprr
 
 import (
-	"bufio"
 	goxml "encoding/xml"
 	"github.com/nats-io/go-nats-streaming"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
 	//"io/ioutil"
 	"log"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"sync"
 )

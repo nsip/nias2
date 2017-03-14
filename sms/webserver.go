@@ -126,9 +126,13 @@ func checkHeaderCSVforNAPLANValidation(s string) error {
 	return nil
 }
 
-func validateSIFXML(file multipart.File) error {
+func validateSIFXML(fileheader *multipart.FileHeader) error {
+	file, _ := fileheader.Open()
+	defer file.Close()
 	log.Println("Validating data file...")
-	tmp_xmlfile := "/tmp/" + string(uuid.NewV4()) + ".tmp.xml"
+	filename := uuid.NewV4().String()
+	tmp_xmlfile := "/tmp/" + filename + ".tmp.xml"
+	log.Println(tmp_xmlfile)
 	outfile, err := os.Create(tmp_xmlfile)
 	if err != nil {
 		return err
@@ -141,10 +145,13 @@ func validateSIFXML(file multipart.File) error {
 
 	subProcess := exec.Command("xmllint", "--noout", "--schema", "SIF_Message.xsd", tmp_xmlfile)
 	if err != nil {
+		log.Printf("1: %v\n", err)
 		return err
 	}
 	out, err := subProcess.CombinedOutput()
 	if err != nil {
+		log.Printf("2: %s\n", string(out))
+		log.Printf("2: %v\n", err)
 		return err
 	}
 	log.Println(string(out))
@@ -156,7 +163,7 @@ func enqueueXML(file multipart.File, usecase string, route []string) (IngestResp
 
 	ir := IngestResponse{}
 	v := XMLContainer{"none"}
-
+	log.Printf("enqueueXML %v", file)
 	var b bytes.Buffer
 	decoder := xml.NewDecoder(file)
 	encoder := xml.NewEncoder(&b)
@@ -165,6 +172,7 @@ func enqueueXML(file multipart.File, usecase string, route []string) (IngestResp
 	txid := nuid.Next()
 	for {
 		t, _ := decoder.Token()
+		log.Printf("Token %v\n", t)
 		if t == nil {
 			break
 		}
@@ -193,7 +201,7 @@ func enqueueXML(file multipart.File, usecase string, route []string) (IngestResp
 				msg.MsgID = nuid.Next()
 				msg.Target = usecase
 				msg.Route = route
-
+				log.Println(msg.Body)
 				publish(msg)
 			}
 			child = true
@@ -241,10 +249,12 @@ func (nws *NIASWebServer) Run(nats_cfg lib.NATSConfig) {
 		// get the file from the input form
 		file, err := c.FormFile("validationFile")
 		if err != nil {
+			log.Println("Ingest #1")
 			return err
 		}
 		src, err := file.Open()
 		if err != nil {
+			log.Println("Ingest #2")
 			return err
 		}
 		defer src.Close()
@@ -252,13 +262,16 @@ func (nws *NIASWebServer) Run(nats_cfg lib.NATSConfig) {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
-			if err = validateSIFXML(src); err != nil {
+			if err = validateSIFXML(file); err != nil {
+				log.Println("Ingest #3")
 				return c.String(http.StatusBadRequest, err.Error())
 			}
 			if ir, err = enqueueXML(src, STORE_AND_FORWARD_PREFIX, SSF_ROUTE); err != nil {
+				log.Println("Ingest #4")
 				return err
 			}
 		} else {
+			log.Println("Ingest #5")
 			return c.String(http.StatusBadRequest, "File submitted is not .xml")
 		}
 
@@ -282,7 +295,7 @@ func (nws *NIASWebServer) Run(nats_cfg lib.NATSConfig) {
 		// read onto qs with appropriate handler
 		var ir IngestResponse
 		if strings.Contains(file.Filename, ".xml") {
-			if err = validateSIFXML(src); err != nil {
+			if err = validateSIFXML(file); err != nil {
 				return c.String(http.StatusBadRequest, err.Error())
 			}
 			if ir, err = enqueueXML(src, SIF_MEMORY_STORE_PREFIX, SMS_ROUTE); err != nil {

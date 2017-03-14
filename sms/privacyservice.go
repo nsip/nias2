@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"github.com/beevik/etree"
 	"github.com/nsip/nias2/lib"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -76,6 +77,7 @@ func filter(xml string, filters [][]PrivacyFilter) ([]string, error) {
 			}
 		}
 		out, err := doc.WriteToString() // output cumulative effect of filtering
+		log.Println("FILTER " + out)
 		if err != nil {
 			return nil, err
 		} else {

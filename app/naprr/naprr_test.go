@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 )
 
@@ -81,7 +82,7 @@ func filescompare(t *testing.T, file1name string, file2name string) {
 	sort.Strings(file1)
 	sort.Strings(file2)
 	for i := 0; i < len(file1); i++ {
-		if file1[i] != file2[i] {
+		if !strings.EqualFold(file1[i], file2[i]) {
 			t.Fatalf("Line in %s is not the expected value:\nExpected: %s\nActual  : %s\n", file1name, file2[i], file1[i])
 		}
 	}
