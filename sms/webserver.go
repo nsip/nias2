@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"github.com/labstack/echo"
+	"github.com/nsip/nias2/lib"
 	//"github.com/labstack/echo/engine/fasthttp"
 	"bytes"
 	"github.com/labstack/echo/engine/standard"
@@ -50,21 +51,6 @@ type XMLContainer struct {
 	Value string `xml:",innerxml"`
 }
 
-// truncate the record by removing items that have blank entries.
-// this prevents the validation from throwing validation exceptions
-// for fields that are not mandatory but included as empty in the
-// dataset
-func removeBlanks(m map[string]string) map[string]string {
-
-	reducedmap := make(map[string]string)
-	for key, val := range m {
-		if val != "" {
-			reducedmap[key] = strings.TrimSpace(val)
-		}
-	}
-	return reducedmap
-}
-
 // generic publish routine that handles different requirements
 // of the 3 possible message infrastrucutres
 func publish(msg *NiasMessage) {
@@ -97,7 +83,7 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 		i = i + 1
 
 		regr := RegistrationRecord{}
-		r := removeBlanks(record.AsMap())
+		r := lib.RemoveBlanks(record.AsMap())
 		decode_err := ms.Decode(r, &regr)
 		if decode_err != nil {
 			return ir, decode_err
@@ -383,7 +369,7 @@ func (nws *NIASWebServer) Run() {
 		sprsnls := make([]map[string]string, 0)
 		for _, r := range records {
 			r := r.AsMap()
-			r1 := removeBlanks(r)
+			r1 := lib.RemoveBlanks(r)
 			r1["SIFuuid"] = uuid.NewV4().String()
 			sprsnls = append(sprsnls, r1)
 		}
