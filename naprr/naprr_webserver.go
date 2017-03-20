@@ -110,6 +110,21 @@ func (rrs *ResultsReportingServer) Run() {
 	})
 
 	//
+	// download the codeframe report
+	//
+	e.GET("/naprr/downloadreport/codeframe", func(c echo.Context) error {
+
+		c.Response().Header().Set("Content-Disposition", "attachment; filename="+"codeframe.csv")
+		c.Response().Header().Set("Content-Type", "text/csv")
+
+		localFileName := "./out/codeframe.csv"
+		// log.Println("csv local file: ", localFileName)
+
+		return c.File(localFileName)
+
+	})
+
+	//
 	// get the schoolinfo object for the given acaraid
 	//
 	e.GET("/naprr/schoolinfo/:acaraid", func(c echo.Context) error {
@@ -119,6 +134,16 @@ func (rrs *ResultsReportingServer) Run() {
 
 		return c.JSON(http.StatusAccepted, sd.SchoolInfos[acaraID])
 
+	})
+
+	//
+	// get the test codeframe data
+	//
+	e.GET("/naprr/codeframe", func(c echo.Context) error {
+
+		cfds := rrs.sr.GetCodeFrameData()
+
+		return c.JSON(http.StatusAccepted, cfds)
 	})
 
 	// static resources

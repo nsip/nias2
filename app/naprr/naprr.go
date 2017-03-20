@@ -37,6 +37,7 @@ func main() {
 
 		di := naprr.NewDataIngest()
 		di.Run()
+		di.RunCSV()
 
 		log.Println("Generating report data...")
 		rb := naprr.NewReportBuilder()

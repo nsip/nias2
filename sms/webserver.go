@@ -10,7 +10,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/labstack/echo"
-	"io/ioutil"
+	"github.com/nsip/nias2/lib"
 	//"github.com/labstack/echo/engine/fasthttp"
 	"bytes"
 	//"github.com/labstack/echo/engine/standard"
@@ -60,21 +60,6 @@ type IngestResponse struct {
 // Struct to contain single XML record
 type XMLContainer struct {
 	Value string `xml:",innerxml"`
-}
-
-// truncate the record by removing items that have blank entries.
-// this prevents the validation from throwing validation exceptions
-// for fields that are not mandatory but included as empty in the
-// dataset
-func removeBlanks(m map[string]string) map[string]string {
-
-	reducedmap := make(map[string]string)
-	for key, val := range m {
-		if val != "" {
-			reducedmap[key] = strings.TrimSpace(val)
-		}
-	}
-	return reducedmap
 }
 
 // generic publish routine that handles different requirements
@@ -307,6 +292,124 @@ func (nws *NIASWebServer) Run(nats_cfg lib.NATSConfig) {
 
 		log.Println("ir: ", ir)
 		return c.JSON(http.StatusAccepted, ir)
+	})
+
+	// handler for validation of NAPLAN
+	e.Post("/naplan/reg/validate", func(c echo.Context) error {
+
+		// get the file from the input form
+		file, err := c.FormFile("validationFile")
+		if err != nil {
+			return err
+		}
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		// read onto qs with appropriate handler
+		var ir IngestResponse
+		if strings.Contains(file.Filename, ".csv") {
+			if ir, err = enqueueCSVforNAPLANValidation(src); err != nil {
+				return err
+			}
+		} else if strings.Contains(file.Filename, ".xml") {
+			if ir, err = enqueueXMLforNAPLANValidation(src); err != nil {
+				return err
+			}
+		} else {
+
+			return c.String(http.StatusBadRequest, "File submitted is not .csv or .xml")
+		}
+
+		log.Println("ir: ", ir)
+		return c.JSON(http.StatusAccepted, ir)
+
+	})
+
+	// handler for csv-xml conversion
+	e.Post("/naplan/reg/convert", func(c echo.Context) error {
+
+		// get the file from the input form
+		file, err := c.FormFile("conversionFile")
+		if err != nil {
+			return err
+		}
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		// check it's a csv file
+		if !strings.Contains(file.Filename, ".csv") {
+			return c.String(http.StatusBadRequest, "File must be of type .csv")
+		}
+
+		// create outbound file name
+		fname := file.Filename
+		rplcr := strings.NewReplacer(".csv", ".xml")
+		xml_fname := rplcr.Replace(fname)
+
+		// read the csv file
+		reader := csv.WithIoReader(src)
+		records, err := csv.ReadAll(reader)
+		if err != nil {
+			return err
+		}
+
+		// create valid sif guids
+		sprsnls := make([]map[string]string, 0)
+		for _, r := range records {
+			r := r.AsMap()
+			r1 := lib.RemoveBlanks(r)
+			r1["SIFuuid"] = uuid.NewV4().String()
+			sprsnls = append(sprsnls, r1)
+		}
+
+		// set headers to 'force' file download where appropriate
+		c.Response().Header().Set("Content-Disposition", "attachment; filename="+xml_fname)
+		c.Response().Header().Set("Content-Type", "application/xml")
+
+		// apply the template & write results to the client
+		if err := sptmpl.Execute(c.Response().Writer(), sprsnls); err != nil {
+			return err
+		}
+
+		return nil
+
+	})
+
+	// monitoring endpoint for validation progress
+	e.Get("/naplan/reg/status/:txid", func(c echo.Context) error {
+
+		c.Response().Header().Set(echo.HeaderContentType, "text/event-stream")
+		c.Response().WriteHeader(http.StatusOK)
+
+		txid := c.Param("txid")
+		reply := GetTrackingData(txid)
+
+		sm, _ := json.Marshal(reply)
+		suffix := string(sm) + "\n\n"
+		if _, err := c.Response().Write([]byte("data: " + suffix)); err != nil {
+			log.Println(err)
+		}
+
+		return nil
+
+	})
+
+	// get validation analysis results
+	e.Get("/naplan/reg/results/:txid", func(c echo.Context) error {
+
+		msgs, err := GetTxData(c.Param("txid"), VALIDATION_PREFIX, false)
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(http.StatusOK, msgs)
+
 	})
 
 	// get filtered text

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"log"
+	"strings"
 )
 
 // helper routines collection for encoding nias messages
@@ -33,4 +34,19 @@ func DecodeNiasMessage(bytemsg []uint8) *NiasMessage {
 		log.Println("Error decoding message from q/store(internal):", err)
 	}
 	return &msgOut
+}
+
+// truncate the record by removing items that have blank entries.
+// this prevents the validation from throwing validation exceptions
+// for fields that are not mandatory but included as empty in the
+// dataset
+func RemoveBlanks(m map[string]string) map[string]string {
+
+	reducedmap := make(map[string]string)
+	for key, val := range m {
+		if val != "" {
+			reducedmap[key] = strings.TrimSpace(val)
+		}
+	}
+	return reducedmap
 }
