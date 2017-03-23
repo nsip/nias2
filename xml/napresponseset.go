@@ -26,31 +26,36 @@ type NAPResponseSet struct {
 	} `xml:"DomainScore"`
 
 	TestletList struct {
-		Testlet []struct {
-			NapTestletRefId   string `xml:"NAPTestletRefId"`
-			NapTestletLocalId string `xml:"NAPTestletLocalId"`
-			TestletScore      string `xml:"TestletSubScore"`
-			ItemResponseList  struct {
-				ItemResponse []struct {
-					ItemRefID           string `xml:"NAPTestItemRefId"`
-					LocalID             string `xml:"NAPTestItemLocalId"`
-					Response            string `xml:"Response"`
-					ResponseCorrectness string `xml:"ResponseCorrectness"`
-					Score               string `xml:"Score"`
-					LapsedTimeItem      string `xml:"LapsedTimeItem"`
-					SequenceNumber      string `xml:"SequenceNumber"`
-					ItemWeight          string `xml:"ItemWeight"`
-
-					SubscoreList struct {
-						Subscore []struct {
-							SubscoreType  string `xml:"SubscoreType"`
-							SubscoreValue string `xml:"SubscoreValue"`
-						} `xml:"Subscore"`
-					} `xml:"SubscoreList"`
-				} `xml:"ItemResponse"`
-			} `xml:"ItemResponseList"`
-		} `xml:"Testlet"`
+		Testlet []NAPResponseSet_Testlet `xml:"Testlet"`
 	} `xml:"TestletList"`
+}
+
+type NAPResponseSet_Testlet struct {
+	NapTestletRefId   string `xml:"NAPTestletRefId"`
+	NapTestletLocalId string `xml:"NAPTestletLocalId"`
+	TestletScore      string `xml:"TestletSubScore"`
+	ItemResponseList  struct {
+		ItemResponse []NAPResponseSet_ItemResponse `xml:"ItemResponse"`
+	} `xml:"ItemResponseList"`
+}
+
+type NAPResponseSet_Subscore struct {
+	SubscoreType  string `xml:"SubscoreType"`
+	SubscoreValue string `xml:"SubscoreValue"`
+}
+
+type NAPResponseSet_ItemResponse struct {
+	ItemRefID           string `xml:"NAPTestItemRefId"`
+	LocalID             string `xml:"NAPTestItemLocalId"`
+	Response            string `xml:"Response"`
+	ResponseCorrectness string `xml:"ResponseCorrectness"`
+	Score               string `xml:"Score"`
+	LapsedTimeItem      string `xml:"LapsedTimeItem"`
+	SequenceNumber      string `xml:"SequenceNumber"`
+	ItemWeight          string `xml:"ItemWeight"`
+	SubscoreList        struct {
+		Subscore []NAPResponseSet_Subscore `xml:"Subscore"`
+	} `xml:"SubscoreList"`
 }
 
 func (t NAPResponseSet) GetHeaders() []string {

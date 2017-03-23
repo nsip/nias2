@@ -69,7 +69,7 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 		i = i + 1
 
 		regr := &nxml.RegistrationRecord{}
-		r := lib.removeBlanks(record.AsMap())
+		r := lib.RemoveBlanks(record.AsMap())
 		decode_err := ms.Decode(r, regr)
 		regr.Unflatten()
 		if decode_err != nil {

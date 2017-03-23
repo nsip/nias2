@@ -77,7 +77,7 @@ func filescompare(t *testing.T, file1name string, file2name string) {
 	file2, err := readLines(file2name)
 	errcheck(t, err)
 	if len(file1) != len(file2) {
-		t.Fatalf("%s does not have the expected number of lines\n", file1name)
+		t.Fatalf("%s does not have the  number of lines (%d, %d)\n%v\n%v\n", file1name, len(file1), len(file2), file1, file2)
 	}
 	sort.Strings(file1)
 	sort.Strings(file2)

@@ -2,32 +2,22 @@ package naprr
 
 import (
 	"bufio"
-	ms "github.com/mitchellh/mapstructure"
+	//ms "github.com/mitchellh/mapstructure"
 	"github.com/nats-io/nuid"
 	"strconv"
 	//"github.com/nats-io/go-nats-streaming"
+	"fmt"
 	"github.com/nsip/nias2/lib"
 	nxml "github.com/nsip/nias2/xml"
+	"github.com/twinj/uuid"
 	"log"
 	"path/filepath"
 	"sync"
 )
 
-/*
-type DataIngest struct {
-	sc stan.Conn
-	ge GobEncoder
-	sr *StreamReader
-}
-
-func NewDataIngest() *DataIngest {
-	di := DataIngest{sc: CreateSTANConnection(), ge: GobEncoder{}, sr: NewStreamReader()}
-	return &di
-}
-*/
-
 func (di *DataIngest) RunCSV() {
 
+	uuid.Init()
 	csvFiles := parsePearsonCSVFileDirectory()
 
 	var wg sync.WaitGroup
@@ -65,7 +55,6 @@ var pearsonStruct = []fixedLengthField{
 	fixedLengthField{name: "vsn", start: 9, length: 10},
 	fixedLengthField{name: "fname", start: 19, length: 22},
 	fixedLengthField{name: "lname", start: 41, length: 25},
-	fixedLengthField{name: "second_name", start: 66, length: 15},
 	fixedLengthField{name: "dob_dm", start: 81, length: 4},
 	fixedLengthField{name: "dob_year_1", start: 85, length: 2},
 	fixedLengthField{name: "dob_year_2", start: 87, length: 2},
@@ -107,8 +96,142 @@ func pearsonLineScan(s string) map[string]string {
 	for _, f := range pearsonStruct {
 		ret[f.name] = s[f.start-1 : f.start-1+f.length]
 	}
-	log.Println("%v\n", ret)
 	return lib.RemoveBlanks(ret)
+}
+
+func pearson2sifSex(s string) string {
+	switch s {
+	case "M":
+		return "1"
+	case "F":
+		return "2"
+	default:
+		return "9"
+	}
+}
+
+func pearson2sifIndigenousStatus(s string) string {
+	switch s {
+	case "T":
+		return "2"
+	case "K":
+		return "1"
+	case "N":
+		return "4"
+	case "B":
+		return "3"
+	case "U":
+		return "9"
+	default:
+		return "9"
+	}
+}
+
+func pearson2sifParticipationCode(s string) string {
+	switch s {
+	case "P":
+		return "P"
+	case "C":
+		// catch up
+		return "P"
+	case "A":
+		return "A"
+	case "W":
+		return "W"
+	case "E":
+		return "E"
+	case "H":
+		// withheld
+		return "S"
+	case "L":
+		return "X"
+	default:
+		return "P"
+	}
+}
+
+func pearson2sifParticipationText(s string) string {
+	switch s {
+	case "P":
+		return "Present"
+	case "C":
+		return "Present (Catch-Up)"
+	case "A":
+		return "Absent"
+	case "W":
+		return "Withdrawn"
+	case "E":
+		return "Exempt"
+	case "H":
+		// withheld
+		return "Sanctioned Abandonment (Withheld)"
+	case "L":
+		return "No Longer Enrolled"
+	default:
+		return "Present"
+	}
+}
+
+func pearson2sifExemptionReason(s string) string {
+	switch s {
+	case "1":
+		return "Disability"
+	case "2":
+		return "Language"
+	default:
+		return ""
+	}
+}
+
+func pearson2sifTestDisruption(s string) string {
+	switch s {
+	case "1":
+		return "Illness"
+	case "2":
+		return "Parental removal"
+	default:
+		return ""
+	}
+}
+
+func pearson2sifAdjustment(s string) []string {
+	switch s {
+	case "ET":
+		return []string{"ETA"} // conventional choice against ETB or ETC
+	case "RB":
+		return []string{"RBK"}
+	case "SS":
+		return []string{"SUP"} // conventional choice of NAPLAN Support for Separate Supervision
+	case "OS":
+		return []string{"OSS"}
+	case "SC":
+		return []string{"SCR"}
+	case "TY":
+		return []string{"AST"} // conventional choice of "assistive technology" for "typed response/attachment"
+	case "CT":
+		return []string{"AST"}
+	case "SP":
+		return []string{"SUP"}
+	case "CO":
+		return []string{"COL"}
+	case "SR":
+		return []string{"AIA"}
+	case "OT":
+		return []string{"AST"} // conventional choice of Assistive Technology for Othre  ---- make it pearson-other
+	default:
+		return []string{}
+	}
+}
+
+func wrapMessage(regr interface{}, i int, txid string, route string) *lib.NiasMessage {
+	msg := &lib.NiasMessage{}
+	msg.Body = regr
+	msg.SeqNo = strconv.Itoa(i)
+	msg.TxID = txid
+	msg.MsgID = nuid.Next()
+	// msg.Target = VALIDATION_PREFIX
+	msg.Route = []string{route}
+	return msg
 }
 
 func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.WaitGroup) {
@@ -131,32 +254,137 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 	}
 
 	log.Println("Reading data file...")
+	testRefId := uuid.NewV4().String()
+	naptest := nxml.NAPTest{TestID: testRefId}
+	//naptest.TestContent = nxml.TestContent{LocalId: r["booklet_id"], TestLevel: "3", TestDomain: "Writing"}
+	naptest.TestContent = nxml.TestContent{TestLevel: "3", TestDomain: "Writing"}
+	gt, err := di.ge.Encode(naptest)
+	if err != nil {
+		log.Println("Unable to gob-encode nap test: ", err)
+	}
+	di.sc.Publish("meta", gt)
+
+	// we will set up 1 testlet and 1 item, which is assessed in the 10 rubrics
+	testletRefId := uuid.NewV4().String()
+	naptestlet := nxml.NAPTestlet{TestletID: testletRefId,
+		NAPTestRefId: testRefId,
+	}
+	naptestlet.TestItemList.TestItem = make([]nxml.NAPTestlet_TestItem, 10)
+	for i := range naptestlet.TestItemList.TestItem {
+		naptestlet.TestItemList.TestItem[i] = nxml.NAPTestlet_TestItem{TestItemRefId: uuid.NewV4().String(),
+			SequenceNumber: string(i)}
+	}
+	gtl, err := di.ge.Encode(naptestlet)
+	if err != nil {
+		log.Println("Unable to gob-encode nap testlet: ", err)
+	}
+	di.sc.Publish("meta", gtl)
+
+	rubrics := [10]string{"audience", "text structure", "ideas", "character and setting", "vocabulary",
+		"cohesion", "paragraphing", "sentence structure", "punctuation", "spelling"}
+	rubricsabbr := [10]string{"AUD", "TXT", "IDE", "CAS", "VOC", "COH", "PAR", "SEN", "PUN", "SPE"}
+	maxscores := [10]string{"6", "4", "5", "4", "5", "4", "2", "6", "5", "6"}
+
+	for i := range naptestlet.TestItemList.TestItem {
+		naptestitem := nxml.NAPTestItem{ItemID: naptestlet.TestItemList.TestItem[i].TestItemRefId}
+		naptestitem.TestItemContent = nxml.TestItemContent{ItemName: rubrics[i]}
+		gti, err := di.ge.Encode(naptestlet)
+		if err != nil {
+			log.Println("Unable to gob-encode nap test item: ", err)
+		}
+		di.sc.Publish("meta", gti)
+	}
 
 	//defer file.Close()
+	totalStudents := 0
 	i := 0
-	txid := nuid.Next()
+	//txid := nuid.Next()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		r := pearsonLineScan(scanner.Text())
-		i = i + 1
-
-		regr := nxml.RegistrationRecord{}
-		decode_err := ms.Decode(r, &regr)
-		if decode_err != nil {
-			log.Fatalln("unable to open results data file: ", decode_err)
+		if r == nil {
+			break
 		}
+		i = i + 1
+		studentRefId := uuid.NewV4().String()
+		regr := nxml.RegistrationRecord{BirthDate: fmt.Sprintf("%s%s-%s-%s", r["dob_year_1"], r["dob_year_2"], r["dob_dm"][0:2], r["dob_dm"][2:]),
+			RefId:            studentRefId,
+			TAAId:            r["booklet_id"],
+			StateProvinceId:  r["vsn"],
+			LocalId:          r["vsn"],
+			FamilyName:       r["lname"],
+			MainSchoolFlag:   "01",
+			GivenName:        r["fname"],
+			Sex:              pearson2sifSex(r["gender"]),
+			IndigenousStatus: pearson2sifIndigenousStatus(r["gender"]),
+			LBOTE:            r["lbote"],
+			ClassGroup:       r["home_group"],
+			SchoolLocalId:    r["school_vcaa_code"],
+			ASLSchoolId:      r["asl_school_code"], // may be missing
+		}
+		// stopgap
+		if r["asl_school_code"] != "" {
+			r["asl_school_code"] = r["school_vcaa_code"]
+		}
+		regr.Unflatten()
+		gsp, err := di.ge.Encode(regr)
+		if err != nil {
+			log.Println("Unable to gob-encode studentpersonal: ", err)
+		}
+		// store linkage locally
+		ss_link[regr.RefId] = regr.ASLSchoolId
+		di.sc.Publish(regr.ASLSchoolId, gsp)
+		totalStudents++
+		event := nxml.NAPEvent{EventID: uuid.NewV4().String(),
+			SPRefID:           studentRefId,
+			SchoolID:          regr.ASLSchoolId,
+			TestID:            testRefId,
+			ParticipationCode: pearson2sifParticipationCode(r["student_attendance"]),
+			ParticipationText: pearson2sifParticipationText(r["student_attendance"]),
+			ExemptionReason:   pearson2sifExemptionReason(r["reason_for_exemption"]),
+		}
+		event.Adjustment.BookletType = r["special_provision_other_text"]
+		if r["special_provision"] != "" {
+			event.Adjustment.PNPCodelist = struct {
+				PNPCode []string `xml:"PNPCode"`
+			}{PNPCode: pearson2sifAdjustment(r["special_provision"])}
+		}
+		if r["reason_for_withholding"] != "" {
+			event.TestDisruptionList.TestDisruption = make([]struct {
+				Event string `xml:"Event"`
+			}, 1)
+			event.TestDisruptionList.TestDisruption[0].Event = pearson2sifTestDisruption(r["reason_for_withholding"])
+		}
+		ge, err := di.ge.Encode(event)
+		if err != nil {
+			log.Println("Unable to gob-encode nap event link: ", err)
+		}
+		di.sc.Publish(event.SchoolID, ge)
 
-		msg := &lib.NiasMessage{}
-		msg.Body = regr
-		msg.SeqNo = strconv.Itoa(i)
-		msg.TxID = txid
-		msg.MsgID = nuid.Next()
-		// msg.Target = VALIDATION_PREFIX
-		msg.Route = []string{"pearson"}
+		response := nxml.NAPResponseSet{ResponseID: uuid.NewV4().String(),
+			StudentID: studentRefId,
+			TestID:    testRefId,
+		}
+		response.TestletList.Testlet = make([]nxml.NAPResponseSet_Testlet, 1)
+		response.TestletList.Testlet[0] = nxml.NAPResponseSet_Testlet{NapTestletRefId: testletRefId}
+		response.TestletList.Testlet[0].ItemResponseList.ItemResponse = make([]nxml.NAPResponseSet_ItemResponse, 10)
 
-		//publish(msg)
+		for i := range naptestlet.TestItemList.TestItem {
+			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i] = nxml.NAPResponseSet_ItemResponse{ItemRefID: naptestlet.TestItemList.TestItem[i].TestItemRefId}
+
+			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i].SubscoreList.Subscore = make([]nxml.NAPResponseSet_Subscore, 1)
+		}
+		for i := 0; i < 10; i++ {
+			response = rubricPopulate(i, rubricsabbr[i], rubrics[i], maxscores[i], r, response)
+		}
+		gr, err := di.ge.Encode(response)
+		if err != nil {
+			log.Println("Unable to gob-encode student response set: ", err)
+		}
+		di.sc.Publish("responses", gr)
 
 	}
+	log.Println("Finished reading data file...")
 	// post end of stream message to responses queue
 	eot := lib.TxStatusUpdate{TxComplete: true}
 	geot, err := di.ge.Encode(eot)
@@ -166,7 +394,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 	di.sc.Publish("responses", geot)
 	di.sc.Publish("meta", geot)
 
-	di.assignResponsesToSchools(ss_link)
+	//di.assignResponsesToSchools(ss_link)
 
 	log.Println("response assignment complete")
 
@@ -174,4 +402,19 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 
 	wg.Done()
 
+}
+
+func rubricPopulate(seqPos int, abbr string, rubric string, maxscore string, r map[string]string, response nxml.NAPResponseSet) nxml.NAPResponseSet {
+	if r[abbr] == "" {
+		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].ResponseCorrectness = "NotAttempted"
+	} else {
+		if r[abbr] == maxscore {
+			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].ResponseCorrectness = "Correct"
+		} else {
+			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].ResponseCorrectness = "Incorrect"
+		}
+		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[0].SubscoreList.Subscore[seqPos].SubscoreType = rubric
+		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[0].SubscoreList.Subscore[seqPos].SubscoreValue = r[abbr]
+	}
+	return response
 }

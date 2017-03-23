@@ -78,34 +78,6 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 	if err != nil {
 		log.Fatalln("unable to open results data file: ", err)
 	}
-	/*
-		log.Println("Validating data file...")
-		tmp_xmlfile := resultsFilePath + ".tmp.xml"
-		subProcess := exec.Command("xmllint", "--noout", "--schema", "SIF_Message.xsd", tmp_xmlfile)
-		//stdin, err := subProcess.StdinPipe()
-		if err != nil {
-			log.Println(err) //replace with logger, or anything you want
-		}
-		//messages := make(chan string)
-		//semaphore := make(chan string)
-		f, err := os.Create(tmp_xmlfile)
-		log.Println(tmp_xmlfile)
-		defer f.Close()
-		scanner := bufio.NewScanner(xmlFile)
-		for scanner.Scan() {
-			//log.Println(scanner.Text())
-			f.WriteString(scanner.Text() + "\n")
-		}
-		f.Sync()
-		log.Println("CLOSED INPUT")
-		//stdin.Close()
-
-		out, err := subProcess.CombinedOutput()
-		if err != nil {
-			log.Fatal(string(out))
-		}
-		log.Println(string(out))
-	*/
 	xmlFile, err = OpenResultsFile(resultsFilePath)
 
 	log.Println("Reading data file...")
