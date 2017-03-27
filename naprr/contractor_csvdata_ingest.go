@@ -195,32 +195,35 @@ func pearson2sifTestDisruption(s string) string {
 }
 
 func pearson2sifAdjustment(s string) []string {
-	switch s {
-	case "ET":
-		return []string{"ETA"} // conventional choice against ETB or ETC
-	case "RB":
-		return []string{"RBK"}
-	case "SS":
-		return []string{"SUP"} // conventional choice of NAPLAN Support for Separate Supervision
-	case "OS":
-		return []string{"OSS"}
-	case "SC":
-		return []string{"SCR"}
-	case "TY":
-		return []string{"AST"} // conventional choice of "assistive technology" for "typed response/attachment"
-	case "CT":
-		return []string{"AST"}
-	case "SP":
-		return []string{"SUP"}
-	case "CO":
-		return []string{"COL"}
-	case "SR":
-		return []string{"AIA"}
-	case "OT":
-		return []string{"AST"} // conventional choice of Assistive Technology for Othre  ---- make it pearson-other
-	default:
-		return []string{}
+	ret := make([]string, 0)
+	for i := 0; i < len(s); i = i + 2 {
+		s1 := s[i : i+2]
+		switch s1 {
+		case "ET":
+			ret = append(ret, "ETA") // conventional choice against ETB or ETC
+		case "RB":
+			ret = append(ret, "RBK")
+		case "SS":
+			ret = append(ret, "SUP") // conventional choice of NAPLAN Support for Separate Supervision
+		case "OS":
+			ret = append(ret, "OSS")
+		case "SC":
+			ret = append(ret, "SCR")
+		case "TY":
+			ret = append(ret, "AST") // conventional choice of "assistive technology" for "typed response/attachment"
+		case "CT":
+			ret = append(ret, "AST")
+		case "SP":
+			ret = append(ret, "SUP")
+		case "CO":
+			ret = append(ret, "COL")
+		case "SR":
+			ret = append(ret, "AIA")
+		case "OT":
+			ret = append(ret, "AST") // conventional choice of Assistive Technology for Other  ---- make it pearson-other
+		}
 	}
+	return ret
 }
 
 func wrapMessage(regr interface{}, i int, txid string, route string) *lib.NiasMessage {

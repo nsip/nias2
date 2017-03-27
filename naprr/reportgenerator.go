@@ -24,6 +24,55 @@ func NewReportGenerator() *ReportGenerator {
 // routines to build the required reports
 //
 
+// generate XML representations of ingested data, used in first instance to deal with ingests of Year 3 Writing data
+// generated only once as represents structure of test not school-level data
+func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData) {
+
+	count := 0
+	cfds := make([]CodeFrameDataSet, 0)
+
+	for _, codeframe := range nd.Codeframes {
+		for _, cf_testlet := range codeframe.TestletList.Testlet {
+			tl := nd.Testlets[cf_testlet.NAPTestletRefId]
+			// log.Printf("\t%s", tl.TestletContent.TestletName)
+			for _, cf_item := range cf_testlet.TestItemList.TestItem {
+				ti := nd.Items[cf_item.TestItemRefId]
+				// log.Printf("\t\t%s", ti.TestItemContent.ItemName)
+				cfd := CodeFrameDataSet{
+					Test:    nd.Tests[codeframe.NAPTestRefId],
+					Testlet: tl,
+					Item:    ti,
+				}
+				cfds = append(cfds, cfd)
+			}
+		}
+	}
+
+	count = len(cfds)
+
+	// publish the records
+	for _, cfd := range cfds {
+		payload, err := rg.ge.Encode(cfd)
+		if err != nil {
+			log.Println("unable to encode codeframe: ", err)
+		}
+		// log.Printf("\t%s - %s - %s", cfd.Test.TestContent.TestDomain,
+		//      cfd.Testlet.TestletContent.TestletName, cfd.Item.TestItemContent.ItemName)
+		rg.sc.Publish("reports.xml", payload)
+	}
+
+	// finish the transaction - completion msg
+	txu := lib.TxStatusUpdate{TxComplete: true}
+	gtxu, err := rg.ge.Encode(txu)
+	if err != nil {
+		log.Println("unable to encode txu codeframe report: ", err)
+	}
+	rg.sc.Publish("reports.cframe", gtxu)
+
+	log.Printf("codeframe records %d: ", count)
+
+}
+
 // generate codeframe objects (currently as per VCAA requirements)
 // generated only once as represents strucure of test not school-level data
 func (rg *ReportGenerator) GenerateCodeFrameData(nd *NAPLANData) {
