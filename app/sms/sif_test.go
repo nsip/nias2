@@ -40,20 +40,21 @@ func TestSMS(t *testing.T) {
 	test_harness_sms(t, "../../unit_test_files/StudentPersonal.xml", "../../unit_test_files/1StudentPersonal_Graph.json")
 }
 func TestSMS1(t *testing.T) {
-	test_harness_sms(t, "../../unit_test_files/Sif3AssessmentRegistration.xml", "../../unit_test_files/1Sif3AssessmentRegistration_Graph.json")
+	test_harness_sms(t, "../../unit_test_files/1napstudentresponseset.xml", "../../unit_test_files/1napstudentresponseset_Graph.json")
 }
 func TestSif2Graph_StudentPersonal(t *testing.T) {
 	sif2graph_harness(t, "../../unit_test_files/StudentPersonal.xml", "../../unit_test_files/1StudentPersonal_Graph.json")
 }
 
-func TestSif2Graph_Sif3AssessmentRegistration(t *testing.T) {
-	sif2graph_harness(t, "../../unit_test_files/Sif3AssessmentRegistration.xml", "../../unit_test_files/1Sif3AssessmentRegistration_Graph.json")
+func TestSif2Graph_1TeachingGroup(t *testing.T) {
+	sif2graph_harness(t, "../../unit_test_files/1napstudentresponseset.xml", "../../unit_test_files/1napstudentresponseset_Graph.json")
 }
 
 func post_file(filename string, endpoint string) (string, error) {
 	var f *os.File
 	var err error
 	if f, err = os.Open(filename); err != nil {
+		log.Println("POST FILE 1")
 		return "", err
 	}
 	defer f.Close()
@@ -66,11 +67,13 @@ func post_file(filename string, endpoint string) (string, error) {
 	requestVariables := url.Values{"name": {path.Base(f.Name())}}
 	msg, err := rest.NewMultipartMessage(requestVariables, files)
 	if err != nil {
+		log.Println("POST FILE 2")
 		return "", err
 	}
 	dst := map[string]interface{}{}
 	log.Printf("%v\n", msg)
 	if err = customClient.PostMultipart(&dst, endpoint, msg); err != nil {
+		log.Println("POST FILE 3")
 		return "", err
 	}
 	txid := dst["TxID"].(string)
@@ -93,17 +96,19 @@ func test_harness_filecomp_privacy_xml(t *testing.T, filename string) {
 		errcheck(t, err, 2)
 		// we are getting back a JSON array
 		err = json.Unmarshal(bytebuf, &dat)
+		log.Println(dat)
 		errcheck(t, err, 3)
 		err = compare_files(strings.Join(dat, "\n"), filename+"."+sensitivities[i])
 		errcheck(t, err, 4)
 	}
+	log.Printf("%v\n", err)
 
 }
 
 // compare the retrieved file in retvalue to the file in filename
 func compare_files(retvalue string, filename string) error {
 	var err error
-	var re *regexp.Regexp
+	var re, re2 *regexp.Regexp
 	dat1 := []byte{}
 
 	dat1, err = ioutil.ReadFile(filename)
@@ -113,8 +118,14 @@ func compare_files(retvalue string, filename string) error {
 	if re, err = regexp.Compile("(\\n|^)\\s+"); err != nil {
 		return err
 	}
+	if re2, err = regexp.Compile("[\\n|\\s]+$"); err != nil {
+		return err
+	}
 	dat1 = re.ReplaceAll(dat1, []byte("\n"))
 	retvalue1 := re.ReplaceAll([]byte(retvalue), []byte("\n"))
+	dat1 = re2.ReplaceAll(dat1, []byte(""))
+	retvalue1 = re2.ReplaceAll(retvalue1, []byte(""))
+	log.Printf("COMP\n%v####%v####\n", string(dat1), string(retvalue1))
 	if bytes.Compare(dat1, retvalue1) != 0 {
 		return fmt.Errorf("output does not match file %s:\n=====\n%s\n====\n%s\n====\n", filename, string(dat1), string(retvalue1))
 	}

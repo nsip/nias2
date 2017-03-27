@@ -12,12 +12,14 @@ type NAPTestlet struct {
 		TestletMaximumScore string `xml:"TestletMaximumScore"`
 	} `xml:"TestletContent"`
 	TestItemList struct {
-		TestItem []struct {
-			TestItemRefId   string `xml:"TestItemRefId"`
-			TestItemLocalId string `xml:"TestItemLocalId"`
-			SequenceNumber  string `xml:"SequenceNumber"`
-		} `xml:"TestItem"`
+		TestItem []NAPTestlet_TestItem `xml:"TestItem"`
 	} `xml:"TestItemList"`
+}
+
+type NAPTestlet_TestItem struct {
+	TestItemRefId   string `xml:"TestItemRefId"`
+	TestItemLocalId string `xml:"TestItemLocalId"`
+	SequenceNumber  string `xml:"SequenceNumber"`
 }
 
 func (t NAPTestlet) GetHeaders() []string {

@@ -3,6 +3,7 @@ package naprr
 import (
 	"bufio"
 	"bytes"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"log"
@@ -32,9 +33,28 @@ func (rw *ReportWriter) Run() {
 	rw.writeSchoolLevelReports(schools)
 	rw.writeAggregateSchoolReports(schools)
 	rw.writeTestLevelReports()
+	rw.writeYr3WReports()
 
 	log.Println("All reports written\n")
 
+}
+
+// create data reports from the test strucutre
+func (rw *ReportWriter) writeYr3WReports() {
+
+	log.Println("Creating test-level reports...")
+
+	var wg sync.WaitGroup
+
+	cfds := rw.sr.GetCodeFrameData()
+
+	wg.Add(2)
+
+	go rw.writeYr3WritingReport(cfds, &wg)
+
+	wg.Wait()
+
+	log.Println("Year 3 Writing XML created.")
 }
 
 // create data reports from the test strucutre
@@ -173,7 +193,7 @@ func (rw *ReportWriter) writeSchoolReports(acaraid string, wg *sync.WaitGroup) {
 	wg.Done()
 }
 
-// report of test strucure for writing items only
+// report of test structure for writing items only
 // with extended item information
 func (rw *ReportWriter) writeCodeFrameWritingReport(cfds []CodeFrameDataSet, wg *sync.WaitGroup) {
 
@@ -221,6 +241,41 @@ func (rw *ReportWriter) writeCodeFrameWritingReport(cfds []CodeFrameDataSet, wg 
 	// remove the temp data files
 	err = os.RemoveAll(fname)
 	check(err)
+
+	log.Printf("Codeframe writing report created for: %d elements", len(cfds))
+
+	wg.Done()
+
+}
+
+// report of test structure for writing items only
+// with extended item information
+func (rw *ReportWriter) writeYr3WritingReport(cfds []CodeFrameDataSet, wg *sync.WaitGroup) {
+
+	// create directory for the school
+	fpath := "yr3w/"
+	err := os.MkdirAll(fpath, os.ModePerm)
+	check(err)
+
+	// create the report data file in the output directory
+	// delete any ecisting files and create empty new one
+	fname := fpath + "codeframe_writing.xml"
+	err = os.RemoveAll(fname)
+	f, err := os.Create(fname)
+	check(err)
+	defer f.Close()
+
+	e := xml.NewEncoder(f)
+	e.Indent("", "  ")
+	f.WriteString("<NAPResulsReporting>\n")
+	// write the data - writing items only
+	for _, cfd := range cfds {
+		if cfd.Test.TestContent.TestDomain == "Writing" {
+			e.Encode(cfd)
+		}
+	}
+	e.Flush()
+	f.WriteString("</NAPResulsReporting>\n")
 
 	log.Printf("Codeframe writing report created for: %d elements", len(cfds))
 

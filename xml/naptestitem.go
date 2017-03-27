@@ -1,71 +1,73 @@
 package xml
 
 type NAPTestItem struct {
-	ItemID          string `xml:"RefId,attr"`
-	TestItemContent struct {
-		NAPTestItemLocalId        string `xml:"NAPTestItemLocalId"`
-		ItemName                  string `xml:"ItemName"`
-		ItemType                  string `xml:"ItemType"`
-		Subdomain                 string `xml:"Subdomain"`
-		WritingGenre              string `xml:"WritingGenre"`
-		ItemDescriptor            string `xml:"ItemDescriptor"`
-		ReleasedStatus            string `xml:"ReleasedStatus"`
-		MarkingType               string `xml:"MarkingType"`
-		MultipleChoiceOptionCount string `xml:"MultipleChoiceOptionCount"`
-		CorrectAnswer             string `xml:"CorrectAnswer"`
-		MaximumScore              string `xml:"MaximumScore"`
-		ItemDifficulty            string `xml:"ItemDifficulty"`
-		ItemDifficultyLogit5      string `xml:"ItemDifficultyLogit5"`
-		ItemDifficultyLogit62     string `xml:"ItemDifficultyLogit62"`
-		ItemDifficultyLogit5SE    string `xml:"ItemDifficultyLogit5SE"`
-		ItemDifficultyLogit62SE   string `xml:"ItemDifficultyLogit62SE"`
-		ItemProficiencyBand       string `xml:"ItemProficiencyBand"`
-		ItemProficiencyLevel      string `xml:"ItemProficiencyLevel"`
-		ExemplarURL               string `xml:"ExemplarURL"`
+	ItemID          string          `xml:"RefId,attr"`
+	TestItemContent TestItemContent `xml:"TestItemContent"`
+}
 
-		ItemSubstitutedForList struct {
-			SubstituteItem []struct {
-				SubstituteItemRefId string `xml:"SubstituteItemRefId"`
-				LocalId             string `xml:"SubstituteItemLocalId"`
-				PNPCodeList         struct {
-					PNPCode []string `xml:"PNPCode"`
-				} `xml:"PNPCodeList"`
-			} `xml:"SubstituteItem"`
-		} `xml:"ItemSubstitutedForList"`
+type TestItemContent struct {
+	NAPTestItemLocalId        string `xml:"NAPTestItemLocalId"`
+	ItemName                  string `xml:"ItemName"`
+	ItemType                  string `xml:"ItemType"`
+	Subdomain                 string `xml:"Subdomain"`
+	WritingGenre              string `xml:"WritingGenre"`
+	ItemDescriptor            string `xml:"ItemDescriptor"`
+	ReleasedStatus            string `xml:"ReleasedStatus"`
+	MarkingType               string `xml:"MarkingType"`
+	MultipleChoiceOptionCount string `xml:"MultipleChoiceOptionCount"`
+	CorrectAnswer             string `xml:"CorrectAnswer"`
+	MaximumScore              string `xml:"MaximumScore"`
+	ItemDifficulty            string `xml:"ItemDifficulty"`
+	ItemDifficultyLogit5      string `xml:"ItemDifficultyLogit5"`
+	ItemDifficultyLogit62     string `xml:"ItemDifficultyLogit62"`
+	ItemDifficultyLogit5SE    string `xml:"ItemDifficultyLogit5SE"`
+	ItemDifficultyLogit62SE   string `xml:"ItemDifficultyLogit62SE"`
+	ItemProficiencyBand       string `xml:"ItemProficiencyBand"`
+	ItemProficiencyLevel      string `xml:"ItemProficiencyLevel"`
+	ExemplarURL               string `xml:"ExemplarURL"`
 
-		ContentDescriptionList struct {
-			ContentDescription []string `xml:"ContentDescription"`
-		} `xml:"ContentDescriptionList"`
+	ItemSubstitutedForList struct {
+		SubstituteItem []struct {
+			SubstituteItemRefId string `xml:"SubstituteItemRefId"`
+			LocalId             string `xml:"SubstituteItemLocalId"`
+			PNPCodeList         struct {
+				PNPCode []string `xml:"PNPCode"`
+			} `xml:"PNPCodeList"`
+		} `xml:"SubstituteItem"`
+	} `xml:"ItemSubstitutedForList"`
 
-		StimulusList struct {
-			Stimulus []struct {
-				LocalId        string `xml:"StimulusLocalId"`
-				TextGenre      string `xml:"TextGenre"`
-				TextType       string `xml:"TextType"`
-				WordCount      string `xml:"WordCount"`
-				TextDescriptor string `xml:"TextDescriptor"`
-				Content        string `xml:"Content"`
-			} `xml:"Stimulus"`
-		} `xml:"StimulusList"`
+	ContentDescriptionList struct {
+		ContentDescription []string `xml:"ContentDescription"`
+	} `xml:"ContentDescriptionList"`
 
-		NAPWritingRubricList struct {
-			NAPWritingRubric []struct {
-				RubricType string `xml:"RubricType"`
-				Descriptor string `xml:"Descriptor"`
-				ScoreList  struct {
-					Score []struct {
-						MaxScoreValue        string `xml:"MaxScoreValue"`
-						ScoreDescriptionList struct {
-							ScoreDescription []struct {
-								ScoreValue string `xml:"ScoreValue"`
-								Descriptor string `xml:"Descriptor"`
-							} `xml:"ScoreDescription"`
-						} `xml:"ScoreDescriptionList"`
-					} `xml:"Score"`
-				} `xml:"ScoreList"`
-			} `xml:"NAPWritingRubric"`
-		} `xml:"NAPWritingRubricList"`
-	} `xml:"TestItemContent"`
+	StimulusList struct {
+		Stimulus []struct {
+			LocalId        string `xml:"StimulusLocalId"`
+			TextGenre      string `xml:"TextGenre"`
+			TextType       string `xml:"TextType"`
+			WordCount      string `xml:"WordCount"`
+			TextDescriptor string `xml:"TextDescriptor"`
+			Content        string `xml:"Content"`
+		} `xml:"Stimulus"`
+	} `xml:"StimulusList"`
+
+	NAPWritingRubricList struct {
+		NAPWritingRubric []struct {
+			RubricType string `xml:"RubricType"`
+			Descriptor string `xml:"Descriptor"`
+			ScoreList  struct {
+				Score []struct {
+					MaxScoreValue        string `xml:"MaxScoreValue"`
+					ScoreDescriptionList struct {
+						ScoreDescription []struct {
+							ScoreValue string `xml:"ScoreValue"`
+							Descriptor string `xml:"Descriptor"`
+						} `xml:"ScoreDescription"`
+					} `xml:"ScoreDescriptionList"`
+				} `xml:"Score"`
+			} `xml:"ScoreList"`
+		} `xml:"NAPWritingRubric"`
+	} `xml:"NAPWritingRubricList"`
 }
 
 func (t NAPTestItem) GetHeaders() []string {

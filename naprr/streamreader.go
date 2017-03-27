@@ -26,6 +26,51 @@ func NewStreamReader() *StreamReader {
 	return &sr
 }
 
+func (sr *StreamReader) GetXMLData() []CodeFrameDataSet {
+
+	cfds := make([]CodeFrameDataSet, 0)
+
+	// signal channel to notify asynch stan stream read is complete
+	txComplete := make(chan bool)
+
+	// main message handling callback for the stan stream
+	// get names of schools that have been processed by ingest
+	// and create reports
+	mcb := func(m *stan.Msg) {
+
+		// as we don't know message type ([]byte slice on wire) decode as interface
+		// then assert type dynamically
+		var m_if interface{}
+		err := sr.ge.Decode(m.Data, &m_if)
+		if err != nil {
+			log.Println("streamreader codeframe message decoding error: ", err)
+			txComplete <- true
+		}
+
+		switch t := m_if.(type) {
+		case CodeFrameDataSet:
+			cfd := m_if.(CodeFrameDataSet)
+			cfds = append(cfds, cfd)
+		case lib.TxStatusUpdate:
+			txComplete <- true
+		default:
+			_ = t
+			// log.Printf("unknown message type in participation data handler: %v", m_if)
+		}
+	}
+
+	sub, err := sr.sc.Subscribe("reports.pearson", mcb, stan.DeliverAllAvailable())
+	defer sub.Unsubscribe()
+	if err != nil {
+		log.Println("streamreader: stan subsciption error get codeframe data: ", err)
+	}
+
+	<-txComplete
+
+	return cfds
+
+}
+
 func (sr *StreamReader) GetCodeFrameData() []CodeFrameDataSet {
 
 	cfds := make([]CodeFrameDataSet, 0)

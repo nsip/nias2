@@ -135,3 +135,9 @@ func removeTx(txID string) {
 	statusMutex.Unlock()
 
 }
+
+// standard response to successful file upload
+type IngestResponse struct {
+	TxID    string
+	Records int
+}

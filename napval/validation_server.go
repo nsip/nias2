@@ -44,27 +44,6 @@ var sptmpl *template.Template
 
 type ValidationWebServer struct{}
 
-// standard response to successful file upload
-type IngestResponse struct {
-	TxID    string
-	Records int
-}
-
-// truncate the record by removing items that have blank entries.
-// this prevents the validation from throwing validation exceptions
-// for fields that are not mandatory but included as empty in the
-// dataset
-func removeBlanks(m map[string]string) map[string]string {
-
-	reducedmap := make(map[string]string)
-	for key, val := range m {
-		if val != "" {
-			reducedmap[key] = strings.TrimSpace(val)
-		}
-	}
-	return reducedmap
-}
-
 // generic publish routine that handles different requirements
 // of the 3 possible message infrastrucutres
 func publish(msg *lib.NiasMessage) {
@@ -76,9 +55,9 @@ func publish(msg *lib.NiasMessage) {
 //
 // read csv file as stream and post records onto processing queue
 //
-func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) {
+func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, error) {
 
-	ir := IngestResponse{}
+	ir := lib.IngestResponse{}
 
 	reader := csv.WithIoReader(file)
 	defer reader.Close()
@@ -90,7 +69,7 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 		i = i + 1
 
 		regr := &nxml.RegistrationRecord{}
-		r := removeBlanks(record.AsMap())
+		r := lib.RemoveBlanks(record.AsMap())
 		decode_err := ms.Decode(r, regr)
 		regr.Unflatten()
 		if decode_err != nil {
@@ -123,9 +102,9 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 //
 // read xml file as stream and post records onto processing queue
 //
-func enqueueXMLforNAPLANValidation(file multipart.File) (IngestResponse, error) {
+func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, error) {
 
-	ir := IngestResponse{}
+	ir := lib.IngestResponse{}
 
 	decoder := xml.NewDecoder(file)
 	total := 0
@@ -224,7 +203,7 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 		defer src.Close()
 
 		// read onto qs with appropriate handler
-		var ir IngestResponse
+		var ir lib.IngestResponse
 		if strings.Contains(file.Filename, ".csv") {
 			if ir, err = enqueueCSVforNAPLANValidation(src); err != nil {
 				return err
@@ -380,7 +359,7 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 		sprsnls := make([]map[string]string, 0)
 		for _, r := range records {
 			r := r.AsMap()
-			r1 := removeBlanks(r)
+			r1 := lib.RemoveBlanks(r)
 			r1["SIFuuid"] = uuid.NewV4().String()
 			sprsnls = append(sprsnls, r1)
 		}

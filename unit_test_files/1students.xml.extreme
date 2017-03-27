@@ -1,4 +1,5 @@
-<StudentPersonal xmlns="http://www.sifassociation.org/au/datamodel/3.4" RefId="00000000-0000-0000-0000-000000000000">
+<StudentPersonals  xmlns="http://www.sifassociation.org/datamodel/au/3.4">
+		<StudentPersonal RefId="00000000-0000-0000-0000-000000000000">
 		<LocalId>ZZREDACTED</LocalId>
 		<StateProvinceId>ZZREDACTED</StateProvinceId>
 		<OtherIdList>
@@ -69,8 +70,8 @@
 		<SchoolACARAId>44370</SchoolACARAId>
 		<TestLevel><Code>3</Code></TestLevel>
 		<Homegroup/>
-		<ClassGroup>3E</ClassGroup>
-		<MembershipType>1</MembershipType>
+		<ClassCode>3E</ClassCode>
+		<MembershipType>01</MembershipType>
 		<FFPOS>2</FFPOS>
 		<ReportingSchoolId>lxwnp178</ReportingSchoolId>
 		<OtherEnrollmentSchoolACARAId>tjtzi844</OtherEnrollmentSchoolACARAId>
@@ -80,3 +81,4 @@
 		<Sensitive>Y</Sensitive>
 		<OfflineDelivery>N</OfflineDelivery>
 		</StudentPersonal>
+</StudentPersonals>

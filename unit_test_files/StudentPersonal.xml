@@ -1,5 +1,5 @@
-<StudentPersonals>
-<StudentPersonal RefId="7C834EA9EDA12090347F83297E1C290C">
+<StudentPersonals  xmlns="http://www.sifassociation.org/datamodel/au/3.4">
+<StudentPersonal RefId="7C834EA9-EDA1-2090-347F-83297E1C290C">
   <AlertMessages>
       <AlertMessage Type="Legal">Mother is legal guardian</AlertMessage>
         </AlertMessages>
@@ -134,7 +134,7 @@
           <LocalCampusId>D</LocalCampusId>
       <SchoolACARAId>VIC687</SchoolACARAId>
           <Homegroup>7A</Homegroup>
-      <ClassGroup>English 7D</ClassGroup>
+      <ClassCode>English 7D</ClassCode>
           <MembershipType>02</MembershipType>
       <FFPOS>2</FFPOS>
           <ReportingSchoolId>VIC670</ReportingSchoolId>
