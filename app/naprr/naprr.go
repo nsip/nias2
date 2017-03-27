@@ -37,10 +37,12 @@ func main() {
 
 		di := naprr.NewDataIngest()
 		di.Run()
-		di.RunCSV()
+		//di.RunYr3Writing()
 
-		log.Println("Generating report data...")
+		log.Println("Generating report data, Year 3 Writing...")
 		rb := naprr.NewReportBuilder()
+		//rb.RunYr3W(false)
+		log.Println("Generating report data...")
 		rb.Run()
 	}
 

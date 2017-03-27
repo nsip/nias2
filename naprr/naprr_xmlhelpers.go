@@ -15,6 +15,7 @@ func init() {
 	gob.Register(ScoreSummaryDataSet{})
 	gob.Register(ResponseDataSet{})
 	gob.Register(CodeFrameDataSet{})
+	gob.Register(ResultsByStudent{})
 }
 
 // convenience types for aggregating response information sets
@@ -96,6 +97,13 @@ type CodeFrameDataSet struct {
 	Test    xml.NAPTest
 	Testlet xml.NAPTestlet
 	Item    xml.NAPTestItem
+}
+
+// aggregate all objects referencing students for a single test
+type ResultsByStudent struct {
+	Student     xml.RegistrationRecord
+	Event       xml.NAPEvent
+	ResponseSet xml.NAPResponseSet
 }
 
 //

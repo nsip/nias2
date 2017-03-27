@@ -26,9 +26,9 @@ func NewStreamReader() *StreamReader {
 	return &sr
 }
 
-func (sr *StreamReader) GetXMLData() []CodeFrameDataSet {
+func (sr *StreamReader) GetResultsByStudent() []ResultsByStudent {
 
-	cfds := make([]CodeFrameDataSet, 0)
+	cfds := make([]ResultsByStudent, 0)
 
 	// signal channel to notify asynch stan stream read is complete
 	txComplete := make(chan bool)
@@ -48,8 +48,8 @@ func (sr *StreamReader) GetXMLData() []CodeFrameDataSet {
 		}
 
 		switch t := m_if.(type) {
-		case CodeFrameDataSet:
-			cfd := m_if.(CodeFrameDataSet)
+		case ResultsByStudent:
+			cfd := m_if.(ResultsByStudent)
 			cfds = append(cfds, cfd)
 		case lib.TxStatusUpdate:
 			txComplete <- true
@@ -59,14 +59,15 @@ func (sr *StreamReader) GetXMLData() []CodeFrameDataSet {
 		}
 	}
 
-	sub, err := sr.sc.Subscribe("reports.pearson", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe("reports.xml", mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
-		log.Println("streamreader: stan subsciption error get codeframe data: ", err)
+		log.Println("streamreader: stan subsciption error get students & results data: ", err)
 	}
 
 	<-txComplete
 
+	log.Printf("Retrieved %d results by students records\n", len(cfds))
 	return cfds
 
 }
@@ -326,9 +327,68 @@ func (sr *StreamReader) GetSchoolDetails() [][]SchoolDetails {
 }
 
 // NAPLAN data is the same for all schools, so can be retrieved once
-func (sr *StreamReader) GetNAPLANData() *NAPLANData {
+// codeframe_stream: "meta" is ingested from xml, "meta_yr3w" from Year 3 writing files
+func (sr *StreamReader) GetNAPLANData(codeframe_stream string) *NAPLANData {
 
 	nd := NewNAPLANData()
+
+	// signal channel to notify asynch stan stream read is complete
+	txComplete := make(chan bool)
+
+	// main message handling callback for the stan stream
+	mcb := func(m *stan.Msg) {
+
+		log.Printf("%v\n", m)
+		// as we don't know message type ([]byte slice on wire) decode as interface
+		// then assert type dynamically
+		var m_if interface{}
+		err := sr.ge.Decode(m.Data, &m_if)
+		if err != nil {
+			log.Println("streamreader: schooldata message decoding error: ", err)
+			txComplete <- true
+		}
+
+		switch mtype := m_if.(type) {
+		case xml.NAPTest:
+			t := m_if.(xml.NAPTest)
+			nd.Tests[t.TestID] = t
+			log.Printf("%v\n", t)
+		case xml.NAPTestlet:
+			tl := m_if.(xml.NAPTestlet)
+			nd.Testlets[tl.TestletID] = tl
+		case xml.NAPTestItem:
+			ti := m_if.(xml.NAPTestItem)
+			nd.Items[ti.ItemID] = ti
+		case xml.NAPCodeFrame:
+			cf := m_if.(xml.NAPCodeFrame)
+			nd.Codeframes[cf.NAPTestRefId] = cf
+		case lib.TxStatusUpdate:
+			log.Println("DONE XXX")
+			txComplete <- true
+		default:
+			_ = mtype
+			// log.Printf("unknown message type in stream reader meta handler: %v", m_if)
+		}
+
+	}
+
+	log.Println("Ingesting for " + codeframe_stream)
+	sub, err := sr.sc.Subscribe("mate", mcb, stan.DeliverAllAvailable())
+	defer sub.Unsubscribe()
+	if err != nil {
+		log.Println("streamreader: stan subsciption error meta channel: ", err)
+	}
+
+	<-txComplete
+
+	return nd
+
+}
+
+// Get all the students and results in the stream
+func (sr *StreamReader) GetStudentAndResultsData() *StudentAndResultsData {
+
+	srd := NewStudentAndResultsData()
 
 	// signal channel to notify asynch stan stream read is complete
 	txComplete := make(chan bool)
@@ -346,18 +406,15 @@ func (sr *StreamReader) GetNAPLANData() *NAPLANData {
 		}
 
 		switch mtype := m_if.(type) {
-		case xml.NAPTest:
-			t := m_if.(xml.NAPTest)
-			nd.Tests[t.TestID] = t
-		case xml.NAPTestlet:
-			tl := m_if.(xml.NAPTestlet)
-			nd.Testlets[tl.TestletID] = tl
-		case xml.NAPTestItem:
-			ti := m_if.(xml.NAPTestItem)
-			nd.Items[ti.ItemID] = ti
-		case xml.NAPCodeFrame:
-			cf := m_if.(xml.NAPCodeFrame)
-			nd.Codeframes[cf.NAPTestRefId] = cf
+		case xml.RegistrationRecord:
+			t := m_if.(xml.RegistrationRecord)
+			srd.Students[t.RefId] = t
+		case xml.NAPEvent:
+			e := m_if.(xml.NAPEvent)
+			srd.Events[e.SPRefID] = e
+		case xml.NAPResponseSet:
+			rs := m_if.(xml.NAPResponseSet)
+			srd.ResponseSets[rs.StudentID] = rs
 		case lib.TxStatusUpdate:
 			txComplete <- true
 		default:
@@ -367,7 +424,7 @@ func (sr *StreamReader) GetNAPLANData() *NAPLANData {
 
 	}
 
-	sub, err := sr.sc.Subscribe("meta", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe("studentsAndResults", mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error meta channel: ", err)
@@ -375,7 +432,8 @@ func (sr *StreamReader) GetNAPLANData() *NAPLANData {
 
 	<-txComplete
 
-	return nd
+	log.Printf("Retrieved %d students and results records\n", len(srd.Students))
+	return srd
 
 }
 

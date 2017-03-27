@@ -22,7 +22,7 @@ func (rb *ReportBuilder) Run() {
 	var wg sync.WaitGroup
 
 	schools := rb.sr.GetSchoolDetails()
-	nd := rb.sr.GetNAPLANData()
+	nd := rb.sr.GetNAPLANData("meta")
 
 	for _, subslice := range schools {
 		for _, school := range subslice {
@@ -46,7 +46,10 @@ func (rb *ReportBuilder) RunYr3W(schools bool) {
 	var wg sync.WaitGroup
 
 	schoolslist := rb.sr.GetSchoolDetails()
-	nd := rb.sr.GetNAPLANData()
+	nd := rb.sr.GetNAPLANData("meta_yr3w")
+	log.Println("Getting student data")
+	sr := rb.sr.GetStudentAndResultsData()
+	log.Println("Gotten student data")
 
 	if schools {
 		for _, subslice := range schoolslist {
@@ -58,11 +61,11 @@ func (rb *ReportBuilder) RunYr3W(schools bool) {
 	}
 
 	wg.Add(1)
-	go rb.createYr3WReports(nd, &wg)
+	go rb.createYr3WReports(nd, sr, &wg)
 
 	// block until all reports generated
 	wg.Wait()
-	log.Println("All reports generated")
+	log.Println("All Year 3 Writing report data generated")
 
 }
 
@@ -87,8 +90,8 @@ func (rb *ReportBuilder) createTestReports(nd *NAPLANData, wg *sync.WaitGroup) {
 }
 
 // generate test-level reports
-func (rb *ReportBuilder) createYr3WReports(nd *NAPLANData, wg *sync.WaitGroup) {
-	rb.rg.GenerateYr3WData(nd)
+func (rb *ReportBuilder) createYr3WReports(nd *NAPLANData, sr *StudentAndResultsData, wg *sync.WaitGroup) {
+	rb.rg.GenerateYr3WData(nd, sr)
 	log.Println("Year 3 Writing XML data created.")
 	wg.Done()
 }

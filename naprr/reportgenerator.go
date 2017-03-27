@@ -24,12 +24,15 @@ func NewReportGenerator() *ReportGenerator {
 // routines to build the required reports
 //
 
-// generate XML representations of ingested data, used in first instance to deal with ingests of Year 3 Writing data
+// generate a student record, their event link, and their responses, for a single test
+// assumes a single test is represented in the ingested data (may yet refine this);
+// intended in the first instance for Yr3 Writing ingest
 // generated only once as represents structure of test not school-level data
-func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData) {
+func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData, sr *StudentAndResultsData) {
 
 	count := 0
 	cfds := make([]CodeFrameDataSet, 0)
+	rbs := make([]ResultsByStudent, 0)
 
 	for _, codeframe := range nd.Codeframes {
 		for _, cf_testlet := range codeframe.TestletList.Testlet {
@@ -61,15 +64,38 @@ func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData) {
 		rg.sc.Publish("reports.xml", payload)
 	}
 
+	// assume 1 student 1 event 1 response set
+	for _, student := range sr.Students {
+		event := sr.Events[student.RefId]
+		responseset := sr.ResponseSets[student.RefId]
+		r := ResultsByStudent{
+			Student:     student,
+			Event:       event,
+			ResponseSet: responseset,
+		}
+		rbs = append(rbs, r)
+	}
+
+	count = count + len(rbs)
+
+	// publish the records
+	for _, r := range rbs {
+		payload, err := rg.ge.Encode(r)
+		if err != nil {
+			log.Println("unable to encode student results: ", err)
+		}
+		rg.sc.Publish("reports.xml", payload)
+	}
+
 	// finish the transaction - completion msg
 	txu := lib.TxStatusUpdate{TxComplete: true}
 	gtxu, err := rg.ge.Encode(txu)
 	if err != nil {
-		log.Println("unable to encode txu codeframe report: ", err)
+		log.Println("unable to encode txu Yr 3 Writing report: ", err)
 	}
-	rg.sc.Publish("reports.cframe", gtxu)
+	rg.sc.Publish("reports.xml", gtxu)
 
-	log.Printf("codeframe records %d: ", count)
+	log.Printf("Yr 3 Writing records %d: ", count)
 
 }
 

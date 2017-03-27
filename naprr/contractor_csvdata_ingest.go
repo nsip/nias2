@@ -15,7 +15,7 @@ import (
 	"sync"
 )
 
-func (di *DataIngest) RunCSV() {
+func (di *DataIngest) RunYr3Writing() {
 
 	uuid.Init()
 	csvFiles := parsePearsonCSVFileDirectory()
@@ -265,9 +265,9 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 	if err != nil {
 		log.Println("Unable to gob-encode nap test: ", err)
 	}
-	di.sc.Publish("meta", gt)
+	di.sc.Publish("meta_yr3w", gt)
 
-	// we will set up 1 testlet and 1 item, which is assessed in the 10 rubrics
+	// we will set up 1 testlet and 10 items, which are assessed in 1 rubric each
 	testletRefId := uuid.NewV4().String()
 	naptestlet := nxml.NAPTestlet{TestletID: testletRefId,
 		NAPTestRefId: testRefId,
@@ -281,7 +281,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 	if err != nil {
 		log.Println("Unable to gob-encode nap testlet: ", err)
 	}
-	di.sc.Publish("meta", gtl)
+	di.sc.Publish("meta_yr3w", gtl)
 
 	rubrics := [10]string{"audience", "text structure", "ideas", "character and setting", "vocabulary",
 		"cohesion", "paragraphing", "sentence structure", "punctuation", "spelling"}
@@ -295,7 +295,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		if err != nil {
 			log.Println("Unable to gob-encode nap test item: ", err)
 		}
-		di.sc.Publish("meta", gti)
+		di.sc.Publish("meta_yr3w", gti)
 	}
 
 	//defer file.Close()
@@ -336,7 +336,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		}
 		// store linkage locally
 		ss_link[regr.RefId] = regr.ASLSchoolId
-		di.sc.Publish(regr.ASLSchoolId, gsp)
+		di.sc.Publish("studentAndResults", gsp)
 		totalStudents++
 		event := nxml.NAPEvent{EventID: uuid.NewV4().String(),
 			SPRefID:           studentRefId,
@@ -362,7 +362,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		if err != nil {
 			log.Println("Unable to gob-encode nap event link: ", err)
 		}
-		di.sc.Publish(event.SchoolID, ge)
+		di.sc.Publish("studentAndResults", ge)
 
 		response := nxml.NAPResponseSet{ResponseID: uuid.NewV4().String(),
 			StudentID: studentRefId,
@@ -384,7 +384,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		if err != nil {
 			log.Println("Unable to gob-encode student response set: ", err)
 		}
-		di.sc.Publish("responses", gr)
+		di.sc.Publish("studentAndResults", gr)
 
 	}
 	log.Println("Finished reading data file...")
@@ -394,12 +394,12 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 	if err != nil {
 		log.Println("Unable to gob-encode tx complete message: ", err)
 	}
-	di.sc.Publish("responses", geot)
-	di.sc.Publish("meta", geot)
+	di.sc.Publish("studentAndResults", geot)
+	di.sc.Publish("meta_yr3w", geot)
 
 	//di.assignResponsesToSchools(ss_link)
 
-	log.Println("response assignment complete")
+	//log.Println("response assignment complete")
 
 	log.Printf("ingestion complete for %s", resultsFilePath)
 

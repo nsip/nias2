@@ -42,15 +42,16 @@ func (rw *ReportWriter) Run() {
 // create data reports from the test strucutre
 func (rw *ReportWriter) writeYr3WReports() {
 
-	log.Println("Creating test-level reports...")
+	log.Println("Creating Year 3 Writing XML...")
 
 	var wg sync.WaitGroup
 
 	cfds := rw.sr.GetCodeFrameData()
+	rbs := rw.sr.GetResultsByStudent()
 
 	wg.Add(2)
 
-	go rw.writeYr3WritingReport(cfds, &wg)
+	go rw.writeYr3WritingReport(cfds, rbs, &wg)
 
 	wg.Wait()
 
@@ -250,7 +251,7 @@ func (rw *ReportWriter) writeCodeFrameWritingReport(cfds []CodeFrameDataSet, wg 
 
 // report of test structure for writing items only
 // with extended item information
-func (rw *ReportWriter) writeYr3WritingReport(cfds []CodeFrameDataSet, wg *sync.WaitGroup) {
+func (rw *ReportWriter) writeYr3WritingReport(cfds []CodeFrameDataSet, rbs []ResultsByStudent, wg *sync.WaitGroup) {
 
 	// create directory for the school
 	fpath := "yr3w/"
@@ -274,6 +275,10 @@ func (rw *ReportWriter) writeYr3WritingReport(cfds []CodeFrameDataSet, wg *sync.
 			e.Encode(cfd)
 		}
 	}
+	for _, r := range rbs {
+		e.Encode(r)
+	}
+
 	e.Flush()
 	f.WriteString("</NAPResulsReporting>\n")
 
