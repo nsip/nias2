@@ -12,28 +12,19 @@ import (
 	"github.com/twinj/uuid"
 	"log"
 	"path/filepath"
-	"sync"
+	//"sync"
 )
 
 func (di *DataIngest) RunYr3Writing() {
-
 	uuid.Init()
 	csvFiles := parsePearsonCSVFileDirectory()
-
-	var wg sync.WaitGroup
-
 	for _, csvFile := range csvFiles {
-		wg.Add(1)
-		go di.ingestPearsonResultsFile(csvFile, &wg)
+		di.ingestPearsonResultsFile(csvFile)
 	}
-
-	wg.Wait()
 
 	di.finaliseTransactions()
 
-	di.sc.Close()
-
-	log.Println("All data files read, ingest complete.")
+	log.Println("All Yr 3 Writing data files read, ingest complete.")
 }
 
 func parsePearsonCSVFileDirectory() []string {
@@ -237,7 +228,7 @@ func wrapMessage(regr interface{}, i int, txid string, route string) *lib.NiasMe
 	return msg
 }
 
-func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.WaitGroup) {
+func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
 
 	// create a connection to the streaming server
 	log.Println("Connecting to STAN server...")
@@ -260,43 +251,65 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 	testRefId := uuid.NewV4().String()
 	naptest := nxml.NAPTest{TestID: testRefId}
 	//naptest.TestContent = nxml.TestContent{LocalId: r["booklet_id"], TestLevel: "3", TestDomain: "Writing"}
-	naptest.TestContent = nxml.TestContent{TestLevel: "3", TestDomain: "Writing"}
+	naptest.TestContent = nxml.TestContent{TestLevel: "3",
+		TestDomain: "Writing",
+		TestYear:   "2017",
+	}
 	gt, err := di.ge.Encode(naptest)
 	if err != nil {
 		log.Println("Unable to gob-encode nap test: ", err)
 	}
-	di.sc.Publish("meta_yr3w", gt)
+	di.sc.Publish(META_YR3W_STREAM, gt)
 
 	// we will set up 1 testlet and 10 items, which are assessed in 1 rubric each
 	testletRefId := uuid.NewV4().String()
 	naptestlet := nxml.NAPTestlet{TestletID: testletRefId,
 		NAPTestRefId: testRefId,
 	}
+	naptestlet.TestletContent.LocationInStage = "1"
 	naptestlet.TestItemList.TestItem = make([]nxml.NAPTestlet_TestItem, 10)
 	for i := range naptestlet.TestItemList.TestItem {
-		naptestlet.TestItemList.TestItem[i] = nxml.NAPTestlet_TestItem{TestItemRefId: uuid.NewV4().String(),
-			SequenceNumber: string(i)}
+		tiri := uuid.NewV4().String()
+		naptestlet.TestItemList.TestItem[i] = nxml.NAPTestlet_TestItem{TestItemRefId: tiri,
+			TestItemLocalId: tiri,
+			SequenceNumber:  fmt.Sprintf("%d", i)}
 	}
 	gtl, err := di.ge.Encode(naptestlet)
 	if err != nil {
 		log.Println("Unable to gob-encode nap testlet: ", err)
 	}
-	di.sc.Publish("meta_yr3w", gtl)
+	di.sc.Publish(META_YR3W_STREAM, gtl)
 
 	rubrics := [10]string{"audience", "text structure", "ideas", "character and setting", "vocabulary",
 		"cohesion", "paragraphing", "sentence structure", "punctuation", "spelling"}
-	rubricsabbr := [10]string{"AUD", "TXT", "IDE", "CAS", "VOC", "COH", "PAR", "SEN", "PUN", "SPE"}
+	rubricsabbr := [10]string{"aud", "txt", "ide", "cas", "voc", "coh", "par", "sen", "pun", "spe"}
 	maxscores := [10]string{"6", "4", "5", "4", "5", "4", "2", "6", "5", "6"}
 
 	for i := range naptestlet.TestItemList.TestItem {
 		naptestitem := nxml.NAPTestItem{ItemID: naptestlet.TestItemList.TestItem[i].TestItemRefId}
-		naptestitem.TestItemContent = nxml.TestItemContent{ItemName: rubrics[i]}
-		gti, err := di.ge.Encode(naptestlet)
+		naptestitem.TestItemContent = nxml.TestItemContent{ItemName: rubrics[i],
+			NAPTestItemLocalId: naptestlet.TestItemList.TestItem[i].TestItemRefId}
+		gti, err := di.ge.Encode(naptestitem)
 		if err != nil {
 			log.Println("Unable to gob-encode nap test item: ", err)
 		}
-		di.sc.Publish("meta_yr3w", gti)
+		di.sc.Publish(META_YR3W_STREAM, gti)
 	}
+
+	codeframe := nxml.NAPCodeFrame{RefId: uuid.NewV4().String(),
+		NAPTestRefId: testRefId,
+	}
+	codeframe.TestletList.Testlet = make([]nxml.NAPCodeFrame_Testlet, 1)
+	codeframe.TestletList.Testlet[0].NAPTestletRefId = testletRefId
+	codeframe.TestletList.Testlet[0].TestItemList.TestItem = make([]nxml.NAPCodeFrame_TestItem, 10)
+	for i := range naptestlet.TestItemList.TestItem {
+		codeframe.TestletList.Testlet[0].TestItemList.TestItem[i].TestItemRefId = naptestlet.TestItemList.TestItem[i].TestItemRefId
+	}
+	gtcf, err := di.ge.Encode(codeframe)
+	if err != nil {
+		log.Println("Unable to gob-encode nap codeframe: ", err)
+	}
+	di.sc.Publish(META_YR3W_STREAM, gtcf)
 
 	//defer file.Close()
 	totalStudents := 0
@@ -324,6 +337,8 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 			ClassGroup:       r["home_group"],
 			SchoolLocalId:    r["school_vcaa_code"],
 			ASLSchoolId:      r["asl_school_code"], // may be missing
+			YearLevel:        "3",
+			TestLevel:        "3",
 		}
 		// stopgap
 		if r["asl_school_code"] != "" {
@@ -336,7 +351,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		}
 		// store linkage locally
 		ss_link[regr.RefId] = regr.ASLSchoolId
-		di.sc.Publish("studentAndResults", gsp)
+		di.sc.Publish(RESULTS_YR3W_STREAM, gsp)
 		totalStudents++
 		event := nxml.NAPEvent{EventID: uuid.NewV4().String(),
 			SPRefID:           studentRefId,
@@ -349,12 +364,12 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		event.Adjustment.BookletType = r["special_provision_other_text"]
 		if r["special_provision"] != "" {
 			event.Adjustment.PNPCodelist = struct {
-				PNPCode []string `xml:"PNPCode"`
+				PNPCode []string `xml:"PNPCode,omitempty"`
 			}{PNPCode: pearson2sifAdjustment(r["special_provision"])}
 		}
 		if r["reason_for_withholding"] != "" {
 			event.TestDisruptionList.TestDisruption = make([]struct {
-				Event string `xml:"Event"`
+				Event string `xml:"Event,omitempty"`
 			}, 1)
 			event.TestDisruptionList.TestDisruption[0].Event = pearson2sifTestDisruption(r["reason_for_withholding"])
 		}
@@ -362,7 +377,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		if err != nil {
 			log.Println("Unable to gob-encode nap event link: ", err)
 		}
-		di.sc.Publish("studentAndResults", ge)
+		di.sc.Publish(RESULTS_YR3W_STREAM, ge)
 
 		response := nxml.NAPResponseSet{ResponseID: uuid.NewV4().String(),
 			StudentID: studentRefId,
@@ -373,7 +388,8 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		response.TestletList.Testlet[0].ItemResponseList.ItemResponse = make([]nxml.NAPResponseSet_ItemResponse, 10)
 
 		for i := range naptestlet.TestItemList.TestItem {
-			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i] = nxml.NAPResponseSet_ItemResponse{ItemRefID: naptestlet.TestItemList.TestItem[i].TestItemRefId}
+			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i] = nxml.NAPResponseSet_ItemResponse{ItemRefID: naptestlet.TestItemList.TestItem[i].TestItemRefId,
+				SequenceNumber: naptestlet.TestItemList.TestItem[i].SequenceNumber}
 
 			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i].SubscoreList.Subscore = make([]nxml.NAPResponseSet_Subscore, 1)
 		}
@@ -384,7 +400,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 		if err != nil {
 			log.Println("Unable to gob-encode student response set: ", err)
 		}
-		di.sc.Publish("studentAndResults", gr)
+		di.sc.Publish(RESULTS_YR3W_STREAM, gr)
 
 	}
 	log.Println("Finished reading data file...")
@@ -394,8 +410,8 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 	if err != nil {
 		log.Println("Unable to gob-encode tx complete message: ", err)
 	}
-	di.sc.Publish("studentAndResults", geot)
-	di.sc.Publish("meta_yr3w", geot)
+	di.sc.Publish(RESULTS_YR3W_STREAM, geot)
+	di.sc.Publish(META_YR3W_STREAM, geot)
 
 	//di.assignResponsesToSchools(ss_link)
 
@@ -403,7 +419,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string, wg *sync.
 
 	log.Printf("ingestion complete for %s", resultsFilePath)
 
-	wg.Done()
+	//wg.Done()
 
 }
 
@@ -416,8 +432,8 @@ func rubricPopulate(seqPos int, abbr string, rubric string, maxscore string, r m
 		} else {
 			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].ResponseCorrectness = "Incorrect"
 		}
-		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[0].SubscoreList.Subscore[seqPos].SubscoreType = rubric
-		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[0].SubscoreList.Subscore[seqPos].SubscoreValue = r[abbr]
+		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].SubscoreList.Subscore[0].SubscoreType = rubric
+		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].SubscoreList.Subscore[0].SubscoreValue = r[abbr]
 	}
 	return response
 }

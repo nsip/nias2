@@ -31,37 +31,31 @@ func NewReportGenerator() *ReportGenerator {
 func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData, sr *StudentAndResultsData) {
 
 	count := 0
-	cfds := make([]CodeFrameDataSet, 0)
 	rbs := make([]ResultsByStudent, 0)
 
-	for _, codeframe := range nd.Codeframes {
-		for _, cf_testlet := range codeframe.TestletList.Testlet {
-			tl := nd.Testlets[cf_testlet.NAPTestletRefId]
-			// log.Printf("\t%s", tl.TestletContent.TestletName)
-			for _, cf_item := range cf_testlet.TestItemList.TestItem {
-				ti := nd.Items[cf_item.TestItemRefId]
-				// log.Printf("\t\t%s", ti.TestItemContent.ItemName)
-				cfd := CodeFrameDataSet{
-					Test:    nd.Tests[codeframe.NAPTestRefId],
-					Testlet: tl,
-					Item:    ti,
-				}
-				cfds = append(cfds, cfd)
-			}
-		}
-	}
-
-	count = len(cfds)
-
-	// publish the records
-	for _, cfd := range cfds {
-		payload, err := rg.ge.Encode(cfd)
+	for _, test := range nd.Tests {
+		count++
+		payload, err := rg.ge.Encode(test)
 		if err != nil {
-			log.Println("unable to encode codeframe: ", err)
+			log.Println("unable to encode test: ", err)
 		}
-		// log.Printf("\t%s - %s - %s", cfd.Test.TestContent.TestDomain,
-		//      cfd.Testlet.TestletContent.TestletName, cfd.Item.TestItemContent.ItemName)
-		rg.sc.Publish("reports.xml", payload)
+		rg.sc.Publish(REPORTS_YR3W, payload)
+	}
+	for _, testlet := range nd.Testlets {
+		count++
+		payload, err := rg.ge.Encode(testlet)
+		if err != nil {
+			log.Println("unable to encode testlet: ", err)
+		}
+		rg.sc.Publish(REPORTS_YR3W, payload)
+	}
+	for _, item := range nd.Items {
+		count++
+		payload, err := rg.ge.Encode(item)
+		if err != nil {
+			log.Println("unable to encode item: ", err)
+		}
+		rg.sc.Publish(REPORTS_YR3W, payload)
 	}
 
 	// assume 1 student 1 event 1 response set
@@ -84,7 +78,7 @@ func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData, sr *StudentAndResult
 		if err != nil {
 			log.Println("unable to encode student results: ", err)
 		}
-		rg.sc.Publish("reports.xml", payload)
+		rg.sc.Publish(REPORTS_YR3W, payload)
 	}
 
 	// finish the transaction - completion msg
@@ -93,7 +87,7 @@ func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData, sr *StudentAndResult
 	if err != nil {
 		log.Println("unable to encode txu Yr 3 Writing report: ", err)
 	}
-	rg.sc.Publish("reports.xml", gtxu)
+	rg.sc.Publish(REPORTS_YR3W, gtxu)
 
 	log.Printf("Yr 3 Writing records %d: ", count)
 
@@ -133,7 +127,7 @@ func (rg *ReportGenerator) GenerateCodeFrameData(nd *NAPLANData) {
 		}
 		// log.Printf("\t%s - %s - %s", cfd.Test.TestContent.TestDomain,
 		// 	cfd.Testlet.TestletContent.TestletName, cfd.Item.TestItemContent.ItemName)
-		rg.sc.Publish("reports.cframe", payload)
+		rg.sc.Publish(REPORTS_CODEFRAME, payload)
 	}
 
 	// finish the transaction - completion msg
@@ -142,7 +136,7 @@ func (rg *ReportGenerator) GenerateCodeFrameData(nd *NAPLANData) {
 	if err != nil {
 		log.Println("unable to encode txu codeframe report: ", err)
 	}
-	rg.sc.Publish("reports.cframe", gtxu)
+	rg.sc.Publish(REPORTS_CODEFRAME, gtxu)
 
 	log.Printf("codeframe records %d: ", count)
 

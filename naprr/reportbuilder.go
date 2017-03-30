@@ -22,7 +22,7 @@ func (rb *ReportBuilder) Run() {
 	var wg sync.WaitGroup
 
 	schools := rb.sr.GetSchoolDetails()
-	nd := rb.sr.GetNAPLANData("meta")
+	nd := rb.sr.GetNAPLANData(META_STREAM)
 
 	for _, subslice := range schools {
 		for _, school := range subslice {
@@ -45,13 +45,13 @@ func (rb *ReportBuilder) RunYr3W(schools bool) {
 
 	var wg sync.WaitGroup
 
-	schoolslist := rb.sr.GetSchoolDetails()
-	nd := rb.sr.GetNAPLANData("meta_yr3w")
 	log.Println("Getting student data")
 	sr := rb.sr.GetStudentAndResultsData()
 	log.Println("Gotten student data")
+	nd := rb.sr.GetNAPLANData(META_YR3W_STREAM)
 
 	if schools {
+		schoolslist := rb.sr.GetSchoolDetails()
 		for _, subslice := range schoolslist {
 			for _, school := range subslice {
 				wg.Add(1)

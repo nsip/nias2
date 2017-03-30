@@ -6,11 +6,11 @@ type NAPTestScoreSummary struct {
 	SchoolACARAId                 string `xml:"SchoolACARAId"`
 	NAPTestRefId                  string `xml:"NAPTestRefId"`
 	NAPTestLocalId                string `xml:"NAPTestLocalId"`
-	DomainNationalAverage         string `xml:"DomainNationalAverage"`
-	DomainSchoolAverage           string `xml:"DomainSchoolAverage"`
-	DomainJurisdictionAverage     string `xml:"DomainJurisdictionAverage"`
-	DomainTopNational60Percent    string `xml:"DomainTopNational60Percent"`
-	DomainBottomNational60Percent string `xml:"DomainBottomNational60Percent"`
+	DomainNationalAverage         string `xml:"DomainNationalAverage,omitempty"`
+	DomainSchoolAverage           string `xml:"DomainSchoolAverage,omitempty"`
+	DomainJurisdictionAverage     string `xml:"DomainJurisdictionAverage,omitempty"`
+	DomainTopNational60Percent    string `xml:"DomainTopNational60Percent,omitempty"`
+	DomainBottomNational60Percent string `xml:"DomainBottomNational60Percent,omitempty"`
 }
 
 func (t NAPTestScoreSummary) GetHeaders() []string {

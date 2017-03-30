@@ -46,12 +46,12 @@ func (rw *ReportWriter) writeYr3WReports() {
 
 	var wg sync.WaitGroup
 
-	cfds := rw.sr.GetCodeFrameData()
+	nd := rw.sr.GetNAPLANData(REPORTS_YR3W)
 	rbs := rw.sr.GetResultsByStudent()
 
 	wg.Add(2)
 
-	go rw.writeYr3WritingReport(cfds, rbs, &wg)
+	go rw.writeYr3WritingReport(nd, rbs, &wg)
 
 	wg.Wait()
 
@@ -65,7 +65,7 @@ func (rw *ReportWriter) writeTestLevelReports() {
 
 	var wg sync.WaitGroup
 
-	cfds := rw.sr.GetCodeFrameData()
+	cfds := rw.sr.GetCodeFrameData(REPORTS_CODEFRAME)
 
 	wg.Add(2)
 
@@ -251,7 +251,7 @@ func (rw *ReportWriter) writeCodeFrameWritingReport(cfds []CodeFrameDataSet, wg 
 
 // report of test structure for writing items only
 // with extended item information
-func (rw *ReportWriter) writeYr3WritingReport(cfds []CodeFrameDataSet, rbs []ResultsByStudent, wg *sync.WaitGroup) {
+func (rw *ReportWriter) writeYr3WritingReport(nd *NAPLANData, rbs []ResultsByStudent, wg *sync.WaitGroup) {
 
 	// create directory for the school
 	fpath := "yr3w/"
@@ -269,20 +269,29 @@ func (rw *ReportWriter) writeYr3WritingReport(cfds []CodeFrameDataSet, rbs []Res
 	e := xml.NewEncoder(f)
 	e.Indent("", "  ")
 	f.WriteString("<NAPResulsReporting>\n")
-	// write the data - writing items only
-	for _, cfd := range cfds {
-		if cfd.Test.TestContent.TestDomain == "Writing" {
-			e.Encode(cfd)
-		}
+	cfcount := 0
+	for _, val := range nd.Tests {
+		e.Encode(val)
+		cfcount++
+	}
+	for _, val := range nd.Testlets {
+		e.Encode(val)
+		cfcount++
+	}
+	for _, val := range nd.Items {
+		e.Encode(val)
+		cfcount++
 	}
 	for _, r := range rbs {
-		e.Encode(r)
+		e.Encode(r.Student)
+		e.Encode(r.Event)
+		e.Encode(r.ResponseSet)
 	}
 
 	e.Flush()
 	f.WriteString("</NAPResulsReporting>\n")
 
-	log.Printf("Codeframe writing report created for: %d elements", len(cfds))
+	log.Printf("Codeframe writing report created for: %d codeframe elements and %d results elements", cfcount, len(rbs))
 
 	wg.Done()
 

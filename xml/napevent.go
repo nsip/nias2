@@ -3,37 +3,37 @@ package xml
 type NAPEvent struct {
 	EventID                string `xml:"RefId,attr"`
 	SPRefID                string `xml:"StudentPersonalRefId"`
-	PSI                    string `xml:"PlatformStudentIdentifier"`
-	SchoolRefID            string `xml:"SchoolInfoRefId"`
-	SchoolID               string `xml:"SchoolACARAId"`
+	PSI                    string `xml:"PlatformStudentIdentifier,omitempty"`
+	SchoolRefID            string `xml:"SchoolInfoRefId,omitempty"`
+	SchoolID               string `xml:"SchoolACARAId,omitempty"`
 	TestID                 string `xml:"NAPTestRefId"`
-	NAPTestLocalID         string `xml:"NAPTestLocalId"`
-	SchoolSector           string `xml:"SchoolSector"`
-	System                 string `xml:"System"`
-	SchoolGeolocation      string `xml:"SchoolGeolocation"`
-	ReportingSchoolName    string `xml:"ReportingSchoolName"`
-	JurisdictionID         string `xml:"JurisdictionID"`
+	NAPTestLocalID         string `xml:"NAPTestLocalId,omitempty"`
+	SchoolSector           string `xml:"SchoolSector,omitempty"`
+	System                 string `xml:"System,omitempty"`
+	SchoolGeolocation      string `xml:"SchoolGeolocation,omitempty"`
+	ReportingSchoolName    string `xml:"ReportingSchoolName,omitempty"`
+	JurisdictionID         string `xml:"JurisdictionID,omitempty"`
 	ParticipationCode      string `xml:"ParticipationCode"`
-	ParticipationText      string `xml:"ParticipationText"`
-	Device                 string `xml:"Device"`
-	Date                   string `xml:"Date"`
-	StartTime              string `xml:"StartTime"`
-	LapsedTimeTest         string `xml:"LapsedTimeTest"`
-	ExemptionReason        string `xml:"ExemptionReason"`
-	PersonalDetailsChanged string `xml:"PersonalDetailsChanged"`
-	PossibleDuplicate      string `xml:"PossibleDuplicate"`
-	DOBRange               string `xml:"DOBRange"`
+	ParticipationText      string `xml:"ParticipationText,omitempty"`
+	Device                 string `xml:"Device,omitempty"`
+	Date                   string `xml:"Date,omitempty"`
+	StartTime              string `xml:"StartTime,omitempty"`
+	LapsedTimeTest         string `xml:"LapsedTimeTest,omitempty"`
+	ExemptionReason        string `xml:"ExemptionReason,omitempty"`
+	PersonalDetailsChanged string `xml:"PersonalDetailsChanged,omitempty"`
+	PossibleDuplicate      string `xml:"PossibleDuplicate,omitempty"`
+	DOBRange               string `xml:"DOBRange,omitempty"`
 	TestDisruptionList     struct {
 		TestDisruption []struct {
-			Event string `xml:"Event"`
-		} `xml:"TestDisruption"`
-	} `xml:"TestDisruptionList"`
+			Event string `xml:"Event,omitempty"`
+		} `xml:"TestDisruption,omitempty"`
+	} `xml:"TestDisruptionList,omitempty"`
 	Adjustment struct {
 		PNPCodelist struct {
-			PNPCode []string `xml:"PNPCode"`
-		} `xml:"PNPCodeList"`
-		BookletType string `xml:"BookletType"`
-	} `xml:"Adjustment"`
+			PNPCode []string `xml:"PNPCode,omitempty"`
+		} `xml:"PNPCodeList,omitempty"`
+		BookletType string `xml:"BookletType,omitempty"`
+	} `xml:"Adjustment,omitempty"`
 }
 
 func (t NAPEvent) GetHeaders() []string {

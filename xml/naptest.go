@@ -6,13 +6,13 @@ type NAPTest struct {
 }
 
 type TestContent struct {
-	LocalId     string `xml:"NAPTestLocalId"`
-	TestName    string `xml:"TestName"`
+	LocalId     string `xml:"NAPTestLocalId,omitempty"`
+	TestName    string `xml:"TestName,omitempty"`
 	TestLevel   string `xml:"TestLevel>Code"`
 	TestDomain  string `xml:"Domain"`
 	TestYear    string `xml:"TestYear"`
-	StagesCount string `xml:"StagesCount"`
-	TestType    string `xml:"TestType"`
+	StagesCount string `xml:"StagesCount,omitempty"`
+	TestType    string `xml:"TestType,omitempty"`
 	DomainBands struct {
 		Band1Lower  string `xml:"Band1Lower"`
 		Band1Upper  string `xml:"Band1Upper"`
@@ -34,7 +34,7 @@ type TestContent struct {
 		Band9Upper  string `xml:"Band9Upper"`
 		Band10Lower string `xml:"Band10Lower"`
 		Band10Upper string `xml:"Band10Upper"`
-	} `xml:"DomainBands"`
+	} `xml:"DomainBands,omitempty"`
 	DomainProficiency struct {
 		Level1Lower string `xml:"Level1Lower"`
 		Level1Upper string `xml:"Level1Upper"`
@@ -44,7 +44,7 @@ type TestContent struct {
 		Level3Upper string `xml:"Level3Upper"`
 		Level4Lower string `xml:"Level4Lower"`
 		Level4Upper string `xml:"Level4Upper"`
-	} `xml:"DomainProficiency"`
+	} `xml:"DomainProficiency,omitempty"`
 }
 
 func (t NAPTest) GetHeaders() []string {

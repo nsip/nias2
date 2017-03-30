@@ -18,6 +18,12 @@ type StreamReader struct {
 	ge GobEncoder
 }
 
+const META_STREAM = "meta"
+const META_YR3W_STREAM = "meta_yr3w"
+const RESULTS_YR3W_STREAM = "studentAndResults"
+const REPORTS_CODEFRAME = "reports.cframe"
+const REPORTS_YR3W = "reports.yr3w"
+
 func NewStreamReader() *StreamReader {
 	sr := StreamReader{
 		sc: CreateSTANConnection(),
@@ -59,7 +65,7 @@ func (sr *StreamReader) GetResultsByStudent() []ResultsByStudent {
 		}
 	}
 
-	sub, err := sr.sc.Subscribe("reports.xml", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe(REPORTS_YR3W, mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error get students & results data: ", err)
@@ -72,7 +78,7 @@ func (sr *StreamReader) GetResultsByStudent() []ResultsByStudent {
 
 }
 
-func (sr *StreamReader) GetCodeFrameData() []CodeFrameDataSet {
+func (sr *StreamReader) GetCodeFrameData(stream_name string) []CodeFrameDataSet {
 
 	cfds := make([]CodeFrameDataSet, 0)
 
@@ -105,7 +111,7 @@ func (sr *StreamReader) GetCodeFrameData() []CodeFrameDataSet {
 		}
 	}
 
-	sub, err := sr.sc.Subscribe("reports.cframe", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe(stream_name, mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error get codeframe data: ", err)
@@ -337,8 +343,6 @@ func (sr *StreamReader) GetNAPLANData(codeframe_stream string) *NAPLANData {
 
 	// main message handling callback for the stan stream
 	mcb := func(m *stan.Msg) {
-
-		log.Printf("%v\n", m)
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
@@ -352,7 +356,6 @@ func (sr *StreamReader) GetNAPLANData(codeframe_stream string) *NAPLANData {
 		case xml.NAPTest:
 			t := m_if.(xml.NAPTest)
 			nd.Tests[t.TestID] = t
-			log.Printf("%v\n", t)
 		case xml.NAPTestlet:
 			tl := m_if.(xml.NAPTestlet)
 			nd.Testlets[tl.TestletID] = tl
@@ -363,7 +366,6 @@ func (sr *StreamReader) GetNAPLANData(codeframe_stream string) *NAPLANData {
 			cf := m_if.(xml.NAPCodeFrame)
 			nd.Codeframes[cf.NAPTestRefId] = cf
 		case lib.TxStatusUpdate:
-			log.Println("DONE XXX")
 			txComplete <- true
 		default:
 			_ = mtype
@@ -373,7 +375,7 @@ func (sr *StreamReader) GetNAPLANData(codeframe_stream string) *NAPLANData {
 	}
 
 	log.Println("Ingesting for " + codeframe_stream)
-	sub, err := sr.sc.Subscribe("mate", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe(codeframe_stream, mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error meta channel: ", err)
@@ -424,7 +426,7 @@ func (sr *StreamReader) GetStudentAndResultsData() *StudentAndResultsData {
 
 	}
 
-	sub, err := sr.sc.Subscribe("studentsAndResults", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe(RESULTS_YR3W_STREAM, mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error meta channel: ", err)
