@@ -41,12 +41,13 @@ func (rb *ReportBuilder) Run() {
 }
 
 // Year 3 Writing
-func (rb *ReportBuilder) RunYr3W(schools bool) {
+func (rb *ReportBuilder) RunYr3W(schools bool, student_ids map[string]string, NaprrConfig naprr_config) {
 
 	var wg sync.WaitGroup
 
+	log.Printf("%v\n", student_ids)
 	log.Println("Getting student data")
-	sr := rb.sr.GetStudentAndResultsData()
+	sr := rb.sr.GetStudentAndResultsData(student_ids, NaprrConfig)
 	log.Println("Gotten student data")
 	nd := rb.sr.GetNAPLANData(META_YR3W_STREAM)
 

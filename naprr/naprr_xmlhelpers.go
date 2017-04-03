@@ -101,9 +101,9 @@ type CodeFrameDataSet struct {
 
 // aggregate all objects referencing students for a single test
 type ResultsByStudent struct {
-	Student     xml.RegistrationRecord
-	Event       xml.NAPEvent
-	ResponseSet xml.NAPResponseSet
+	Student     *xml.RegistrationRecord
+	Event       *xml.NAPEvent
+	ResponseSet *xml.NAPResponseSet
 }
 
 //

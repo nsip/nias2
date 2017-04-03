@@ -7,6 +7,7 @@
 package naprr
 
 import (
+	"encoding/gob"
 	"github.com/nats-io/go-nats-streaming"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
@@ -18,17 +19,26 @@ type StreamReader struct {
 	ge GobEncoder
 }
 
+// track how many students matched between Yr 3 writing and core XML ingest
+type Yr3WritingMatchReport struct {
+	Matches         []string
+	Yr3w_mismatches []string // students in yr3w ingest not in xml
+	Xml_mismatches  []string // students in xml not in yr3 ingest
+}
+
 const META_STREAM = "meta"
 const META_YR3W_STREAM = "meta_yr3w"
 const RESULTS_YR3W_STREAM = "studentAndResults"
 const REPORTS_CODEFRAME = "reports.cframe"
 const REPORTS_YR3W = "reports.yr3w"
+const REPORTS_YR3W_STATUS = "reports.yr3w.status"
 
 func NewStreamReader() *StreamReader {
 	sr := StreamReader{
 		sc: CreateSTANConnection(),
 		ge: GobEncoder{},
 	}
+	gob.Register(Yr3WritingMatchReport{})
 	return &sr
 }
 
@@ -388,7 +398,7 @@ func (sr *StreamReader) GetNAPLANData(codeframe_stream string) *NAPLANData {
 }
 
 // Get all the students and results in the stream
-func (sr *StreamReader) GetStudentAndResultsData() *StudentAndResultsData {
+func (sr *StreamReader) GetStudentAndResultsData(student_ids map[string]string, NaprrConfig naprr_config) *StudentAndResultsData {
 
 	srd := NewStudentAndResultsData()
 
@@ -410,13 +420,13 @@ func (sr *StreamReader) GetStudentAndResultsData() *StudentAndResultsData {
 		switch mtype := m_if.(type) {
 		case xml.RegistrationRecord:
 			t := m_if.(xml.RegistrationRecord)
-			srd.Students[t.RefId] = t
+			srd.Students[t.RefId] = &t
 		case xml.NAPEvent:
 			e := m_if.(xml.NAPEvent)
-			srd.Events[e.SPRefID] = e
+			srd.Events[e.SPRefID] = &e
 		case xml.NAPResponseSet:
 			rs := m_if.(xml.NAPResponseSet)
-			srd.ResponseSets[rs.StudentID] = rs
+			srd.ResponseSets[rs.StudentID] = &rs
 		case lib.TxStatusUpdate:
 			txComplete <- true
 		default:
@@ -435,8 +445,58 @@ func (sr *StreamReader) GetStudentAndResultsData() *StudentAndResultsData {
 	<-txComplete
 
 	log.Printf("Retrieved %d students and results records\n", len(srd.Students))
+	srd = sr.remapStudents(srd, student_ids, NaprrConfig)
 	return srd
 
+}
+
+// given the mapping of keys to XML RefIDs, remap all references to made up RegistrationRecords from fixed format file, to XML records already ingested
+func (sr *StreamReader) remapStudents(srd *StudentAndResultsData, student_ids map[string]string, NaprrConfig naprr_config) *StudentAndResultsData {
+	yr3wmatches := Yr3WritingMatchReport{}
+	matches := make(map[string]int)
+	newStudents := make(map[string]*xml.RegistrationRecord)
+	log.Printf("%v\n", NaprrConfig)
+	log.Println(NaprrConfig.Yr3WStudentMatch)
+	for _, sp := range srd.Students {
+		student_key := StudentKeyLookup(*sp, NaprrConfig.Yr3WStudentMatch)
+		if newRefId, ok := student_ids[student_key]; ok {
+			refid := sp.RefId
+			log.Printf("Mapped student %s from Yr 3 Writing from %s to matching student %s in XML ingest", student_key, refid, newRefId)
+			//append(yr3wmatches.matches, student_key)
+			matches[student_key] = 1
+			// eliminating this record from the list: not passing on to newStudents
+			if _, ok := srd.Events[refid]; ok {
+				log.Printf("%v\n", srd.Events[refid])
+				(srd.Events[refid]).SPRefID = newRefId
+				log.Printf("%v\n", srd.Events[refid])
+			}
+			if _, ok := srd.ResponseSets[refid]; ok {
+				(srd.ResponseSets[refid]).StudentID = newRefId
+			}
+		} else {
+			log.Printf("No match in mapping student %s from Yr 3 Writing to matching student in XML ingest", student_key)
+			yr3wmatches.Yr3w_mismatches = append(yr3wmatches.Yr3w_mismatches, student_key)
+			newStudents[sp.RefId] = sp
+		}
+	}
+	for k, _ := range student_ids {
+		if _, ok := matches[k]; !ok {
+			yr3wmatches.Xml_mismatches = append(yr3wmatches.Xml_mismatches, k)
+		}
+	}
+	yr3wmatches.Matches = make([]string, 0, len(matches))
+	for k := range matches {
+		yr3wmatches.Matches = append(yr3wmatches.Matches, k)
+	}
+	log.Printf("%v\n", yr3wmatches)
+	payload, err := sr.ge.Encode(yr3wmatches)
+	if err != nil {
+		log.Println("unable to encode yr 3 writing status report: ", err)
+	}
+	sr.sc.Publish(REPORTS_YR3W_STATUS, payload)
+
+	srd.Students = newStudents
+	return srd
 }
 
 // for the school identified by the acaraid retrieves all of the

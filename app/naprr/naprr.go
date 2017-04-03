@@ -38,14 +38,16 @@ func main() {
 		di := naprr.NewDataIngest()
 		di.Run()
 		di.RunYr3Writing()
+		student_ids := di.StudentIds
+		naprr_config := di.NaprrConfig
 		di.Close()
 
 		rb := naprr.NewReportBuilder()
-		// must run Year 3 Writing ingest before full XML: Full XML ingest calls function to reconcile student identities between the two
-		log.Println("Generating report data, Year 3 Writing...")
-		rb.RunYr3W(false)
+		// must run Year 3 Writing ingest before full XML: Full XML ingest generates map to reconcile student identities between the two
 		log.Println("Generating report data...")
 		rb.Run()
+		log.Println("Generating report data, Year 3 Writing...")
+		rb.RunYr3W(false, student_ids, naprr_config)
 	}
 
 	log.Println("Writing report files...")

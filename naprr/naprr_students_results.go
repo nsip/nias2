@@ -11,16 +11,16 @@ import (
 
 // each map indexed on Student RefID, so that RefID can be changed quickly
 type StudentAndResultsData struct {
-	Students     map[string]xml.RegistrationRecord
-	Events       map[string]xml.NAPEvent
-	ResponseSets map[string]xml.NAPResponseSet
+	Students     map[string]*xml.RegistrationRecord
+	Events       map[string]*xml.NAPEvent
+	ResponseSets map[string]*xml.NAPResponseSet
 }
 
 func NewStudentAndResultsData() *StudentAndResultsData {
 	nd := StudentAndResultsData{
-		Students:     make(map[string]xml.RegistrationRecord),
-		Events:       make(map[string]xml.NAPEvent),
-		ResponseSets: make(map[string]xml.NAPResponseSet),
+		Students:     make(map[string]*xml.RegistrationRecord),
+		Events:       make(map[string]*xml.NAPEvent),
+		ResponseSets: make(map[string]*xml.NAPResponseSet),
 	}
 	return &nd
 }

@@ -58,10 +58,14 @@ func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData, sr *StudentAndResult
 		rg.sc.Publish(REPORTS_YR3W, payload)
 	}
 
-	// assume 1 student 1 event 1 response set
-	for _, student := range sr.Students {
-		event := sr.Events[student.RefId]
-		responseset := sr.ResponseSets[student.RefId]
+	// assume 0-1 student 1 event 1 response set
+	// student may be missing because they are already present in the XML
+	for key, event := range sr.Events {
+		responseset := sr.ResponseSets[key]
+		student, ok := sr.Students[key]
+		if !ok {
+			student = nil
+		}
 		r := ResultsByStudent{
 			Student:     student,
 			Event:       event,

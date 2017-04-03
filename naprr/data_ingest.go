@@ -9,6 +9,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"log"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -31,10 +32,13 @@ type DataIngest struct {
 	sc stan.Conn
 	ge GobEncoder
 	sr *StreamReader
+	// mapping of key to RefId for student records
+	StudentIds  map[string]string
+	NaprrConfig naprr_config
 }
 
 func NewDataIngest() *DataIngest {
-	di := DataIngest{sc: CreateSTANConnection(), ge: GobEncoder{}, sr: NewStreamReader()}
+	di := DataIngest{sc: CreateSTANConnection(), ge: GobEncoder{}, sr: NewStreamReader(), NaprrConfig: LoadConfig()}
 	return &di
 }
 
@@ -66,7 +70,7 @@ func (di *DataIngest) RunSynchronous(FilePath string) {
 }
 
 // Given a student record and a list of fields, return a colon-delimited key giving those field values
-func studentKeyLookup(r xml.RegistrationRecord, fields []string) string {
+func StudentKeyLookup(r xml.RegistrationRecord, fields []string) string {
 	// we could use Go Reflect, but for performance, let's not
 	key := ""
 	for _, field := range fields {
@@ -89,9 +93,13 @@ func studentKeyLookup(r xml.RegistrationRecord, fields []string) string {
 			key = key + "::" + r.NationalId
 		case "PlatformId":
 			key = key + "::" + r.PlatformId
+		case "ASLSchoolId":
+			key = key + "::" + r.ASLSchoolId
+		case "SchoolLocalId":
+			key = key + "::" + r.SchoolLocalId
 		}
 	}
-	return key
+	return strings.ToLower(key)
 }
 
 func parseXMLFileDirectory() []string {
@@ -111,12 +119,12 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 	// create a connection to the streaming server
 	log.Println("Connecting to STAN server...")
 
-	config := LoadConfig()
+	log.Printf("%v\n", di.NaprrConfig)
 	// map to hold student-school links temporarily
 	// so student responses can be assigned to correct schools
 	ss_link := make(map[string]string)
 	// map to hold student identities temporarily, so that Yr3 Writing links to students can be made later
-	student_ids := make(map[string]string)
+	di.StudentIds = make(map[string]string)
 
 	// simple list of schools
 	// schools := make([]SchoolDetails, 0)
@@ -252,8 +260,8 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 				}
 				// store linkage locally
 				ss_link[sp.RefId] = sp.ASLSchoolId
-				student_key := studentKeyLookup(sp, config.Yr3WStudentMatch)
-				student_ids[student_key] = sp.RefId
+				student_key := StudentKeyLookup(sp, di.NaprrConfig.Yr3WStudentMatch)
+				di.StudentIds[student_key] = sp.RefId
 				di.sc.Publish(sp.ASLSchoolId, gsp)
 				totalStudents++
 
@@ -340,7 +348,6 @@ func (di *DataIngest) assignResponsesToSchools(ss_link map[string]string) {
 	<-txComplete
 
 	log.Println("All reponses assigned to schools.")
-
 }
 
 func (di *DataIngest) finaliseTransactions() {
