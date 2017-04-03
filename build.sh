@@ -29,7 +29,7 @@ do_build() {
 	cd $CWD
 	cd ./app
 	rsync -a ../test_data napval/nias8help.pdf napval/napval.toml sms/nias.toml napval/napval_nss.cfg sms/nias_nss.cfg napval/public napval/schemas napval/schoolslist napval/templates sms/privacyfilters sms/SIF_Message.xsd $OUTPUT/
-	rsync -a ../test_data naprr/in naprr/templates naprr/public $OUTPUTNAPRR/
+	rsync -a ../test_data naprr/in naprr/templates naprr/public naprr/naprr.toml $OUTPUTNAPRR/
 }
 
 do_shells() {

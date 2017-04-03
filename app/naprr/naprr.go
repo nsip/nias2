@@ -41,10 +41,11 @@ func main() {
 		di.Close()
 
 		rb := naprr.NewReportBuilder()
-		log.Println("Generating report data...")
-		rb.Run()
+		// must run Year 3 Writing ingest before full XML: Full XML ingest calls function to reconcile student identities between the two
 		log.Println("Generating report data, Year 3 Writing...")
 		rb.RunYr3W(false)
+		log.Println("Generating report data...")
+		rb.Run()
 	}
 
 	log.Println("Writing report files...")

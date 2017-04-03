@@ -6,10 +6,26 @@ import (
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
 	//"io/ioutil"
+	"github.com/BurntSushi/toml"
 	"log"
 	"path/filepath"
 	"sync"
 )
+
+type naprr_config struct {
+	// fields on which to match student in Yr3W ingest with student in XML ingest
+	Yr3WStudentMatch []string
+	Loaded           bool
+}
+
+func LoadConfig() naprr_config {
+	ncfg := naprr_config{Loaded: false}
+	if _, err := toml.DecodeFile("naprr.toml", &ncfg); err != nil {
+		log.Fatalln("Unable to read naprr config, aborting.", err)
+	}
+	ncfg.Loaded = true
+	return ncfg
+}
 
 type DataIngest struct {
 	sc stan.Conn
@@ -49,6 +65,35 @@ func (di *DataIngest) RunSynchronous(FilePath string) {
 	di.finaliseTransactions()
 }
 
+// Given a student record and a list of fields, return a colon-delimited key giving those field values
+func studentKeyLookup(r xml.RegistrationRecord, fields []string) string {
+	// we could use Go Reflect, but for performance, let's not
+	key := ""
+	for _, field := range fields {
+		switch field {
+		case "GivenName":
+			key = key + "::" + r.GivenName
+		case "FamilyName":
+			key = key + "::" + r.FamilyName
+		case "MiddleName":
+			key = key + "::" + r.MiddleName
+		case "PreferredName":
+			key = key + "::" + r.PreferredName
+		case "LocalId":
+			key = key + "::" + r.LocalId
+		case "StateProvinceId":
+			key = key + "::" + r.StateProvinceId
+		case "DiocesanId":
+			key = key + "::" + r.DiocesanId
+		case "NationalId":
+			key = key + "::" + r.NationalId
+		case "PlatformId":
+			key = key + "::" + r.PlatformId
+		}
+	}
+	return key
+}
+
 func parseXMLFileDirectory() []string {
 
 	files, _ := filepath.Glob("./in/*.zip")
@@ -66,9 +111,12 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 	// create a connection to the streaming server
 	log.Println("Connecting to STAN server...")
 
+	config := LoadConfig()
 	// map to hold student-school links temporarily
 	// so student responses can be assigned to correct schools
 	ss_link := make(map[string]string)
+	// map to hold student identities temporarily, so that Yr3 Writing links to students can be made later
+	student_ids := make(map[string]string)
 
 	// simple list of schools
 	// schools := make([]SchoolDetails, 0)
@@ -204,6 +252,8 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 				}
 				// store linkage locally
 				ss_link[sp.RefId] = sp.ASLSchoolId
+				student_key := studentKeyLookup(sp, config.Yr3WStudentMatch)
+				student_ids[student_key] = sp.RefId
 				di.sc.Publish(sp.ASLSchoolId, gsp)
 				totalStudents++
 
