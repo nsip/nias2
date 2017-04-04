@@ -30,7 +30,7 @@ func (di *DataIngest) RunYr3Writing() {
 func parsePearsonCSVFileDirectory() []string {
 	files, _ := filepath.Glob("./in/Pearson/*.txt")
 	if len(files) == 0 {
-		log.Fatalln("No results data zip files found in input folder.")
+		log.Println("No writing data files found in input folder.")
 	}
 	return files
 }
