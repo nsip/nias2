@@ -33,8 +33,8 @@ type DataIngest struct {
 	ge GobEncoder
 	sr *StreamReader
 	// mapping of key to RefId for student records
-	StudentIds  map[string]string
-	NaprrConfig naprr_config
+	Yr3StudentIds map[string]string
+	NaprrConfig   naprr_config
 }
 
 func NewDataIngest() *DataIngest {
@@ -124,7 +124,7 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 	// so student responses can be assigned to correct schools
 	ss_link := make(map[string]string)
 	// map to hold student identities temporarily, so that Yr3 Writing links to students can be made later
-	di.StudentIds = make(map[string]string)
+	di.Yr3StudentIds = make(map[string]string)
 
 	// simple list of schools
 	// schools := make([]SchoolDetails, 0)
@@ -261,7 +261,9 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 				// store linkage locally
 				ss_link[sp.RefId] = sp.ASLSchoolId
 				student_key := StudentKeyLookup(sp, di.NaprrConfig.Yr3WStudentMatch)
-				di.StudentIds[student_key] = sp.RefId
+				if sp.TestLevel == "3" {
+					di.Yr3StudentIds[student_key] = sp.RefId
+				}
 				di.sc.Publish(sp.ASLSchoolId, gsp)
 				totalStudents++
 

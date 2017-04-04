@@ -38,7 +38,7 @@ func main() {
 		di := naprr.NewDataIngest()
 		di.Run()
 		di.RunYr3Writing()
-		student_ids := di.StudentIds
+		student_ids := di.Yr3StudentIds
 		naprr_config := di.NaprrConfig
 		di.Close()
 
