@@ -49,7 +49,7 @@ func (rw *ReportWriter) writeYr3WReports() {
 	nd := rw.sr.GetNAPLANData(REPORTS_YR3W)
 	rbs := rw.sr.GetResultsByStudent()
 
-	wg.Add(2)
+	wg.Add(1)
 
 	go rw.writeYr3WritingReport(nd, rbs, &wg)
 
