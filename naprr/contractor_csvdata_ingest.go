@@ -21,6 +21,16 @@ func (di *DataIngest) RunYr3Writing() {
 	for _, csvFile := range csvFiles {
 		di.ingestPearsonResultsFile(csvFile)
 	}
+	if len(csvFiles) == 0 {
+		// send out signal that there is nothing in the Yr3W queues
+		eot := lib.TxStatusUpdate{TxComplete: true}
+		geot, err := di.ge.Encode(eot)
+		if err != nil {
+			log.Println("Unable to gob-encode tx complete message: ", err)
+		}
+		di.sc.Publish(RESULTS_YR3W_STREAM, geot)
+		di.sc.Publish(META_YR3W_STREAM, geot)
+	}
 
 	di.finaliseTransactions()
 
