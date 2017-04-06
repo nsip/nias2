@@ -13,15 +13,21 @@ import (
 	"log"
 	"path/filepath"
 	//"sync"
+	"github.com/wildducktheories/go-csv"
+	"os"
 )
 
 func (di *DataIngest) RunYr3Writing() {
 	uuid.Init()
-	csvFiles := parsePearsonCSVFileDirectory()
-	for _, csvFile := range csvFiles {
-		di.ingestPearsonResultsFile(csvFile)
+	pearsonFiles := parsePearsonFixedWidthFileDirectory()
+	for _, file := range pearsonFiles {
+		di.ingestPearsonResultsFile(file)
 	}
-	if len(csvFiles) == 0 {
+	fujixeroxFiles := parseFujiXeroxCSVFileDirectory()
+	for _, file := range fujixeroxFiles {
+		di.ingestFujiXeroxResultsFile(file)
+	}
+	if len(pearsonFiles)+len(fujixeroxFiles) == 0 {
 		// send out signal that there is nothing in the Yr3W queues
 		eot := lib.TxStatusUpdate{TxComplete: true}
 		geot, err := di.ge.Encode(eot)
@@ -37,10 +43,18 @@ func (di *DataIngest) RunYr3Writing() {
 	log.Println("All Yr 3 Writing data files read, ingest complete.")
 }
 
-func parsePearsonCSVFileDirectory() []string {
+func parsePearsonFixedWidthFileDirectory() []string {
 	files, _ := filepath.Glob("./in/Pearson/*.txt")
 	if len(files) == 0 {
-		log.Println("No writing data files found in input folder.")
+		log.Println("No writing data files found in Pearson input folder.")
+	}
+	return files
+}
+
+func parseFujiXeroxCSVFileDirectory() []string {
+	files, _ := filepath.Glob("./in/FujiXerox/*.csv")
+	if len(files) == 0 {
+		log.Println("No writing data files found in FujiXerox input folder.")
 	}
 	return files
 }
@@ -238,24 +252,21 @@ func wrapMessage(regr interface{}, i int, txid string, route string) *lib.NiasMe
 	return msg
 }
 
-func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
+var rubrics = [10]string{"audience", "text structure", "ideas", "character and setting", "vocabulary",
+	"cohesion", "paragraphing", "sentence structure", "punctuation", "spelling"}
+var rubricsabbr = [10]string{"aud", "txt", "ide", "cas", "voc", "coh", "par", "sen", "pun", "spe"}
+var fuji2rubric = map[string]string{"q1": "audience", "q2": "text structure", "q3": "ideas", "q4": "character and setting", "q5": "vocabulary",
+	"q6": "cohesion", "q7": "paragraphing", "q8": "sentence structure", "q9": "punctuation", "q10": "spelling"}
+var maxscores = map[string]string{"audience": "6", "text structure": "4", "ideas": "5", "character and setting": "4", "vocabulary": "5",
+	"cohesion": "4", "paragraphing": "2", "sentence structure": "6", "punctuation": "5", "spelling": "6"}
 
-	// create a connection to the streaming server
-	log.Println("Connecting to STAN server...")
+type codeframeType struct {
+	testRefId    string
+	testletRefId string
+	naptestlet   nxml.NAPTestlet
+}
 
-	// map to hold student-school links temporarily
-	// so student responses can be assigned to correct schools
-	ss_link := make(map[string]string)
-
-	// simple list of schools
-	// schools := make([]SchoolDetails, 0)
-
-	// open the data file for streaming read
-	log.Printf("Opening results data file %s...", resultsFilePath)
-	file, err := openDataFile(resultsFilePath)
-	if err != nil {
-		log.Fatalln("unable to open results data file: ", err)
-	}
+func (di *DataIngest) codeframeWriting() codeframeType {
 
 	log.Println("Reading data file...")
 	testRefId := uuid.NewV4().String()
@@ -290,11 +301,6 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
 	}
 	di.sc.Publish(META_YR3W_STREAM, gtl)
 
-	rubrics := [10]string{"audience", "text structure", "ideas", "character and setting", "vocabulary",
-		"cohesion", "paragraphing", "sentence structure", "punctuation", "spelling"}
-	rubricsabbr := [10]string{"aud", "txt", "ide", "cas", "voc", "coh", "par", "sen", "pun", "spe"}
-	maxscores := [10]string{"6", "4", "5", "4", "5", "4", "2", "6", "5", "6"}
-
 	for i := range naptestlet.TestItemList.TestItem {
 		naptestitem := nxml.NAPTestItem{ItemID: naptestlet.TestItemList.TestItem[i].TestItemRefId}
 		naptestitem.TestItemContent = nxml.TestItemContent{ItemName: rubrics[i],
@@ -320,11 +326,134 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
 		log.Println("Unable to gob-encode nap codeframe: ", err)
 	}
 	di.sc.Publish(META_YR3W_STREAM, gtcf)
+	return codeframeType{testRefId: testRefId,
+		testletRefId: testletRefId,
+		naptestlet:   naptestlet}
+}
 
-	//defer file.Close()
+func (di *DataIngest) ingestFujiXeroxResultsFile(resultsFilePath string) {
+	log.Printf("Opening results data file for FujiXerox: %s...", resultsFilePath)
+	src, err := os.Open(resultsFilePath)
+	if err != nil {
+		log.Println("Unable to open: ", resultsFilePath)
+	}
+	defer src.Close()
+	reader := csv.WithIoReader(src)
+	defer reader.Close()
+
+	// map to hold student-school links temporarily
+	// so student responses can be assigned to correct schools
+	ss_link := make(map[string]string)
+	codeframe := di.codeframeWriting()
 	totalStudents := 0
 	i := 0
 	//txid := nuid.Next()
+	for record := range reader.C() {
+		i = i + 1
+		r := lib.RemoveBlanks(record.AsMap())
+		studentRefId := uuid.NewV4().String()
+		if len(r["DOB"]) == 7 {
+			r["DOB"] = "0" + r["DOB"] // initial zero
+		}
+		regr := nxml.RegistrationRecord{RefId: studentRefId,
+			BirthDate:       fmt.Sprintf("%s-%s-%s", r["DOB"][4:8], r["DOB"][2:4], r["DOB"][0:2]),
+			StateProvinceId: r["EDID"],
+			TAAId:           r["Book Id"],
+			LocalId:         r["EDID"],
+			FamilyName:      r["Firstname"],
+			MainSchoolFlag:  "01",
+			GivenName:       r["Lastname"],
+			ClassGroup:      r["Homegroup"],
+			SchoolLocalId:   r["School Code"],
+			ASLSchoolId:     r["ASL School ID"],
+			YearLevel:       "3",
+			TestLevel:       "3",
+		}
+		// stopgap
+		if r["asl_school_code"] != "" {
+			r["asl_school_code"] = r["school_vcaa_code"]
+		}
+		regr.Unflatten()
+		gsp, err := di.ge.Encode(regr)
+		if err != nil {
+			log.Println("Unable to gob-encode studentpersonal: ", err)
+		}
+		// store linkage locally
+		ss_link[regr.RefId] = regr.ASLSchoolId
+		di.sc.Publish(RESULTS_YR3W_STREAM, gsp)
+		totalStudents++
+
+		event := nxml.NAPEvent{EventID: uuid.NewV4().String(),
+			SPRefID:           studentRefId,
+			SchoolID:          regr.ASLSchoolId,
+			TestID:            codeframe.testRefId,
+			ParticipationCode: pearson2sifParticipationCode(r["Non-Attempt Flag"]),
+			ParticipationText: pearson2sifParticipationText(r["Non-Attempt Flag"]),
+		}
+		// event.Adjustment.BookletType = r["special_provision_other_text"]
+		if r["SpecialAccom"] != "0" {
+			event.Adjustment.PNPCodelist = struct {
+				PNPCode []string `xml:"PNPCode,omitempty"`
+			}{PNPCode: pearson2sifAdjustment(r["SpecialAccom"])}
+		}
+		ge, err := di.ge.Encode(event)
+		if err != nil {
+			log.Println("Unable to gob-encode nap event link: ", err)
+		}
+		di.sc.Publish(RESULTS_YR3W_STREAM, ge)
+
+		response := nxml.NAPResponseSet{ResponseID: uuid.NewV4().String(),
+			StudentID: studentRefId,
+			TestID:    codeframe.testRefId,
+		}
+		response.TestletList.Testlet = make([]nxml.NAPResponseSet_Testlet, 1)
+		response.TestletList.Testlet[0] = nxml.NAPResponseSet_Testlet{NapTestletRefId: codeframe.testletRefId}
+		response.TestletList.Testlet[0].ItemResponseList.ItemResponse = make([]nxml.NAPResponseSet_ItemResponse, 10)
+
+		for i := range codeframe.naptestlet.TestItemList.TestItem {
+			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i] = nxml.NAPResponseSet_ItemResponse{ItemRefID: codeframe.naptestlet.TestItemList.TestItem[i].TestItemRefId,
+				SequenceNumber: codeframe.naptestlet.TestItemList.TestItem[i].SequenceNumber}
+
+			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i].SubscoreList.Subscore = make([]nxml.NAPResponseSet_Subscore, 1)
+		}
+		for key := range fuji2rubric {
+			response = rubricPopulate(i, key, fuji2rubric[key], maxscores[fuji2rubric[key]], r, response)
+		}
+		gr, err := di.ge.Encode(response)
+		if err != nil {
+			log.Println("Unable to gob-encode student response set: ", err)
+		}
+		di.sc.Publish(RESULTS_YR3W_STREAM, gr)
+	}
+	log.Println("Finished reading data file...")
+	// post end of stream message to responses queue
+	eot := lib.TxStatusUpdate{TxComplete: true}
+	geot, err := di.ge.Encode(eot)
+	if err != nil {
+		log.Println("Unable to gob-encode tx complete message: ", err)
+	}
+	di.sc.Publish(RESULTS_YR3W_STREAM, geot)
+	di.sc.Publish(META_YR3W_STREAM, geot)
+
+	log.Printf("FujiXerox ingestion complete for %s", resultsFilePath)
+
+}
+
+func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
+
+	// open the data file for streaming read
+	log.Printf("Opening results data file for Pearson: %s...", resultsFilePath)
+	file, err := openDataFile(resultsFilePath)
+	if err != nil {
+		log.Fatalln("unable to open results data file: ", err)
+	}
+
+	// map to hold student-school links temporarily
+	// so student responses can be assigned to correct schools
+	ss_link := make(map[string]string)
+	codeframe := di.codeframeWriting()
+	totalStudents := 0
+	i := 0
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		r := pearsonLineScan(scanner.Text())
@@ -366,7 +495,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
 		event := nxml.NAPEvent{EventID: uuid.NewV4().String(),
 			SPRefID:           studentRefId,
 			SchoolID:          regr.ASLSchoolId,
-			TestID:            testRefId,
+			TestID:            codeframe.testRefId,
 			ParticipationCode: pearson2sifParticipationCode(r["student_attendance"]),
 			ParticipationText: pearson2sifParticipationText(r["student_attendance"]),
 			ExemptionReason:   pearson2sifExemptionReason(r["reason_for_exemption"]),
@@ -391,20 +520,20 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
 
 		response := nxml.NAPResponseSet{ResponseID: uuid.NewV4().String(),
 			StudentID: studentRefId,
-			TestID:    testRefId,
+			TestID:    codeframe.testRefId,
 		}
 		response.TestletList.Testlet = make([]nxml.NAPResponseSet_Testlet, 1)
-		response.TestletList.Testlet[0] = nxml.NAPResponseSet_Testlet{NapTestletRefId: testletRefId}
+		response.TestletList.Testlet[0] = nxml.NAPResponseSet_Testlet{NapTestletRefId: codeframe.testletRefId}
 		response.TestletList.Testlet[0].ItemResponseList.ItemResponse = make([]nxml.NAPResponseSet_ItemResponse, 10)
 
-		for i := range naptestlet.TestItemList.TestItem {
-			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i] = nxml.NAPResponseSet_ItemResponse{ItemRefID: naptestlet.TestItemList.TestItem[i].TestItemRefId,
-				SequenceNumber: naptestlet.TestItemList.TestItem[i].SequenceNumber}
+		for i := range codeframe.naptestlet.TestItemList.TestItem {
+			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i] = nxml.NAPResponseSet_ItemResponse{ItemRefID: codeframe.naptestlet.TestItemList.TestItem[i].TestItemRefId,
+				SequenceNumber: codeframe.naptestlet.TestItemList.TestItem[i].SequenceNumber}
 
 			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[i].SubscoreList.Subscore = make([]nxml.NAPResponseSet_Subscore, 1)
 		}
 		for i := 0; i < 10; i++ {
-			response = rubricPopulate(i, rubricsabbr[i], rubrics[i], maxscores[i], r, response)
+			response = rubricPopulate(i, rubricsabbr[i], rubrics[i], maxscores[rubrics[i]], r, response)
 		}
 		gr, err := di.ge.Encode(response)
 		if err != nil {
@@ -423,27 +552,23 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
 	di.sc.Publish(RESULTS_YR3W_STREAM, geot)
 	di.sc.Publish(META_YR3W_STREAM, geot)
 
-	//di.assignResponsesToSchools(ss_link)
-
-	//log.Println("response assignment complete")
-
-	log.Printf("ingestion complete for %s", resultsFilePath)
+	log.Printf("Pearson ingestion complete for %s", resultsFilePath)
 
 	//wg.Done()
 
 }
 
-func rubricPopulate(seqPos int, abbr string, rubric string, maxscore string, r map[string]string, response nxml.NAPResponseSet) nxml.NAPResponseSet {
-	if r[abbr] == "" {
+func rubricPopulate(seqPos int, questionname string, rubric string, maxscore string, r map[string]string, response nxml.NAPResponseSet) nxml.NAPResponseSet {
+	if r[questionname] == "" {
 		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].ResponseCorrectness = "NotAttempted"
 	} else {
-		if r[abbr] == maxscore {
+		if r[questionname] == maxscore {
 			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].ResponseCorrectness = "Correct"
 		} else {
 			response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].ResponseCorrectness = "Incorrect"
 		}
 		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].SubscoreList.Subscore[0].SubscoreType = rubric
-		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].SubscoreList.Subscore[0].SubscoreValue = r[abbr]
+		response.TestletList.Testlet[0].ItemResponseList.ItemResponse[seqPos].SubscoreList.Subscore[0].SubscoreValue = r[questionname]
 	}
 	return response
 }
