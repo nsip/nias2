@@ -2,13 +2,13 @@ package naprr
 
 import (
 	goxml "encoding/xml"
-	"github.com/nats-io/go-nats-streaming"
-	"github.com/nsip/nias2/lib"
-	"github.com/nsip/nias2/xml"
-	//"io/ioutil"
 	"log"
 	"path/filepath"
 	"sync"
+
+	"github.com/nats-io/go-nats-streaming"
+	"github.com/nsip/nias2/lib"
+	"github.com/nsip/nias2/xml"
 )
 
 type DataIngest struct {
@@ -210,6 +210,7 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 			}
 		default:
 		}
+
 	}
 
 	log.Println("Data file read complete...")
