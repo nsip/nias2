@@ -5,9 +5,10 @@ package napval
 // will be matched against required tasks in NasMessage.Route meta-data
 
 import (
-	"github.com/nsip/nias2/lib"
 	"log"
 	"sync"
+
+	"github.com/nsip/nias2/lib"
 )
 
 // simple thread-safe container for group of services that will be available
@@ -131,6 +132,13 @@ func (sr *ServiceRegister) ProcessByRoute(m *lib.NiasMessage) []lib.NiasMessage 
 				response_msgs = append(response_msgs, response)
 			}
 		}
+
+		//
+		// enable this for low-cpu machines, drastically increases
+		// processing time, but reduces cpu load to around 30%
+		// may be a worthwhile tradeoff for some users
+		//
+		// time.Sleep(1 * time.Millisecond)
 	}
 
 	// log.Printf("\t\tresponse messages: %+v", response_msgs)

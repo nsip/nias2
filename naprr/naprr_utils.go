@@ -2,11 +2,12 @@ package naprr
 
 import (
 	"archive/zip"
-	"github.com/nats-io/go-nats-streaming"
-	"github.com/nats-io/nuid"
 	"io"
 	"log"
 	"os"
+
+	"github.com/nats-io/go-nats-streaming"
+	"github.com/nats-io/nuid"
 )
 
 // connection to the Streaming NATS server

@@ -6,9 +6,7 @@
 // in NiasMessage.Route
 package napval
 
-import (
-	"github.com/nsip/nias2/lib"
-)
+import "github.com/nsip/nias2/lib"
 
 // creates a pool of message handlers which process the
 // routing slip of each message thru the listed services
@@ -42,6 +40,7 @@ func (vd *ValidationDistributor) Run(poolsize int) {
 				if sigChange {
 					ec.Publish(lib.STORE_TOPIC, msg)
 				}
+
 			})
 
 		}(vs, tt)
