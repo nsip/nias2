@@ -1,22 +1,15 @@
 package sms
 
 import (
+	//"encoding/json"
 	"errors"
 	"github.com/beevik/etree"
+	"github.com/nsip/nias2/lib"
+	"github.com/nsip/nias2/xml"
 	"strings"
 )
 
-// information extracted out of SIF for graph
-type GraphStruct struct {
-	Guid          string            // RefID of object
-	EquivalentIds []string          // equivalent Ids
-	OtherIds      map[string]string // map of OtherId type to OtherId
-	Type          string            // object type
-	Links         []string          // list of related ids
-	Label         string            // human readable label
-}
-
-// implementation of the psi service
+// implementation of the sif2graph service
 type Sif2GraphService struct {
 	Paths map[string]etree.Path // map of paths to search
 }
@@ -148,21 +141,21 @@ func extract_label(doc *etree.Document, root *etree.Element) (string, error) {
 	return ret, nil
 }
 
-func parseSIF(s2g *Sif2GraphService, xml string) (*GraphStruct, error) {
+func parseSIF(s2g *Sif2GraphService, xmldoc string) (xml.GraphStruct, error) {
 	doc := etree.NewDocument()
-	if err := doc.ReadFromString(xml); err != nil {
-		return nil, err
+	if err := doc.ReadFromString(xmldoc); err != nil {
+		return xml.GraphStruct{}, err
 	}
 	root := doc.Root()
 	if root == nil {
-		return nil, errors.New("XML has no root")
+		return xml.GraphStruct{}, errors.New("XML has no root")
 	}
 	label, err := extract_label(doc, root)
 	if err != nil {
-		return nil, err
+		return xml.GraphStruct{}, err
 	}
 	guid := root.SelectAttrValue("RefId", "")
-	ret := GraphStruct{
+	ret := xml.GraphStruct{
 		Guid:          guid,
 		EquivalentIds: make([]string, 0),
 		OtherIds:      make(map[string]string),
@@ -192,7 +185,7 @@ func parseSIF(s2g *Sif2GraphService, xml string) (*GraphStruct, error) {
 		ret.OtherIds[elem.SelectAttrValue("Type", "")] = elem.Text()
 	}
 
-	return &ret, nil
+	return ret, nil
 }
 
 // recursively extract links from xml: elements suffixed with RefId, attributes suffixed with RefId,
@@ -225,18 +218,20 @@ func conditional_append(slice []string, element string, skip string) []string {
 }
 
 // implement the nias Service interface
-func (s2g *Sif2GraphService) HandleMessage(req *NiasMessage) ([]NiasMessage, error) {
+func (s2g *Sif2GraphService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, error) {
 
-	responses := make([]NiasMessage, 0)
+	responses := make([]lib.NiasMessage, 0)
 	out, err := parseSIF(s2g, req.Body.(string))
 	if err != nil {
 		return nil, err
 	}
-	r := NiasMessage{}
+	r := lib.NiasMessage{}
 	r.TxID = req.TxID
 	r.SeqNo = req.SeqNo
 	r.Target = SIF_MEMORY_STORE_PREFIX
-	r.Body = *out
+	r.Body = out
+	// having to JSON marshal this: the struct is blocking NATS2 from proccessing it
+	//r.Body, _ = json.Marshal(out)
 	responses = append(responses, r)
 	return responses, nil
 }

@@ -16,17 +16,18 @@ type ValidationDistributor struct{}
 // given the write-heavy nature of storage activities
 // this is significantly faster than shared read/write
 // services in parallel
-func (vd *ValidationDistributor) Run(poolsize int) {
+func (vd *ValidationDistributor) Run(poolsize int, nats_cfg lib.NATSConfig) {
 
-	ec := lib.CreateNATSConnection()
+	config := LoadNAPLANConfig()
+	ec := lib.CreateNATSConnection(nats_cfg)
 	vs := NewValidationStore()
-	tt := lib.NewTransactionTracker(DefaultValidationConfig.TxReportInterval)
+	tt := lib.NewTransactionTracker(config.TxReportInterval, nats_cfg)
 
 	for i := 0; i < poolsize; i++ {
 
 		// create service handler
 		go func(vs *ValidationStore, tt *lib.TransactionTracker) {
-			sr := NewServiceRegister()
+			sr := NewServiceRegister(nats_cfg)
 			ec.QueueSubscribe(lib.REQUEST_TOPIC, "distributor", func(m *lib.NiasMessage) {
 				responses := sr.ProcessByRoute(m)
 				for _, response := range responses {

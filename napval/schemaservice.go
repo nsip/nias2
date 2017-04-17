@@ -7,7 +7,7 @@ import (
 	"github.com/nsip/nias2/xml"
 	"github.com/xeipuuv/gojsonschema"
 	"io/ioutil"
-	// "log"
+	//"log"
 )
 
 // implementaiton of the json schema validation service
@@ -65,7 +65,10 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 	responses := make([]lib.NiasMessage, 0)
 
 	// extract reg data from message as json
-	data, err := json.Marshal(req.Body.(xml.RegistrationRecord))
+	r := req.Body.(xml.RegistrationRecord)
+	var r_ptr = &r
+	r_ptr.Flatten()
+	data, err := json.Marshal(*r_ptr)
 	if err != nil {
 		return responses, err
 	}
@@ -78,8 +81,9 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 	}
 
 	if !result.Valid() {
-
+		seen := make(map[string]bool)
 		for _, desc := range result.Errors() {
+			//log.Printf("ERRRORRRRR: %d: %s\n", desc, req.SeqNo)
 			field := desc.Field()
 
 			// Handle dependencies  errors
@@ -100,6 +104,11 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 					field = "Parent2LOTE"
 					desc.SetDescription("Must be present if other Parent2 fields are present")
 				}
+				// report any given field only once per line
+				if seen[string(req.SeqNo)+field] {
+					continue
+				}
+				seen[string(req.SeqNo)+field] = true
 			}
 
 			// trap enum errors for large enums such as country code

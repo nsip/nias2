@@ -22,7 +22,7 @@ func (rb *ReportBuilder) Run() {
 	var wg sync.WaitGroup
 
 	schools := rb.sr.GetSchoolDetails()
-	nd := rb.sr.GetNAPLANData()
+	nd := rb.sr.GetNAPLANData(META_STREAM)
 
 	for _, subslice := range schools {
 		for _, school := range subslice {
@@ -37,6 +37,35 @@ func (rb *ReportBuilder) Run() {
 	// block until all reports generated
 	wg.Wait()
 	log.Println("All reports generated")
+
+}
+
+// Year 3 Writing
+func (rb *ReportBuilder) RunYr3W(schools bool) {
+
+	var wg sync.WaitGroup
+
+	log.Println("Getting student data")
+	sr := rb.sr.GetStudentAndResultsData()
+	log.Println("Gotten student data")
+	nd := rb.sr.GetNAPLANData(META_YR3W_STREAM)
+
+	if schools {
+		schoolslist := rb.sr.GetSchoolDetails()
+		for _, subslice := range schoolslist {
+			for _, school := range subslice {
+				wg.Add(1)
+				go rb.createSchoolReports(nd, school.ACARAId, &wg)
+			}
+		}
+	}
+
+	wg.Add(1)
+	go rb.createYr3WReports(nd, sr, &wg)
+
+	// block until all reports generated
+	wg.Wait()
+	log.Println("All Year 3 Writing report data generated")
 
 }
 
@@ -57,5 +86,12 @@ func (rb *ReportBuilder) createSchoolReports(nd *NAPLANData, acaraid string, wg 
 func (rb *ReportBuilder) createTestReports(nd *NAPLANData, wg *sync.WaitGroup) {
 	rb.rg.GenerateCodeFrameData(nd)
 	log.Println("Codeframe data created.")
+	wg.Done()
+}
+
+// generate test-level reports
+func (rb *ReportBuilder) createYr3WReports(nd *NAPLANData, sr *StudentAndResultsData, wg *sync.WaitGroup) {
+	rb.rg.GenerateYr3WData(nd, sr)
+	log.Println("Year 3 Writing XML data created.")
 	wg.Done()
 }

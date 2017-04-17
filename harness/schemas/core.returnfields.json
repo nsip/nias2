@@ -1,0 +1,188 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "http://naplan.edu.au/fields",
+    "type": "object",
+    "title": "NAPLAN validation schema",
+    "description": "Schema for validating fields returned  from Platform",
+    "name": "/",
+    "properties": {
+        "Schoolname": {
+            "id": "http://naplan.edu.au/Schoolname",
+	    "type": "string",
+            "title": "Schoolname schema.",
+            "description": "Description (output field)",
+            "name": "Schoolname"
+        },
+        "OtherSchoolName": {
+            "id": "http://naplan.edu.au/OtherSchoolName",
+	    "type": "string",
+            "title": "OtherSchoolName schema.",
+            "description": "Description (output field)",
+            "name": "OtherSchoolName"
+        },
+        "ReportingSchoolName": {
+            "id": "http://naplan.edu.au/ReportingSchoolName",
+	    "type": "string",
+            "title": "ReportingSchoolName schema.",
+            "description": "Description (output field)",
+            "name": "ReportingSchoolName"
+        },
+        "ReportExclusion": {
+            "id": "http://naplan.edu.au/ReportExclusion",
+	    "type": "string",
+            "title": "ReportExclusion schema.",
+            "description": "Description (output field)",
+            "name": "ReportExclusion"
+        },
+        "ParticipationNumeracy": {
+            "id": "http://naplan.edu.au/ParticipationNumeracy",
+	    "type": "string",
+            "title": "ParticipationNumeracy schema.",
+            "description": "Description (output field)",
+            "name": "ParticipationNumeracy"
+        },
+        "NumeracyExemptReason": {
+            "id": "http://naplan.edu.au/NumeracyExemptReason",
+	    "type": "string",
+            "title": "NumeracyExemptReason schema.",
+            "description": "Description (output field)",
+            "name": "NumeracyExemptReason"
+        },
+        "ParticipationConventionsOfLanguage": {
+            "id": "http://naplan.edu.au/ParticipationConventionsOfLanguage",
+	    "type": "string",
+            "title": "ParticipationConventionsOfLanguage schema.",
+            "description": "Description (output field)",
+            "name": "ParticipationConventionsOfLanguage"
+        },
+        "ConventionsOfLanguageExemptReason": {
+            "id": "http://naplan.edu.au/ConventionsOfLanguageExemptReason",
+	    "type": "string",
+            "title": "ConventionsOfLanguageExemptReason schema.",
+            "description": "Description (output field)",
+            "name": "ConventionsOfLanguageExemptReason"
+        },
+        "ParticipationReading": {
+            "id": "http://naplan.edu.au/ParticipationReading",
+	    "type": "string",
+            "title": "ParticipationReading schema.",
+            "description": "Description (output field)",
+            "name": "ParticipationReading"
+        },
+        "ReadingExemptReason": {
+            "id": "http://naplan.edu.au/ReadingExemptReason",
+	    "type": "string",
+            "title": "ReadingExemptReason schema.",
+            "description": "Description (output field)",
+            "name": "ReadingExemptReason"
+        },
+        "ParticipationWriting": {
+            "id": "http://naplan.edu.au/ParticipationWriting",
+	    "type": "string",
+            "title": "ParticipationWriting schema.",
+            "description": "Description (output field)",
+            "name": "ParticipationWriting"
+        },
+        "WritingExemptReason": {
+            "id": "http://naplan.edu.au/WritingExemptReason",
+	    "type": "string",
+            "title": "WritingExemptReason schema.",
+            "description": "Description (output field)",
+            "name": "WritingExemptReason"
+        },
+        "AdjustmentsNumeracy": {
+            "id": "http://naplan.edu.au/AdjustmentsNumeracy",
+	    "type": "string",
+            "title": "AdjustmentsNumeracy schema.",
+            "description": "Description (output field)",
+            "name": "AdjustmentsNumeracy"
+        },
+        "AdjustmentsConventionsOfLanguage": {
+            "id": "http://naplan.edu.au/AdjustmentsConventionsOfLanguage",
+	    "type": "string",
+            "title": "AdjustmentsConventionsOfLanguage schema.",
+            "description": "Description (output field)",
+            "name": "AdjustmentsConventionsOfLanguage"
+        },
+        "AdjustmentsReading": {
+            "id": "http://naplan.edu.au/AdjustmentsReading",
+	    "type": "string",
+            "title": "AdjustmentsReading schema.",
+            "description": "Description (output field)",
+            "name": "AdjustmentsReading"
+        },
+        "AdjustmentsWriting": {
+            "id": "http://naplan.edu.au/AdjustmentsWriting",
+	    "type": "string",
+            "title": "AdjustmentsWriting schema.",
+            "description": "Description (output field)",
+            "name": "AdjustmentsWriting"
+        },
+        "BookletType": {
+            "id": "http://naplan.edu.au/BookletType",
+	    "type": "string",
+            "title": "BookletType schema.",
+            "description": "Description (output field)",
+            "name": "BookletType"
+        },
+        "PersonalDetailsChanged": {
+            "id": "http://naplan.edu.au/PersonalDetailsChanged",
+	    "type": "string",
+            "title": "PersonalDetailsChanged schema.",
+            "description": "Description (output field)",
+            "name": "PersonalDetailsChanged"
+        },
+        "PsiOtherIdMismatch": {
+            "id": "http://naplan.edu.au/PsiOtherIdMismatch",
+	    "type": "string",
+            "title": "PsiOtherIdMismatch schema.",
+            "description": "Description (output field)",
+            "name": "PsiOtherIdMismatch"
+        },
+        "PossibleDuplicate": {
+            "id": "http://naplan.edu.au/PossibleDuplicate",
+	    "type": "string",
+            "title": "PossibleDuplicate schema.",
+            "description": "Description (output field)",
+            "name": "PossibleDuplicate"
+        },
+        "DOBRange": {
+            "id": "http://naplan.edu.au/DOBRange",
+	    "type": "string",
+            "title": "DOBRange schema.",
+            "description": "Description (output field)",
+            "name": "DOBRange"
+        },
+        "Ungradedstudent": {
+            "id": "http://naplan.edu.au/Ungradedstudent",
+	    "type": "string",
+            "title": "Ungradedstudent schema.",
+            "description": "Description (output field)",
+            "name": "Ungradedstudent"
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

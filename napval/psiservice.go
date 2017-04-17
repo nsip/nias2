@@ -108,7 +108,7 @@ func (psi *PsiService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		return responses, nil
 	}
 
-	if !checksumok(rr.PlatformId) {
+	if !checksumok(rr.GetOtherId("NAPPlatformStudentId")) {
 		desc := "Platform ID has incorrect checksum"
 		ve := ValidationError{
 			Description:  desc,
@@ -123,7 +123,7 @@ func (psi *PsiService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		r.Body = ve
 		responses = append(responses, r)
 	}
-	if !checksumok(rr.PreviousPlatformId) {
+	if !checksumok(rr.GetOtherId("PreviousNAPPlatformStudentId")) {
 		desc := "Previous Platform ID has incorrect checksum"
 
 		ve := ValidationError{

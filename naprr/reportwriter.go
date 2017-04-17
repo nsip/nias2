@@ -3,6 +3,7 @@ package naprr
 import (
 	"bufio"
 	"bytes"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"log"
@@ -32,9 +33,29 @@ func (rw *ReportWriter) Run() {
 	rw.writeSchoolLevelReports(schools)
 	rw.writeAggregateSchoolReports(schools)
 	rw.writeTestLevelReports()
+	rw.writeYr3WReports()
 
 	log.Println("All reports written\n")
 
+}
+
+// create data reports from the test strucutre
+func (rw *ReportWriter) writeYr3WReports() {
+
+	log.Println("Creating Year 3 Writing XML...")
+
+	var wg sync.WaitGroup
+
+	nd := rw.sr.GetNAPLANData(REPORTS_YR3W)
+	rbs := rw.sr.GetResultsByStudent()
+
+	wg.Add(2)
+
+	go rw.writeYr3WritingReport(nd, rbs, &wg)
+
+	wg.Wait()
+
+	log.Println("Year 3 Writing XML created.")
 }
 
 // create data reports from the test strucutre
@@ -44,7 +65,7 @@ func (rw *ReportWriter) writeTestLevelReports() {
 
 	var wg sync.WaitGroup
 
-	cfds := rw.sr.GetCodeFrameData()
+	cfds := rw.sr.GetCodeFrameData(REPORTS_CODEFRAME)
 
 	wg.Add(2)
 
@@ -173,7 +194,7 @@ func (rw *ReportWriter) writeSchoolReports(acaraid string, wg *sync.WaitGroup) {
 	wg.Done()
 }
 
-// report of test strucure for writing items only
+// report of test structure for writing items only
 // with extended item information
 func (rw *ReportWriter) writeCodeFrameWritingReport(cfds []CodeFrameDataSet, wg *sync.WaitGroup) {
 
@@ -223,6 +244,54 @@ func (rw *ReportWriter) writeCodeFrameWritingReport(cfds []CodeFrameDataSet, wg 
 	check(err)
 
 	log.Printf("Codeframe writing report created for: %d elements", len(cfds))
+
+	wg.Done()
+
+}
+
+// report of test structure for writing items only
+// with extended item information
+func (rw *ReportWriter) writeYr3WritingReport(nd *NAPLANData, rbs []ResultsByStudent, wg *sync.WaitGroup) {
+
+	// create directory for the school
+	fpath := "yr3w/"
+	err := os.MkdirAll(fpath, os.ModePerm)
+	check(err)
+
+	// create the report data file in the output directory
+	// delete any ecisting files and create empty new one
+	fname := fpath + "codeframe_writing.xml"
+	err = os.RemoveAll(fname)
+	f, err := os.Create(fname)
+	check(err)
+	defer f.Close()
+
+	e := xml.NewEncoder(f)
+	e.Indent("", "  ")
+	f.WriteString("<NAPResulsReporting>\n")
+	cfcount := 0
+	for _, val := range nd.Tests {
+		e.Encode(val)
+		cfcount++
+	}
+	for _, val := range nd.Testlets {
+		e.Encode(val)
+		cfcount++
+	}
+	for _, val := range nd.Items {
+		e.Encode(val)
+		cfcount++
+	}
+	for _, r := range rbs {
+		e.Encode(r.Student)
+		e.Encode(r.Event)
+		e.Encode(r.ResponseSet)
+	}
+
+	e.Flush()
+	f.WriteString("</NAPResulsReporting>\n")
+
+	log.Printf("Codeframe writing report created for: %d codeframe elements and %d results elements", cfcount, len(rbs))
 
 	wg.Done()
 

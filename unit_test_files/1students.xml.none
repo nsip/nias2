@@ -1,0 +1,83 @@
+<StudentPersonal xmlns="http://www.sifassociation.org/datamodel/au/3.4" RefId="0b0c3c0e-1a79-4330-bed4-fec30945fa36">
+      <LocalId>gqhvy514</LocalId>
+      <StateProvinceId></StateProvinceId>
+      <OtherIdList>
+        <OtherId Type="SectorStudentId">75346</OtherId>
+        <OtherId Type="DiocesanStudentId">84945</OtherId>
+        <OtherId Type="OtherStudentId">55629</OtherId>
+        <OtherId Type="TAAStudentId">24653</OtherId>
+        <OtherId Type="NationalStudentId">33999</OtherId>
+        <OtherId Type="NAPPlatformStudentId">540</OtherId>
+        <OtherId Type="PreviousLocalSchoolStudentId">3374</OtherId>
+        <OtherId Type="PreviousSectorStudentId">75911</OtherId>
+        <OtherId Type="PreviousDiocesanStudentId">44624</OtherId>
+        <OtherId Type="PreviousOtherStudentId">29026</OtherId>
+        <OtherId Type="PreviousTAAStudentId">83755</OtherId>
+        <OtherId Type="PreviousStateProvinceId"></OtherId>
+        <OtherId Type="PreviousNationalStudentId">38284</OtherId>
+        <OtherId Type="PreviousNAPPlatformStudentId">55807</OtherId>
+      </OtherIdList>
+      <PersonInfo>
+        <Name Type="LGL">
+          <FamilyName>Baker</FamilyName>
+          <GivenName>Cynthia</GivenName>
+          <MiddleName>C</MiddleName>
+          <PreferredGivenName>Cynthia</PreferredGivenName>
+        </Name>
+        <Demographics>
+          <IndigenousStatus>2</IndigenousStatus>
+          <Sex>2</Sex>
+          <BirthDate>2009-08-01</BirthDate>
+          <CountryOfBirth>1300</CountryOfBirth>
+          <LanguageList>
+            <Language>
+              <Code>1101</Code>
+              <LanguageType>4</LanguageType>
+            </Language>
+          </LanguageList>
+          <VisaSubClass>500</VisaSubClass>
+          <LBOTE>Y</LBOTE>
+        </Demographics>
+        <AddressList>
+          <Address Type="0765" Role="012B">
+            <Street>
+              <Line1>634 Frenchmen Street asdfgfdnbdjhgtghdujhasdfg</Line1>
+              <Line2></Line2>
+            </Street>
+            <City>CORNELIA CREEK</City>
+            <StateProvince>VIC</StateProvince>
+            <Country>1101</Country>
+            <PostalCode>3622</PostalCode>
+          </Address>
+        </AddressList>
+      </PersonInfo>
+      <MostRecent>
+        <SchoolLocalId>37298</SchoolLocalId>
+        <YearLevel>
+          <Code>3</Code>
+        </YearLevel>
+        <FTE>0.63</FTE>
+        <Parent1Language>6199</Parent1Language>
+        <Parent2Language>1101</Parent2Language>
+        <Parent1EmploymentType>4</Parent1EmploymentType>
+        <Parent2EmploymentType>1</Parent2EmploymentType>
+        <Parent1SchoolEducationLevel>4</Parent1SchoolEducationLevel>
+        <Parent2SchoolEducationLevel>1</Parent2SchoolEducationLevel>
+        <Parent1NonSchoolEducation>7</Parent1NonSchoolEducation>
+        <Parent2NonSchoolEducation>6</Parent2NonSchoolEducation>
+        <LocalCampusId>1</LocalCampusId>
+        <SchoolACARAId>44370</SchoolACARAId>
+        <TestLevel><Code>3</Code></TestLevel>
+        <Homegroup></Homegroup>
+        <ClassCode>3E</ClassCode>
+        <MembershipType>01</MembershipType>
+        <FFPOS>2</FFPOS>
+        <ReportingSchoolId>lxwnp178</ReportingSchoolId>
+        <OtherEnrollmentSchoolACARAId>tjtzi844</OtherEnrollmentSchoolACARAId>
+      </MostRecent>
+      <EducationSupport>X</EducationSupport>
+      <HomeSchooledStudent>Y</HomeSchooledStudent>
+      <Sensitive>Y</Sensitive>
+      <OfflineDelivery>N</OfflineDelivery>
+    </StudentPersonal>
+

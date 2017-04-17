@@ -1,48 +1,50 @@
 package xml
 
 type NAPTest struct {
-	TestID      string `xml:"RefId,attr"`
-	TestContent struct {
-		LocalId     string `xml:"NAPTestLocalId"`
-		TestName    string `xml:"TestName"`
-		TestLevel   string `xml:"TestLevel>Code"`
-		TestDomain  string `xml:"Domain"`
-		TestYear    string `xml:"TestYear"`
-		StagesCount string `xml:"StagesCount"`
-		TestType    string `xml:"TestType"`
-		DomainBands struct {
-			Band1Lower  string `xml:"Band1Lower"`
-			Band1Upper  string `xml:"Band1Upper"`
-			Band2Lower  string `xml:"Band2Lower"`
-			Band2Upper  string `xml:"Band2Upper"`
-			Band3Lower  string `xml:"Band3Lower"`
-			Band3Upper  string `xml:"Band3Upper"`
-			Band4Lower  string `xml:"Band4Lower"`
-			Band4Upper  string `xml:"Band4Upper"`
-			Band5Lower  string `xml:"Band5Lower"`
-			Band5Upper  string `xml:"Band5Upper"`
-			Band6Lower  string `xml:"Band6Lower"`
-			Band6Upper  string `xml:"Band6Upper"`
-			Band7Lower  string `xml:"Band7Lower"`
-			Band7Upper  string `xml:"Band7Upper"`
-			Band8Lower  string `xml:"Band8Lower"`
-			Band8Upper  string `xml:"Band8Upper"`
-			Band9Lower  string `xml:"Band9Lower"`
-			Band9Upper  string `xml:"Band9Upper"`
-			Band10Lower string `xml:"Band10Lower"`
-			Band10Upper string `xml:"Band10Upper"`
-		} `xml:"DomainBands"`
-		DomainProficiency struct {
-			Level1Lower string `xml:"Level1Lower"`
-			Level1Upper string `xml:"Level1Upper"`
-			Level2Lower string `xml:"Level2Lower"`
-			Level2Upper string `xml:"Level2Upper"`
-			Level3Lower string `xml:"Level3Lower"`
-			Level3Upper string `xml:"Level3Upper"`
-			Level4Lower string `xml:"Level4Lower"`
-			Level4Upper string `xml:"Level4Upper"`
-		} `xml:"DomainProficiency"`
-	} `xml:"TestContent"`
+	TestID      string      `xml:"RefId,attr"`
+	TestContent TestContent `xml:"TestContent"`
+}
+
+type TestContent struct {
+	LocalId     string `xml:"NAPTestLocalId,omitempty"`
+	TestName    string `xml:"TestName,omitempty"`
+	TestLevel   string `xml:"TestLevel>Code"`
+	TestDomain  string `xml:"Domain"`
+	TestYear    string `xml:"TestYear"`
+	StagesCount string `xml:"StagesCount,omitempty"`
+	TestType    string `xml:"TestType,omitempty"`
+	DomainBands struct {
+		Band1Lower  string `xml:"Band1Lower"`
+		Band1Upper  string `xml:"Band1Upper"`
+		Band2Lower  string `xml:"Band2Lower"`
+		Band2Upper  string `xml:"Band2Upper"`
+		Band3Lower  string `xml:"Band3Lower"`
+		Band3Upper  string `xml:"Band3Upper"`
+		Band4Lower  string `xml:"Band4Lower"`
+		Band4Upper  string `xml:"Band4Upper"`
+		Band5Lower  string `xml:"Band5Lower"`
+		Band5Upper  string `xml:"Band5Upper"`
+		Band6Lower  string `xml:"Band6Lower"`
+		Band6Upper  string `xml:"Band6Upper"`
+		Band7Lower  string `xml:"Band7Lower"`
+		Band7Upper  string `xml:"Band7Upper"`
+		Band8Lower  string `xml:"Band8Lower"`
+		Band8Upper  string `xml:"Band8Upper"`
+		Band9Lower  string `xml:"Band9Lower"`
+		Band9Upper  string `xml:"Band9Upper"`
+		Band10Lower string `xml:"Band10Lower"`
+		Band10Upper string `xml:"Band10Upper"`
+	} `xml:"DomainBands,omitempty"`
+	DomainProficiency struct {
+		Level1Lower string `xml:"Level1Lower"`
+		Level1Upper string `xml:"Level1Upper"`
+		Level2Lower string `xml:"Level2Lower"`
+		Level2Upper string `xml:"Level2Upper"`
+		Level3Lower string `xml:"Level3Lower"`
+		Level3Upper string `xml:"Level3Upper"`
+		Level4Lower string `xml:"Level4Lower"`
+		Level4Upper string `xml:"Level4Upper"`
+	} `xml:"DomainProficiency,omitempty"`
 }
 
 func (t NAPTest) GetHeaders() []string {

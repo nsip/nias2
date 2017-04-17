@@ -14,6 +14,10 @@ func init() {
 	gob.Register(TxStatusUpdate{})
 }
 
+// interval for status reporting: every n items processed
+// to avoid flooding clients with update messages
+var report_interval int
+
 // track status in simple hash counter; key is transactionid, value is no. records processed
 var txStatus = make(map[string]int)
 
@@ -36,9 +40,9 @@ type TransactionTracker struct {
 // create a TransactionTracker
 // progress interval is how many messages between status updates
 // eg. report status every 500 messages
-func NewTransactionTracker(report_interval int) *TransactionTracker {
+func NewTransactionTracker(report_interval int, cfg NATSConfig) *TransactionTracker {
 
-	return &TransactionTracker{C: CreateNATSConnection(), ReportInterval: report_interval}
+	return &TransactionTracker{C: CreateNATSConnection(cfg), ReportInterval: report_interval}
 
 }
 
@@ -111,6 +115,7 @@ func (tt *TransactionTracker) GetStatusReport(txID string) (significantChange bo
 	report := NiasMessage{}
 	report.TxID = txID
 	report.Body = txu
+	report.Target = "Status Report"
 
 	// otherwise cahnge is small, no update
 	return sigChange, &report
@@ -129,4 +134,10 @@ func removeTx(txID string) {
 	delete(txStatus, txID)
 	statusMutex.Unlock()
 
+}
+
+// standard response to successful file upload
+type IngestResponse struct {
+	TxID    string
+	Records int
 }

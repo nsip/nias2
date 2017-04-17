@@ -22,6 +22,10 @@ func NewDataIngest() *DataIngest {
 	return &di
 }
 
+func (di *DataIngest) Close() {
+	di.sc.Close()
+}
+
 func (di *DataIngest) Run() {
 
 	xmlFiles := parseXMLFileDirectory()
@@ -37,9 +41,12 @@ func (di *DataIngest) Run() {
 
 	di.finaliseTransactions()
 
-	di.sc.Close()
-
 	log.Println("All data files read, ingest complete.")
+}
+
+func (di *DataIngest) RunSynchronous(FilePath string) {
+	di.ingestResultsFile(FilePath, nil)
+	di.finaliseTransactions()
 }
 
 func parseXMLFileDirectory() []string {
@@ -72,6 +79,7 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 	if err != nil {
 		log.Fatalln("unable to open results data file: ", err)
 	}
+	xmlFile, err = OpenResultsFile(resultsFilePath)
 
 	log.Println("Reading data file...")
 
@@ -106,7 +114,7 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 				if err != nil {
 					log.Println("Unable to gob-encode nap test: ", err)
 				}
-				di.sc.Publish("meta", gt)
+				di.sc.Publish(META_STREAM, gt)
 				totalTests++
 
 			case "NAPTestlet":
@@ -116,7 +124,7 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 				if err != nil {
 					log.Println("Unable to gob-encode nap testlet: ", err)
 				}
-				di.sc.Publish("meta", gtl)
+				di.sc.Publish(META_STREAM, gtl)
 				totalTestlets++
 
 			case "NAPTestItem":
@@ -126,7 +134,7 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 				if err != nil {
 					log.Println("Unable to gob-encode nap test item: ", err)
 				}
-				di.sc.Publish("meta", gti)
+				di.sc.Publish(META_STREAM, gti)
 				totalTestItems++
 
 			case "NAPTestScoreSummary":
@@ -166,7 +174,7 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 				if err != nil {
 					log.Println("Unable to gob-encode nap codeframe: ", err)
 				}
-				di.sc.Publish("meta", gcf)
+				di.sc.Publish(META_STREAM, gcf)
 				totalCodeFrames++
 
 			case "SchoolInfo":
@@ -225,7 +233,7 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 		log.Println("Unable to gob-encode tx complete message: ", err)
 	}
 	di.sc.Publish("responses", geot)
-	di.sc.Publish("meta", geot)
+	di.sc.Publish(META_STREAM, geot)
 
 	di.assignResponsesToSchools(ss_link)
 
@@ -233,7 +241,9 @@ func (di *DataIngest) ingestResultsFile(resultsFilePath string, wg *sync.WaitGro
 
 	log.Printf("ingestion complete for %s", resultsFilePath)
 
-	wg.Done()
+	if wg != nil {
+		wg.Done()
+	}
 
 }
 

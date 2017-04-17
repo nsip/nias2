@@ -1,10 +1,11 @@
 // serviceregister.go
-package lib
+package sms
 
 // simple hashtable of service handlers stored by name
 // will be matched against required tasks in NasMessage.Route meta-data
 
 import (
+	"github.com/nsip/nias2/lib"
 	"log"
 	"sync"
 )
@@ -13,7 +14,7 @@ import (
 // to process messages passed from a distributor node
 type ServiceRegister struct {
 	sync.RWMutex
-	registry map[string]NiasService
+	registry map[string]lib.NiasService
 }
 
 // creates a ServiceRegister with properly initilaised internal map
@@ -23,7 +24,7 @@ func NewServiceRegister() *ServiceRegister {
 }
 
 // add a service to the registry with a name
-func (sr *ServiceRegister) AddService(servicename string, service NiasService) {
+func (sr *ServiceRegister) AddService(servicename string, service lib.NiasService) {
 	sr.Lock()
 	sr.registry[servicename] = service
 	sr.Unlock()
@@ -37,7 +38,7 @@ func (sr *ServiceRegister) RemoveService(servicename string) {
 }
 
 // return a service by providing the name
-func (sr *ServiceRegister) FindService(servicename string) NiasService {
+func (sr *ServiceRegister) FindService(servicename string) lib.NiasService {
 	sr.RLock()
 	defer sr.RUnlock()
 	return sr.registry[servicename]
@@ -48,42 +49,7 @@ func createDefaultServiceRegister() *ServiceRegister {
 
 	log.Println("Creating services & register")
 	sr := ServiceRegister{}
-	sr.registry = make(map[string]NiasService)
-
-	schema1, err := NewCoreSchemaService()
-	if err != nil {
-		log.Fatal("Unable to create schema service ", err)
-	}
-
-	schema11, err := NewCustomSchemaService("core_parent2.json")
-	if err != nil {
-		log.Fatal("Unable to create schema service ", err)
-	}
-
-	schema2, err := NewCustomSchemaService("local.json")
-	if err != nil {
-		log.Fatal("Unable to create schema service ", err)
-	}
-
-	id1, err := NewIDService3()
-	if err != nil {
-		log.Fatal("Unable to create id service ", err)
-	}
-
-	dob1, err := NewDOBService(NiasConfig.TestYear)
-	if err != nil {
-		log.Fatal("Unable to create dob service ", err)
-	}
-
-	asl1, err := NewASLService()
-	if err != nil {
-		log.Fatal("Unable to create asl service ", err)
-	}
-
-	psi1, err := NewPsiService()
-	if err != nil {
-		log.Fatal("Unable to create psi service ", err)
-	}
+	sr.registry = make(map[string]lib.NiasService)
 
 	priv1, err := NewPrivacyService()
 	if err != nil {
@@ -95,21 +61,16 @@ func createDefaultServiceRegister() *ServiceRegister {
 		log.Fatal("Unable to create sif2graph service ", err)
 	}
 
-	num, err := NewNumericValidService()
-	if err != nil {
-		log.Fatal("Unable to create numeric validation service ", err)
-	}
+	/*
+		sif, err := NewSifValidationService()
+		if err != nil {
+			log.Fatal("Unable to create numeric validation service ", err)
+		}
+	*/
 
-	sr.AddService("schema", schema1)
-	sr.AddService("schema2", schema11)
-	sr.AddService("local", schema2)
-	sr.AddService("id", id1)
-	sr.AddService("dob", dob1)
-	sr.AddService("asl", asl1)
-	sr.AddService("psi", psi1)
 	sr.AddService("privacy", priv1)
 	sr.AddService("sif2graph", s2g1)
-	sr.AddService("numericvalid", num)
+	//sr.AddService("sifvalidation", sif)
 
 	log.Println("services created & installed in register")
 
@@ -117,9 +78,9 @@ func createDefaultServiceRegister() *ServiceRegister {
 
 }
 
-func (sr *ServiceRegister) ProcessByRoute(m *NiasMessage) []NiasMessage {
+func (sr *ServiceRegister) ProcessByRoute(m *lib.NiasMessage) []lib.NiasMessage {
 
-	response_msgs := make([]NiasMessage, 0)
+	response_msgs := make([]lib.NiasMessage, 0)
 
 	route := m.Route
 

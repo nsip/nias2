@@ -67,7 +67,7 @@ func add_error(responses []lib.NiasMessage, desc string, field string, req *lib.
 		Description:  desc,
 		Field:        field,
 		OriginalLine: req.SeqNo,
-		Vtype:        "date",
+		Vtype:        "numeric",
 	}
 	r := lib.NiasMessage{}
 	r.TxID = req.TxID

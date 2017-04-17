@@ -24,6 +24,75 @@ func NewReportGenerator() *ReportGenerator {
 // routines to build the required reports
 //
 
+// generate a student record, their event link, and their responses, for a single test
+// assumes a single test is represented in the ingested data (may yet refine this);
+// intended in the first instance for Yr3 Writing ingest
+// generated only once as represents structure of test not school-level data
+func (rg *ReportGenerator) GenerateYr3WData(nd *NAPLANData, sr *StudentAndResultsData) {
+
+	count := 0
+	rbs := make([]ResultsByStudent, 0)
+
+	for _, test := range nd.Tests {
+		count++
+		payload, err := rg.ge.Encode(test)
+		if err != nil {
+			log.Println("unable to encode test: ", err)
+		}
+		rg.sc.Publish(REPORTS_YR3W, payload)
+	}
+	for _, testlet := range nd.Testlets {
+		count++
+		payload, err := rg.ge.Encode(testlet)
+		if err != nil {
+			log.Println("unable to encode testlet: ", err)
+		}
+		rg.sc.Publish(REPORTS_YR3W, payload)
+	}
+	for _, item := range nd.Items {
+		count++
+		payload, err := rg.ge.Encode(item)
+		if err != nil {
+			log.Println("unable to encode item: ", err)
+		}
+		rg.sc.Publish(REPORTS_YR3W, payload)
+	}
+
+	// assume 1 student 1 event 1 response set
+	for _, student := range sr.Students {
+		event := sr.Events[student.RefId]
+		responseset := sr.ResponseSets[student.RefId]
+		r := ResultsByStudent{
+			Student:     student,
+			Event:       event,
+			ResponseSet: responseset,
+		}
+		rbs = append(rbs, r)
+	}
+
+	count = count + len(rbs)
+
+	// publish the records
+	for _, r := range rbs {
+		payload, err := rg.ge.Encode(r)
+		if err != nil {
+			log.Println("unable to encode student results: ", err)
+		}
+		rg.sc.Publish(REPORTS_YR3W, payload)
+	}
+
+	// finish the transaction - completion msg
+	txu := lib.TxStatusUpdate{TxComplete: true}
+	gtxu, err := rg.ge.Encode(txu)
+	if err != nil {
+		log.Println("unable to encode txu Yr 3 Writing report: ", err)
+	}
+	rg.sc.Publish(REPORTS_YR3W, gtxu)
+
+	log.Printf("Yr 3 Writing records %d: ", count)
+
+}
+
 // generate codeframe objects (currently as per VCAA requirements)
 // generated only once as represents strucure of test not school-level data
 func (rg *ReportGenerator) GenerateCodeFrameData(nd *NAPLANData) {
@@ -58,7 +127,7 @@ func (rg *ReportGenerator) GenerateCodeFrameData(nd *NAPLANData) {
 		}
 		// log.Printf("\t%s - %s - %s", cfd.Test.TestContent.TestDomain,
 		// 	cfd.Testlet.TestletContent.TestletName, cfd.Item.TestItemContent.ItemName)
-		rg.sc.Publish("reports.cframe", payload)
+		rg.sc.Publish(REPORTS_CODEFRAME, payload)
 	}
 
 	// finish the transaction - completion msg
@@ -67,7 +136,7 @@ func (rg *ReportGenerator) GenerateCodeFrameData(nd *NAPLANData) {
 	if err != nil {
 		log.Println("unable to encode txu codeframe report: ", err)
 	}
-	rg.sc.Publish("reports.cframe", gtxu)
+	rg.sc.Publish(REPORTS_CODEFRAME, gtxu)
 
 	log.Printf("codeframe records %d: ", count)
 

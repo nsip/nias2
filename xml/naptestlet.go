@@ -4,20 +4,22 @@ type NAPTestlet struct {
 	TestletID      string `xml:"RefId,attr"`
 	NAPTestRefId   string `xml:"NAPTestRefId"`
 	TestletContent struct {
-		LocalId             string `xml:"NAPTestletLocalId"`
-		NAPTestLocalId      string `xml:"NAPTestLocalId"`
-		TestletName         string `xml:"TestletName"`
-		Node                string `xml:"Node"`
-		LocationInStage     string `xml:"LocationInStage"`
-		TestletMaximumScore string `xml:"TestletMaximumScore"`
+		LocalId             string `xml:"NAPTestletLocalId,omitempty"`
+		NAPTestLocalId      string `xml:"NAPTestLocalId,omitempty"`
+		TestletName         string `xml:"TestletName,omitempty"`
+		Node                string `xml:"Node,omitempty"`
+		LocationInStage     string `xml:"LocationInStage,omitempty"`
+		TestletMaximumScore string `xml:"TestletMaximumScore,omitempty"`
 	} `xml:"TestletContent"`
 	TestItemList struct {
-		TestItem []struct {
-			TestItemRefId   string `xml:"TestItemRefId"`
-			TestItemLocalId string `xml:"TestItemLocalId"`
-			SequenceNumber  string `xml:"SequenceNumber"`
-		} `xml:"TestItem"`
+		TestItem []NAPTestlet_TestItem `xml:"TestItem"`
 	} `xml:"TestItemList"`
+}
+
+type NAPTestlet_TestItem struct {
+	TestItemRefId   string `xml:"TestItemRefId"`
+	TestItemLocalId string `xml:"TestItemLocalId"`
+	SequenceNumber  string `xml:"SequenceNumber"`
 }
 
 func (t NAPTestlet) GetHeaders() []string {

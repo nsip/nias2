@@ -18,6 +18,12 @@ type StreamReader struct {
 	ge GobEncoder
 }
 
+const META_STREAM = "meta"
+const META_YR3W_STREAM = "meta_yr3w"
+const RESULTS_YR3W_STREAM = "studentAndResults"
+const REPORTS_CODEFRAME = "reports.cframe"
+const REPORTS_YR3W = "reports.yr3w"
+
 func NewStreamReader() *StreamReader {
 	sr := StreamReader{
 		sc: CreateSTANConnection(),
@@ -26,7 +32,53 @@ func NewStreamReader() *StreamReader {
 	return &sr
 }
 
-func (sr *StreamReader) GetCodeFrameData() []CodeFrameDataSet {
+func (sr *StreamReader) GetResultsByStudent() []ResultsByStudent {
+
+	cfds := make([]ResultsByStudent, 0)
+
+	// signal channel to notify asynch stan stream read is complete
+	txComplete := make(chan bool)
+
+	// main message handling callback for the stan stream
+	// get names of schools that have been processed by ingest
+	// and create reports
+	mcb := func(m *stan.Msg) {
+
+		// as we don't know message type ([]byte slice on wire) decode as interface
+		// then assert type dynamically
+		var m_if interface{}
+		err := sr.ge.Decode(m.Data, &m_if)
+		if err != nil {
+			log.Println("streamreader codeframe message decoding error: ", err)
+			txComplete <- true
+		}
+
+		switch t := m_if.(type) {
+		case ResultsByStudent:
+			cfd := m_if.(ResultsByStudent)
+			cfds = append(cfds, cfd)
+		case lib.TxStatusUpdate:
+			txComplete <- true
+		default:
+			_ = t
+			// log.Printf("unknown message type in participation data handler: %v", m_if)
+		}
+	}
+
+	sub, err := sr.sc.Subscribe(REPORTS_YR3W, mcb, stan.DeliverAllAvailable())
+	defer sub.Unsubscribe()
+	if err != nil {
+		log.Println("streamreader: stan subsciption error get students & results data: ", err)
+	}
+
+	<-txComplete
+
+	log.Printf("Retrieved %d results by students records\n", len(cfds))
+	return cfds
+
+}
+
+func (sr *StreamReader) GetCodeFrameData(stream_name string) []CodeFrameDataSet {
 
 	cfds := make([]CodeFrameDataSet, 0)
 
@@ -59,7 +111,7 @@ func (sr *StreamReader) GetCodeFrameData() []CodeFrameDataSet {
 		}
 	}
 
-	sub, err := sr.sc.Subscribe("reports.cframe", mcb, stan.DeliverAllAvailable())
+	sub, err := sr.sc.Subscribe(stream_name, mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error get codeframe data: ", err)
@@ -281,7 +333,8 @@ func (sr *StreamReader) GetSchoolDetails() [][]SchoolDetails {
 }
 
 // NAPLAN data is the same for all schools, so can be retrieved once
-func (sr *StreamReader) GetNAPLANData() *NAPLANData {
+// codeframe_stream: "meta" is ingested from xml, "meta_yr3w" from Year 3 writing files
+func (sr *StreamReader) GetNAPLANData(codeframe_stream string) *NAPLANData {
 
 	nd := NewNAPLANData()
 
@@ -290,7 +343,6 @@ func (sr *StreamReader) GetNAPLANData() *NAPLANData {
 
 	// main message handling callback for the stan stream
 	mcb := func(m *stan.Msg) {
-
 		// as we don't know message type ([]byte slice on wire) decode as interface
 		// then assert type dynamically
 		var m_if interface{}
@@ -322,7 +374,8 @@ func (sr *StreamReader) GetNAPLANData() *NAPLANData {
 
 	}
 
-	sub, err := sr.sc.Subscribe("meta", mcb, stan.DeliverAllAvailable())
+	log.Println("Ingesting for " + codeframe_stream)
+	sub, err := sr.sc.Subscribe(codeframe_stream, mcb, stan.DeliverAllAvailable())
 	defer sub.Unsubscribe()
 	if err != nil {
 		log.Println("streamreader: stan subsciption error meta channel: ", err)
@@ -331,6 +384,58 @@ func (sr *StreamReader) GetNAPLANData() *NAPLANData {
 	<-txComplete
 
 	return nd
+
+}
+
+// Get all the students and results in the stream
+func (sr *StreamReader) GetStudentAndResultsData() *StudentAndResultsData {
+
+	srd := NewStudentAndResultsData()
+
+	// signal channel to notify asynch stan stream read is complete
+	txComplete := make(chan bool)
+
+	// main message handling callback for the stan stream
+	mcb := func(m *stan.Msg) {
+
+		// as we don't know message type ([]byte slice on wire) decode as interface
+		// then assert type dynamically
+		var m_if interface{}
+		err := sr.ge.Decode(m.Data, &m_if)
+		if err != nil {
+			log.Println("streamreader: schooldata message decoding error: ", err)
+			txComplete <- true
+		}
+
+		switch mtype := m_if.(type) {
+		case xml.RegistrationRecord:
+			t := m_if.(xml.RegistrationRecord)
+			srd.Students[t.RefId] = t
+		case xml.NAPEvent:
+			e := m_if.(xml.NAPEvent)
+			srd.Events[e.SPRefID] = e
+		case xml.NAPResponseSet:
+			rs := m_if.(xml.NAPResponseSet)
+			srd.ResponseSets[rs.StudentID] = rs
+		case lib.TxStatusUpdate:
+			txComplete <- true
+		default:
+			_ = mtype
+			// log.Printf("unknown message type in stream reader meta handler: %v", m_if)
+		}
+
+	}
+
+	sub, err := sr.sc.Subscribe(RESULTS_YR3W_STREAM, mcb, stan.DeliverAllAvailable())
+	defer sub.Unsubscribe()
+	if err != nil {
+		log.Println("streamreader: stan subsciption error meta channel: ", err)
+	}
+
+	<-txComplete
+
+	log.Printf("Retrieved %d students and results records\n", len(srd.Students))
+	return srd
 
 }
 

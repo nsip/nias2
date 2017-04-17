@@ -26,13 +26,15 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
+	//"time"
 )
 
-var VALIDATION_ROUTE = DefaultValidationConfig.ValidationRoute
+var naplanconfig = LoadNAPLANConfig()
+var VALIDATION_ROUTE = naplanconfig.ValidationRoute
+
 var req_ec *nats.EncodedConn
 var req_conn stan.Conn
-var tt = lib.NewTransactionTracker(DefaultValidationConfig.TxReportInterval)
+var tt *lib.TransactionTracker //= lib.NewTransactionTracker(naplanconfig.TxReportInterval, NAPLAN_NATS_CFG)
 var stan_conn stan.Conn
 
 var UI_LIMIT int
@@ -41,27 +43,6 @@ var UI_LIMIT int
 var sptmpl *template.Template
 
 type ValidationWebServer struct{}
-
-// standard response to successful file upload
-type IngestResponse struct {
-	TxID    string
-	Records int
-}
-
-// truncate the record by removing items that have blank entries.
-// this prevents the validation from throwing validation exceptions
-// for fields that are not mandatory but included as empty in the
-// dataset
-func removeBlanks(m map[string]string) map[string]string {
-
-	reducedmap := make(map[string]string)
-	for key, val := range m {
-		if val != "" {
-			reducedmap[key] = strings.TrimSpace(val)
-		}
-	}
-	return reducedmap
-}
 
 // generic publish routine that handles different requirements
 // of the 3 possible message infrastrucutres
@@ -74,9 +55,9 @@ func publish(msg *lib.NiasMessage) {
 //
 // read csv file as stream and post records onto processing queue
 //
-func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) {
+func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, error) {
 
-	ir := IngestResponse{}
+	ir := lib.IngestResponse{}
 
 	reader := csv.WithIoReader(file)
 	defer reader.Close()
@@ -87,15 +68,16 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 
 		i = i + 1
 
-		regr := nxml.RegistrationRecord{}
-		r := removeBlanks(record.AsMap())
-		decode_err := ms.Decode(r, &regr)
+		regr := &nxml.RegistrationRecord{}
+		r := lib.RemoveBlanks(record.AsMap())
+		decode_err := ms.Decode(r, regr)
+		regr.Unflatten()
 		if decode_err != nil {
 			return ir, decode_err
 		}
 
 		msg := &lib.NiasMessage{}
-		msg.Body = regr
+		msg.Body = *regr
 		msg.SeqNo = strconv.Itoa(i)
 		msg.TxID = txid
 		msg.MsgID = nuid.Next()
@@ -120,9 +102,9 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 //
 // read xml file as stream and post records onto processing queue
 //
-func enqueueXMLforNAPLANValidation(file multipart.File) (IngestResponse, error) {
+func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, error) {
 
-	ir := IngestResponse{}
+	ir := lib.IngestResponse{}
 
 	decoder := xml.NewDecoder(file)
 	total := 0
@@ -176,24 +158,27 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (IngestResponse, error) 
 //
 // start the server
 //
-func (vws *ValidationWebServer) Run() {
+func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 
-	log.Println("Connecting to message bus")
-	req_ec = lib.CreateNATSConnection()
+	log.Println("NAPLAN: Connecting to message bus")
+	req_ec = lib.CreateNATSConnection(nats_cfg)
 
-	log.Println("Initialising uuid generator")
-	config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
-	uuid.SetupFileSystemStateSaver(config)
-	log.Println("UUID generator initialised.")
+	log.Println("NAPLAN: Initialising uuid generator")
+	// config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
+	// uuid.SetupFileSystemStateSaver(config)
+	uuid.Init()
+	log.Println("NAPLAN: UUID generator initialised.")
 
-	log.Println("Loading xml conversion templates")
+	tt = lib.NewTransactionTracker(naplanconfig.TxReportInterval, nats_cfg)
+
+	log.Println("NAPLAN: Loading xml conversion templates")
 	fp := path.Join("templates", "studentpersonals.tmpl")
 	tmpl, err := template.ParseFiles(fp)
 	if err != nil {
 		log.Fatalf("Unable to parse xml conversion template, service aborting...")
 	}
 	sptmpl = tmpl
-	log.Println("XML conversion template loaded ok.")
+	log.Println("NAPLAN: XML conversion template loaded ok.")
 
 	//setup stan connection
 	stan_conn, _ = stan.Connect(lib.NAP_VAL_CID, nuid.Next())
@@ -218,7 +203,7 @@ func (vws *ValidationWebServer) Run() {
 		defer src.Close()
 
 		// read onto qs with appropriate handler
-		var ir IngestResponse
+		var ir lib.IngestResponse
 		if strings.Contains(file.Filename, ".csv") {
 			if ir, err = enqueueCSVforNAPLANValidation(src); err != nil {
 				return err
@@ -374,7 +359,7 @@ func (vws *ValidationWebServer) Run() {
 		sprsnls := make([]map[string]string, 0)
 		for _, r := range records {
 			r := r.AsMap()
-			r1 := removeBlanks(r)
+			r1 := lib.RemoveBlanks(r)
 			r1["SIFuuid"] = uuid.NewV4().String()
 			sprsnls = append(sprsnls, r1)
 		}
@@ -384,6 +369,7 @@ func (vws *ValidationWebServer) Run() {
 		c.Response().Header().Set("Content-Type", "application/xml")
 
 		// apply the template & write results to the client
+		/* note that this does not currently go via the RegistrationRecord, so no need for .Unflatten() */
 		if err := sptmpl.Execute(c.Response().Writer, sprsnls); err != nil {
 			return err
 		}
@@ -405,6 +391,8 @@ func (vws *ValidationWebServer) Run() {
 		// signal channel to notify asynch stan stream read is complete
 		txComplete := make(chan bool)
 
+		//enc := json.NewEncoder(c.Response())
+
 		// main message handling callback for the stan stream
 		mcb := func(m *stan.Msg) {
 
@@ -421,6 +409,7 @@ func (vws *ValidationWebServer) Run() {
 			case ValidationError:
 				ve := msg.Body.(ValidationError)
 				if err := json.NewEncoder(c.Response()).Encode(ve); err != nil {
+					//if err := enc.Encode(ve); err != nil {
 					log.Println("error encoding json validationerror: ", err)
 				}
 				c.Response().Flush()
@@ -436,7 +425,7 @@ func (vws *ValidationWebServer) Run() {
 				log.Printf("unknown message type in handler: %v", vmsg)
 			}
 
-			// log.Printf("message decoded from stan is:\n\n %+v\n\n", msg)
+			//log.Printf("message decoded from stan is:\n\n %+v\n\n", msg)
 
 		}
 
@@ -546,12 +535,12 @@ func (vws *ValidationWebServer) Run() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	log.Println("Starting web-ui services...")
-	port := DefaultValidationConfig.WebServerPort
-	log.Println("Service is listening on localhost:" + port)
+	log.Println("NAPLAN: Starting web-ui services...")
+	port := naplanconfig.WebServerPort
+	log.Println("NAPLAN: Service is listening on localhost:" + port)
 
 	// set upper bound for no. messages sent to web clients
-	UI_LIMIT = DefaultValidationConfig.UIMessageLimit
+	UI_LIMIT = naplanconfig.UIMessageLimit
 
 	//e.Run(fasthttp.New(":" + port))
 	// e.Run(standard.New(":" + port))
