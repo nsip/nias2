@@ -56,3 +56,5 @@ harness/var/goleveldb_data/LOG
 
 
 *.zip
+
+test_data/naprr/XMLData-2017-02-14.xml
