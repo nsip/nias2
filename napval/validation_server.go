@@ -7,6 +7,15 @@ import (
 	gcsv "encoding/csv"
 	"encoding/json"
 	"encoding/xml"
+	"html/template"
+	"io"
+	"log"
+	"mime/multipart"
+	"net/http"
+	"path"
+	"strconv"
+	"strings"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	ms "github.com/mitchellh/mapstructure"
@@ -18,14 +27,6 @@ import (
 	"github.com/twinj/uuid"
 	"github.com/wildducktheories/go-csv"
 	"golang.org/x/net/websocket"
-	"html/template"
-	"io"
-	"log"
-	"mime/multipart"
-	"net/http"
-	"path"
-	"strconv"
-	"strings"
 	//"time"
 )
 
@@ -181,7 +182,7 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 	log.Println("NAPLAN: XML conversion template loaded ok.")
 
 	//setup stan connection
-	stan_conn, _ = stan.Connect(lib.NAP_VAL_CID, nuid.Next())
+	stan_conn = lib.CreateSTANConnection(nats_cfg)
 
 	// create the web service framework
 	e := echo.New()

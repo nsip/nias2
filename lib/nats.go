@@ -3,11 +3,9 @@
 package lib
 
 import (
-	"fmt"
 	"github.com/nats-io/go-nats"
 	"github.com/nats-io/go-nats-streaming"
 	"github.com/nats-io/nuid"
-	"log"
 )
 
 // create nats connections, and useful constants for topics etc.
@@ -37,6 +35,7 @@ storage (store) connections
 */
 
 // ProcessChain when running with NATS Streaming Server, known as STAN
+//
 type STANProcessChain struct {
 	dist_in_conn     stan.Conn
 	dist_in_subject  string
@@ -68,16 +67,13 @@ type NATSProcessChain struct {
 	store_in_subject string
 }
 
-type NATSConfig struct {
-	Port string
-}
-
 // ProcessChain for running in memory - useful for standaloe use
 // and for resource constrained enviornments, use of blocking channels accross
 // the chain means solution will balance processing accross the chain based on
 // speed of host
 // Channel of struct rather than of pointers to struct: pointer channel was not
 // updating properly when read out
+//
 type MemProcessChain struct {
 	req_chan   chan NiasMessage
 	srvc_chan  chan NiasMessage
@@ -128,24 +124,6 @@ func createNATSProcessChain(cfg NATSConfig) (NATSProcessChain, error) {
 	pc.store_in_subject = srvcID
 
 	return pc, nil
-}
-
-// helper function to provide encoded connections for standard NATA
-func CreateNATSConnection(cfg NATSConfig) *nats.EncodedConn {
-
-	// var servers = "nats://localhost:4222, nats://localhost:5222, nats://localhost:6222" //cluster
-	var servers = fmt.Sprintf("nats://localhost:%s", cfg.Port) // standalone
-
-	nc, err := nats.Connect(servers)
-	if err != nil {
-		log.Fatalln("Unable to connect to gnatsd, services aborting...\n", err)
-	}
-	ec, err := nats.NewEncodedConn(nc, nats.GOB_ENCODER)
-	if err != nil {
-		log.Fatalln("Unable to connect to gnatsd, services aborting...\n", err)
-	}
-	return ec
-
 }
 
 func NewSTANProcessChain() STANProcessChain {
