@@ -20,7 +20,7 @@ func (vd *ValidationDistributor) Run(poolsize int, nats_cfg lib.NATSConfig) {
 
 	config := LoadNAPLANConfig()
 	ec := lib.CreateNATSConnection(nats_cfg)
-	vs := NewValidationStore()
+	vs := NewValidationStore(nats_cfg)
 	tt := lib.NewTransactionTracker(config.TxReportInterval, nats_cfg)
 
 	for i := 0; i < poolsize; i++ {

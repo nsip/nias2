@@ -2,10 +2,10 @@
 package napval
 
 import (
-	"github.com/nats-io/go-nats-streaming"
-	"github.com/nats-io/nuid"
-	"github.com/nsip/nias2/lib"
 	"log"
+
+	"github.com/nats-io/go-nats-streaming"
+	"github.com/nsip/nias2/lib"
 )
 
 // amount of error reports to store for any given input file
@@ -23,11 +23,8 @@ type ValidationStore struct {
 
 // Returns a ValidationStore with an active connection
 // to the stan server.
-func NewValidationStore() *ValidationStore {
-	sc, err := stan.Connect(lib.NAP_VAL_CID, nuid.Next())
-	if err != nil {
-		log.Fatalln("Unable to establish storage connection to STAN server, aborting.", err)
-	}
+func NewValidationStore(nats_cfg lib.NATSConfig) *ValidationStore {
+	sc := lib.CreateSTANConnection(nats_cfg)
 	vs := ValidationStore{C: sc, TxCounter: make(map[string]int), TxLimit: make(map[string]bool)}
 	return &vs
 }
