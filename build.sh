@@ -10,8 +10,15 @@ curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_pa
 echo "Downloading nats-streaming-server"
 go get github.com/nats-io/nats-streaming-server
 
+do_clear() {
+	echo "clear"
+	rm -r $OUTPUT/
+	rm -r $OUTPUTNAPRR/
+}
+
 do_build() {
 	mkdir -p $OUTPUT
+	mkdir -p $OUTPUTNAPRR
 	cd ../../nats-io/nats-streaming-server
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
 	cd $CWD
@@ -82,6 +89,7 @@ build_mac64() {
 	SMSHARNESS=sms
 	NAPRRHARNESS=naprr
 	ZIP=go-nias-Mac.zip
+	do_clear
 	do_build
 	#do_upx
 	do_shells
@@ -103,6 +111,7 @@ build_windows64() {
 	SMSHARNESS=sms.exe
 	NAPRRHARNESS=naprr.exe
 	ZIP=go-nias-Win64.zip
+	do_clear
 	do_build
 	#do_upx
 	do_bats
@@ -123,6 +132,7 @@ build_windows32() {
 	SMSHARNESS=sms.exe
 	NAPRRHARNESS=naprr.exe
 	ZIP=go-nias-Win32.zip
+	do_clear
 	do_build
 	#do_upx
 	do_bats
@@ -143,6 +153,7 @@ build_linux64() {
 	SMSHARNESS=sms
 	NAPRRHARNESS=naprr
 	ZIP=go-nias-Linux64.zip
+	do_clear
 	do_build
 	#do_goupx
 	do_shells
@@ -163,6 +174,7 @@ build_linux32() {
 	SMSHARNESS=sms
 	NAPRRHARNESS=naprr
 	ZIP=go-nias-Linux32.zip
+	do_clear
 	do_build
 	#do_goupx
 	do_shells

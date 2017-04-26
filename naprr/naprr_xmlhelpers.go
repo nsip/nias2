@@ -2,10 +2,11 @@ package naprr
 
 import (
 	"encoding/gob"
-	"github.com/nsip/nias2/xml"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/nsip/nias2/xml"
 )
 
 func init() {
