@@ -3,7 +3,6 @@ package xml
 import (
 	"encoding/gob"
 	"encoding/xml"
-	"github.com/nsip/nias2/go_SifMessage"
 	"strings"
 )
 
@@ -11,7 +10,7 @@ func init() {
 	// make gob encoder aware of local types
 	gob.Register(RegistrationRecord{})
 	gob.Register(GraphStruct{})
-	gob.Register(SifStudentPersonal{})
+	// gob.Register(SifStudentPersonal{})
 }
 
 type XMLAttributeStruct struct {
@@ -331,10 +330,4 @@ type GraphStruct struct {
 	Type          string            // object type
 	Links         []string          // list of related ids
 	Label         string            // human readable label
-}
-
-// from metaleap/go-xsd conversion
-type SifStudentPersonal struct {
-	XMLName xml.Name `xml:"StudentPersonal"`
-	go_SifMessage.TStudentPersonalType
 }

@@ -6,9 +6,7 @@
 // in NiasMessage.Route
 package napval
 
-import (
-	"github.com/nsip/nias2/lib"
-)
+import "github.com/nsip/nias2/lib"
 
 // creates a pool of message handlers which process the
 // routing slip of each message thru the listed services
@@ -22,7 +20,7 @@ func (vd *ValidationDistributor) Run(poolsize int, nats_cfg lib.NATSConfig) {
 
 	config := LoadNAPLANConfig()
 	ec := lib.CreateNATSConnection(nats_cfg)
-	vs := NewValidationStore()
+	vs := NewValidationStore(nats_cfg)
 	tt := lib.NewTransactionTracker(config.TxReportInterval, nats_cfg)
 
 	for i := 0; i < poolsize; i++ {
@@ -43,6 +41,7 @@ func (vd *ValidationDistributor) Run(poolsize int, nats_cfg lib.NATSConfig) {
 				if sigChange {
 					ec.Publish(lib.STORE_TOPIC, msg)
 				}
+
 			})
 
 		}(vs, tt)
