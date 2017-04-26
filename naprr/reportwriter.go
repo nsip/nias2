@@ -268,7 +268,7 @@ func (rw *ReportWriter) writeYr3WritingReport(nd *NAPLANData, rbs []ResultsByStu
 
 	e := xml.NewEncoder(f)
 	e.Indent("", "  ")
-	f.WriteString("<NAPResulsReporting>\n")
+	f.WriteString("<NAPResultsReporting>\n")
 	cfcount := 0
 	for _, val := range nd.Tests {
 		e.Encode(val)
@@ -289,7 +289,7 @@ func (rw *ReportWriter) writeYr3WritingReport(nd *NAPLANData, rbs []ResultsByStu
 	}
 
 	e.Flush()
-	f.WriteString("</NAPResulsReporting>\n")
+	f.WriteString("</NAPResultsReporting>\n")
 
 	log.Printf("Codeframe writing report created for: %d codeframe elements and %d results elements", cfcount, len(rbs))
 
