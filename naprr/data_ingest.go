@@ -2,6 +2,7 @@ package naprr
 
 import (
 	goxml "encoding/xml"
+	"github.com/BurntSushi/toml"
 	"log"
 	"path/filepath"
 	"sync"
