@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
-	"github.com/nats-io/nats-streaming-server/server"
-	"github.com/nsip/nias2/naprr"
 	"log"
 	"net"
 	"os"
+
+	"github.com/nats-io/nats-streaming-server/server"
+	"github.com/nsip/nias2/naprr"
 	// "os/exec"
 	// "os/signal"
 	"runtime"

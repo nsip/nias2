@@ -4,6 +4,7 @@ var participationData = [];
 var domainscoresData = [];
 var codeframeData = [];
 var schoolinfoData = {};
+var debug =true;
 
 var currentASLId;
 

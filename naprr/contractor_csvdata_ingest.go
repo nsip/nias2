@@ -3,15 +3,18 @@ package naprr
 import (
 	"bufio"
 	//ms "github.com/mitchellh/mapstructure"
-	"github.com/nats-io/nuid"
 	"strconv"
+
+	"github.com/nats-io/nuid"
 	//"github.com/nats-io/go-nats-streaming"
 	"fmt"
+	"log"
+	"path/filepath"
+
 	"github.com/nsip/nias2/lib"
 	nxml "github.com/nsip/nias2/xml"
 	"github.com/twinj/uuid"
-	"log"
-	"path/filepath"
+
 	//"sync"
 	"github.com/wildducktheories/go-csv"
 	"os"

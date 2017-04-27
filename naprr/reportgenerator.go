@@ -2,9 +2,10 @@
 package naprr
 
 import (
+	"log"
+
 	"github.com/nats-io/go-nats-streaming"
 	"github.com/nsip/nias2/lib"
-	"log"
 )
 
 type ReportGenerator struct {
@@ -238,6 +239,7 @@ func (rg *ReportGenerator) GenerateParticipationData(nd *NAPLANData, sd *SchoolD
 		for _, ei := range pds.EventInfos {
 			pds.Summary[ei.Test.TestContent.TestDomain] = ei.Event.ParticipationCode
 		}
+
 		payload, err := rg.ge.Encode(pds)
 		if err != nil {
 			log.Println("unable to encode pds: ", err)

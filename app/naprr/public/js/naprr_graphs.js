@@ -41,7 +41,7 @@ function createScoreSummaryGraph(ssdata)
     attributes['Value'] = +ssdata.Summ.DomainBottomNational60Percent;
     data.push(attributes);
 
-    console.log(data);
+    // console.log(data);
 
     var orderMeasures = [
         'Bottom National 60%',

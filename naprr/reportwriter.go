@@ -33,7 +33,6 @@ func (rw *ReportWriter) Run() {
 	rw.writeSchoolLevelReports(schools)
 	rw.writeAggregateSchoolReports(schools)
 	rw.writeTestLevelReports()
-	//rw.writeYr3WReports()
 
 	log.Println("All reports written\n")
 }
