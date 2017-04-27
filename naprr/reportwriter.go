@@ -33,14 +33,13 @@ func (rw *ReportWriter) Run() {
 	rw.writeSchoolLevelReports(schools)
 	rw.writeAggregateSchoolReports(schools)
 	rw.writeTestLevelReports()
-	rw.writeYr3WReports()
+	//rw.writeYr3WReports()
 
 	log.Println("All reports written\n")
-
 }
 
 // create data reports from the test strucutre
-func (rw *ReportWriter) writeYr3WReports() {
+func (rw *ReportWriter) WriteYr3WReports() {
 
 	log.Println("Creating Year 3 Writing XML...")
 

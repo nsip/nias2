@@ -1,0 +1,2 @@
+# Attributes on which student is matched between Pearson/Fuji ingest and XML ingest. Done as list of struct attributes of RegistrationRecord, comma delimited
+Yr3WStudentMatch = ["FamilyName", "GivenName"]

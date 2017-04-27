@@ -9,12 +9,9 @@ import (
 	"os"
 	// "os/exec"
 	// "os/signal"
-	"runtime"
+	//"runtime"
 	// "time"
 )
-
-var rewrite = flag.Bool("rewrite", false, "rewrite regenerates all reports without re-loading data")
-var webonly = flag.Bool("webonly", false, "just launch web data explorer")
 
 func main() {
 
@@ -23,45 +20,33 @@ func main() {
 	wd, _ := os.Getwd()
 	log.Println("working directory:", wd)
 
-	if !*rewrite {
-		log.Println("removing old files...")
-		clearNSSWorkingDirectory()
-	}
+	log.Println("removing old files...")
+	clearNSSWorkingDirectory()
 
 	log.Println("Launching stream server...")
 	ss := launchNatsStreamingServer()
 	defer ss.Shutdown()
 
-	if !*rewrite {
-		log.Println("Starting data ingest...")
+	log.Println("Starting data ingest...")
 
-		di := naprr.NewDataIngest()
-		di.Run()
-		//di.RunYr3Writing()
-		//student_ids := di.Yr3StudentIds
-		//naprr_config := di.NaprrConfig
-		di.Close()
+	di := naprr.NewDataIngest()
+	di.Run()
+	di.RunYr3Writing()
+	student_ids := di.Yr3StudentIds
+	naprr_config := di.NaprrConfig
+	di.Close()
 
-		rb := naprr.NewReportBuilder()
-		// must run Year 3 Writing ingest before full XML: Full XML ingest generates map to reconcile student identities between the two
-		log.Println("Generating report data...")
-		rb.Run()
-		//log.Println("Generating report data, Year 3 Writing...")
-		//rb.RunYr3W(false, student_ids, naprr_config)
-	}
+	rb := naprr.NewReportBuilder()
+	// must run Year 3 Writing ingest before full XML: Full XML ingest generates map to reconcile student identities between the two
+	log.Println("Generating report data, Year 3 Writing...")
+	rb.RunYr3W(false, student_ids, naprr_config)
 
 	log.Println("Writing report files...")
 	rw := naprr.NewReportWriter()
-	rw.Run()
+	rw.WriteYr3WReports()
+	log.Println("Report files Done")
 
-	log.Println("Ingest and report writing complete.")
-
-	log.Println("Starting web data browser server.")
-
-	rrs := naprr.NewResultsReportingServer()
-	rrs.Run()
-
-	runtime.Goexit()
+	//runtime.Goexit()
 }
 
 func clearNSSWorkingDirectory() {

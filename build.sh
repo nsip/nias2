@@ -7,6 +7,7 @@ CWD=`pwd`
 echo "Downloading CORE.json"
 curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > app/napval/schemas/core.json
 curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > app/napval/schemas/core_parent2.json
+curl http://specification.sifassociation.org/Implementation/AU/3.4/XSD/SIF_Message/SIF_Message.xsd > app/sms/SIF_Message.xsd
 echo "Downloading nats-streaming-server"
 go get github.com/nats-io/nats-streaming-server
 
@@ -26,6 +27,10 @@ do_build() {
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUTNAPRR/$NAPRRHARNESS
 	cd $CWD
+	cd ./app/napyr3w
+	go get
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUTNAPRR/$NAPYR3WHARNESS
+	cd $CWD
 	cd ./app/napval
 	go get 
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUT/$NAPVALHARNESS
@@ -36,7 +41,7 @@ do_build() {
 	cd $CWD
 	cd ./app
 	rsync -a ../test_data napval/nias8help.pdf napval/napval.toml sms/nias.toml napval/napval_nss.cfg sms/nias_nss.cfg napval/public napval/schemas napval/schoolslist napval/templates sms/privacyfilters sms/SIF_Message.xsd $OUTPUT/
-	rsync -a ../test_data naprr/in naprr/templates naprr/public naprr/naprr.toml $OUTPUTNAPRR/
+	rsync -a ../test_data naprr/templates naprr/public naprr/naprr.toml $OUTPUTNAPRR/
 }
 
 do_shells() {
@@ -55,14 +60,16 @@ do_upx() {
 	upx $OUTPUT/$GNATS
 	upx $OUTPUT/$NAPVALHARNESS
 	upx $OUTPUTNAPRR/$NAPRRHARNESS
+	upx $OUTPUTNAPRR/$NAPYR3WHARNESS
 	upx $OUTPUT/$SMSHARNESS
 }
 
 do_goupx() {
 	goupx $OUTPUT/$GNATS
 	goupx $OUTPUT/$SMSHARNESS
-	goupx $OUTPUTNAPRR/$NAPVALHARNESS
-	goupx $OUTPUT/$NAPRRHARNESS
+	goupx $OUTPUT/$NAPVALHARNESS
+	goupx $OUTPUTNAPRR/$NAPRRHARNESS
+	goupx $OUTPUTNAPRR/$NAPYR3WHARNESS
 }
 
 do_zip() {
@@ -88,6 +95,7 @@ build_mac64() {
 	NAPVALHARNESS=napval
 	SMSHARNESS=sms
 	NAPRRHARNESS=naprr
+	NAPYR3WHARNESS=napyr3w
 	ZIP=go-nias-Mac.zip
 	do_clear
 	do_build
@@ -110,6 +118,7 @@ build_windows64() {
 	NAPVALHARNESS=napval.exe
 	SMSHARNESS=sms.exe
 	NAPRRHARNESS=naprr.exe
+	NAPYR3WHARNESS=napyr3w
 	ZIP=go-nias-Win64.zip
 	do_clear
 	do_build
@@ -131,6 +140,7 @@ build_windows32() {
 	NAPVALHARNESS=napval.exe
 	SMSHARNESS=sms.exe
 	NAPRRHARNESS=naprr.exe
+	NAPYR3WHARNESS=napyr3w
 	ZIP=go-nias-Win32.zip
 	do_clear
 	do_build
@@ -152,6 +162,7 @@ build_linux64() {
 	NAPVALHARNESS=napval
 	SMSHARNESS=sms
 	NAPRRHARNESS=naprr
+	NAPYR3WHARNESS=napyr3w
 	ZIP=go-nias-Linux64.zip
 	do_clear
 	do_build
@@ -173,6 +184,7 @@ build_linux32() {
 	NAPVALHARNESS=napval
 	SMSHARNESS=sms
 	NAPRRHARNESS=naprr
+	NAPYR3WHARNESS=napyr3w
 	ZIP=go-nias-Linux32.zip
 	do_clear
 	do_build
