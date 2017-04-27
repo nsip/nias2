@@ -1,4 +1,8 @@
-The naprr executable runs as a single binary, and launches its own streaming server instance within the application.
+# NAPLAN Result and Reporting code
+
+## NAPLAN Results and Reporting processing
+
+The `naprr` executable runs as a single binary, and launches its own streaming server instance within the application.
 
 The unzipped binary files should have the `naprr` executable, an `/in` directory and a `/templates` directory. The `/templates` directory contains templates for the various report formats, in [Golang's template language](https://golang.org/pkg/text/template/). The `/in` directory contains zipped XML files to be processed by the `naprr` executable; the zip distribution comes packaged with `/in/master_nap.xml.zip` as a test xml results file. This will get processed automatically when the executable is run. 
 
@@ -22,3 +26,14 @@ All reports have been generated as requested, except for `codeframe_writing.csv`
 To test the reporting engine only, as opposed to data parsing, delete the `/out` directory then run the `naprr` executable with the flag `-rewrite`. This will simply regenerate the reports without reloading the data.
 
 Report formats are all governed by templates so they can be modified, but will be better once a UI is in place.
+
+## NAPLAN Year 3 Writing preprocessing code
+
+The `napyr3w` executable runs as a single binary. It processes both Pearson format and FujiXerox format files for Year 3 Writing results, and converts them into SIF/XML files consistent with those received from the NAPLAN Online Assessment Platform.
+
+* Any Pearson format files are expected to be in the `in/Pearson` directory, as fixed format txt files.
+* Any FujiXerox format files are expected to be in the `in/FujiXerox` directory, as csv format files.
+* The program generates a report of which students are matched between the Pearson or FujiXerox files, and any XML files received from the platform. For that reason, the `/in` directory is still expected to contain a zipped XML file of results.
+
+* The SIF/XML output is generated to the file `yr3w/codeframe_writing.xml`. This includes a dummy Year 3 Writing codeframe, to which test results are attached.
+* A report of matches and mismatches between the students in the Pearson/FujiXerox files and the SIF/XML results file is generated to the file `yr3w/codeframe_report.txt`.

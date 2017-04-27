@@ -36,6 +36,10 @@ In Windows, `gonias.bat` launches the required processes for an examination year
 
 The web interface to the validator can be accessed at `http://localhost:1325` by default; you can configure the Web Server Port in `nias.toml`
 
+## Running NAPlan Results & Reporting modules
+
+Separate executables are run to process NAPLAN Results and Reporting processing; see [NAPRR readme](./naprr/README.md)
+
 # Code Structure
 
 NIAS2 relies on the following infrastructure:

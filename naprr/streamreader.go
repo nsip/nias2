@@ -8,10 +8,12 @@ package naprr
 
 import (
 	"encoding/gob"
+	"fmt"
 	"github.com/nats-io/go-nats-streaming"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
 	"log"
+	"os"
 )
 
 type StreamReader struct {
@@ -489,11 +491,28 @@ func (sr *StreamReader) remapStudents(srd *StudentAndResultsData, student_ids ma
 		yr3wmatches.Matches = append(yr3wmatches.Matches, k)
 	}
 	log.Printf("%v\n", yr3wmatches)
-	payload, err := sr.ge.Encode(yr3wmatches)
-	if err != nil {
-		log.Println("unable to encode yr 3 writing status report: ", err)
-	}
-	sr.sc.Publish(REPORTS_YR3W_STATUS, payload)
+	/*
+		payload, err := sr.ge.Encode(yr3wmatches)
+		if err != nil {
+			log.Println("unable to encode yr 3 writing status report: ", err)
+		}
+	*/
+	//sr.sc.Publish(REPORTS_YR3W_STATUS, payload)
+	// create directory for the school
+	fpath := "yr3w/"
+	err := os.MkdirAll(fpath, os.ModePerm)
+	check(err)
+
+	// create the report data file in the output directory
+	// delete any ecisting files and create empty new one
+	fname := fpath + "codeframe_report.txt"
+	err = os.RemoveAll(fname)
+	f, err := os.Create(fname)
+	check(err)
+	defer f.Close()
+	payload := fmt.Sprintf("Matches: %v\nYr3W only: %v\nXML only: %v\n",
+		yr3wmatches.Matches, yr3wmatches.Yr3w_mismatches, yr3wmatches.Xml_mismatches)
+	f.WriteString(payload)
 
 	srd.Students = newStudents
 	return srd
