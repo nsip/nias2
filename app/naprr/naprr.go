@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
-	"github.com/nats-io/nats-streaming-server/server"
-	"github.com/nsip/nias2/naprr"
 	"log"
 	"net"
 	"os"
+
+	"github.com/nats-io/nats-streaming-server/server"
+	"github.com/nsip/nias2/naprr"
 	// "os/exec"
 	// "os/signal"
 	"runtime"
@@ -15,6 +16,7 @@ import (
 
 var rewrite = flag.Bool("rewrite", false, "rewrite regenerates all reports without re-loading data")
 var webonly = flag.Bool("webonly", false, "just launch web data explorer")
+var yr3writing = flag.Bool("yr3writing", false, "read external yr3 writing files")
 
 func main() {
 
@@ -37,14 +39,28 @@ func main() {
 
 		di := naprr.NewDataIngest()
 		di.Run()
-		di.RunYr3Writing()
+
+		//
+		// only parse external yr3 if requested
+		//
+		// if *yr3writing {
+		// 	log.Println("attempting to read yr3 writing files...")
+		// 	di.RunYr3Writing()
+		// }
+
 		di.Close()
 
 		rb := naprr.NewReportBuilder()
 		log.Println("Generating report data...")
 		rb.Run()
-		log.Println("Generating report data, Year 3 Writing...")
-		rb.RunYr3W(false)
+
+		//
+		// report on yr3 only if requested
+		//
+		// if *yr3writing {
+		// 	log.Println("Generating report data, Year 3 Writing...")
+		// 	rb.RunYr3W(false)
+		// }
 	}
 
 	log.Println("Writing report files...")

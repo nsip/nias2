@@ -123,7 +123,7 @@ func (rrs *ResultsReportingServer) Run() {
 	//
 	e.GET("/naprr/codeframe", func(c echo.Context) error {
 
-		cfds := rrs.sr.GetCodeFrameData("report.cframe")
+		cfds := rrs.sr.GetCodeFrameData(REPORTS_CODEFRAME)
 
 		return c.JSON(http.StatusAccepted, cfds)
 	})

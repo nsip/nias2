@@ -156,6 +156,12 @@ function initSchoolChooserHandler()
             scoresummaryData = data;
             console.log("score summary data downloaded for " + acaraid +
                 " elements: " + scoresummaryData.length);
+
+            if (debug)
+            {
+                console.log(scoresummaryData);
+            }
+
             // display on screen while other reports download
             hideReport();
             createScoreSummaryReport();
@@ -169,6 +175,12 @@ function initSchoolChooserHandler()
             domainscoresData = data;
             console.log("domain scores data downloaded for " + acaraid +
                 " elements: " + domainscoresData.length);
+
+            if (debug)
+            {
+                console.log(domainscoresData);
+            }
+
         });
 
         $.get("/naprr/participation/" + acaraid, function(data, status)
@@ -177,6 +189,12 @@ function initSchoolChooserHandler()
             participationData = data;
             console.log("participation data downloaded for " + acaraid +
                 " elements: " + participationData.length);
+
+            if (debug)
+            {
+                console.log(participationData);
+            }
+
         });
 
         $.get("/naprr/schoolinfo/" + acaraid, function(data, status)
@@ -185,6 +203,12 @@ function initSchoolChooserHandler()
             schoolinfoData = data;
             console.log("school info data downloaded for " + acaraid);
 
+            if (debug)
+            {
+                console.log(schoolinfoData);
+            }
+
+
         });
 
         $.get("/naprr/codeframe", function(data, status)
@@ -192,6 +216,12 @@ function initSchoolChooserHandler()
             codeframeData = {};
             codeframeData = data;
             console.log("codeframe data downloaded.");
+
+            if (debug)
+            {
+                console.log(codeframeData);
+            }
+
         });
 
     });

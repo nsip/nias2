@@ -3,15 +3,18 @@ package naprr
 import (
 	"bufio"
 	//ms "github.com/mitchellh/mapstructure"
-	"github.com/nats-io/nuid"
 	"strconv"
+
+	"github.com/nats-io/nuid"
 	//"github.com/nats-io/go-nats-streaming"
 	"fmt"
+	"log"
+	"path/filepath"
+
 	"github.com/nsip/nias2/lib"
 	nxml "github.com/nsip/nias2/xml"
 	"github.com/twinj/uuid"
-	"log"
-	"path/filepath"
+
 	//"sync"
 )
 
@@ -30,7 +33,7 @@ func (di *DataIngest) RunYr3Writing() {
 func parsePearsonCSVFileDirectory() []string {
 	files, _ := filepath.Glob("./in/Pearson/*.txt")
 	if len(files) == 0 {
-		log.Fatalln("No results data zip files found in input folder.")
+		log.Fatalln("No Pearson format data files found in input folder.")
 	}
 	return files
 }

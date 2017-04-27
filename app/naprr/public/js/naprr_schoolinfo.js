@@ -33,8 +33,6 @@ function createSchoolInfoReport()
 
     // console.log(schoolinfoData);
 
-    var contactInfo = schoolinfoData.SchoolContactList.SchoolContact[0].ContactInfo;
-
     $("#si-header").empty();
     $("#si-contact").empty();
     $("#si-establishment").empty();
@@ -43,19 +41,26 @@ function createSchoolInfoReport()
     $("#si-header").append("<h5 class=''>" +
         schoolinfoData.SchoolName + "</h5>");
 
-    $("#si-contact").append("<p>" + contactInfo.Address.Street.Line1 +
-        ", " + contactInfo.Address.City +
-        ", " + contactInfo.Address.StateProvince +
-        ", " + contactInfo.Address.PostalCode +
-        ".</p>");
+    var contactExists = schoolinfoData.SchoolContactList.SchoolContact !== null ? true : false
+    if (contactExists)
+    {
+        contactInfo = schoolinfoData.SchoolContactList.SchoolContact[0].ContactInfo;
+        $("#si-contact").append("<p>" + contactInfo.Address.Street.Line1 +
+            ", " + contactInfo.Address.City +
+            ", " + contactInfo.Address.StateProvince +
+            ", " + contactInfo.Address.PostalCode +
+            ".</p>");
 
-    $("#si-contact").append("<p>Principal: " + schoolinfoData.PrincipalInfo.ContactName.FullName +
-        ".</p>");
+        $("#si-contact").append("<p>Principal: " + schoolinfoData.PrincipalInfo.ContactName.FullName +
+            ".</p>");
 
-    $("#si-contact").append("<p>Contact: " + contactInfo.Name.FullName + "<br/>" +
-        "Phone: " + contactInfo.PhoneNumberList.PhoneNumber[0].Number +
-        " Ext.: " + contactInfo.PhoneNumberList.PhoneNumber[0].Extension +
-        ".</p>");
+        $("#si-contact").append("<p>Contact: " + contactInfo.Name.FullName + "<br/>" +
+            "Phone: " + contactInfo.PhoneNumberList.PhoneNumber[0].Number +
+            " Ext.: " + contactInfo.PhoneNumberList.PhoneNumber[0].Extension +
+            ".</p>");
+
+    }
+
 
     $("#si-establishment").append("<p>ACARA (ASL) Id:   " + schoolinfoData.ACARAId + "<br/>" +
         "Local Id:  " + schoolinfoData.LocalId + "<br/>" +
@@ -76,10 +81,13 @@ function createSchoolInfoReport()
         "LGA:  " + schoolinfoData.LocalGovernmentArea + "<br/>" +
         "Federal Electorate:  " + schoolinfoData.FederalElectorate + "<br/>" +
         "Religious Affiliation:  " + schoolinfoData.ReligiousAffiliation + "<br/>" +
-        "Geographic Location:  " + schoolinfoData.SchoolGeographicLocation + "<br/>" +
-        "Grid Location:  " + contactInfo.Address.GridLocation.Latitude +
-        ", " + contactInfo.Address.GridLocation.Longitude + "<br/>" +
-        ".</p>");
+        "Geographic Location:  " + schoolinfoData.SchoolGeographicLocation + "<br/></p>");
+
+    if (contactExists)
+    {
+        $("#si-extended").append("<p>Grid Location:  " + contactInfo.Address.GridLocation.Latitude +
+            ", " + contactInfo.Address.GridLocation.Longitude + "<br/></p>");
+    }
 
 
 
