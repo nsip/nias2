@@ -76,7 +76,7 @@ func launchNatsStreamingServer() *server.StanServer {
 	nOpts := server.DefaultNatsServerOptions
 	nOpts.Port = 5222
 
-	ss := server.RunServerWithOpts(stanOpts, &nOpts)
+	ss, _ := server.RunServerWithOpts(stanOpts, &nOpts)
 
 	return ss
 

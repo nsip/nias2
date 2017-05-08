@@ -188,6 +188,7 @@ func (rw *ReportWriter) writeSchoolReports(acaraid string, wg *sync.WaitGroup) {
 	rw.writeParticipationReport(acaraid)
 	rw.writeScoreSummaryReport(acaraid)
 	rw.writeDomainScoreReport(acaraid)
+	rw.splitNAPXMLperSchool(acaraid)
 
 	wg.Done()
 }
@@ -362,7 +363,7 @@ func (rw *ReportWriter) writeDomainScoreReport(acaraid string) {
 	check(err)
 
 	// create the report data file in the directory
-	// delete any ecisting files and create empty new one
+	// delete any existing files and create empty new one
 	fname := fpath + "/domain_scores.dat"
 	err = os.RemoveAll(fname)
 	f, err := os.Create(fname)
@@ -440,6 +441,65 @@ func (rw *ReportWriter) writeParticipationReport(acaraid string) {
 	concatenateFiles(inputFile, outputFile)
 
 	log.Printf("Participation report created for: %s %d students", acaraid, len(pds))
+
+}
+
+func (rw *ReportWriter) splitNAPXMLperSchool(acaraid string) {
+
+	// create directory for the school
+	fpath := "out/" + acaraid
+	err := os.MkdirAll(fpath, os.ModePerm)
+	check(err)
+	sd := rw.sr.GetSchoolData(acaraid)
+
+	// create the report data file in the directory
+	// delete any existing files and create empty new one
+	fname := fpath + "/napevents.xml"
+	err = os.RemoveAll(fname)
+	f, err := os.Create(fname)
+	check(err)
+	enc := xml.NewEncoder(f)
+	enc.Indent("", "  ")
+	f.WriteString("<NAPEventStudentLinks xmlns=\"http://www.sifassociation.org/datamodel/au/3.4\">\n")
+	defer f.Close()
+	// write the data
+	for _, val := range sd.Events {
+		enc.Encode(val)
+	}
+	enc.Flush()
+	f.WriteString("</NAPEventStudentLinks>\n")
+
+	fname = fpath + "/students.xml"
+	err = os.RemoveAll(fname)
+	f, err = os.Create(fname)
+	check(err)
+	enc = xml.NewEncoder(f)
+	enc.Indent("", "  ")
+	f.WriteString("<StudentPersonals xmlns=\"http://www.sifassociation.org/datamodel/au/3.4\">\n")
+	defer f.Close()
+	// write the data
+	for _, val := range sd.Students {
+		enc.Encode(val)
+	}
+	enc.Flush()
+	f.WriteString("</StudentPersonals>\n")
+
+	fname = fpath + "/napresponses.xml"
+	err = os.RemoveAll(fname)
+	f, err = os.Create(fname)
+	check(err)
+	enc = xml.NewEncoder(f)
+	enc.Indent("", "  ")
+	f.WriteString("<NAPStudentResponseSets xmlns=\"http://www.sifassociation.org/datamodel/au/3.4\">\n")
+	defer f.Close()
+	// write the data
+	for _, val := range sd.Responses {
+		enc.Encode(val)
+	}
+	enc.Flush()
+	f.WriteString("</NAPStudentResponseSets>\n")
+
+	log.Printf("XML split created for: %s %d students", acaraid, len(sd.Students))
 
 }
 
