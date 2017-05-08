@@ -1,23 +1,67 @@
 # nias2
-NIAS: golang naplan registration modules.
+NIAS: NSIP Integration As A Service.
 
-This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components, specific to NAPLAN validation. It uses
-[NATS](http://nats.io) queues. This module is currently limited to NAPLAN registration validation.
+This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components. This version incorporates NAPLAN validation and post-processing functionality, as well as the generic  functionality of NIAS.
 
-NSIP plans to to expand NIAS2 to cover the full range of functionality of [NIAS](http://github.com/nsip/nias), porting them from Ruby and Kafka to Golang and NATS. This will substantially improve performance and robustness of the code. 
+# 1. Overview
 
-Install
-* go version 1.6+
-* ````go get github.com/pwaller/goupx````
+NIAS is a suite of open-source components designed to enable as many different users as possible to quickly and easily solve issues of system integration using the Australian [SIF Data Model](http://specification.sifassociation.org/Implementation/AU/1.4/html/) for school education.
+
+The product was developed by harnessing existing open source middleware components, including:
+* [NATS](http://nats.io) streaming queues 
+* [Echo](https://github.com/labstack/echo) web framework
+
+Over these components, two main modules have been built:
+* The __SIF Store & Forward (SSF)__ is an opinionated message queueing system, which ingests very large quantities of data and stores them for delivery to clients. XML messages on the system are assumed by default to be in SIF. The SSF service builds an education-standards aware REST interface on top of Kafka, and provides a number of utility services to ease SIF-based integrations.
+* The __SIF Memory Store (SMS)__ is a database that builds its internal structures from the data it receives, using RefIds both as keys to access stored messages, and to map out a network graph for SIF objects.
+
+The software also uses these components as architecture to support the validation and post-processing of NAPLAN records.
+
+The code is open source, and is released through the NSIP Github repository. 
+
+## 1.1. Scope
+
+This product delivers the following high level functions: 
+
+1. Support for persistent and ordered queues of SIF messages, which can be reread multiple times.
+2. Support for asynchronous queues in both clients and servers.
+3. Support for format-agnostic messaging infrastructure.
+4. Support for data exchange through an event/subscribe model (in brokered environments)
+~~5. Support for message validation.~~
+6. Support for extracting arbitrary relations between object types within SIF (bypassing need to configure service path queries, and simplifying the query API for objects).
+~~7. Support for extracting arbitrary relations between object types from different standards (allowing multiple data standards to coexist in an integration, referring to the same entities).~~
+8. Support for privacy filtering in middleware (which releases object providers from having to do privacy filtering internally).
+~~9. Support for simple and extensible interactive analytics.~~
+~~10. Support for the ODDESSA data dictionary as a service.~~
+11. Support for data format conversions, including CSV to SIF, and SIF 2 to SIF 3.
+
+This product only acts as middleware. It does not provide integration with the back ends of products (although this can be provided by combining NIAS with the [SIF Framework](https://github.com/nsip/sif3-framework-java)). It is not intended to deliver business value to end consumers, or to compete with existing market offerings.
+
+The product delivers only exemplar analytics, and the SIF team is not committing to developing analytics and queries for all product users. Users that do develop their own analytics and queries are encouraged to contribute these back as open source.
+
+~The product delivers only exemplar integrations between multiple standards (SIF/XML and [IMS OneRoster](https://www.imsglobal.org/lis/index.html)/CSV), and the SIF team is not committing to developing standards integrations for all product users. Users that do develop their own standards integrations are encouraged to contribute these back as open source.~
+
+The product does not incorporate authentication or authorisation.
 
 
-# Installation
+## 1.2. Constraints
 
-## Binary, DOS
+* The product is released with the SIF-AU 3.4 XSD schema, and validates against it. Other schemas can be used, but may require re-coding of some modules.
+
+
+# 2. Installation
+
+## 2.1. Precondition
+
+* go version 1.8+
+* ```go get github.com/pwaller/goupx```
+
+
+## 2.2. Binary, DOS
 Manually unzip file directory in the zip "go-nias" and put it in c:\
 Then run gonias.bat file from that directory
 
-## From source code
+## 2.3. From source code
 
 [Install golang](https://golang.org/doc/install). Making sure you have a working
 `$GOPATH` etc (common mistake is to skip the `src/` directory after `$GOPATH`)
@@ -27,20 +71,14 @@ In `$GOPATH/src/github.com/nsip` do:
     git clone https://github.com/nsip/nias2
     ./build.sh
 
-# Running
 
-In Unix-like systems (including OSX), `gonias.sh` launches the required processes, and `shutdown.sh` shuts them down. The PIDs of
-the processes are stored in `nias.pid`.
-
-In Windows, `gonias.bat` launches the required processes for an examination year of 2017, and `gonias.bat` launches the required processes for an examination year of 2016.
-
-The web interface to the validator can be accessed at `http://localhost:1325` by default; you can configure the Web Server Port in `nias.toml`
-
-## Running NAPlan Results & Reporting modules
+## 2.4. Running NAPLAN Results & Reporting modules
 
 Separate executables are run to process NAPLAN Results and Reporting processing; see [NAPRR readme](./naprr/README.md)
 
-# Code Structure
+# 3. Code Structure
+
+See also [NAPRR readme](./naprr/README.md), [NAPLVAL readme](./napval/README.md)
 
 NIAS2 relies on the following infrastructure:
 * [ledis](http://ledisdb.com), a NoSQL database similar to [redis](http://redis.io)
@@ -69,98 +107,25 @@ Contains the scripts and batch files to start and stop running NIAS. These are c
 Contains utilities for managing NIAS2
   * `release.go` creates a new release of the NIAS2 code on github.
 
-`harness/`
-Contains the code to run NIAS2 as a single piece of software, along with necessary configuration files. The configuration fields are copied into the binary distributions of NIAS.
-  * `harness.go` : launches the base microservices of NIAS:
-    * ledis, the NoSQL database
-    * the ASL lookup service
-    * the distributor service
-    * the web server
-  * `validator_test.go` : runs unit/integration tests for validation
-    
-`harness/nias.toml` 
-Configuration file for NIAS:
-  * TestYear: the baseline year for date of birth validation 
-  * ValidationRoute: the validators to which every incoming message is sent
-      * `schema`: schema validation against `core.json`  
-      * `schema2`: schema validation against `core_parent2.json` (ensures that if one Parent2 field is present, all such fields are present)
-      * `local`: schema validation against `local.json` 
-      * `id`: identity validation (detection of duplicates)
-      * `dob`: date of birth validation
-      * `asl`: check of validity of ASL school identifers
-      * `psi`: check of validity of Platform Student Identifier checksums
-      * `numericvalid`: does number validation on contents of schema (currently restricted to FTE maximum and minimum for NAPLAN)
-  * WebServerPort: the port on which the NIAS web server runs
-  * PoolSize: the number of parallel connections run in the microservice distributor
-  * MsgTransport: the connection mode used for the microservice distributor
-      * `MEM`: in-memory processing, no persistent queue
-      * `NATS`: [NATS Server](http://nats.io/documentation/server/gnatsd-intro/)
-      * `STAN`: [NATS Streaming Server](http://nats.io/documentation/streaming/nats-streaming-intro/)
-
-Configuration files:
-  * `harness/schemas/` : Schemas for validating incoming messages. CSV is converted to JSON, and is validated against JSON Schema:
-    * `core.json`: The schema for NAPLAN registration records.
-    * `core_parent2.json`: The schema ensuring that if one Parent2 field is present, all such fields are present.
-    * `local.json`: Dummy schema for local validation of NAPLAN registration records. Can be used to impose more restrictive conditions on validation, to satisfy local requirements.
-  * `harness/schoolslist/` : Contains CSV export of the [Australian Schools List](http://asl.acara.edu.au), using in validation
-  * `harness/templates/` : Contains templates for populating SIF XML
-  * `harness/var/` : Contains ledis database instance
-  * `harness/public/` : Contains web server site, including CSS and Javascript
+`app/`
+Contains the code to run executables within NIAS as single pieces of software, along with necessary configuration files, and test executables. The configuration fields are copied into the binary distributions of NIAS.
+  * `sms/` : the SIF Memory Store functionality of NIAS (ported from Ruby)
+  * `napval` : NAPLAN Registration records validation
+  * `naprr` : NAPLAN Results and Reporting post-processing
+  * `napyr3w` : Reconciliation of Paper Year 3 Writing results with Online NAPLAN results
   
-`lib/`
-* Microservices invoked by NIAS directly via `harness/harness.go`
-  * `ledis.go` : Launch the ledis database
-  * `aslservice.go` : Validate the ASL school identifiers in a registration record against the ASL data in `harness/schoolslist/`
-  * `webserver.go` : Launch web service to deal with RESTful queries for validation. 
-  * `distributor.go` : Launch a pool of message handlers to deal with incoming messages, as the microservice bus. 
-    * The pool involves instances of NATS Server, NATS Streaming Server, or internal memory channels. 
-    * The distributor handles incoming requests as a multiplexer (from "requests" subject to the _distID_ subject: a new GUID)
-    * The distributor assigns incoming messages (from the _distID_ subject) for processing by the sequence of microservices named in the message's Route attribute; the output of each named microservice is published to the _srvcID_ subject (a new GUID).
-    * The distributor stores incoming messages to ledis (from the _srvcID_ subject).
-    * This means that all microservice outputs are output to ledis.
-* Microservices invoked by NIAS via the message Route attribute 
-  * `dobservice.go` : Date of Birth validator
-  * `psiservice.go`: Checksum validator for Platform Student Identifiers
-  * `numericvalidservice.go`: Validator of numeric values in NAPLAN registration
-  * `idservice.go` : Check each message in a transmission for uniqueness within the transmission. Check involves two keys: (LocalId, ASLSchoolId), and (LocalId, ASLSchoolId, FamilyName, GivenName, BirthDate).
-  * `schemaservice.go` : Validate a message against either the core JSON schema or the local JSON schema. The service replaces some JSON Schema error messages with custom messages.
-* Support code
-  * `nats.go` : Connector code for NATS, involving connectors to storage (store), service handlers (srv), and inbound distributors from the web gateway (dist).
-  * `niasmessage.go` : NIAS Message wrapper types
-  * `config.go` : read in the NIAS configuration file (`harness/nias.toml`)
-  * `vtypes.go` : common types used for validation. Includes the validation error type, and the registration record type (all fields in NAPLAN).
-  * `store.go` : code to store messages in ledis. Has mutex support. 
-  * `service.go` : interface to handle message requests: request, response, errors
-  * `serviceregister.go` : registry of microservices, mapping Route keys to service instances, and with code for processing messages according to their Route attribute
+`napval/`
+Code for NAPLAN Registration records validation
 
+`naprr/`
+Code for NAPLAN Results and Reporting post-processing
 
-#API
+`sms/`
+SIF Memory Store functionality of NIAS
 
-## Supported Queries
-* `POST /naplan/reg/validate` : validate the record(s), whether in XML or CSV. This involves publishing the records received onto the microservice bus, with the configured list of validators as the message route. Blank entries are stripped.
-* `POST /naplan/reg/convert` : convert the record(s) from CSV to XML, using the templates in  `harness/templates/`. Response is the XML records.
-* `GET /naplan/reg/status/:txid` : receive a status report for the validation request with transmission identifier `:txid`
-* `GET /naplan/reg/results/:txid` : receive the analysis results for the validation request with transmission identifier `:txid`
-* `GET /naplan/reg/results/:txid/:fname` : receive the analysis results for the validation request with transmission identifier `:txid`, as a CSV file to be named `:fname`
+`xml/`
+Golang structs corresponding to SIF XML objects
 
-## Database
-* All messages published to storage as outputs of the distributor are stored in ledis under a list (`rpush`) with the key of `nvr:` followed by the transmission ID. That means that the key for a transmission will access a list of each consecutive microservice output, for each record in that transmission.
-
-## Format
-* Ingest Response: response to `POST /naplan/reg/validate`. JSON object:
-  * record count (`Records`)
-  * transmission identifier (`TxID`). The transmission identifier applies to the specific payload.
-* NIAS Message: metadata for any message sent on the microservice bus:
-  * Body: message content
-  * SeqNo: sequence number of the message within the transmission (corresponding to a single REST payload)
-  * TxID: transmission identifier (GUID) for the REST payload
-  * MsgID: GUID for the message
-  * Target: namespace on ledis under which messages will be stored
-  * Route: sequence of microservices that the message is to be passed to. _(Chaining of microservices is not currently supported)_
-* NIAS Error Message: as for NIAS Message
-  * Body: 
-    * Description: description of the validation error
-    * Field: field in which the validation error was found
-    * OriginalLine: Line of the transmission payload in which the validation error was found
-    * Vtype: Validation error type
+  
+    
 
