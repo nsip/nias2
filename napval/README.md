@@ -41,7 +41,7 @@ Configuration file for NIAS run for validation of NAPLAN Registration records:
   * TestYear: the baseline year for date of birth validation 
   * ValidationRoute: the validators to which every incoming message is sent
       * `schema`: schema validation against `core.json`  
-      * `schema2`: schema validation against `core_parent2.json` (ensures that if one Parent2 field is present, all such fields are present)
+      * `schema2`: schema validation against `core_parent2.json` (ensures that if one Parent2 field is present, all such fields are present)
       * `local`: schema validation against `local.json` 
       * `id`: identity validation (detection of duplicates)
       * `dob`: date of birth validation
