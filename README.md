@@ -12,10 +12,12 @@ The product was developed by harnessing existing open source middleware componen
 * [Echo](https://github.com/labstack/echo) web framework
 
 Over these components, two main modules have been built:
-* The __SIF Store & Forward (SSF)__ is an opinionated message queueing system, which ingests very large quantities of data and stores them for delivery to clients. XML messages on the system are assumed by default to be in SIF. The SSF service builds an education-standards aware REST interface on top of Kafka, and provides a number of utility services to ease SIF-based integrations.
+* The __SIF Store & Forward (SSF)__ is an opinionated message queueing system, which ingests very large quantities of data and stores them for delivery to clients. XML messages on the system are assumed by default to be in SIF. The SSF service builds an education-standards aware REST interface on top of the NATS message queues, and provides a number of utility services to ease SIF-based integrations.
 * The __SIF Memory Store (SMS)__ is a database that builds its internal structures from the data it receives, using RefIds both as keys to access stored messages, and to map out a network graph for SIF objects.
 
-The software also uses these components as architecture to support the validation and post-processing of NAPLAN records.
+The software also uses these components as architecture to support Test Administration Authorities' interaction with NAPLAN Online:
+* __napval__ validates NAPLAN registration records, in either SIF/XML or CSV format.
+* __naprr__ post-processes the NAPLAN results & reporting dataset, including generating local reports, and aligning Year 3 Writing results to the codeframe.
 
 The code is open source, and is released through the NSIP Github repository. 
 
@@ -58,8 +60,8 @@ The product does not incorporate authentication or authorisation.
 
 
 ## 2.2. Binary, DOS
-Manually unzip file directory in the zip "go-nias" and put it in c:\
-Then run gonias.bat file from that directory
+Manually unzip file directory in the zip `go-nias` and put it in c:\
+Then run `gonias.bat` file from that directory
 
 ## 2.3. From source code
 
@@ -74,7 +76,7 @@ In `$GOPATH/src/github.com/nsip` do:
 
 ## 2.4. Running NAPLAN Results & Reporting modules
 
-Separate executables are run to process NAPLAN Results and Reporting processing; see [NAPRR readme](./naprr/README.md)
+Separate executables are run to process NAPLAN data; see [NAPVAL readme](./napval/README.md), [NAPRR readme](./naprr/README.md)
 
 # 3. Code Structure
 
@@ -88,8 +90,10 @@ NIAS2 relies on the following infrastructure:
 * Contains files used in unit/integration testing of the code. Currently restricted to CSV files input into the validation module.
 
 `build.sh`, `build/`, `release.sh`
-* `build.sh` is the script to build NIAS2 executables for the various supported platforms. The builds for each platform are built in `build/PLATFORM/go-nias8/`. 
-* The `release.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including those binary files. 
+* `build.sh` is the script to build all NIAS2 executables for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/go-nias8/`. 
+* `build_napval.sh` is the script to build NIAS2 executables speficic to NAPLAN registration for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/go-nias8/`. 
+* `build_naprr.sh` is the script to build NIAS2 executables specific to NAPLAN results & reporting for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/naprr/`. 
+* The `release_naprr.sh` and `release_napvalr.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including the binary files specific to NAPLAN results & reporting and NAPLAN registration, respectively. 
 * The supported platforms are: 
   * Mac OSX
   * Windows 32 bit
@@ -127,6 +131,14 @@ SIF Memory Store functionality of NIAS
 `xml/`
 Golang structs corresponding to SIF XML objects relevant to executables. Currently limited to NAPLAN-specific objects.
 
-  
+`lib/`
+Library code shared between all executables:
+* `config.go`: read configuration files (in [toml](github.com/BurntSushi/toml) format)
+* `encoding.go`: encode NIAS messages
+* `nats.go`: create NATS connections and process chains
+* `niasmessage.go`: message wrapper types
+* `server_connections.go`: standardised NATS server access module
+* `service.go`: service interface to handle message requests
+* `transactiontracker.go`: transaction status reporting structure
     
 
