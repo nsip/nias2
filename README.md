@@ -82,19 +82,20 @@ See also [NAPRR readme](./naprr/README.md), [NAPLVAL readme](./napval/README.md)
 
 NIAS2 relies on the following infrastructure:
 * [ledis](http://ledisdb.com), a NoSQL database similar to [redis](http://redis.io)
+* xmllint, an XML validator included in the [libxml](http://xmlsoft.org) package
 
 `unit_test_files/`
 * Contains files used in unit/integration testing of the code. Currently restricted to CSV files input into the validation module.
 
 `build.sh`, `build/`, `release.sh`
-* `build.sh` is the script to build NIAS2 executables for the various supported platforms. The builds for each platform are built in `build/PLATFORM/go-nias/`. 
+* `build.sh` is the script to build NIAS2 executables for the various supported platforms. The builds for each platform are built in `build/PLATFORM/go-nias8/`. 
 * The `release.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including those binary files. 
 * The supported platforms are: 
   * Mac OSX
   * Windows 32 bit
   * Windows 64 bit
   * Linux 32 bit
-  * Linux 64 bit.
+  * Linux 64 bit
 
 `bin/`
 Contains the scripts and batch files to start and stop running NIAS. These are copied into the builds for each platform:
@@ -110,9 +111,9 @@ Contains utilities for managing NIAS2
 `app/`
 Contains the code to run executables within NIAS as single pieces of software, along with necessary configuration files, and test executables. The configuration fields are copied into the binary distributions of NIAS.
   * `sms/` : the SIF Memory Store functionality of NIAS (ported from Ruby)
-  * `napval` : NAPLAN Registration records validation
-  * `naprr` : NAPLAN Results and Reporting post-processing
-  * `napyr3w` : Reconciliation of Paper Year 3 Writing results with Online NAPLAN results
+  * `napval/` : NAPLAN Registration records validation
+  * `naprr/` : NAPLAN Results and Reporting post-processing
+  * `napyr3w/` : Reconciliation of Paper Year 3 Writing results with Online NAPLAN results
   
 `napval/`
 Code for NAPLAN Registration records validation
@@ -124,7 +125,7 @@ Code for NAPLAN Results and Reporting post-processing
 SIF Memory Store functionality of NIAS
 
 `xml/`
-Golang structs corresponding to SIF XML objects
+Golang structs corresponding to SIF XML objects relevant to executables. Currently limited to NAPLAN-specific objects.
 
   
     
