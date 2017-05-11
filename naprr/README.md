@@ -2,13 +2,19 @@
 
 ## NAPLAN Results and Reporting processing
 
-The `naprr` executable runs as a single binary, and launches its own streaming server instance within the application.
+The `naprr` executable runs as a single binary, and launches its own streaming server instance within the application. Unlike other NIAS executables, it does not require a batch file or shell script to be executed.
 
-The unzipped binary files should have the `naprr` executable, an `/in` directory and a `/templates` directory. The `/templates` directory contains templates for the various report formats, in [Golang's template language](https://golang.org/pkg/text/template/). The `/in` directory contains zipped XML files to be processed by the `naprr` executable; the zip distribution comes packaged with `/in/master_nap.xml.zip` as a test xml results file. This will get processed automatically when the executable is run. 
+The unzipped binary files released for `naprr` should contain the `naprr` executable, an `/in` directory and a `/templates` directory. The `/templates` directory contains templates for the various report formats, in [Golang's template language](https://golang.org/pkg/text/template/). The `/in` directory contains zipped XML files to be processed by the `naprr` executable; the zip distribution comes packaged with `/in/master_nap.xml.zip` as a test xml results file. This will get processed automatically when the executable is run. 
 
-To process the results file, just use a terminal to `cd `to the `naprr` folder and run the `naprr` executable.
+To process the results file, just use a terminal to `cd `to the `naprr` folder and run the `naprr` executable:
 
-All reports will be written to the `/out` directory; this contains summary reports at the top level, and then a folder for each school with relevant reports inside.
+    cd naprr
+    ./naprr 
+
+    cd naprr
+    ./naprr.exe
+
+All reports will be written to the `/out` directory; this contains summary reports at the top level, and then a folder for each school with relevant reports inside. The school folders are named by their ACARA IDs.
 
 The current report structure in `/out` is:
 * `codeframe.csv`: Flattened CSV file containing codeframe information for test items, along with the testlets and tests that contain them (given redundantly)		
@@ -20,6 +26,9 @@ The current report structure in `/out` is:
   * `domain_scores.csv`: 	Domain scores for each student in the school; students are indicated by their Platform Student Identifier.
   * `participation.csv`:	Which students in the school participated in which NAPLAN tests. Demographic information and Platform Student Identifier are given for each student.
   * `score_summary.csv`: Overall domain scores for the school for each test in the file. Schools identified by ACARA ID.
+  * `napevents.xml`: The NAP Events objects specific to that school, in SIF/XML format.
+  * `napresponses.xml`: The NAP Reponse objects specific to that school, in SIF/XML format.
+  * `students.xml`: The Student objects specific to that school, in SIF/XML format.
 
 All reports have been generated as requested, except for `codeframe_writing.csv`. For the writing codeframe, we still need to understand the structure more clearly; but sensible real defaults have been put into the file from the results and reporting dataset, so the reports are structurally correct.
 

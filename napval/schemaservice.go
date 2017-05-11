@@ -136,6 +136,7 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 				Field:        field,
 				OriginalLine: req.SeqNo,
 				Vtype:        "content",
+				Severity:     "error",
 			}
 
 			r := lib.NiasMessage{}

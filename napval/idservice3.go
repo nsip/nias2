@@ -161,6 +161,7 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "Multiple (see description)",
 			OriginalLine: req.SeqNo,
 			Vtype:        "identity",
+			Severity:     "warning",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID
@@ -178,6 +179,7 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "LocalID/ASL ID",
 			OriginalLine: req.SeqNo,
 			Vtype:        "identity",
+			Severity:     "warning",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID
@@ -195,6 +197,7 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "PSI/ASL ID",
 			OriginalLine: req.SeqNo,
 			Vtype:        "identity",
+			Severity:     "warning",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID

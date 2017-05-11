@@ -464,7 +464,8 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 		hdr := []string{"Original File Line No. where error occurred",
 			"Validation Type",
 			"Field that failed validation",
-			"Error Description"}
+			"Error Description",
+			"Severity"}
 
 		if err := w.Write(hdr); err != nil {
 			log.Println("error writing headers to csv:", err)

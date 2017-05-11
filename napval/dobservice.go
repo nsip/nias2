@@ -81,6 +81,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "BirthDate",
 			OriginalLine: req.SeqNo,
 			Vtype:        "date",
+			Severity:     "error",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID
@@ -95,6 +96,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		desc := ""
 		field := "BirthDate"
 		ok := true
+		severity := "error"
 		matched, _ := regexp.MatchString("^([KFP0-9]|1[012]|UG|11MINUS|12PLUS|CC|K[34]|PS|UG(JunSec|Pri|Sec|SnrSec))$", yrlvl)
 		switch {
 		case !matched:
@@ -110,6 +112,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			desc = "Year level supplied is UG, will result in SRM warning flag for test level " + rr.TestLevel
 			field = field + "/TestLevel/YearLevel"
 			ok = false
+			severity = "warning"
 		case yrlvl == "0":
 			// log.Println("student is in year 0!!")
 			desc = "Year level supplied is 0, does not match expected test level " + rr.TestLevel
@@ -120,6 +123,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			desc = "Year Level calculated from BirthDate does not fall within expected NAPLAN year level ranges"
 			field = field + "/YearLevel"
 			ok = false
+			severity = "warning"
 		default:
 			field = "BirthDate"
 			if yrlvl != "" && yrlvl != dob.calculateYearLevel(t) {
@@ -127,6 +131,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 				desc = "Student Year Level (yr " + yrlvl + ") does not match year level derived from BirthDate (yr " + dob.calculateYearLevel(t) + ")"
 				field = field + "/" + "YearLevel"
 				ok = false
+				severity = "warning"
 			}
 			tstlvl := rr.TestLevel
 			if tstlvl != "" && tstlvl != dob.calculateYearLevel(t) {
@@ -134,6 +139,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 				desc = "Student Test Level (yr " + tstlvl + ") does not match year level derived from BirthDate (yr " + dob.calculateYearLevel(t) + ")"
 				field = field + "/" + "TestLevel"
 				ok = false
+				severity = "warning"
 			}
 		}
 
@@ -143,6 +149,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 				Field:        field,
 				OriginalLine: req.SeqNo,
 				Vtype:        "date",
+				Severity:     severity,
 			}
 			r := lib.NiasMessage{}
 			r.TxID = req.TxID

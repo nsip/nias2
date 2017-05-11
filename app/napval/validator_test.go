@@ -375,11 +375,12 @@ func test_harness(t *testing.T, filename string, errfield string, errdescription
 		err = json.Unmarshal(lines[0], &dat)
 	}
 	errcheck(t, err)
+	// we are getting back a JSON array
 	/*
-		// we are getting back a JSON array
 		for i := 0; i < len(lines); i++ {
 			log.Println("\t" + string(lines[i]))
-		log.Println(dat)
+			log.Println(dat)
+		}
 	*/
 	if errfield == "" {
 		if len(dat) > 0 {

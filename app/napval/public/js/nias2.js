@@ -398,7 +398,11 @@ function renderAnalysis(data)
             function(d)
             {
                 return d.description;
-            }
+            },
+	    function(d)
+	    {
+		return d.severity.substring(0,1).toUpperCase()
+	    }
         ])
         .sortBy(function(d)
         {

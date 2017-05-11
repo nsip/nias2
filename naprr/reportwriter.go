@@ -64,9 +64,11 @@ func (rw *ReportWriter) writeTestLevelReports() {
 	var wg sync.WaitGroup
 
 	cfds := rw.sr.GetCodeFrameData(REPORTS_CODEFRAME)
+	nd := rw.sr.GetNAPLANData(META_STREAM)
 
-	wg.Add(2)
+	wg.Add(3)
 
+	go rw.writeCodeFrameReportXML(nd, &wg)
 	go rw.writeCodeFrameReport(cfds, &wg)
 	go rw.writeCodeFrameWritingReport(cfds, &wg)
 
@@ -296,6 +298,67 @@ func (rw *ReportWriter) writeYr3WritingReport(nd *NAPLANData, rbs []ResultsByStu
 
 }
 
+// report of test structure for writing items only
+// with extended item information
+func (rw *ReportWriter) writeCodeFrameReportXML(nd *NAPLANData, wg *sync.WaitGroup) {
+
+	fpath := "out/"
+	err := os.MkdirAll(fpath, os.ModePerm)
+	check(err)
+
+	// create the report data file in the output directory
+	// delete any ecisting files and create empty new one
+	fname := fpath + "codeframe.xml"
+	err = os.RemoveAll(fname)
+	f, err := os.Create(fname)
+	check(err)
+	defer f.Close()
+
+	e := xml.NewEncoder(f)
+	e.Indent("", "  ")
+	f.WriteString("<NAPResultsReporting>\n")
+	seen := make(map[string]bool)
+	cfcount := 0
+	for _, codeframe := range nd.Codeframes {
+		if len(codeframe.NAPTestRefId) == 0 || seen[codeframe.NAPTestRefId] {
+			continue
+		}
+		if _, ok := nd.Tests[codeframe.NAPTestRefId]; ok {
+			e.Encode(nd.Tests[codeframe.NAPTestRefId])
+			seen[codeframe.NAPTestRefId] = true
+			cfcount++
+		}
+		for _, cf_testlet := range codeframe.TestletList.Testlet {
+			if len(cf_testlet.NAPTestletRefId) == 0 /*|| seen[cf_testlet.NAPTestletRefId] */ {
+				continue
+			}
+			if _, ok := nd.Testlets[cf_testlet.NAPTestletRefId]; ok {
+				e.Encode(nd.Testlets[cf_testlet.NAPTestletRefId])
+				seen[cf_testlet.NAPTestletRefId] = true
+				cfcount++
+			}
+			for _, cf_item := range cf_testlet.TestItemList.TestItem {
+				if len(cf_item.TestItemRefId) == 0 /* || seen[cf_item.TestItemRefId] */ {
+					continue
+				}
+				if _, ok := nd.Items[cf_item.TestItemRefId]; ok {
+					seen[cf_item.TestItemRefId] = true
+					e.Encode(nd.Items[cf_item.TestItemRefId])
+					cfcount++
+				}
+			}
+		}
+	}
+
+	e.Flush()
+	f.WriteString("</NAPResultsReporting>\n")
+
+	log.Printf("Codeframe writing report in XML created for: %d codeframe elements", cfcount)
+
+	wg.Done()
+
+}
+
 // report of test structure, is written only once
 // as an aggrregate report, not at school level
 func (rw *ReportWriter) writeCodeFrameReport(cfds []CodeFrameDataSet, wg *sync.WaitGroup) {
@@ -303,7 +366,7 @@ func (rw *ReportWriter) writeCodeFrameReport(cfds []CodeFrameDataSet, wg *sync.W
 	thdr := rw.t.Lookup("codeframe_hdr.tmpl")
 	trow := rw.t.Lookup("codeframe_row.tmpl")
 
-	// create directory for the school
+	// create directory for the output
 	fpath := "out/"
 	err := os.MkdirAll(fpath, os.ModePerm)
 	check(err)
