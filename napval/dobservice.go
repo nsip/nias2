@@ -93,6 +93,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	} else {
 
 		yrlvl := rr.YearLevel
+		tstlvl := rr.TestLevel
 		desc := ""
 		field := "BirthDate"
 		ok := true
@@ -105,9 +106,9 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		case yrlvl == "P":
 			// log.Println("student is primary")
 			desc = "Year level supplied is P, does not match expected test level " + rr.TestLevel
-			field = field + "/TestLevel"
+			field = field + "/YearLevel"
 			ok = false
-		case strings.Contains(yrlvl, "UG"):
+		case strings.Contains(yrlvl, "UG") && tstlvl != dob.calculateYearLevel(t):
 			// log.Println("student is ungraded")
 			desc = "Year level supplied is UG, will result in SRM warning flag for test level " + rr.TestLevel
 			field = field + "/TestLevel/YearLevel"
@@ -124,6 +125,11 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			field = field + "/YearLevel"
 			ok = false
 			severity = "warning"
+		case yrlvl != tstlvl:
+			desc = "Year Level " + yrlvl + " does not match Test level " + tstlvl
+			field = field + "/TestLevel"
+			ok = false
+			severity = "warning"
 		default:
 			field = "BirthDate"
 			if yrlvl != "" && yrlvl != dob.calculateYearLevel(t) {
@@ -133,7 +139,6 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 				ok = false
 				severity = "warning"
 			}
-			tstlvl := rr.TestLevel
 			if tstlvl != "" && tstlvl != dob.calculateYearLevel(t) {
 				// log.Println("Student is in wrong test level: ", tstlvl)
 				desc = "Student Test Level (yr " + tstlvl + ") does not match year level derived from BirthDate (yr " + dob.calculateYearLevel(t) + ")"
