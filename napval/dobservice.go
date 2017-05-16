@@ -99,19 +99,20 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		ok := true
 		severity := "error"
 		matched, _ := regexp.MatchString("^([KFP0-9]|1[012]|UG|11MINUS|12PLUS|CC|K[34]|PS|UG(JunSec|Pri|Sec|SnrSec))$", yrlvl)
+		tooyoung, _ := regexp.MatchString("^([KFP]|CC|K[34]|PS))$", yrlvl)
 		switch {
 		case !matched:
 			// will be rejected in schema
 			ok = true
-		case yrlvl == "P":
+		case tooyoung:
 			// log.Println("student is primary")
-			desc = "Year level supplied is P, does not match expected test level " + rr.TestLevel
+			desc = "Year level supplied is " + yrlvl + ", does not match expected test level " + rr.TestLevel
 			field = field + "/YearLevel"
 			ok = false
 		case strings.Contains(yrlvl, "UG") && tstlvl != dob.calculateYearLevel(t):
 			// log.Println("student is ungraded")
 			desc = "Year level supplied is UG, will result in SRM warning flag for test level " + rr.TestLevel
-			field = field + "/TestLevel/YearLevel"
+			field = field + "/TestLevel"
 			ok = false
 			severity = "warning"
 		case yrlvl == "0":
@@ -129,7 +130,6 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			desc = "Year Level " + yrlvl + " does not match Test level " + tstlvl
 			field = field + "/TestLevel"
 			ok = false
-			severity = "warning"
 		default:
 			field = "BirthDate"
 			if yrlvl != "" && yrlvl != dob.calculateYearLevel(t) {
