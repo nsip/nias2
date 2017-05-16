@@ -126,7 +126,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			field = field + "/YearLevel"
 			ok = false
 			severity = "warning"
-		case yrlvl != tstlvl:
+		case yrlvl != tstlvl && !strings.Contains(yrlvl, "UG"):
 			desc = "Year Level " + yrlvl + " does not match Test level " + tstlvl
 			field = field + "/TestLevel"
 			ok = false
