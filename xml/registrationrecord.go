@@ -196,7 +196,7 @@ func (r RegistrationRecord) GetOtherId(idtype string) string {
 		}
 	}
 
-	return idtype
+	return ""
 }
 
 // convenience method for writing to csv

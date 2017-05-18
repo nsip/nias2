@@ -33,7 +33,7 @@ do_build() {
 	cd $CWD
 	cd ./app/napval
 	go get 
-	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUT/$NAPVALHARNESS
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUTNAPVAL/$NAPVALHARNESS
 	cd $CWD
 	cd ./app/sms
 	go get
@@ -48,17 +48,21 @@ do_shells() {
 	cd $CWD
 	cp bin/gonias.sh $OUTPUT/
 	cp bin/stopnias.sh $OUTPUT/
+	cp bin/gonias.sh $OUTPUTNAPVAL/
+	cp bin/stopnias.sh $OUTPUTNAPVAL/
 }
 
 do_bats() {
 	cd $CWD
 	cp bin/gonias.bat $OUTPUT/
 	cp bin/stopnias.bat $OUTPUT/
+	cp bin/gonias.bat $OUTPUTNAPVAL/
+	cp bin/stopnias.bat $OUTPUTNAPVAL/
 }
 
 do_upx() {
 	upx $OUTPUT/$GNATS
-	upx $OUTPUT/$NAPVALHARNESS
+	upx $OUTPUTNAPVAL/$NAPVALHARNESS
 	upx $OUTPUTNAPRR/$NAPRRHARNESS
 	upx $OUTPUTNAPRR/$NAPYR3WHARNESS
 	upx $OUTPUT/$SMSHARNESS
@@ -67,7 +71,7 @@ do_upx() {
 do_goupx() {
 	goupx $OUTPUT/$GNATS
 	goupx $OUTPUT/$SMSHARNESS
-	goupx $OUTPUT/$NAPVALHARNESS
+	goupx $OUTPUTNAPVAL/$NAPVALHARNESS
 	goupx $OUTPUTNAPRR/$NAPRRHARNESS
 	goupx $OUTPUTNAPRR/$NAPYR3WHARNESS
 }
@@ -91,6 +95,7 @@ build_mac64() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Mac/go-nias8
 	OUTPUTNAPRR=$CWD/build/Mac/naprr
+	OUTPUTNAPVAL=$CWD/build/Mac/napval
 	GNATS=nats-streaming-server
 	NAPVALHARNESS=napval
 	SMSHARNESS=sms
@@ -114,6 +119,7 @@ build_windows64() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win64/go-nias8
 	OUTPUTNAPRR=$CWD/build/Win64/naprr
+	OUTPUTNAPVAL=$CWD/build/Win64/napval
 	GNATS=nats-streaming-server.exe
 	NAPVALHARNESS=napval.exe
 	SMSHARNESS=sms.exe
@@ -136,6 +142,7 @@ build_windows32() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win32/go-nias8
 	OUTPUTNAPRR=$CWD/build/Win32/naprr
+	OUTPUTNAPVAL=$CWD/build/Win32/napval
 	GNATS=nats-streaming-server.exe
 	NAPVALHARNESS=napval.exe
 	SMSHARNESS=sms.exe
@@ -158,6 +165,7 @@ build_linux64() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Linux64/go-nias8
 	OUTPUTNAPRR=$CWD/build/Linux64/naprr
+	OUTPUTNAPVAL=$CWD/build/Linux64/napval
 	GNATS=nats-streaming-server
 	NAPVALHARNESS=napval
 	SMSHARNESS=sms
@@ -180,6 +188,7 @@ build_linux32() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Linux32/go-nias8
 	OUTPUTNAPRR=$CWD/build/Linux32/naprr
+	OUTPUTNAPVAL=$CWD/build/Linux32/napval
 	GNATS=nats-streaming-server
 	NAPVALHARNESS=napval
 	SMSHARNESS=sms

@@ -455,7 +455,7 @@ func (sr *StreamReader) GetStudentAndResultsData(student_ids map[string]string, 
 // given the mapping of keys to XML RefIDs, remap all references to made up RegistrationRecords from fixed format file, to XML records already ingested
 func (sr *StreamReader) remapStudents(srd *StudentAndResultsData, student_ids map[string]string, NaprrConfig naprr_config) *StudentAndResultsData {
 	yr3wmatches := Yr3WritingMatchReport{}
-	matches := make(map[string]int)
+	matches := make(map[string]bool)
 	newStudents := make(map[string]*xml.RegistrationRecord)
 	log.Printf("%v\n", NaprrConfig)
 	log.Println(NaprrConfig.Yr3WStudentMatch)
@@ -465,7 +465,7 @@ func (sr *StreamReader) remapStudents(srd *StudentAndResultsData, student_ids ma
 			refid := sp.RefId
 			log.Printf("Mapped student %s from Yr 3 Writing from %s to matching student %s in XML ingest", student_key, refid, newRefId)
 			//append(yr3wmatches.matches, student_key)
-			matches[student_key] = 1
+			matches[student_key] = true
 			// eliminating this record from the list: not passing on to newStudents
 			if _, ok := srd.Events[refid]; ok {
 				log.Printf("%v\n", srd.Events[refid])
