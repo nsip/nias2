@@ -12,6 +12,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	//"os"
 	"path"
 	"strconv"
 	"strings"
@@ -329,12 +330,17 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 	e.POST("/naplan/reg/convert", func(c echo.Context) error {
 
 		// get the file from the input form
-		file, err := c.FormFile("conversionFile")
+		p, err := c.MultipartForm()
+		log.Printf("%v\n", p)
+		//file, err := c.FormFile("conversionFile")
+		file, err := c.FormFile("validationFile")
 		if err != nil {
+			log.Println(err)
 			return err
 		}
 		src, err := file.Open()
 		if err != nil {
+			log.Println((err))
 			return err
 		}
 		defer src.Close()
@@ -348,11 +354,20 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 		fname := file.Filename
 		rplcr := strings.NewReplacer(".csv", ".xml")
 		xml_fname := rplcr.Replace(fname)
+		/*
+			tmpname := "/tmp/" + uuid.NewV4().String()
+			f, err := os.Create(tmpname)
+			if err != nil {
+				log.Println("error tmp file: ", err)
+				return err
+			}
+		*/
 
 		// read the csv file
 		reader := csv.WithIoReader(src)
 		records, err := csv.ReadAll(reader)
 		if err != nil {
+			log.Println((err))
 			return err
 		}
 
@@ -372,8 +387,15 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 		// apply the template & write results to the client
 		/* note that this does not currently go via the RegistrationRecord, so no need for .Unflatten() */
 		if err := sptmpl.Execute(c.Response().Writer, sprsnls); err != nil {
+			//if err := sptmpl.Execute(f, sprsnls); err != nil {
+			log.Println((err))
 			return err
 		}
+		log.Println("Aooga 4")
+		//f.Sync()
+		//f.Close()
+		//log.Println("Aooga")
+		//http.ServeFile(c.Response().Writer, c.Request(), tmpname)
 
 		return nil
 
@@ -391,8 +413,6 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 
 		// signal channel to notify asynch stan stream read is complete
 		txComplete := make(chan bool)
-
-		//enc := json.NewEncoder(c.Response())
 
 		// main message handling callback for the stan stream
 		mcb := func(m *stan.Msg) {

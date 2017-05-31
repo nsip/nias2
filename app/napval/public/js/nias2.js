@@ -88,6 +88,9 @@ function Validate()
 
     Materialize.toast('Sending file to server...', 4000, 'rounded')
 
+
+    $('#validateform').prop('action' , '/naplan/reg/validate');
+
     $('#upload').fileupload(
     {
         autoUpload: false
@@ -123,9 +126,33 @@ function XmlConvert()
         return
     }
 
+    $('#validateform').prop('action' , '/naplan/reg/convert');
+    /*
+        $('#upload').fileupload(
+			    {   
+			            autoUpload: false
+	 });
+    $('#upload').fileupload('send',
+    {
+        sequentialUploads: true,
+        files: filesList[0]
+    });
+    */
+    var x = $('#validateform').submit();
+	    
+
+    /*
     // console.log(filesList);
+    if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+          // Firefox treats files as read only
+	  var fileArray = [filesList[0].name];
+	  var fc = multiFileInput = document.getElementById('fileConvert'); 
+	  fc.mozSetFileNameArray(fileArray, fileArray.length);
+    } else {
     $('#fileConvert').prop('files', filesList);
+    }
     var x = $('#convForm').submit();
+    */
     // console.log(x);
 
 }
