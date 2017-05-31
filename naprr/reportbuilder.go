@@ -1,6 +1,7 @@
 package naprr
 
 import (
+	"github.com/RoaringBitmap/roaring"
 	"log"
 	"sync"
 )
@@ -67,6 +68,29 @@ func (rb *ReportBuilder) RunYr3W(schools bool, student_ids map[string]string, Na
 	// block until all reports generated
 	wg.Wait()
 	log.Println("All Year 3 Writing report data generated")
+
+}
+
+func (rb *ReportBuilder) RunCompareRegistrationReporting(NaprrConfig naprr_config) {
+
+	//var wg sync.WaitGroup
+
+	log.Println("Getting student data")
+	reg_bitmap := rb.sr.GetStudentBitmap(REGISTRATION_STUDENT_RECORDS)
+	rep_bitmap := rb.sr.GetStudentBitmap(REPORTING_STUDENT_RECORDS)
+	diff1 := roaring.AndNot(reg_bitmap, rep_bitmap) // ids in registration not reporting
+	diff2 := roaring.AndNot(rep_bitmap, reg_bitmap) // ids in reporting not registration
+	diff1students := rb.sr.FilterStudentsBitmap(REGISTRATION_STUDENT_RECORDS, diff1)
+	diff2students := rb.sr.FilterStudentsBitmap(REPORTING_STUDENT_RECORDS, diff2)
+	rb.rg.GenerateStudentComparisons(diff1students, diff2students, NaprrConfig)
+	/*
+		wg.Add(1)
+		go rb.createYr3WReports(nd, sr, &wg)
+
+		// block until all reports generated
+		wg.Wait()
+	*/
+	log.Println("Comparison of Students between Registration and Reporting done")
 
 }
 

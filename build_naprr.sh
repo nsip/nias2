@@ -15,9 +15,14 @@ do_build() {
 	cd ./app/naprr
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
+	cd $CWD
+	cd ./app/auditdiff
+	go get
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $AUDITDIFF/$AUDITDIFFHARNESS
 	cd ..
 
 	rsync -a naprr/templates naprr/public naprr/naprr.toml $OUTPUT/
+	rsync -a auditdiff/naprr.toml $AUDITDIFF/
 }
 
 # do_shells() {
@@ -56,8 +61,10 @@ build_mac64() {
 	GOARCH=amd64
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Mac/naprr
+	AUDITDIFF=$CWD/build/Mac/auditdiff
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
+	AUDITDIFFHARNESS=auditdiff
 	ZIP=nias-naprr-Mac.zip
 	do_build
 	#do_upx
@@ -74,7 +81,9 @@ build_windows64() {
 	GOARCH=amd64
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win64/naprr
+	AUDITDIFF=$CWD/build/Win64/auditdiff
 	# GNATS=nats-streaming-server.exe
+	AUDITDIFFHARNESS=auditdiff.exe
 	HARNESS=naprr.exe
 	ZIP=nias-naprr-Win64.zip
 	do_build
@@ -91,8 +100,10 @@ build_windows32() {
 	GOARCH=386
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win32/naprr
+	AUDITDIFF=$CWD/build/Win32/auditdiff
 	# GNATS=nats-streaming-server.exe
 	HARNESS=naprr.exe
+	AUDITDIFFHARNESS=auditdiff.exe
 	ZIP=nias-naprr-Win32.zip
 	do_build
 	#do_upx
@@ -108,8 +119,10 @@ build_linux64() {
 	GOARCH=amd64
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Linux64/naprr
+	AUDITDIFF=$CWD/build/Linux64/auditdiff
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
+	AUDITDIFFHARNESS=auditdiff
 	ZIP=nias-naprr-Linux64.zip
 	do_build
 	#do_goupx
@@ -125,8 +138,10 @@ build_linux32() {
 	GOARCH=386
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Linux32/naprr
+	AUDITDIFF=$CWD/build/Linux32/auditdiff
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
+	AUDITDIFFHARNESS=auditdiff
 	ZIP=nias-naprr-Linux32.zip
 	do_build
 	#do_goupx
