@@ -4,18 +4,50 @@ set -e
 
 CWD=`pwd`
 
-echo "Downloading CORE.json"
-curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > app/napval/schemas/core.json
-curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > app/napval/schemas/core_parent2.json
 curl http://specification.sifassociation.org/Implementation/AU/3.4/XSD/SIF_Message/SIF_Message.xsd > app/sms/SIF_Message.xsd
-#echo "Downloading nats-streaming-server"
-#go get github.com/nats-io/nats-streaming-server
 
+do_clear() {
+	echo "clear"
+	rm -r $OUTPUT/
+}
 
 do_build() {
-	cd ../../nats-io/nats-streaming-server
-	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
+	mkdir -p $OUTPUT
 	cd $CWD
+	cd ./app/sms
+	go get
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -i -ldflags="$LDFLAGS" -o $OUTPUT/$SMSHARNESS
+	cd $CWD
+	cd ./app
+	rsync -a ../test_data sms/nias_nss.cfg sms/privacyfilters sms/SIF_Message.xsd $OUTPUT/
+}
+
+do_shells() {
+	cd $CWD
+	cp bin/gonias.sh $OUTPUT/
+	cp bin/stopnias.sh $OUTPUT/
+}
+
+do_bats() {
+	cd $CWD
+	cp bin/gonias.bat $OUTPUT/
+	cp bin/stopnias.bat $OUTPUT/
+}
+
+do_upx() {
+	upx $OUTPUT/$GNATS
+	upx $OUTPUT/$SMSHARNESS
+}
+
+do_goupx() {
+	goupx $OUTPUT/$GNATS
+	goupx $OUTPUT/$SMSHARNESS
+}
+
+do_zip() {
+	cd $OUTPUT
+	cd ..
+	zip -qr ../$ZIP go-nias8
 }
 
 build_mac64() {
@@ -26,8 +58,13 @@ build_mac64() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Mac/go-nias8
 	GNATS=nats-streaming-server
+	SMSHARNESS=sms
 	ZIP=go-nias-Mac.zip
+	do_clear
 	do_build
+	#do_upx
+	do_shells
+	do_zip
 	echo "...all Mac binaries built..."
 }
 
@@ -40,8 +77,13 @@ build_windows64() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win64/go-nias8
 	GNATS=nats-streaming-server.exe
+	SMSHARNESS=sms.exe
 	ZIP=go-nias-Win64.zip
+	do_clear
 	do_build
+	#do_upx
+	do_bats
+	do_zip
 	echo "...all Windows64 binaries built..."
 }
 
@@ -53,8 +95,13 @@ build_windows32() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win32/go-nias8
 	GNATS=nats-streaming-server.exe
+	SMSHARNESS=sms.exe
 	ZIP=go-nias-Win32.zip
+	do_clear
 	do_build
+	#do_upx
+	do_bats
+	do_zip
 	echo "...all Windows32 binaries built..."
 }
 
@@ -66,8 +113,13 @@ build_linux64() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Linux64/go-nias8
 	GNATS=nats-streaming-server
+	SMSHARNESS=sms
 	ZIP=go-nias-Linux64.zip
+	do_clear
 	do_build
+	#do_goupx
+	do_shells
+	do_zip
 	echo "...all Linux64 binaries built..."
 }
 
@@ -78,15 +130,14 @@ build_linux32() {
 	GOARCH=386
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Linux32/go-nias8
-	OUTPUTNAPRR=$CWD/build/Linux32/naprr
-	OUTPUTNAPVAL=$CWD/build/Linux32/napval
 	GNATS=nats-streaming-server
-	NAPVALHARNESS=napval
 	SMSHARNESS=sms
-	NAPRRHARNESS=naprr
-	NAPYR3WHARNESS=napyr3w
 	ZIP=go-nias-Linux32.zip
+	do_clear
 	do_build
+	#do_goupx
+	do_shells
+	do_zip
 	echo "...all Linux32 binaries built..."
 }
 
@@ -99,6 +150,3 @@ build_windows32
 build_linux64
 build_linux32
 
-sh build_sms.sh
-sh build_napval.sh
-sh build_naprr.sh

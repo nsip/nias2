@@ -7,7 +7,9 @@
 package naprr
 
 import (
+	gcsv "encoding/csv"
 	"encoding/gob"
+	gxml "encoding/xml"
 	"fmt"
 	"github.com/RoaringBitmap/roaring"
 	"github.com/nats-io/go-nats-streaming"
@@ -677,8 +679,10 @@ func (rg *ReportGenerator) GenerateStudentComparisons(diff1students []xml.Regist
 	diff2students []xml.RegistrationRecord, NaprrConfig naprr_config) {
 	diff1keys := make(map[string]bool)
 	diff2keys := make(map[string]bool)
-	diff1mismatches := make([]string, 0, len(diff1students))
-	diff2mismatches := make([]string, 0, len(diff2students))
+	diff1mismatchkeys := make([]string, 0, len(diff1students))
+	diff2mismatchkeys := make([]string, 0, len(diff2students))
+	diff1mismatches := make([]xml.RegistrationRecord, 0, len(diff1students))
+	diff2mismatches := make([]xml.RegistrationRecord, 0, len(diff2students))
 	//log.Println(NaprrConfig.MatchAttributes)
 	for _, sp := range diff1students {
 		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
@@ -692,15 +696,18 @@ func (rg *ReportGenerator) GenerateStudentComparisons(diff1students []xml.Regist
 	for _, sp := range diff1students {
 		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
 		if _, ok := diff2keys[student_key]; !ok {
-			diff1mismatches = append(diff1mismatches, student_key)
+			diff1mismatchkeys = append(diff1mismatchkeys,
+				fmt.Sprintf("PSI: %s Student Key: %s", sp.PlatformId, student_key))
+			diff1mismatches = append(diff1mismatches, sp)
 
 		}
 	}
 	for _, sp := range diff2students {
 		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
 		if _, ok := diff1keys[student_key]; !ok {
-			diff2mismatches = append(diff2mismatches, student_key)
-
+			diff2mismatchkeys = append(diff2mismatchkeys,
+				fmt.Sprintf("PSI: %s Student Key: %s RefId: %s", sp.PlatformId, student_key, sp.RefId))
+			diff2mismatches = append(diff2mismatches, sp)
 		}
 	}
 	fpath := "./"
@@ -714,7 +721,21 @@ func (rg *ReportGenerator) GenerateStudentComparisons(diff1students []xml.Regist
 	f, err := os.Create(fname)
 	check(err)
 	defer f.Close()
-	payload := fmt.Sprintf("Registration Only: %v\nReporting Only: %v\n",
-		diff1mismatches, diff2mismatches)
+	payload := fmt.Sprintf("Registration Only: %d records\n%v\nReporting Only: %d records\n%v\n",
+		len(diff1mismatches), diff1mismatchkeys, len(diff2mismatches), diff2mismatchkeys)
 	f.WriteString(payload)
+	f.WriteString("\n\nRegistration only students:\n")
+	f.Sync()
+	w := gcsv.NewWriter(f)
+	w.Write(xml.RegistrationRecord{}.GetHeaders())
+	for _, sp := range diff1students {
+		w.Write(sp.GetSlice())
+	}
+	w.Flush()
+	f.WriteString("\n\nResults only students:\n")
+	encXml := gxml.NewEncoder(f)
+	encXml.Indent("", "  ")
+	for _, sp := range diff2students {
+		encXml.Encode(sp)
+	}
 }

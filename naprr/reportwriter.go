@@ -124,7 +124,7 @@ func (rw *ReportWriter) writeAggregateSchoolReports(schools [][]SchoolDetails) {
 			}
 			if len(filePaths) > 0 {
 				concatenateFiles(filePaths, outputFile)
-				// rewmove temp data files
+				// remove temp data files
 				for _, file := range filePaths {
 					err := os.Remove(file)
 					if err != nil {
