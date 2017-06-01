@@ -697,7 +697,7 @@ func (rg *ReportGenerator) GenerateStudentComparisons(diff1students []xml.Regist
 		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
 		if _, ok := diff2keys[student_key]; !ok {
 			diff1mismatchkeys = append(diff1mismatchkeys,
-				fmt.Sprintf("PSI: %s Student Key: %s", sp.PlatformId, student_key))
+				fmt.Sprintf("PSI: %s Student Key: %s\n", sp.PlatformId, student_key))
 			diff1mismatches = append(diff1mismatches, sp)
 
 		}
@@ -706,7 +706,7 @@ func (rg *ReportGenerator) GenerateStudentComparisons(diff1students []xml.Regist
 		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
 		if _, ok := diff1keys[student_key]; !ok {
 			diff2mismatchkeys = append(diff2mismatchkeys,
-				fmt.Sprintf("PSI: %s Student Key: %s RefId: %s", sp.PlatformId, student_key, sp.RefId))
+				fmt.Sprintf("PSI: %s Student Key: %s RefId: %s\n", sp.PlatformId, student_key, sp.RefId))
 			diff2mismatches = append(diff2mismatches, sp)
 		}
 	}

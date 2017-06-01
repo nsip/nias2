@@ -46,3 +46,19 @@ The `napyr3w` executable runs as a single binary. It processes both Pearson form
 
 * The SIF/XML output is generated to the file `yr3w/codeframe_writing.xml`. This includes a dummy Year 3 Writing codeframe, to which test results are attached.
 * A report of matches and mismatches between the students in the Pearson/FujiXerox files and the SIF/XML results file is generated to the file `yr3w/codeframe_report.txt`.
+
+## Comparing Registration CSV files with received results
+
+The `auditdiff` executable runs as a single binary. It compares a CSV file of Student Registration records (located in the `in/Reg` directory) with the student records in the NAPLAN Online results XML file in the `in` directory, and detects which students appear only in one or the other file.
+
+* The comparison runs in two passes. 
+  * First, records in the two files which have the same Platform Identifier (PSI) are eliminated. (For the comparison to run efficiently, users should endeavour  to download from the Student Registration Management system a CSV file containing all student records, and including their allocated PSIs.) 
+  * Second, all remaining records from the two files are compared according to fields they have in common. The fields are specified in the `naprr.toml` file, under the key `MatchAttributes`, which contains a list of field names from the `xml.RegistrationRecord` struct. So `MatchAttributes = ["FamilyName", "GivenName"]`, for instance, will compare the  remaiining records according to their family name and given name.
+* The mismatches are output to the file `reg_rep_mismatches.txt`. This contains:
+  * A count of the students found to be unique to the Registration record
+  * A listing of the students found to be unique to the Registration record (PSI and user-defined key)
+  * A count of the students found to be unique to the Results & Reporting record
+  * A listing of the students found to be unique to the Results & Reporting record (PSI, user-defined key, and RefId)
+  * A listing of all the student records unique to the Registration record, in CSV
+  * A listing of all the student records unique to the Results & Reporting record, in SIF/XML
+
