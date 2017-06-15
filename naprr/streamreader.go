@@ -721,10 +721,18 @@ func (rg *ReportGenerator) GenerateStudentComparisons(diff1students []xml.Regist
 	f, err := os.Create(fname)
 	check(err)
 	defer f.Close()
-	payload := fmt.Sprintf("Registration Only: %d records\n%v\nReporting Only: %d records\n%v\n",
-		len(diff1mismatches), diff1mismatchkeys, len(diff2mismatches), diff2mismatchkeys)
+	payload := fmt.Sprintf("Registration Only: %d records\nReporting Only: %d records\n\n",
+		len(diff1mismatches), len(diff2mismatches))
 	f.WriteString(payload)
-	f.WriteString("\n\nRegistration only students:\n")
+	f.WriteString("Registration only students:\n")
+	for _, k := range diff1mismatchkeys {
+		f.WriteString(k)
+	}
+	f.WriteString("Reporting only students:\n")
+	for _, k := range diff2mismatchkeys {
+		f.WriteString(k)
+	}
+	f.WriteString("\n\nRegistration only student records:\n")
 	f.Sync()
 	w := gcsv.NewWriter(f)
 	w.Write(xml.RegistrationRecord{}.GetHeaders())
@@ -732,7 +740,7 @@ func (rg *ReportGenerator) GenerateStudentComparisons(diff1students []xml.Regist
 		w.Write(sp.GetSlice())
 	}
 	w.Flush()
-	f.WriteString("\n\nResults only students:\n")
+	f.WriteString("\n\nResults only student records:\n")
 	encXml := gxml.NewEncoder(f)
 	encXml.Indent("", "  ")
 	for _, sp := range diff2students {
