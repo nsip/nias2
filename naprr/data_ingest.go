@@ -121,6 +121,9 @@ func StudentKeyLookup(r xml.RegistrationRecord, fields []string) string {
 			key = key + "::" + r.SchoolLocalId
 		}
 	}
+	if len(key) == 0 && len(r.LocalId) > 0 {
+		key = r.LocalId
+	}
 	return strings.ToLower(key)
 }
 

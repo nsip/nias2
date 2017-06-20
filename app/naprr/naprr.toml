@@ -1,3 +1,6 @@
 # Attributes on which student is matched between Pearson/Fuji ingest and XML ingest. Done as list of struct attributes of RegistrationRecord, comma delimited
 Yr3WStudentMatch = ["FamilyName", "GivenName"]
-StudentMatch = ["FamilyName", "GivenName"]
+
+# Attributes on which student from ingest file is matched with student in response file. Done as list of struct attributes of RegistrationRecord, comma delimited. Note that PSI is used by default.
+MatchAttributes = ["FamilyName", "GivenName"]
+
