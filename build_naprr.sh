@@ -18,11 +18,11 @@ do_build() {
 	cd $CWD
 	cd ./app/auditdiff
 	go get
-	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $AUDITDIFF/$AUDITDIFFHARNESS
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$AUDITDIFFHARNESS
 	cd ..
 
 	rsync -a naprr/templates naprr/public naprr/naprr.toml $OUTPUT/
-	rsync -a auditdiff/naprr.toml $AUDITDIFF/
+	#rsync -a auditdiff/naprr.toml $AUDITDIFF/
 }
 
 # do_shells() {
@@ -51,6 +51,9 @@ do_zip() {
 	cd $OUTPUT
 	cd ..
 	zip -qr ../$ZIP naprr
+	cd $AUDITDIFF
+	cd ..
+	zip -qr ../$ZIP auditdiff
 	cd $CWD
 }
 
