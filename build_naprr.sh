@@ -11,6 +11,12 @@ CWD=`pwd`
 
 do_build() {
 	mkdir -p $OUTPUT
+	cd $OUTPUT
+	rm -fr in
+	mkdir in
+	mkdir in/Reg
+	mkdir in/Pearson
+	mkdir in/FujiXerox
 	cd $CWD
 	cd ./app/naprr
 	go get
@@ -50,10 +56,8 @@ do_build() {
 do_zip() {
 	cd $OUTPUT
 	cd ..
+	rm -f ../$ZIP
 	zip -qr ../$ZIP naprr
-	cd $AUDITDIFF
-	cd ..
-	zip -qr ../$ZIP auditdiff
 	cd $CWD
 }
 
@@ -64,7 +68,6 @@ build_mac64() {
 	GOARCH=amd64
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Mac/naprr
-	AUDITDIFF=$CWD/build/Mac/auditdiff
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
 	AUDITDIFFHARNESS=auditdiff
@@ -84,7 +87,6 @@ build_windows64() {
 	GOARCH=amd64
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win64/naprr
-	AUDITDIFF=$CWD/build/Win64/auditdiff
 	# GNATS=nats-streaming-server.exe
 	AUDITDIFFHARNESS=auditdiff.exe
 	HARNESS=naprr.exe
@@ -103,7 +105,6 @@ build_windows32() {
 	GOARCH=386
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win32/naprr
-	AUDITDIFF=$CWD/build/Win32/auditdiff
 	# GNATS=nats-streaming-server.exe
 	HARNESS=naprr.exe
 	AUDITDIFFHARNESS=auditdiff.exe
@@ -122,7 +123,6 @@ build_linux64() {
 	GOARCH=amd64
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Linux64/naprr
-	AUDITDIFF=$CWD/build/Linux64/auditdiff
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
 	AUDITDIFFHARNESS=auditdiff
@@ -141,7 +141,6 @@ build_linux32() {
 	GOARCH=386
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Linux32/naprr
-	AUDITDIFF=$CWD/build/Linux32/auditdiff
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
 	AUDITDIFFHARNESS=auditdiff
