@@ -510,9 +510,7 @@ func (di *DataIngest) ingestPearsonResultsFile(resultsFilePath string) {
 			}{PNPCode: pearson2sifAdjustment(r["special_provision"])}
 		}
 		if r["reason_for_withholding"] != "" {
-			event.TestDisruptionList.TestDisruption = make([]struct {
-				Event string `xml:"Event,omitempty"`
-			}, 1)
+			event.TestDisruptionList.TestDisruption = make([]nxml.TestDisruption, 1)
 			event.TestDisruptionList.TestDisruption[0].Event = pearson2sifTestDisruption(r["reason_for_withholding"])
 		}
 		ge, err := di.ge.Encode(event)

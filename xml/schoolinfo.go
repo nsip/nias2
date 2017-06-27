@@ -1,124 +1,140 @@
 package xml
 
 type SchoolInfo struct {
-	RefId           string `xml:"RefId,attr"`
-	LocalId         string `xml:"LocalId"`
-	StateProvinceId string `xml:"StateProvinceId"`
-	ACARAId         string `xml:"ACARAId"`
-	SchoolName      string `xml:"SchoolName"`
-	LEAInfoRefId    string `xml:"LEAInfoRefId"`
-	OtherLEA        string `xml:"OtherLEA"`
-	SchoolDistrict  string `xml:"SchoolDistrict"`
-	SchoolType      string `xml:"SchoolType"`
-	StudentCount    string // non xml field added for reporting
+	RefId                    string            `xml:"RefId,attr"`
+	LocalId                  string            `xml:"LocalId"`
+	StateProvinceId          string            `xml:"StateProvinceId"`
+	ACARAId                  string            `xml:"ACARAId"`
+	SchoolName               string            `xml:"SchoolName"`
+	LEAInfoRefId             string            `xml:"LEAInfoRefId"`
+	OtherLEA                 string            `xml:"OtherLEA"`
+	SchoolDistrict           string            `xml:"SchoolDistrict"`
+	SchoolType               string            `xml:"SchoolType"`
+	StudentCount             string            // non xml field added for reporting
+	SchoolFocusList          SchoolFocusList   `xml:"SchoolFocusList"`
+	SchoolURL                string            `xml:"SchoolURL"`
+	PrincipalInfo            PrincipalInfo     `xml:"PrincipalInfo"`
+	SchoolContactList        SchoolContactList `xml:"SchoolContactList"`
+	PhoneNumberList          PhoneNumberList   `xml:"PhoneNumberList"`
+	SessionType              string            `xml:"SessionType"`
+	YearLevels               YearLevelList     `xml:"YearLevels"`
+	ARIA                     string            `xml:"ARIA"`
+	OperationalStatus        string            `xml:"OperationalStatus"`
+	FederalElectorate        string            `xml:"FederalElectorate"`
+	Campus                   Campus            `xml:"Campus"`
+	SchoolSector             string            `xml:"SchoolSector"`
+	IndependentSchool        string            `xml:"IndependentSchool"`
+	NonGovSystemicStatus     string            `xml:"NonGovSystemicStatus"`
+	System                   string            `xml:"System"`
+	ReligiousAffiliation     string            `xml:"ReligiousAffiliation"`
+	SchoolGeographicLocation string            `xml:"SchoolGeographicLocation"`
+	LocalGovernmentArea      string            `xml:"LocalGovernmentArea"`
+	JurisdictionLowerHouse   string            `xml:"JurisdictionLowerHouse"`
+	SLA                      string            `xml:"SLA"`
+	SchoolCoEdStatus         string            `xml:"SchoolCoEdStatus"`
+	SchoolGroupList          SchoolGroupList   `xml:"SchoolGroupList"`
+}
 
-	SchoolFocusList struct {
-		SchoolFocus []string `xml:"SchoolFocus"`
-	} `xml:"SchoolFocusList"`
-	SchoolURL string `xml:"SchoolURL"`
+type SchoolGroupList struct {
+	SchoolGroup []string `xml:"SchoolGroup"`
+}
 
-	PrincipalInfo struct {
-		ContactName struct {
-			Type       string `xml:"Type,attr"`
-			Title      string `xml:"Title"`
-			FamilyName string `xml:"FamilyName"`
-			GivenName  string `xml:"GivenName"`
-			MiddleName string `xml:"MiddleName"`
-			Suffix     string `xml:"Suffix"`
-			FullName   string `xml:"FullName"`
-		} `xml:"ContactName"`
-		ContactTitle string `xml:"ContactTitle"`
-	} `xml:"PrincipalInfo"`
+type Campus struct {
+	SchoolCampusId string `xml:"SchoolCampusId"`
+	CampusType     string `xml:"CampusType"`
+	AdminStatus    string `xml:"AdminStatus"`
+}
 
-	SchoolContactList struct {
-		SchoolContact []struct {
-			PublishInDirectory string `xml:"PublishInDirectory"`
-			ContactInfo        struct {
-				Name struct {
-					Type       string `xml:"Type,attr"`
-					Title      string `xml:"Title"`
-					FamilyName string `xml:"FamilyName"`
-					GivenName  string `xml:"GivenName"`
-					MiddleName string `xml:"MiddleName"`
-					Suffix     string `xml:"Suffix"`
-					FullName   string `xml:"FullName"`
-				} `xml:"Name"`
+type YearLevelList struct {
+	YearLevel []YearLevel `xml:"YearLevel"`
+}
 
-				PositionTitle string `xml:"PositionTitle"`
-				Role          string `xml:"Role"`
+type YearLevel []struct {
+	Code string `xml:"Code"`
+}
 
-				Address struct {
-					Type   string `xml:"Type,attr"`
-					Role   string `xml:"Role,attr"`
-					Street struct {
-						Line1 string `xml:"Line1"`
-					} `xml:"Street"`
-					City          string `xml:"City"`
-					StateProvince string `xml:"StateProvince"`
-					Country       string `xml:"Country"`
-					PostalCode    string `xml:"PostalCode"`
-					GridLocation  struct {
-						Latitude  string `xml:"Latitude"`
-						Longitude string `xml:"Longitude"`
-					} `xml:"GridLocation"`
-				} `xml:"Address"`
+type PhoneNumberList struct {
+	PhoneNumber []PhoneNumber `xml:"PhoneNumber"`
+}
 
-				EmailList struct {
-					Email []struct {
-						Type    string `xml:"Type,attr"`
-						Address string `xml:"Email"`
-					}
-				} `xml:"EmailList"`
+type PhoneNumber struct {
+	Type   string `xml:"Type,attr"`
+	Number string `xml:"Number"`
+}
 
-				PhoneNumberList struct {
-					PhoneNumber []struct {
-						Type         string `xml:"Type,attr"`
-						Number       string `xml:"Number"`
-						Extension    string `xml:"Extension"`
-						ListedStatus string `xml:"ListedStatus"`
-					} `xml:"PhoneNumber"`
-				} `xml:"PhoneNumberList"`
-			} `xml:"ContactInfo"`
-		} `xml:"SchoolContact"`
-	} `xml:"SchoolContactList"`
+type SchoolFocusList struct {
+	SchoolFocus []string `xml:"SchoolFocus"`
+}
 
-	PhoneNumberList struct {
-		PhoneNumber []struct {
-			Type   string `xml:"Type,attr"`
-			Number string `xml:"Number"`
-		} `xml:"PhoneNumber"`
-	} `xml:"PhoneNumberList"`
+type NameType struct {
+	Type       string `xml:"Type,attr"`
+	Title      string `xml:"Title"`
+	FamilyName string `xml:"FamilyName"`
+	GivenName  string `xml:"GivenName"`
+	MiddleName string `xml:"MiddleName"`
+	Suffix     string `xml:"Suffix"`
+	FullName   string `xml:"FullName"`
+}
 
-	SessionType string `xml:"SessionType"`
+type EmailList struct {
+	Email Email
+}
 
-	YearLevels struct {
-		YearLevel []struct {
-			Code string `xml:"Code"`
-		} `xml:"YearLevel"`
-	} `xml:"YearLevels"`
+type Email struct {
+	Type    string `xml:"Type,attr"`
+	Address string `xml:"Email"`
+}
 
-	ARIA              string `xml:"ARIA"`
-	OperationalStatus string `xml:"OperationalStatus"`
-	FederalElectorate string `xml:"FederalElectorate"`
+type FullPhoneNumberList struct {
+	PhoneNumber []FullPhoneNumber `xml:"PhoneNumber"`
+}
 
-	Campus struct {
-		SchoolCampusId string `xml:"SchoolCampusId"`
-		CampusType     string `xml:"CampusType"`
-		AdminStatus    string `xml:"AdminStatus"`
-	} `xml:"Campus"`
+type FullPhoneNumber struct {
+	Type         string `xml:"Type,attr"`
+	Number       string `xml:"Number"`
+	Extension    string `xml:"Extension"`
+	ListedStatus string `xml:"ListedStatus"`
+}
 
-	SchoolSector             string `xml:"SchoolSector"`
-	IndependentSchool        string `xml:"IndependentSchool"`
-	NonGovSystemicStatus     string `xml:"NonGovSystemicStatus"`
-	System                   string `xml:"System"`
-	ReligiousAffiliation     string `xml:"ReligiousAffiliation"`
-	SchoolGeographicLocation string `xml:"SchoolGeographicLocation"`
-	LocalGovernmentArea      string `xml:"LocalGovernmentArea"`
-	JurisdictionLowerHouse   string `xml:"JurisdictionLowerHouse"`
-	SLA                      string `xml:"SLA"`
-	SchoolCoEdStatus         string `xml:"SchoolCoEdStatus"`
+type PrincipalInfo struct {
+	ContactName  NameType `xml:"ContactName"`
+	ContactTitle string   `xml:"ContactTitle"`
+}
 
-	SchoolGroupList struct {
-		SchoolGroup []string `xml:"SchoolGroup"`
-	} `xml:"SchoolGroupList"`
+type SchoolContactList struct {
+	SchoolContact []SchoolContact `xml:"SchoolContact"`
+}
+
+type SchoolContact struct {
+	PublishInDirectory string      `xml:"PublishInDirectory"`
+	ContactInfo        ContactInfo `xml:"ContactInfo"`
+}
+
+type ContactInfo struct {
+	Name            NameType            `xml:"Name"`
+	PositionTitle   string              `xml:"PositionTitle"`
+	Role            string              `xml:"Role"`
+	Address         Address             `xml:"Address"`
+	EmailList       EmailList           `xml:"EmailList"`
+	PhoneNumberList FullPhoneNumberList `xml:"PhoneNumberList"`
+}
+
+type Address struct {
+	Type          string       `xml:"Type,attr"`
+	Role          string       `xml:"Role,attr"`
+	Street        Street       `xml:"Street"`
+	City          string       `xml:"City"`
+	StateProvince string       `xml:"StateProvince"`
+	Country       string       `xml:"Country"`
+	PostalCode    string       `xml:"PostalCode"`
+	GridLocation  GridLocation `xml:"GridLocation"`
+}
+
+type Street struct {
+	Line1 string `xml:"Line1"`
+}
+
+type GridLocation struct {
+	Latitude  string `xml:"Latitude"`
+	Longitude string `xml:"Longitude"`
 }

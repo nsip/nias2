@@ -1,19 +1,23 @@
 package xml
 
 type NAPTestlet struct {
-	TestletID      string `xml:"RefId,attr"`
-	NAPTestRefId   string `xml:"NAPTestRefId"`
-	TestletContent struct {
-		LocalId             string `xml:"NAPTestletLocalId,omitempty"`
-		NAPTestLocalId      string `xml:"NAPTestLocalId,omitempty"`
-		TestletName         string `xml:"TestletName,omitempty"`
-		Node                string `xml:"Node,omitempty"`
-		LocationInStage     string `xml:"LocationInStage,omitempty"`
-		TestletMaximumScore string `xml:"TestletMaximumScore,omitempty"`
-	} `xml:"TestletContent"`
-	TestItemList struct {
-		TestItem []NAPTestlet_TestItem `xml:"TestItem"`
-	} `xml:"TestItemList"`
+	TestletID      string         `xml:"RefId,attr"`
+	NAPTestRefId   string         `xml:"NAPTestRefId"`
+	TestletContent TestletContent `xml:"TestletContent"`
+	TestItemList   TestItemList   `xml:"TestItemList"`
+}
+
+type TestletContent struct {
+	LocalId             string `xml:"NAPTestletLocalId,omitempty"`
+	NAPTestLocalId      string `xml:"NAPTestLocalId,omitempty"`
+	TestletName         string `xml:"TestletName,omitempty"`
+	Node                string `xml:"Node,omitempty"`
+	LocationInStage     string `xml:"LocationInStage,omitempty"`
+	TestletMaximumScore string `xml:"TestletMaximumScore,omitempty"`
+}
+
+type TestItemList struct {
+	TestItem []NAPTestlet_TestItem `xml:"TestItem"`
 }
 
 type NAPTestlet_TestItem struct {

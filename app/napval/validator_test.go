@@ -56,15 +56,15 @@ func TestSexInvalid(t *testing.T) {
 }
 
 func TestYearLevelPrep(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1students1YearLevelPrep.csv", "BirthDate/TestLevel", "Year level supplied is P, does not match expected test level")
+	test_harness(t, "../../unit_test_files/1students1YearLevelPrep.csv", "BirthDate/TestLevel", "Year level P does not match Test level")
 }
 
 func TestYearLevelF(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1students2YearLevelF.csv", "BirthDate/YearLevel", "Student Year Level (yr F) does not match year level derived from BirthDate")
+	test_harness(t, "../../unit_test_files/1students2YearLevelF.csv", "BirthDate/TestLevel", "Student Year Level (yr F) does not match year level derived from BirthDate")
 }
 
 func TestYearLevelP(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1students1YearLevelP.csv", "BirthDate/TestLevel", "")
+	test_harness(t, "../../unit_test_files/1students1YearLevelP.csv", "BirthDate/YearLevel", "")
 }
 
 func TestFutureBirthdate(t *testing.T) {
@@ -272,7 +272,7 @@ func TestOutsideAgeRange9(t *testing.T) {
 }
 
 func TestOutsideAgeRangeUG(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsOutsideAgeRangeUG.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsOutsideAgeRangeUG.csv", "BirthDate/TestLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
 }
 
 func TestSameStudentIdTwoDifferentSchoolId(t *testing.T) {
@@ -280,19 +280,19 @@ func TestSameStudentIdTwoDifferentSchoolId(t *testing.T) {
 }
 
 func TestUngradedValuesUGJunSec(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGJunSec.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGJunSec.csv", "BirthDate/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
 }
 
 func TestUngradedValuesUGSnrSec(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGSnrSec.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGSnrSec.csv", "BirthDate/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
 }
 
 func TestUngradedValuesUGPri(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGPri.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGPri.csv", "BirthDate/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
 }
 
 func TestUngradedValuesUGSec(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGSec.csv", "BirthDate/TestLevel/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGSec.csv", "BirthDate/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
 }
 
 func TestUnusualCountryCodes(t *testing.T) {
