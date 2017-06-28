@@ -47,7 +47,8 @@ do_goupx() {
 do_zip() {
 	cd $OUTPUT
 	cd ..
-	zip -qr ../$ZIP go-nias8
+	#zip -qr ../$ZIP go-nias8
+	cd $CWD
 }
 
 build_mac64() {

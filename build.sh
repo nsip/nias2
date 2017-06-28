@@ -18,6 +18,16 @@ do_build() {
 	cd $CWD
 }
 
+do_zip() {
+        cd $OUTPUT
+        cd ..
+	rm -f ../$ZIP
+        zip -qr ../$ZIP go-nias8
+        zip -qr ../$ZIP napval
+        zip -qr ../$ZIP naprr
+	cd $CWD
+}
+
 build_mac64() {
 	# MAC OS X (64 only)
 	echo "Building Mac binaries..."
@@ -28,6 +38,7 @@ build_mac64() {
 	GNATS=nats-streaming-server
 	ZIP=go-nias-Mac.zip
 	do_build
+	do_zip
 	echo "...all Mac binaries built..."
 }
 
@@ -42,6 +53,7 @@ build_windows64() {
 	GNATS=nats-streaming-server.exe
 	ZIP=go-nias-Win64.zip
 	do_build
+	do_zip
 	echo "...all Windows64 binaries built..."
 }
 
@@ -55,6 +67,7 @@ build_windows32() {
 	GNATS=nats-streaming-server.exe
 	ZIP=go-nias-Win32.zip
 	do_build
+	do_zip
 	echo "...all Windows32 binaries built..."
 }
 
@@ -68,6 +81,7 @@ build_linux64() {
 	GNATS=nats-streaming-server
 	ZIP=go-nias-Linux64.zip
 	do_build
+	do_zip
 	echo "...all Linux64 binaries built..."
 }
 
@@ -87,11 +101,16 @@ build_linux32() {
 	NAPYR3WHARNESS=napyr3w
 	ZIP=go-nias-Linux32.zip
 	do_build
+	do_zip
 	echo "...all Linux32 binaries built..."
 }
 
 # TODO ARM
 # GOOS=linux GOARCH=arm GOARM=7 go build -o $CWD/build/LinuxArm7/go-nias/aggregator
+
+sh build_sms.sh
+sh build_napval.sh
+sh build_naprr.sh
 
 build_mac64
 build_windows64
@@ -99,6 +118,3 @@ build_windows32
 build_linux64
 build_linux32
 
-sh build_sms.sh
-sh build_napval.sh
-sh build_naprr.sh

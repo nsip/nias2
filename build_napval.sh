@@ -47,7 +47,7 @@ do_goupx() {
 do_zip() {
 	cd $OUTPUT
 	cd ..
-	zip -qr ../$ZIP napval
+	#zip -qr ../$ZIP napval
 	cd $CWD
 }
 

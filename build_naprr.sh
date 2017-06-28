@@ -56,8 +56,8 @@ do_build() {
 do_zip() {
 	cd $OUTPUT
 	cd ..
-	rm -f ../$ZIP
-	zip -qr ../$ZIP naprr
+	#rm -f ../$ZIP
+	#zip -qr ../$ZIP naprr
 	cd $CWD
 }
 
