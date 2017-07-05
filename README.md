@@ -61,7 +61,7 @@ The product does not incorporate authentication or authorisation.
 
 ## 2.2. Binary, DOS
 Manually unzip file directory in the zip `go-nias` and put it in c:\
-Then run `gonias.bat` file from that directory
+Then run `gonias.bat` file from the `nias` subdirectory
 
 ## 2.3. From source code
 
@@ -90,10 +90,12 @@ NIAS2 relies on the following infrastructure:
 * Contains files used in unit/integration testing of the code. Currently restricted to CSV files input into the validation module.
 
 `build.sh`, `build/`, `release.sh`
-* `build.sh` is the script to build all NIAS2 executables for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/go-nias8/`. 
-* `build_napval.sh` is the script to build NIAS2 executables speficic to NAPLAN registration for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/go-nias8/`. 
+* `build.sh` is the script to build all NIAS2 executables for the various supported platforms. 
+* `build_sms.sh` is the script to build the executables specific to the SSF and SMS. The builds for each platform are built in `build/{PLATFORM}/nias/`. 
+* `build_napval.sh` is the script to build NIAS2 executables speficic to NAPLAN registration for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/napval/`. 
 * `build_naprr.sh` is the script to build NIAS2 executables specific to NAPLAN results & reporting for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/naprr/`. 
-* The `release_naprr.sh` and `release_napvalr.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including the binary files specific to NAPLAN results & reporting and NAPLAN registration, respectively. 
+* The `release_naprr.sh` and `release_napval.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including the binary files specific to NAPLAN results & reporting and NAPLAN registration, respectively. 
+* The `release_napval.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including the binary files specific to both NAPLAN results & reporting and NAPLAN registration.
 * The supported platforms are: 
   * Mac OSX
   * Windows 32 bit
@@ -117,7 +119,7 @@ Contains the code to run executables within NIAS as single pieces of software, a
   * `sms/` : the SIF Memory Store functionality of NIAS (ported from Ruby)
   * `napval/` : NAPLAN Registration records validation
   * `naprr/` : NAPLAN Results and Reporting post-processing
-  * `napyr3w/` : Reconciliation of Paper Year 3 Writing results with Online NAPLAN results
+  * `napcomp/` : Comparison of students between NAPLAN Registration and NAPLAN Results and Reporting (included in `naprr` distribution)
   
 `napval/`
 Code for NAPLAN Registration records validation

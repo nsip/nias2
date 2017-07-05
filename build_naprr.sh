@@ -22,7 +22,7 @@ do_build() {
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd $CWD
-	cd ./app/auditdiff
+	cd ./app/napcomp
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$AUDITDIFFHARNESS
 	cd ..

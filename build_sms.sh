@@ -57,9 +57,9 @@ build_mac64() {
 	GOOS=darwin
 	GOARCH=amd64
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Mac/go-nias8
+	OUTPUT=$CWD/build/Mac/nias
 	GNATS=nats-streaming-server
-	SMSHARNESS=sms
+	SMSHARNESS=nias
 	ZIP=go-nias-Mac.zip
 	do_clear
 	do_build
@@ -76,9 +76,9 @@ build_windows64() {
 	GOOS=windows
 	GOARCH=amd64
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Win64/go-nias8
+	OUTPUT=$CWD/build/Win64/nias
 	GNATS=nats-streaming-server.exe
-	SMSHARNESS=sms.exe
+	SMSHARNESS=nias.exe
 	ZIP=go-nias-Win64.zip
 	do_clear
 	do_build
@@ -94,9 +94,9 @@ build_windows32() {
 	GOOS=windows
 	GOARCH=386
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Win32/go-nias8
+	OUTPUT=$CWD/build/Win32/nias
 	GNATS=nats-streaming-server.exe
-	SMSHARNESS=sms.exe
+	SMSHARNESS=nias.exe
 	ZIP=go-nias-Win32.zip
 	do_clear
 	do_build
@@ -112,9 +112,9 @@ build_linux64() {
 	GOOS=linux
 	GOARCH=amd64
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Linux64/go-nias8
+	OUTPUT=$CWD/build/Linux64/nias
 	GNATS=nats-streaming-server
-	SMSHARNESS=sms
+	SMSHARNESS=nias
 	ZIP=go-nias-Linux64.zip
 	do_clear
 	do_build
@@ -130,9 +130,9 @@ build_linux32() {
 	GOOS=linux
 	GOARCH=386
 	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Linux32/go-nias8
+	OUTPUT=$CWD/build/Linux32/nias
 	GNATS=nats-streaming-server
-	SMSHARNESS=sms
+	SMSHARNESS=nias
 	ZIP=go-nias-Linux32.zip
 	do_clear
 	do_build
