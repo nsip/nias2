@@ -5,9 +5,9 @@ rem gnatsd MUST be the first program launched
 @echo off
 
 rem Run the NIAS services. Add to the BOTTOM of this list
-start nats-streaming-server -p 4223 -sc napval_nss.cfg
+start nats-streaming-server -p 4223 -sc nias_nss.cfg
 timeout /t 3
-start napval
+start go-nias8
 
 
 rem Run the web client (launch browser here)

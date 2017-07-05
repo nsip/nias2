@@ -20,18 +20,19 @@ do_build() {
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
 	rsync -a napval/nias8help.pdf napval/napval.toml napval/napval_nss.cfg napval/public napval/schemas napval/schoolslist napval/templates $OUTPUT/
+	rsync -a napval/students.csv $OUTPUT/
 }
 
 do_shells() {
 	cd $CWD
-	cp bin/gonias.sh $OUTPUT/
-	cp bin/stopnias.sh $OUTPUT/
+	cp bin/gonapval.sh $OUTPUT/
+	cp bin/stopnapval.sh $OUTPUT/
 }
 
 do_bats() {
 	cd $CWD
-	cp bin/gonias.bat $OUTPUT/
-	cp bin/stopnias.bat $OUTPUT/
+	cp bin/gonapval.bat $OUTPUT/
+	cp bin/stopnapval.bat $OUTPUT/
 }
 
 do_upx() {
