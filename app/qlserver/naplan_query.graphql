@@ -1,0 +1,52 @@
+# Combined query for all data in one go.
+# Expand fragments as needed.
+
+query NAPData($acaraIDs: [String]!, $onlyDisruptions: Boolean) {
+  getSchoolData(acaraIDs: $acaraIDs) {
+    events(onlyDisruptions: $onlyDisruptions) {
+      ...eventFields
+    }
+    responses{
+      ...responseFields
+    }
+    students {
+      ...studentFields
+    }
+    score_summaries {
+      ...summaryFields
+    }
+  }
+}
+
+fragment summaryFields on ScoreSummary {
+  DomainSchoolAverage
+  DomainNationalAverage
+}
+
+fragment eventFields on NAPEvent {
+  PSI
+}
+
+fragment responseFields on NAPResponseSet {
+  PathTakenForDomain
+}
+
+fragment studentFields on RegistrationRecord {
+  FamilyName
+  GivenName
+}
+
+# Variables:
+{
+  "acaraIDs": [
+    "21213"
+  ],
+  "onlyDisruptions": true
+}
+
+
+
+
+
+
+
