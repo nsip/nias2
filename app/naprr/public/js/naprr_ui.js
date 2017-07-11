@@ -363,7 +363,7 @@ function createYearLevelFilter()
 
     // all year levels selector
     var input = $("<p>" +
-        "<input name='yrlvlFilter' type='radio' id='all' level='all' />" +
+        "<input name='yrlvlFilter' type='radio' id='all' level='all' checked />" +
         "<label for='all'>All</label>" +
         "</p>"
     );
@@ -402,7 +402,7 @@ function createDomainFilter()
 
     // all domains selector
     var input = $("<p>" +
-        "<input name='domainFilter' type='radio' id='all-domains' domain='all' />" +
+        "<input name='domainFilter' type='radio' id='all-domains' domain='all' checked />" +
         "<label for='all-domains'>All</label>" +
         "</p>"
     );
