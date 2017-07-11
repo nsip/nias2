@@ -4,7 +4,7 @@
 
 if [ -f "nias.pid" ]
 then
-echo "There is a nias.pid file in place; run stopnias.sh"
+echo "There is a nias.pid file in place; run stopnapval.sh"
 exit
 fi
 
