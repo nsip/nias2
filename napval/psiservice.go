@@ -115,6 +115,7 @@ func (psi *PsiService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "PlatformId",
 			OriginalLine: req.SeqNo,
 			Vtype:        "PSI",
+			Severity:     "error",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID
@@ -131,6 +132,7 @@ func (psi *PsiService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "PreviousPlatformId",
 			OriginalLine: req.SeqNo,
 			Vtype:        "PSI",
+			Severity:     "error",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID

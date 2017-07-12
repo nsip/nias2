@@ -131,14 +131,14 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	//log.Printf("simplekey: %s\nsimplekey2: %s\ncompllexkey: %s", simpleKey1, simpleKey2, complexKey)
 	var simpleRecordExists1, simpleRecordExists2, complexRecordExists bool
 
-	if simpleRecordExists1 = tids.SimpleKeysLocalId.Has(simpleKey1); !simpleRecordExists1 {
+	if simpleRecordExists1 = (tids.SimpleKeysLocalId.Has(simpleKey1) && len(rr.LocalId) > 0); !simpleRecordExists1 {
 		tids.SimpleKeysLocalId.Add(simpleKey1)
 	}
-	if simpleRecordExists2 = tids.SimpleKeysPSI.Has(simpleKey2); !simpleRecordExists2 {
+	if simpleRecordExists2 = (tids.SimpleKeysPSI.Has(simpleKey2) && len(platformid) > 0); !simpleRecordExists2 {
 		tids.SimpleKeysPSI.Add(simpleKey2)
 	}
 
-	if complexRecordExists = tids.ExtendedKeys.Has(complexKey); !complexRecordExists {
+	if complexRecordExists = (tids.ExtendedKeys.Has(complexKey) && len(rr.LocalId) > 0); !complexRecordExists {
 		tids.ExtendedKeys.Add(complexKey)
 	}
 	tids.Locations.SetIfAbsent(simpleKey1, req.SeqNo)
@@ -161,6 +161,7 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "Multiple (see description)",
 			OriginalLine: req.SeqNo,
 			Vtype:        "identity",
+			Severity:     "warning",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID
@@ -178,6 +179,7 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "LocalID/ASL ID",
 			OriginalLine: req.SeqNo,
 			Vtype:        "identity",
+			Severity:     "warning",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID
@@ -195,6 +197,7 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			Field:        "PSI/ASL ID",
 			OriginalLine: req.SeqNo,
 			Vtype:        "identity",
+			Severity:     "warning",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID
@@ -202,6 +205,7 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		// r.Target = VALIDATION_PREFIX
 		r.Body = ve
 		responses = append(responses, r)
+		log.Printf("simplekey: %s\nsimplekey2: %s\ncompllexkey: %s", simpleKey1, simpleKey2, complexKey)
 
 	}
 

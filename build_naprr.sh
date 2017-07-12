@@ -11,12 +11,26 @@ CWD=`pwd`
 
 do_build() {
 	mkdir -p $OUTPUT
+	cd $OUTPUT
+	rm -fr in
+	mkdir in
+	mkdir in/Reg
+	#mkdir in/Pearson
+	#mkdir in/FujiXerox
 	cd $CWD
 	cd ./app/naprr
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
+	cd $CWD
+	cd ./app/napcomp
+	go get
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$AUDITDIFFHARNESS
 	cd ..
-	rsync -a naprr/in naprr/templates naprr/public naprr/naprr.toml $OUTPUT/
+
+	rsync -a naprr/templates naprr/public naprr/naprr.toml $OUTPUT/
+	rsync -a naprr/master_nap.xml.zip $OUTPUT/in/
+	rsync -a napval/students.csv $OUTPUT/in/Reg/
+	#rsync -a auditdiff/naprr.toml $AUDITDIFF/
 }
 
 # do_shells() {
@@ -44,7 +58,8 @@ do_build() {
 do_zip() {
 	cd $OUTPUT
 	cd ..
-	zip -qr ../$ZIP naprr
+	#rm -f ../$ZIP
+	#zip -qr ../$ZIP naprr
 	cd $CWD
 }
 
@@ -57,6 +72,7 @@ build_mac64() {
 	OUTPUT=$CWD/build/Mac/naprr
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
+	AUDITDIFFHARNESS=napcomp
 	ZIP=nias-naprr-Mac.zip
 	do_build
 	#do_upx
@@ -74,6 +90,7 @@ build_windows64() {
 	LDFLAGS="-s -w"
 	OUTPUT=$CWD/build/Win64/naprr
 	# GNATS=nats-streaming-server.exe
+	AUDITDIFFHARNESS=napcomp.exe
 	HARNESS=naprr.exe
 	ZIP=nias-naprr-Win64.zip
 	do_build
@@ -92,6 +109,7 @@ build_windows32() {
 	OUTPUT=$CWD/build/Win32/naprr
 	# GNATS=nats-streaming-server.exe
 	HARNESS=naprr.exe
+	AUDITDIFFHARNESS=napcomp.exe
 	ZIP=nias-naprr-Win32.zip
 	do_build
 	#do_upx
@@ -109,6 +127,7 @@ build_linux64() {
 	OUTPUT=$CWD/build/Linux64/naprr
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
+	AUDITDIFFHARNESS=napcomp
 	ZIP=nias-naprr-Linux64.zip
 	do_build
 	#do_goupx
@@ -126,6 +145,7 @@ build_linux32() {
 	OUTPUT=$CWD/build/Linux32/naprr
 	# GNATS=nats-streaming-server
 	HARNESS=naprr
+	AUDITDIFFHARNESS=napcomp
 	ZIP=nias-naprr-Linux32.zip
 	do_build
 	#do_goupx

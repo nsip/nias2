@@ -10,12 +10,12 @@ fi
 
 #rem Run the NIAS services. Add to the BOTTOM of this list
 # store each PID in pid list
-./nats-streaming-server -p 4223 -sc napval_nss.cfg & echo $! > nias.pid
+./nats-streaming-server -p 4223 -sc nias_nss.cfg & echo $! > nias.pid
 
 # give the nats server time to come up
 sleep 2
 
-./napval & echo $! >> nias.pid
+./go-nias8 & echo $! >> nias.pid
 
 echo "Run the web client (launch browser here):"
 echo "http://localhost:1325/nias (NAPLAN Registration)"

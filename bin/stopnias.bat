@@ -4,6 +4,6 @@ rem This is the NIAS batch file terminator.
 
 rem Stop the NIAS services. 
 taskkill /IM nats-streaming-server.exe
-taskkill /IM napval.exe
+taskkill /IM go-nias8.exe
 
 

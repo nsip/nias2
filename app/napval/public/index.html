@@ -47,9 +47,9 @@
                 <div class="row">
                     <div class="col s12 center">
                         <h3><i class="mdi-content-send brown-text"></i></h3>
-                        <h4 class="header light left-align white-text">Validate NAPLAN Registration Data</h4>
+                        <h4 class="header light left-align white-text">Validate NAPLAN Registration Data (NAPVAL)</h4>
                         <p class="left-align light white-text">
-                            Select a CSV or XML file containing NAPLAN registration data with the File selctor below, or by dragging file from your desktop onto the grey line. Press the green arrow button to run the validation analysis. For access to the user guide and resource links click on the floating blue menu button in the lower right hand corner of the page.
+                            Select a CSV or XML file containing NAPLAN registration data with the File selector below, or by dragging file from your desktop onto the grey line. Press the green arrow button to run the validation analysis. For access to the user guide and resource links click on the floating blue menu button in the lower right hand corner of the page.
                         </p>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
         <div class="section">
             <div class="row">
                 <div class="col s11 center">
-                    <form method="post" action="/naplan/reg/validate" enctype="multipart/form-data">
+                    <form method="post" action="/naplan/reg/validate" enctype="multipart/form-data" id="validateform">
                         <div class="file-field input-field">
                             <div class="btn green">
                                 <span>File</span>
@@ -202,6 +202,7 @@
                                             <th>Error Type</th>
                                             <th>Error Field</th>
                                             <th>Error Description</th>
+                                            <th>Severity</th>
                                         </tr>
                                     </thead>
                                 </table>

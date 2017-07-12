@@ -17,10 +17,11 @@ type ValidationError struct {
 	Description  string `json:"description"`  // error description
 	OriginalLine string `json:"originalLine"` // input file record line that has the error
 	Vtype        string `json:"validationType"`
+	Severity     string `json:"severity"` // warning, error
 }
 
 // helper method for writing out csv encoding of error reports
 func (ve *ValidationError) ToSlice() []string {
 
-	return []string{ve.OriginalLine, ve.Vtype, ve.Field, ve.Description}
+	return []string{ve.OriginalLine, ve.Vtype, ve.Field, ve.Description, ve.Severity}
 }

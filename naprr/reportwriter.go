@@ -64,9 +64,11 @@ func (rw *ReportWriter) writeTestLevelReports() {
 	var wg sync.WaitGroup
 
 	cfds := rw.sr.GetCodeFrameData(REPORTS_CODEFRAME)
+	nd := rw.sr.GetNAPLANData(META_STREAM)
 
-	wg.Add(2)
+	wg.Add(3)
 
+	go rw.writeCodeFrameReportXML(nd, &wg)
 	go rw.writeCodeFrameReport(cfds, &wg)
 	go rw.writeCodeFrameWritingReport(cfds, &wg)
 
@@ -122,7 +124,7 @@ func (rw *ReportWriter) writeAggregateSchoolReports(schools [][]SchoolDetails) {
 			}
 			if len(filePaths) > 0 {
 				concatenateFiles(filePaths, outputFile)
-				// rewmove temp data files
+				// remove temp data files
 				for _, file := range filePaths {
 					err := os.Remove(file)
 					if err != nil {
@@ -188,6 +190,7 @@ func (rw *ReportWriter) writeSchoolReports(acaraid string, wg *sync.WaitGroup) {
 	rw.writeParticipationReport(acaraid)
 	rw.writeScoreSummaryReport(acaraid)
 	rw.writeDomainScoreReport(acaraid)
+	rw.splitNAPXMLperSchool(acaraid)
 
 	wg.Done()
 }
@@ -295,6 +298,67 @@ func (rw *ReportWriter) writeYr3WritingReport(nd *NAPLANData, rbs []ResultsByStu
 
 }
 
+// report of test structure for writing items only
+// with extended item information
+func (rw *ReportWriter) writeCodeFrameReportXML(nd *NAPLANData, wg *sync.WaitGroup) {
+
+	fpath := "out/"
+	err := os.MkdirAll(fpath, os.ModePerm)
+	check(err)
+
+	// create the report data file in the output directory
+	// delete any ecisting files and create empty new one
+	fname := fpath + "codeframe.xml"
+	err = os.RemoveAll(fname)
+	f, err := os.Create(fname)
+	check(err)
+	defer f.Close()
+
+	e := xml.NewEncoder(f)
+	e.Indent("", "  ")
+	f.WriteString("<NAPResultsReporting>\n")
+	seen := make(map[string]bool)
+	cfcount := 0
+	for _, codeframe := range nd.Codeframes {
+		if len(codeframe.NAPTestRefId) == 0 || seen[codeframe.NAPTestRefId] {
+			continue
+		}
+		if _, ok := nd.Tests[codeframe.NAPTestRefId]; ok {
+			e.Encode(nd.Tests[codeframe.NAPTestRefId])
+			seen[codeframe.NAPTestRefId] = true
+			cfcount++
+		}
+		for _, cf_testlet := range codeframe.TestletList.Testlet {
+			if len(cf_testlet.NAPTestletRefId) == 0 /*|| seen[cf_testlet.NAPTestletRefId] */ {
+				continue
+			}
+			if _, ok := nd.Testlets[cf_testlet.NAPTestletRefId]; ok {
+				e.Encode(nd.Testlets[cf_testlet.NAPTestletRefId])
+				seen[cf_testlet.NAPTestletRefId] = true
+				cfcount++
+			}
+			for _, cf_item := range cf_testlet.TestItemList.TestItem {
+				if len(cf_item.TestItemRefId) == 0 /* || seen[cf_item.TestItemRefId] */ {
+					continue
+				}
+				if _, ok := nd.Items[cf_item.TestItemRefId]; ok {
+					seen[cf_item.TestItemRefId] = true
+					e.Encode(nd.Items[cf_item.TestItemRefId])
+					cfcount++
+				}
+			}
+		}
+	}
+
+	e.Flush()
+	f.WriteString("</NAPResultsReporting>\n")
+
+	log.Printf("Codeframe writing report in XML created for: %d codeframe elements", cfcount)
+
+	wg.Done()
+
+}
+
 // report of test structure, is written only once
 // as an aggrregate report, not at school level
 func (rw *ReportWriter) writeCodeFrameReport(cfds []CodeFrameDataSet, wg *sync.WaitGroup) {
@@ -302,7 +366,7 @@ func (rw *ReportWriter) writeCodeFrameReport(cfds []CodeFrameDataSet, wg *sync.W
 	thdr := rw.t.Lookup("codeframe_hdr.tmpl")
 	trow := rw.t.Lookup("codeframe_row.tmpl")
 
-	// create directory for the school
+	// create directory for the output
 	fpath := "out/"
 	err := os.MkdirAll(fpath, os.ModePerm)
 	check(err)
@@ -362,7 +426,7 @@ func (rw *ReportWriter) writeDomainScoreReport(acaraid string) {
 	check(err)
 
 	// create the report data file in the directory
-	// delete any ecisting files and create empty new one
+	// delete any existing files and create empty new one
 	fname := fpath + "/domain_scores.dat"
 	err = os.RemoveAll(fname)
 	f, err := os.Create(fname)
@@ -440,6 +504,65 @@ func (rw *ReportWriter) writeParticipationReport(acaraid string) {
 	concatenateFiles(inputFile, outputFile)
 
 	log.Printf("Participation report created for: %s %d students", acaraid, len(pds))
+
+}
+
+func (rw *ReportWriter) splitNAPXMLperSchool(acaraid string) {
+
+	// create directory for the school
+	fpath := "out/" + acaraid
+	err := os.MkdirAll(fpath, os.ModePerm)
+	check(err)
+	sd := rw.sr.GetSchoolData(acaraid)
+
+	// create the report data file in the directory
+	// delete any existing files and create empty new one
+	fname := fpath + "/napevents.xml"
+	err = os.RemoveAll(fname)
+	f, err := os.Create(fname)
+	check(err)
+	enc := xml.NewEncoder(f)
+	enc.Indent("", "  ")
+	f.WriteString("<NAPEventStudentLinks xmlns=\"http://www.sifassociation.org/datamodel/au/3.4\">\n")
+	defer f.Close()
+	// write the data
+	for _, val := range sd.Events {
+		enc.Encode(val)
+	}
+	enc.Flush()
+	f.WriteString("</NAPEventStudentLinks>\n")
+
+	fname = fpath + "/students.xml"
+	err = os.RemoveAll(fname)
+	f, err = os.Create(fname)
+	check(err)
+	enc = xml.NewEncoder(f)
+	enc.Indent("", "  ")
+	f.WriteString("<StudentPersonals xmlns=\"http://www.sifassociation.org/datamodel/au/3.4\">\n")
+	defer f.Close()
+	// write the data
+	for _, val := range sd.Students {
+		enc.Encode(val)
+	}
+	enc.Flush()
+	f.WriteString("</StudentPersonals>\n")
+
+	fname = fpath + "/napresponses.xml"
+	err = os.RemoveAll(fname)
+	f, err = os.Create(fname)
+	check(err)
+	enc = xml.NewEncoder(f)
+	enc.Indent("", "  ")
+	f.WriteString("<NAPStudentResponseSets xmlns=\"http://www.sifassociation.org/datamodel/au/3.4\">\n")
+	defer f.Close()
+	// write the data
+	for _, val := range sd.Responses {
+		enc.Encode(val)
+	}
+	enc.Flush()
+	f.WriteString("</NAPStudentResponseSets>\n")
+
+	log.Printf("XML split created for: %s %d students", acaraid, len(sd.Students))
 
 }
 

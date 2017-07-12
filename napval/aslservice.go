@@ -47,6 +47,7 @@ func (asls *ASLService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, 
 			Field:        "ASLSchoolId",
 			OriginalLine: req.SeqNo,
 			Vtype:        "asl",
+			Severity:     "error",
 		}
 		r := lib.NiasMessage{}
 		r.TxID = req.TxID
@@ -65,6 +66,7 @@ func (asls *ASLService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, 
 					Field:        "ASLSchoolId",
 					OriginalLine: req.SeqNo,
 					Vtype:        "asl",
+					Severity:     "warning",
 				}
 				r := lib.NiasMessage{}
 				r.TxID = req.TxID

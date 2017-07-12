@@ -30,20 +30,17 @@ func main() {
 	log.Println("Starting data ingest...")
 
 	di := naprr.NewDataIngest()
-	di.Run()
-	di.RunYr3Writing()
-	student_ids := di.Yr3StudentIds
+	di.RunReportingStudents()
+	di.RunRegRecords()
 	naprr_config := di.NaprrConfig
 	di.Close()
 
 	rb := naprr.NewReportBuilder()
-	// must run Year 3 Writing ingest before full XML: Full XML ingest generates map to reconcile student identities between the two
-	log.Println("Generating report data, Year 3 Writing...")
-	rb.RunYr3W(false, student_ids, naprr_config)
+	rb.RunCompareRegistrationReporting(naprr_config)
 
 	log.Println("Writing report files...")
-	rw := naprr.NewReportWriter()
-	rw.WriteYr3WReports()
+	//rw := naprr.NewReportWriter()
+	//rw.WriteRegistrationAudit()
 	log.Println("Report files Done")
 
 	//runtime.Goexit()
@@ -76,7 +73,7 @@ func launchNatsStreamingServer() *server.StanServer {
 	nOpts := server.DefaultNatsServerOptions
 	nOpts.Port = 5222
 
-	ss := server.RunServerWithOpts(stanOpts, &nOpts)
+	ss, _ := server.RunServerWithOpts(stanOpts, &nOpts)
 
 	return ss
 

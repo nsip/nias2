@@ -259,6 +259,3 @@ func (rg *ReportGenerator) GenerateParticipationData(nd *NAPLANData, sd *SchoolD
 
 	log.Printf("particpation records %d: ", count)
 }
-
-//
-//

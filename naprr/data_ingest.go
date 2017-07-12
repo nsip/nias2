@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/RoaringBitmap/roaring"
 	"github.com/nats-io/go-nats-streaming"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
@@ -16,7 +17,9 @@ import (
 type naprr_config struct {
 	// fields on which to match student in Yr3W ingest with student in XML ingest
 	Yr3WStudentMatch []string
-	Loaded           bool
+	// fields on which to match student in registration ingest with student in reporting ingest
+	MatchAttributes []string
+	Loaded          bool
 }
 
 func LoadConfig() naprr_config {
@@ -35,6 +38,7 @@ type DataIngest struct {
 	// mapping of key to RefId for student records
 	Yr3StudentIds map[string]string
 	NaprrConfig   naprr_config
+	PSIBitmap     *roaring.Bitmap
 }
 
 func NewDataIngest() *DataIngest {
@@ -55,6 +59,24 @@ func (di *DataIngest) Run() {
 	for _, xmlFile := range xmlFiles {
 		wg.Add(1)
 		go di.ingestResultsFile(xmlFile, &wg)
+	}
+
+	wg.Wait()
+
+	di.finaliseTransactions()
+
+	log.Println("All data files read, ingest complete.")
+}
+
+func (di *DataIngest) RunReportingStudents() {
+
+	xmlFiles := parseXMLFileDirectory()
+
+	var wg sync.WaitGroup
+
+	for _, xmlFile := range xmlFiles {
+		wg.Add(1)
+		go di.ingestResultsFileStudents(xmlFile, &wg)
 	}
 
 	wg.Wait()
@@ -98,6 +120,9 @@ func StudentKeyLookup(r xml.RegistrationRecord, fields []string) string {
 		case "SchoolLocalId":
 			key = key + "::" + r.SchoolLocalId
 		}
+	}
+	if len(key) == 0 && len(r.LocalId) > 0 {
+		key = r.LocalId
 	}
 	return strings.ToLower(key)
 }
@@ -379,5 +404,75 @@ func (di *DataIngest) finaliseTransactions() {
 	}
 
 	log.Println("All transactions finalised.")
+
+}
+
+func (di *DataIngest) ingestResultsFileStudents(resultsFilePath string, wg *sync.WaitGroup) {
+
+	// create a connection to the streaming server
+	log.Println("Connecting to STAN server...")
+
+	// open the data file for streaming read
+	log.Printf("Opening results data file %s...", resultsFilePath)
+	xmlFile, err := OpenResultsFile(resultsFilePath)
+	if err != nil {
+		log.Fatalln("unable to open results data file: ", err)
+	}
+	xmlFile, err = OpenResultsFile(resultsFilePath)
+
+	log.Println("Reading data file...")
+
+	decoder := goxml.NewDecoder(xmlFile)
+	totalStudents := 0
+	var inElement string
+	for {
+		// Read tokens from the XML document in a stream.
+		t, _ := decoder.Token()
+		if t == nil {
+			break
+		}
+		// Inspect the type of the token just read.
+		switch se := t.(type) {
+		case goxml.StartElement:
+			// If we just read a StartElement token
+			inElement = se.Name.Local
+			// ...handle by type
+			switch inElement {
+			case "StudentPersonal":
+				var sp xml.RegistrationRecord
+				decoder.DecodeElement(&sp, &se)
+				sp.Flatten()
+
+				gsp, err := di.ge.Encode(sp)
+				if err != nil {
+					log.Println("Unable to gob-encode studentpersonal: ", err)
+				}
+				di.sc.Publish(REPORTING_STUDENT_RECORDS, gsp)
+				totalStudents++
+
+			}
+		default:
+		}
+
+	}
+
+	log.Println("Data file read complete...")
+	log.Printf("Total students: %d \n", totalStudents)
+
+	log.Println("Finalising test metadata & responses...")
+
+	// post end of stream message to responses queue
+	eot := lib.TxStatusUpdate{TxComplete: true}
+	geot, err := di.ge.Encode(eot)
+	if err != nil {
+		log.Println("Unable to gob-encode tx complete message: ", err)
+	}
+	di.sc.Publish(REPORTING_STUDENT_RECORDS, geot)
+
+	log.Printf("ingestion complete for %s", resultsFilePath)
+
+	if wg != nil {
+		wg.Done()
+	}
 
 }

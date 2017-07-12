@@ -7,8 +7,11 @@
 package naprr
 
 import (
+	gcsv "encoding/csv"
 	"encoding/gob"
+	gxml "encoding/xml"
 	"fmt"
+	"github.com/RoaringBitmap/roaring"
 	"github.com/nats-io/go-nats-streaming"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
@@ -34,6 +37,8 @@ const RESULTS_YR3W_STREAM = "studentAndResults"
 const REPORTS_CODEFRAME = "reports.cframe"
 const REPORTS_YR3W = "reports.yr3w"
 const REPORTS_YR3W_STATUS = "reports.yr3w.status"
+const REGISTRATION_STUDENT_RECORDS = "registeredStudents"
+const REPORTING_STUDENT_RECORDS = "reportedStudents"
 
 func NewStreamReader() *StreamReader {
 	sr := StreamReader{
@@ -399,6 +404,99 @@ func (sr *StreamReader) GetNAPLANData(codeframe_stream string) *NAPLANData {
 
 }
 
+// Generate a bitmap of the PSIs for the students in the stream
+func (sr *StreamReader) GetStudentBitmap(stream string) *roaring.Bitmap {
+
+	ret := roaring.NewBitmap()
+
+	// signal channel to notify asynch stan stream read is complete
+	txComplete := make(chan bool)
+
+	// main message handling callback for the stan stream
+	mcb := func(m *stan.Msg) {
+
+		// as we don't know message type ([]byte slice on wire) decode as interface
+		// then assert type dynamically
+		var m_if interface{}
+		err := sr.ge.Decode(m.Data, &m_if)
+		if err != nil {
+			log.Println("streamreader: schooldata message decoding error: ", err)
+			txComplete <- true
+		}
+
+		switch mtype := m_if.(type) {
+		case xml.RegistrationRecord:
+			t := m_if.(xml.RegistrationRecord)
+			key := Psi2uint32(t.PlatformId)
+			//log.Printf("%s: %d\n", stream, key)
+			if key > 0 {
+				ret.Add(key)
+			}
+		case lib.TxStatusUpdate:
+			txComplete <- true
+		default:
+			_ = mtype
+			// log.Printf("unknown message type in stream reader meta handler: %v", m_if)
+		}
+
+	}
+
+	sub, err := sr.sc.Subscribe(stream, mcb, stan.DeliverAllAvailable())
+	defer sub.Unsubscribe()
+	if err != nil {
+		log.Println("streamreader: stan subsciption error meta channel: ", err)
+	}
+
+	<-txComplete
+
+	return ret
+}
+
+// Use a bitmap to extract students in a stream
+func (sr *StreamReader) FilterStudentsBitmap(in string, b *roaring.Bitmap) []xml.RegistrationRecord {
+
+	ret := make([]xml.RegistrationRecord, 0)
+	// signal channel to notify asynch stan stream read is complete
+	txComplete := make(chan bool)
+
+	// main message handling callback for the stan stream
+	mcb := func(m *stan.Msg) {
+
+		// as we don't know message type ([]byte slice on wire) decode as interface
+		// then assert type dynamically
+		var m_if interface{}
+		err := sr.ge.Decode(m.Data, &m_if)
+		if err != nil {
+			log.Println("streamreader: schooldata message decoding error: ", err)
+			txComplete <- true
+		}
+
+		switch mtype := m_if.(type) {
+		case xml.RegistrationRecord:
+			t := m_if.(xml.RegistrationRecord)
+			key := Psi2uint32(t.PlatformId)
+			if b.Contains(key) {
+				ret = append(ret, t)
+			}
+		case lib.TxStatusUpdate:
+			txComplete <- true
+		default:
+			_ = mtype
+			// log.Printf("unknown message type in stream reader meta handler: %v", m_if)
+		}
+
+	}
+
+	sub, err := sr.sc.Subscribe(in, mcb, stan.DeliverAllAvailable())
+	defer sub.Unsubscribe()
+	if err != nil {
+		log.Println("streamreader: stan subsciption error meta channel: ", err)
+	}
+
+	<-txComplete
+	return ret
+}
+
 // Get all the students and results in the stream
 func (sr *StreamReader) GetStudentAndResultsData(student_ids map[string]string, NaprrConfig naprr_config) *StudentAndResultsData {
 
@@ -455,7 +553,7 @@ func (sr *StreamReader) GetStudentAndResultsData(student_ids map[string]string, 
 // given the mapping of keys to XML RefIDs, remap all references to made up RegistrationRecords from fixed format file, to XML records already ingested
 func (sr *StreamReader) remapStudents(srd *StudentAndResultsData, student_ids map[string]string, NaprrConfig naprr_config) *StudentAndResultsData {
 	yr3wmatches := Yr3WritingMatchReport{}
-	matches := make(map[string]int)
+	matches := make(map[string]bool)
 	newStudents := make(map[string]*xml.RegistrationRecord)
 	log.Printf("%v\n", NaprrConfig)
 	log.Println(NaprrConfig.Yr3WStudentMatch)
@@ -465,7 +563,7 @@ func (sr *StreamReader) remapStudents(srd *StudentAndResultsData, student_ids ma
 			refid := sp.RefId
 			log.Printf("Mapped student %s from Yr 3 Writing from %s to matching student %s in XML ingest", student_key, refid, newRefId)
 			//append(yr3wmatches.matches, student_key)
-			matches[student_key] = 1
+			matches[student_key] = true
 			// eliminating this record from the list: not passing on to newStudents
 			if _, ok := srd.Events[refid]; ok {
 				log.Printf("%v\n", srd.Events[refid])
@@ -574,4 +672,78 @@ func (sr *StreamReader) GetSchoolData(acaraid string) *SchoolData {
 
 	return sd
 
+}
+
+// Generate report data comparing two cohorts of students by nominated fields
+func (rg *ReportGenerator) GenerateStudentComparisons(diff1students []xml.RegistrationRecord,
+	diff2students []xml.RegistrationRecord, NaprrConfig naprr_config) {
+	diff1keys := make(map[string]bool)
+	diff2keys := make(map[string]bool)
+	diff1mismatchkeys := make([]string, 0, len(diff1students))
+	diff2mismatchkeys := make([]string, 0, len(diff2students))
+	diff1mismatches := make([]xml.RegistrationRecord, 0, len(diff1students))
+	diff2mismatches := make([]xml.RegistrationRecord, 0, len(diff2students))
+	//log.Println(NaprrConfig.MatchAttributes)
+	for _, sp := range diff1students {
+		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
+		diff1keys[student_key] = true
+	}
+	for _, sp := range diff2students {
+		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
+		diff2keys[student_key] = true
+	}
+	//log.Printf("%v\n%v\n", diff1keys, diff2keys)
+	for _, sp := range diff1students {
+		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
+		if _, ok := diff2keys[student_key]; !ok {
+			diff1mismatchkeys = append(diff1mismatchkeys,
+				fmt.Sprintf("PSI: %s Student Key: %s\n", sp.PlatformId, student_key))
+			diff1mismatches = append(diff1mismatches, sp)
+
+		}
+	}
+	for _, sp := range diff2students {
+		student_key := StudentKeyLookup(sp, NaprrConfig.MatchAttributes)
+		if _, ok := diff1keys[student_key]; !ok {
+			diff2mismatchkeys = append(diff2mismatchkeys,
+				fmt.Sprintf("PSI: %s Student Key: %s RefId: %s\n", sp.PlatformId, student_key, sp.RefId))
+			diff2mismatches = append(diff2mismatches, sp)
+		}
+	}
+	fpath := "./"
+	err := os.MkdirAll(fpath, os.ModePerm)
+	check(err)
+
+	// create the report data file in the output directory
+	// delete any existing files and create empty new one
+	fname := fpath + "reg_rep_mismatches.txt"
+	err = os.RemoveAll(fname)
+	f, err := os.Create(fname)
+	check(err)
+	defer f.Close()
+	payload := fmt.Sprintf("Registration Only: %d records\nReporting Only: %d records\n\n",
+		len(diff1mismatches), len(diff2mismatches))
+	f.WriteString(payload)
+	f.WriteString("Registration only students:\n")
+	for _, k := range diff1mismatchkeys {
+		f.WriteString(k)
+	}
+	f.WriteString("Reporting only students:\n")
+	for _, k := range diff2mismatchkeys {
+		f.WriteString(k)
+	}
+	f.WriteString("\n\nRegistration only student records:\n")
+	f.Sync()
+	w := gcsv.NewWriter(f)
+	w.Write(xml.RegistrationRecord{}.GetHeaders())
+	for _, sp := range diff1students {
+		w.Write(sp.GetSlice())
+	}
+	w.Flush()
+	f.WriteString("\n\nResults only student records:\n")
+	encXml := gxml.NewEncoder(f)
+	encXml.Indent("", "  ")
+	for _, sp := range diff2students {
+		encXml.Encode(sp)
+	}
 }
