@@ -60,3 +60,9 @@ harness/var/goleveldb_data/LOG
 test_data/naprr/XMLData-2017-02-14.xml
 
 *.pid
+
+app/naprr/naprr
+
+test_data/naprr/corrected_sif.xml
+
+test_data/naprr/master_nap.xml
