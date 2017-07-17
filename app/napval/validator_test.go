@@ -47,6 +47,10 @@ func TestRepeatPSIwithinSchool(t *testing.T) {
 	test_harness(t, "../../unit_test_files/5StudentsDuplicatePlatformID.csv", "PSI/ASL ID", "Platform Student ID (Student) and ASL ID (School) are potential duplicate")
 }
 
+func TestKurdistan(t *testing.T) {
+	test_harness(t, "../../unit_test_files/1studentsKurdistan.csv", "", "")
+}
+
 func TestSexMissingMandatory(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsMissingMandatorySex.csv", "Sex", "Sex is required")
 }
