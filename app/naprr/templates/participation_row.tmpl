@@ -13,10 +13,23 @@
 {{- .Student.Parent2Occupation}},
 {{- .Student.GetOtherId "NAPPlatformStudentId"}},
 {{- printf "\"%s\"" .School.SchoolName}},
+{{- if .School.SchoolContactList.SchoolContact }}
 {{- with $sci := index .School.SchoolContactList.SchoolContact 0 }}
 {{- $sci.ContactInfo.Address.PostalCode}},
 {{- $sci.ContactInfo.Address.StateProvince}},
 {{- $sci.ContactInfo.Address.City}},
+{{- end}}
+{{- else}}
+{{- if .School.AddressList.Address }}
+{{- with $sci := index .School.AddressList.Address 0 }}
+{{- $sci.PostalCode}},
+{{- $sci.StateProvince}},
+{{- $sci.City}},
+{{- end}}
+{{- else}}
+{{ }}
+{{ }}
+{{ }}
 {{- end}}
 {{- .School.SchoolGeographicLocation}},
 {{- .School.SchoolSector}},
