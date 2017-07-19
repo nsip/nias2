@@ -47,6 +47,8 @@ function getStudentInfoSummaryLine(psi)
     // data can be found in participation info
     $.each(participationData, function(index, pds)
     {
+	if(!(pds == null || pds.EventInfos == null || pds.EventInfos[0] == null )) {
+
         ei = pds.EventInfos[0];
 
         if (ei.Event.PSI == psi)
@@ -55,8 +57,11 @@ function getStudentInfoSummaryLine(psi)
             sp = student;
             return false;
         }
+	}
 
     });
+
+    if (!ei) { return $("<p>N/A</p>");}
 
     return $("<p>" +
         "Student: " + sp.GivenName + " " + sp.FamilyName +

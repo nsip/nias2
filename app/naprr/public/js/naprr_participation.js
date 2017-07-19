@@ -57,6 +57,9 @@ function sortParticipationData(data)
 
     data.sort(function(a, b)
     {
+	if(a == null || b == null || a.EventInfos == null || b.EventInfos == null || a.EventInfos[0] == null || b.EventInfos[0] == null) {
+		return 0;
+	}
 
         var compA = a.EventInfos[0].Test.TestContent.TestLevel.toUpperCase();
         var compB = b.EventInfos[0].Test.TestContent.TestLevel.toUpperCase();
@@ -121,6 +124,26 @@ function createParticipationTableBody(data)
 
     $.each(data, function(index, pds)
     {
+	if(pds == null || pds.EventInfos == null || pds.EventInfos[0] == null ){
+
+	var testLevel = "N/A";
+	if(test != null && test.TestContent != null && test.TestContent.TestLevel != null) {
+		testLevel = test.TestContent.TestLevel;
+	}
+        var $row = $("<tr/>");
+        $row.append("<td>" + testLevel + "</td>" +
+            "<td>" + '??' + "</td>" +
+            "<td class='domain'>" + '??' + "</td>" +
+            "<td class='domain'>" + '??' + "</td>" +
+            "<td class='domain'>" + '??' + "</td>" +
+            "<td class='domain'>" + '??' + "</td>" +
+            "<td class='domain'>" + '??' + "</td>"
+        );
+        $row.data("pdsdata", pds);
+        $row.attr("yr-level", testLevel);
+        $("#report-table-body").append($row);
+        $row = null;
+	} else {
 
         var event = pds.EventInfos[0];
         var test = event.Test;
@@ -139,7 +162,7 @@ function createParticipationTableBody(data)
         $row.attr("yr-level", test.TestContent.TestLevel);
         $("#report-table-body").append($row);
         $row = null;
-    });
+    }});
 
     // colour any non-P values
     $("#report-table-body td.domain").each(function()
