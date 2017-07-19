@@ -33,6 +33,11 @@ type SchoolInfo struct {
 	SLA                      string            `xml:"SLA"`
 	SchoolCoEdStatus         string            `xml:"SchoolCoEdStatus"`
 	SchoolGroupList          SchoolGroupList   `xml:"SchoolGroupList"`
+	AddressList              AddressList       `xml:"AddressList"`
+}
+
+type AddressList struct {
+	Address []string `xml:"Address"`
 }
 
 type SchoolGroupList struct {
