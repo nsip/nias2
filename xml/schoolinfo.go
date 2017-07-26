@@ -49,7 +49,7 @@ type YearLevelList struct {
 	YearLevel []YearLevel `xml:"YearLevel"`
 }
 
-type YearLevel []struct {
+type YearLevel struct {
 	Code string `xml:"Code"`
 }
 
