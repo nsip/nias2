@@ -60,3 +60,13 @@ harness/var/goleveldb_data/LOG
 test_data/naprr/XMLData-2017-02-14.xml
 
 *.pid
+
+naprrql/app/naprrql/naprrql
+
+*.vlog
+
+naprrql/app/naprrql/kvs/clog
+
+naprrql/app/naprrql/kvs
+naprrql/app/naprrql/master_nap.xml
+

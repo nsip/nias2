@@ -32,6 +32,7 @@ do_zip_qlserver() {
         cd $OUTPUT
         cd ..
         zip -qr ../$ZIP qlserver
+        zip -qr ../$ZIP naprrql
 	cd $CWD
 }
 
@@ -121,6 +122,9 @@ sh build_sms.sh
 sh build_napval.sh
 sh build_naprr.sh
 sh build_sifql.sh
+cd naprrql
+sh build_naprrql.sh
+cd ..
 
 build_mac64
 build_windows64
