@@ -50,6 +50,7 @@ func getIdentifiers(keyPrefix string) []string {
 	objIDs := make([]string, 0)
 
 	searchKey := []byte(keyPrefix + ":")
+	// log.Printf("search_key: %s\n\n", searchKey)
 	iter := db.NewIterator(util.BytesPrefix(searchKey), nil)
 	for iter.Next() {
 		id := fmt.Sprintf("%s", iter.Value())

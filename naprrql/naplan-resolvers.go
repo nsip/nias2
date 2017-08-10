@@ -5,7 +5,7 @@ import (
 	"github.com/playlyfe/go-graphql"
 )
 
-func buildResolvers() map[string]interface{} {
+func buildNaplanResolvers() map[string]interface{} {
 
 	resolvers := map[string]interface{}{}
 
