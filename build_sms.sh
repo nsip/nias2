@@ -8,7 +8,7 @@ curl http://specification.sifassociation.org/Implementation/AU/3.4/XSD/SIF_Messa
 
 do_clear() {
 	echo "clear"
-	rm -r $OUTPUT/
+	rm -rf $OUTPUT/
 }
 
 do_build() {

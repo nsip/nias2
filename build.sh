@@ -21,17 +21,17 @@ do_build() {
 do_zip() {
         cd $OUTPUT
         cd ..
-	rm -f ../$ZIP
+		rm -rf ../$ZIP
         zip -qr ../$ZIP nias
         zip -qr ../$ZIP napval
-        zip -qr ../$ZIP naprr
+        # zip -qr ../$ZIP naprr
 	cd $CWD
 }
 
 do_zip_qlserver() {
         cd $OUTPUT
         cd ..
-        zip -qr ../$ZIP qlserver
+        # zip -qr ../$ZIP qlserver
         zip -qr ../$ZIP naprrql
 	cd $CWD
 }
@@ -78,6 +78,7 @@ build_windows32() {
 	ZIP=go-nias-Win32.zip
 	do_build
 	do_zip
+	do_zip_qlserver
 	echo "...all Windows32 binaries built..."
 }
 
@@ -92,6 +93,7 @@ build_linux64() {
 	ZIP=go-nias-Linux64.zip
 	do_build
 	do_zip
+	do_zip_qlserver
 	echo "...all Linux64 binaries built..."
 }
 
@@ -112,6 +114,7 @@ build_linux32() {
 	ZIP=go-nias-Linux32.zip
 	do_build
 	do_zip
+	do_zip_qlserver
 	echo "...all Linux32 binaries built..."
 }
 
@@ -120,11 +123,11 @@ build_linux32() {
 
 sh build_sms.sh
 sh build_napval.sh
-sh build_naprr.sh
-sh build_sifql.sh
-cd naprrql
+# sh build_naprr.sh
+# sh build_sifql.sh
+# cd naprrql
 sh build_naprrql.sh
-cd ..
+# cd ..
 
 build_mac64
 build_windows64
