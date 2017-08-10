@@ -2,6 +2,8 @@
 
 ## NAPLAN Results and Reporting processing
 
+### Note from a user perspective this code has been replaced by naprrql which now provides the interfaces and data access, most of the data classes here, however, are still in active use.
+
 The `naprr` executable runs as a single binary, and launches its own streaming server instance within the application. Unlike other NIAS executables, it does not require a batch file or shell script to be executed.
 
 The unzipped binary files released for `naprr` should contain the `naprr` executable, an `/in` directory and a `/templates` directory. The `/templates` directory contains templates for the various report formats, in [Golang's template language](https://golang.org/pkg/text/template/). The `/in` directory contains zipped XML files to be processed by the `naprr` executable; the zip distribution comes packaged with `/in/master_nap.xml.zip` as a test xml results file. This will get processed automatically when the executable is run. 
