@@ -21,6 +21,8 @@ To perform the ingest at the command prompt run:
 
 (for windows users naprrql will be naprrql.exe)
 
+  > c:\> naprrql.exe -ingest  
+
 ### Launch naprrql
 
 To run the web interfaces of naprrql, at the command prompt run:
