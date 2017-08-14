@@ -14,7 +14,7 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/matt-farmer/naprrql"
+	"github.com/nsip/nias2/naprrql"
 )
 
 var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng data is overwritten.")
