@@ -31,6 +31,7 @@ reports of the result of the difference analysis in the /out folder.
 The reports created will be:
 
 > napcomp/out/RegisteredButNotInResults.csv
+
 > napcomp/out/ResultsButNotInRegister.csv
 
 each file will contain the full student records of those students who were either in the registration file, but not 
