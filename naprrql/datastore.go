@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/nsip/nias2/naprr"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
@@ -14,7 +13,7 @@ import (
 var db *leveldb.DB
 var dbOpen bool = false
 
-var ge = naprr.GobEncoder{}
+var ge = GobEncoder{}
 
 func GetDB() *leveldb.DB {
 	if !dbOpen {

@@ -1,92 +1,40 @@
 package main
 
+// napcomp takes input file from student registration
+// and output file from results reporting
+// and does a comparison to find students not accounted for
+// in both files.
+
 import (
-	"flag"
-	"github.com/nats-io/nats-streaming-server/server"
-	"github.com/nsip/nias2/naprr"
-	"log"
-	"net"
 	"os"
-	// "os/exec"
-	// "os/signal"
-	//"runtime"
-	// "time"
+	"os/signal"
+	"runtime"
+	"syscall"
+
+	"github.com/nsip/nias2/napcomp"
 )
 
 func main() {
 
-	flag.Parse()
+	// shutdown handler
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		napcomp.CloseDB()
+		os.Exit(1)
+	}()
 
-	wd, _ := os.Getwd()
-	log.Println("working directory:", wd)
+	napcomp.IngestData()
+	napcomp.WriteReports()
+	// shut down
+	napcomp.CloseDB()
+	os.Exit(1)
 
-	log.Println("removing old files...")
-	clearNSSWorkingDirectory()
-
-	log.Println("Launching stream server...")
-	ss := launchNatsStreamingServer()
-	defer ss.Shutdown()
-
-	log.Println("Starting data ingest...")
-
-	di := naprr.NewDataIngest()
-	di.RunReportingStudents()
-	di.RunRegRecords()
-	naprr_config := di.NaprrConfig
-	di.Close()
-
-	rb := naprr.NewReportBuilder()
-	rb.RunCompareRegistrationReporting(naprr_config)
-
-	log.Println("Writing report files...")
-	//rw := naprr.NewReportWriter()
-	//rw.WriteRegistrationAudit()
-	log.Println("Report files Done")
-
-	//runtime.Goexit()
-}
-
-func clearNSSWorkingDirectory() {
-
-	// remove existing logs and recreate the directory
-	err := os.RemoveAll("nss")
-	err = os.Mkdir("nss", os.ModePerm)
-	if err != nil {
-		log.Println("Error trying to remove nss working directory")
+	// wait for shutdown
+	// should only be needed if processing hangs for some reason
+	for {
+		runtime.Gosched()
 	}
-}
 
-func launchNatsStreamingServer() *server.StanServer {
-
-	stanOpts := server.GetDefaultOptions()
-
-	stanOpts.ID = "nap-rr"
-	stanOpts.MaxChannels = 30000
-	stanOpts.MaxMsgs = 2000000
-	stanOpts.MaxBytes = 0 //unlimited
-	stanOpts.MaxSubscriptions = 10000
-
-	stanOpts.StoreType = "FILE"
-	stanOpts.FilestoreDir = "nss"
-	// stanOpts.Debug = true
-
-	nOpts := server.DefaultNatsServerOptions
-	nOpts.Port = 5222
-
-	ss, _ := server.RunServerWithOpts(stanOpts, &nOpts)
-
-	return ss
-
-}
-
-// getAvailPort asks the OS for an unused port.
-// There's a race here, where the port could be grabbed by someone else
-// before the caller gets to Listen on it, but in practice such races
-// are rare. Uses net.Listen("tcp", ":0") to determine a free port, then
-// releases it back to the OS with Listener.Close().
-func getAvailPort() int {
-	l, _ := net.Listen("tcp", ":0")
-	r := l.Addr()
-	l.Close()
-	return r.(*net.TCPAddr).Port
 }

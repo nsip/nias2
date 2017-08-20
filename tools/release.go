@@ -2,14 +2,15 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/BurntSushi/toml"
-	"gopkg.in/cheggaaa/pb.v1"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/BurntSushi/toml"
+	"gopkg.in/cheggaaa/pb.v1"
 )
 
 type nsipConfig struct {
@@ -82,13 +83,19 @@ func uploadFile(release jsonRelease, name string, filename string) jsonUpload {
 
 	uploadURLs := strings.Split(release.UploadURL, "{")
 	uploadURL := uploadURLs[0]
-	log.Printf("Sending file to %s", uploadURL+"?name="+name)
+
+	versionSuffix := "-" + release.TagName + ".zip"
+	versionedName := strings.Replace(name, ".zip", versionSuffix, 1)
+
+	// log.Printf("Sending file to %s", uploadURL+"?name="+name)
+	log.Printf("Sending file to %s", uploadURL+"?name="+versionedName)
 
 	bar := pb.StartNew(int(fi.Size())).SetUnits(pb.U_BYTES).SetRefreshRate(time.Millisecond * 10)
 	bar.ShowSpeed = true
 	pr := bar.NewProxyReader(f)
 
-	req, err := http.NewRequest("POST", uploadURL+"?name="+name, pr)
+	// req, err := http.NewRequest("POST", uploadURL+"?name="+name, pr)
+	req, err := http.NewRequest("POST", uploadURL+"?name="+versionedName, pr)
 	if err != nil {
 		// handle err
 		log.Printf("Error upload = %s", err)

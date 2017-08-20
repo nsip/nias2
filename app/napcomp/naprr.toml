@@ -1,2 +1,0 @@
-# Attributes on which student is matched between Registration ingest and Reporting ingest of student records, assuming PSI does not match. Done as list of struct attributes of RegistrationRecord, comma delimited
-MatchAttributes = ["FamilyName", "GivenName"]

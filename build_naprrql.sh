@@ -6,6 +6,7 @@ CWD=`pwd`
 
 
 do_build() {
+	echo "Building NAPRRQL..."
 	mkdir -p $OUTPUT
 	cd $CWD
 	cd ./app/naprrql
@@ -35,7 +36,7 @@ build_mac64() {
 	do_build
 	#do_upx
 	# do_shells
-	do_zip
+	# do_zip
 	echo "...all Mac binaries built..."
 }
 
@@ -53,7 +54,7 @@ build_windows64() {
 	do_build
 	#do_upx
 	# do_bats
-	do_zip
+	# do_zip
 	echo "...all Windows64 binaries built..."
 }
 
@@ -70,7 +71,7 @@ build_windows32() {
 	do_build
 	#do_upx
 	# do_bats
-	do_zip
+	# do_zip
 	echo "...all Windows32 binaries built..."
 }
 
@@ -87,7 +88,7 @@ build_linux64() {
 	do_build
 	#do_goupx
 	# do_shells
-	do_zip
+	# do_zip
 	echo "...all Linux64 binaries built..."
 }
 
@@ -104,7 +105,7 @@ build_linux32() {
 	do_build
 	#do_goupx
 	# do_shells
-	do_zip
+	# do_zip
 	echo "...all Linux32 binaries built..."
 }
 
