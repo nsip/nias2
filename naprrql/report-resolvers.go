@@ -6,24 +6,9 @@
 package naprrql
 
 import (
-	"github.com/nsip/nias2/naprr"
 	"github.com/nsip/nias2/xml"
 	"github.com/playlyfe/go-graphql"
 )
-
-// helper type for summary
-type ParticipationSummary struct {
-	Domain            string
-	ParticipationCode string
-}
-
-// reporting object for student participation
-type ParticipationDataSet struct {
-	Student    xml.RegistrationRecord
-	School     xml.SchoolInfo
-	EventInfos []naprr.EventInfo
-	Summary    []ParticipationSummary
-}
 
 func buildReportResolvers() map[string]interface{} {
 
@@ -70,13 +55,13 @@ func buildReportResolvers() map[string]interface{} {
 		}
 
 		summaries, err := getObjects(summ_refids)
-		summary_datasets := make([]naprr.ScoreSummaryDataSet, 0)
+		summary_datasets := make([]ScoreSummaryDataSet, 0)
 		for _, summary := range summaries {
 			summ, _ := summary.(xml.NAPTestScoreSummary)
 			testid := []string{summ.NAPTestRefId}
 			obj, _ := getObjects(testid)
 			test, _ := obj[0].(xml.NAPTest)
-			sds := naprr.ScoreSummaryDataSet{Summ: summ, Test: test}
+			sds := ScoreSummaryDataSet{Summ: summ, Test: test}
 			summary_datasets = append(summary_datasets, sds)
 		}
 
@@ -165,7 +150,7 @@ func buildReportResolvers() map[string]interface{} {
 		}
 
 		// construct RDS by including referenced test
-		results := make([]naprr.ResponseDataSet, 0)
+		results := make([]ResponseDataSet, 0)
 		for _, response := range responses {
 			resp, _ := response.(xml.NAPResponseSet)
 			// domain score entries will be null if response not completed e.g. abandoned
@@ -177,7 +162,7 @@ func buildReportResolvers() map[string]interface{} {
 			if err != nil || !ok {
 				return []interface{}{}, err
 			}
-			rds := naprr.ResponseDataSet{Test: test, Response: resp}
+			rds := ResponseDataSet{Test: test, Response: resp}
 			results = append(results, rds)
 		}
 
@@ -219,7 +204,7 @@ func buildReportResolvers() map[string]interface{} {
 			if err != nil {
 				return []interface{}{}, err
 			}
-			eventInfos := make([]naprr.EventInfo, 0)
+			eventInfos := make([]EventInfo, 0)
 			for _, eventObj := range eventObjs {
 				event := eventObj.(xml.NAPEvent)
 				// log.Printf("\n\n   event: \n\n%#v\n\n", event)
@@ -229,7 +214,7 @@ func buildReportResolvers() map[string]interface{} {
 				}
 				test := testObj[0].(xml.NAPTest)
 				// log.Printf("\n\n   test: \n\n%#v\n\n", test)
-				eventInfo := naprr.EventInfo{Test: test, Event: event}
+				eventInfo := EventInfo{Test: test, Event: event}
 				eventInfos = append(eventInfos, eventInfo)
 			}
 			// log.Printf("\n\n   eventinfos: \n\n%#v\n\n", eventInfos)
@@ -274,7 +259,7 @@ func buildReportResolvers() map[string]interface{} {
 			codeframes = append(codeframes, codeFrame)
 		}
 
-		cfds := make([]naprr.CodeFrameDataSet, 0)
+		cfds := make([]CodeFrameDataSet, 0)
 		for _, codeframe := range codeframes {
 			testObj, err := getObjects([]string{codeframe.NAPTestRefId})
 			if err != nil {
@@ -294,7 +279,7 @@ func buildReportResolvers() map[string]interface{} {
 					}
 					ti, _ := tiObj[0].(xml.NAPTestItem)
 					// log.Printf("\t\t%s", ti.TestItemContent.ItemName)
-					cfd := naprr.CodeFrameDataSet{
+					cfd := CodeFrameDataSet{
 						Test:    test,
 						Testlet: tl,
 						Item:    ti,

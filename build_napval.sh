@@ -11,6 +11,7 @@ curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_pa
 #go get github.com/nats-io/nats-streaming-server
 
 do_build() {
+	echo "Building NAPVAL..."
 	mkdir -p $OUTPUT
 	cd ../../nats-io/nats-streaming-server
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
@@ -65,7 +66,7 @@ build_mac64() {
 	do_build
 	#do_upx
 	do_shells
-	do_zip
+	# do_zip
 	echo "...all Mac binaries built..."
 }
 
@@ -83,7 +84,7 @@ build_windows64() {
 	do_build
 	#do_upx
 	do_bats
-	do_zip
+	# do_zip
 	echo "...all Windows64 binaries built..."
 }
 
@@ -100,7 +101,7 @@ build_windows32() {
 	do_build
 	#do_upx
 	do_bats
-	do_zip
+	# do_zip
 	echo "...all Windows32 binaries built..."
 }
 
@@ -117,7 +118,7 @@ build_linux64() {
 	do_build
 	#do_goupx
 	do_shells
-	do_zip
+	# do_zip
 	echo "...all Linux64 binaries built..."
 }
 
@@ -134,7 +135,7 @@ build_linux32() {
 	do_build
 	#do_goupx
 	do_shells
-	do_zip
+	# do_zip
 	echo "...all Linux32 binaries built..."
 }
 

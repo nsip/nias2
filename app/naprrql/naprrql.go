@@ -115,7 +115,7 @@ func parseResultsFileDirectory() []string {
 	files = append(files, zipFiles...)
 	files = append(files, xmlFiles...)
 	if len(files) == 0 {
-		log.Fatalln("No results data *.xml.zip or *.xml files found in input folder /in.")
+		log.Fatalln("No results data *.zip *.xml.zip or *.xml files found in input folder /in.")
 	}
 
 	return files

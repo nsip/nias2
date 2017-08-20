@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/nats-io/nuid"
-	"github.com/nsip/nias2/naprr"
 	"github.com/nsip/nias2/xml"
 	"github.com/syndtr/goleveldb/leveldb"
 )
@@ -13,10 +12,10 @@ import (
 func IngestResultsFile(resultsFilePath string) {
 
 	db := GetDB()
-	ge := naprr.GobEncoder{}
+	ge := GobEncoder{}
 
 	// open the data file for streaming read
-	xmlFile, err := naprr.OpenResultsFile(resultsFilePath)
+	xmlFile, err := OpenResultsFile(resultsFilePath)
 	if err != nil {
 		log.Fatalln("unable to open results file")
 	}
@@ -214,7 +213,7 @@ func IngestResultsFile(resultsFilePath string) {
 				// not a sif object so needs a guid
 				sd_id := nuid.Next()
 				key = []byte(sd_id)
-				sd := naprr.SchoolDetails{
+				sd := SchoolDetails{
 					SchoolName: si.SchoolName,
 					ACARAId:    si.ACARAId,
 				}

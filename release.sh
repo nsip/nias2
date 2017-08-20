@@ -1,7 +1,7 @@
 
 cd tools; go build release.go; cd ..
-./tools/release nias2 go-nias-Mac.zip build/go-nias-Mac.zip
-./tools/release nias2 go-nias-Win64.zip build/go-nias-Win64.zip
-./tools/release nias2 go-nias-Win32.zip build/go-nias-Win32.zip
-./tools/release nias2 go-nias-Linux64.zip build/go-nias-Linux64.zip
-./tools/release nias2 go-nias-Linux32.zip build/go-nias-Linux32.zip
+./tools/release nias2 nias-Mac.zip build/nias-Mac.zip
+./tools/release nias2 nias-Win64.zip build/nias-Win64.zip
+./tools/release nias2 nias-Win32.zip build/nias-Win32.zip
+./tools/release nias2 nias-Linux64.zip build/nias-Linux64.zip
+./tools/release nias2 nias-Linux32.zip build/nias-Linux32.zip
