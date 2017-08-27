@@ -23,7 +23,7 @@ $(document).ready(function() {
 // gql query to support search
 // 
 function scoreSummaryQuery() {
-    return `query NAPData($acaraIDs: [String]) {
+    return `query ScoreSummaryData($acaraIDs: [String]) {
               score_summary_report_by_school(acaraIDs: $acaraIDs){
                 Test {
                   TestID
@@ -132,13 +132,13 @@ function createScoreSummaryTableBody(data) {
 
     $.each(data, function(index, ss) {
         var $row = $("<tr/>");
-        $row.append("<td>" + ss.Test.TestContent.TestLevel + "</td>" +
-            "<td>" + ss.Test.TestContent.TestDomain + "</td>" +
-            "<td>" + ss.Summ.DomainSchoolAverage + "</td>" +
-            "<td>" + ss.Summ.DomainJurisdictionAverage + "</td>" +
-            "<td>" + ss.Summ.DomainNationalAverage + "</td>" +
-            "<td>" + ss.Summ.DomainTopNational60Percent + "</td>" +
-            "<td>" + ss.Summ.DomainBottomNational60Percent + "</td>"
+        $row.append("<td>" + hideNull(ss.Test.TestContent.TestLevel) + "</td>" +
+            "<td>" + hideNull(ss.Test.TestContent.TestDomain) + "</td>" +
+            "<td>" + hideNull(ss.Summ.DomainSchoolAverage) + "</td>" +
+            "<td>" + hideNull(ss.Summ.DomainJurisdictionAverage) + "</td>" +
+            "<td>" + hideNull(ss.Summ.DomainNationalAverage) + "</td>" +
+            "<td>" + hideNull(ss.Summ.DomainTopNational60Percent) + "</td>" +
+            "<td>" + hideNull(ss.Summ.DomainBottomNational60Percent) + "</td>"
         );
         $row.data("ssdata", ss);
         $row.attr("yr-level", ss.Test.TestContent.TestLevel);
@@ -244,11 +244,11 @@ function createExtendedDataScoreSummary(ssdata) {
 function sortScoreSummaryData(data) {
 
     data.sort(function(a, b) {
-        var compA = a.Test.TestContent.TestLevel.toUpperCase() +
-            a.Test.TestContent.TestDomain.toUpperCase();
+        var compA = (a.Test.TestContent.TestLevel || '').toUpperCase() +
+            (a.Test.TestContent.TestDomain || '').toUpperCase();
 
-        var compB = b.Test.TestContent.TestLevel.toUpperCase() +
-            b.Test.TestContent.TestDomain.toUpperCase();
+        var compB = (b.Test.TestContent.TestLevel || '').toUpperCase() +
+            (b.Test.TestContent.TestDomain || '').toUpperCase();
 
         return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
     });
@@ -289,5 +289,29 @@ function initScoreSummaryDownloadLinkHandler() {
 
     });
 
+
+}
+
+// 
+// suport to domain-scores graph, provides the jurisd. & school scores for this
+// level/domain pairing
+// 
+// first element of the array returned is the school average
+// second element is the jurisdiction average
+// 
+function getScoreSummaryAverages(tlevel, tdomain) {
+
+    var averages = [0, 0];
+
+    $.each(scoresummaryData, function(index, ss) {
+        if ((ss.Test.TestContent.TestLevel == tlevel) &&
+            (ss.Test.TestContent.TestDomain == tdomain)) {
+            averages[0] = +ss.Summ.DomainSchoolAverage;
+            averages[1] = +ss.Summ.DomainJurisdictionAverage;
+            return averages;
+        }
+    });
+
+    return averages;
 
 }

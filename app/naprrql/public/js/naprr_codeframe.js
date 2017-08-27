@@ -27,7 +27,7 @@ $(document).ready(function()
 // 
 function codeframeQuery() {
     return `
-query NAPData {
+query CodeframeData {
   codeframe_report {
     Test {
       TestID
@@ -156,18 +156,17 @@ function sortCodeframeData(data)
     data.sort(function(a, b)
     {
 
-        var compA = a.Test.TestContent.TestLevel.toUpperCase() +
-            a.Test.TestContent.TestDomain.toUpperCase() +
-            a.Testlet.TestletContent.Node.toUpperCase() +
-            a.Testlet.TestletContent.LocationInStage.toUpperCase() +
-            a.Item.TestItemContent.Subdomain.toUpperCase();
+        var compA = (a.Test.TestContent.TestLevel || '').toUpperCase() +
+            (a.Test.TestContent.TestDomain || '').toUpperCase() +
+            (a.Testlet.TestletContent.Node || '').toUpperCase() +
+            (a.Testlet.TestletContent.LocationInStage || '').toUpperCase() +
+            (a.Item.TestItemContent.Subdomain || '').toUpperCase();
 
-        var compB = b.Test.TestContent.TestLevel.toUpperCase() +
-            b.Test.TestContent.TestDomain.toUpperCase() +
-            b.Testlet.TestletContent.Node.toUpperCase() +
-            b.Testlet.TestletContent.LocationInStage.toUpperCase() +
-            b.Item.TestItemContent.Subdomain.toUpperCase();
-
+        var compB = (b.Test.TestContent.TestLevel || '').toUpperCase() +
+            (b.Test.TestContent.TestDomain || '').toUpperCase() +
+            (b.Testlet.TestletContent.Node || '').toUpperCase() +
+            (b.Testlet.TestletContent.LocationInStage || '').toUpperCase() +
+            (b.Item.TestItemContent.Subdomain || '').toUpperCase();
 
         return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
     });
@@ -228,12 +227,12 @@ function createCodeframeTableBody(data)
     $.each(data, function(index, cfds)
     {
         var $row = $("<tr/>");
-        $row.append("<td>" + cfds.Test.TestContent.TestLevel + "</td>" +
-            "<td>" + cfds.Test.TestContent.TestDomain + "</td>" +
-            "<td>" + cfds.Item.TestItemContent.Subdomain + "</td>" +
-            "<td>" + cfds.Testlet.TestletContent.Node + "</td>" +
-            "<td>" + cfds.Testlet.TestletContent.TestletName + "</td>" +
-            "<td>" + cfds.Item.TestItemContent.ItemName + "</td>"
+        $row.append("<td>" + hideNull(cfds.Test.TestContent.TestLevel) + "</td>" +
+            "<td>" + hideNull(cfds.Test.TestContent.TestDomain) + "</td>" +
+            "<td>" + hideNull(cfds.Item.TestItemContent.Subdomain) + "</td>" +
+            "<td>" + hideNull(cfds.Testlet.TestletContent.Node) + "</td>" +
+            "<td>" + hideNull(cfds.Testlet.TestletContent.TestletName) + "</td>" +
+            "<td>" + hideNull(cfds.Item.TestItemContent.ItemName) + "</td>"
         );
         $row.data("cfdsdata", cfds);
         $row.attr("yr-level", cfds.Test.TestContent.TestLevel);

@@ -9,8 +9,15 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
+// internal check table for guid collisions
+var fileGuids map[string]bool
+
+// internal flag for data quality
+var unfit bool
+
 func IngestResultsFile(resultsFilePath string) {
 
+	fileGuids = make(map[string]bool)
 	db := GetDB()
 	ge := GobEncoder{}
 
@@ -56,6 +63,10 @@ func IngestResultsFile(resultsFilePath string) {
 					log.Println("Unable to gob-encode nap test: ", err)
 				}
 
+				if isGuidCollision(db, t.TestID) {
+					continue
+				}
+
 				// {NAPTest} = object
 				batch.Put([]byte(t.TestID), gt)
 
@@ -71,6 +82,10 @@ func IngestResultsFile(resultsFilePath string) {
 				gtl, err := ge.Encode(tl)
 				if err != nil {
 					log.Println("Unable to gob-encode nap testlet: ", err)
+				}
+
+				if isGuidCollision(db, tl.TestletID) {
+					continue
 				}
 
 				// {NAPTestlet} = object
@@ -90,6 +105,10 @@ func IngestResultsFile(resultsFilePath string) {
 					log.Println("Unable to gob-encode nap test item: ", err)
 				}
 
+				if isGuidCollision(db, ti.ItemID) {
+					continue
+				}
+
 				// {NAPTestItem} = object
 				batch.Put([]byte(ti.ItemID), gti)
 
@@ -102,10 +121,13 @@ func IngestResultsFile(resultsFilePath string) {
 			case "NAPTestScoreSummary":
 				var tss xml.NAPTestScoreSummary
 				decoder.DecodeElement(&tss, &se)
-
 				gtss, err := ge.Encode(tss)
 				if err != nil {
 					log.Println("Unable to gob-encode nap test-score-summary: ", err)
+				}
+
+				if isGuidCollision(db, tss.SummaryID) {
+					continue
 				}
 
 				// {NAPTestScoreSummary} = object
@@ -129,6 +151,10 @@ func IngestResultsFile(resultsFilePath string) {
 					log.Println("Unable to gob-encode nap event link: ", err)
 				}
 
+				if isGuidCollision(db, e.EventID) {
+					continue
+				}
+
 				// {NAPEventStudentLink} = object
 				batch.Put([]byte(e.EventID), gev)
 
@@ -149,10 +175,13 @@ func IngestResultsFile(resultsFilePath string) {
 			case "NAPStudentResponseSet":
 				var r xml.NAPResponseSet
 				decoder.DecodeElement(&r, &se)
-
 				gr, err := ge.Encode(r)
 				if err != nil {
 					log.Println("Unable to gob-encode student response set: ", err)
+				}
+
+				if isGuidCollision(db, r.ResponseID) {
+					continue
 				}
 
 				// {response-id} = object
@@ -180,6 +209,10 @@ func IngestResultsFile(resultsFilePath string) {
 					log.Println("Unable to gob-encode nap codeframe: ", err)
 				}
 
+				if isGuidCollision(db, cf.RefId) {
+					continue
+				}
+
 				// {NAPCodeFrame-id} = object
 				batch.Put([]byte(cf.RefId), gcf)
 
@@ -195,6 +228,10 @@ func IngestResultsFile(resultsFilePath string) {
 				gsi, err := ge.Encode(si)
 				if err != nil {
 					log.Println("Unable to gob-encode schoolinfo: ", err)
+				}
+
+				if isGuidCollision(db, si.RefId) {
+					continue
 				}
 
 				// {SchoolInfo-id} = object
@@ -238,6 +275,10 @@ func IngestResultsFile(resultsFilePath string) {
 					log.Println("Unable to gob-encode studentpersonal: ", err)
 				}
 
+				if isGuidCollision(db, sp.RefId) {
+					continue
+				}
+
 				// {StudentPersonal-id} = object
 				batch.Put([]byte(sp.RefId), gsp)
 
@@ -274,5 +315,29 @@ func IngestResultsFile(resultsFilePath string) {
 	log.Printf("Total students: %d \n", totalStudents)
 
 	log.Printf("ingestion complete for [%s]", resultsFilePath)
+
+}
+
+//
+// guids should only ever exist once in the db, if they are already present
+// flag a warning to the console
+//
+func isGuidCollision(db *leveldb.DB, guid string) bool {
+	_, exists := fileGuids[guid]
+	if exists {
+		log.Printf("Illegal attempt to assign guid {%s} to more than one object", guid)
+		unfit = true // flag this data set has issues
+		return exists
+	}
+	fileGuids[guid] = true
+	return exists
+}
+
+//
+// pick up any quality errors found during ingest
+//
+func DataUnfit() bool {
+
+	return unfit
 
 }

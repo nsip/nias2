@@ -31,7 +31,7 @@ $(document).ready(function()
 // 
 function schoolInfoQuery() {
     return `
-query NAPData($acaraIDs: [String]) {
+query SchoolInfo($acaraIDs: [String]) {
   school_infos_by_acaraid(acaraIDs: $acaraIDs) {
     RefId
     LocalId
@@ -148,47 +148,51 @@ function createSchoolInfoReport()
     $("#si-header").append("<h5 class=''>" +
         schoolinfoData.SchoolName + "</h5>");
 
-    var contactExists = schoolinfoData.SchoolContactList.SchoolContact !== null ? true : false
+    var contactExists = false;
+    if (schoolinfoData.SchoolContactList.SchoolContact.length > 0) {
+        contactExists = true;
+    }
+
     if (contactExists)
     {
         contactInfo = schoolinfoData.SchoolContactList.SchoolContact[0].ContactInfo;
-        $("#si-contact").append("<p>" + contactInfo.Address.Street.Line1 +
-            ", " + contactInfo.Address.City +
-            ", " + contactInfo.Address.StateProvince +
-            ", " + contactInfo.Address.PostalCode +
+        $("#si-contact").append("<p>" + hideNull(contactInfo.Address.Street.Line1) +
+            ", " + hideNull(contactInfo.Address.City) +
+            ", " + hideNull(contactInfo.Address.StateProvince) +
+            ", " + hideNull(contactInfo.Address.PostalCode) +
             ".</p>");
 
-        $("#si-contact").append("<p>Principal: " + schoolinfoData.PrincipalInfo.ContactName.FullName +
+        $("#si-contact").append("<p>Principal: " + hideNull(schoolinfoData.PrincipalInfo.ContactName.FullName) +
             ".</p>");
 
-        $("#si-contact").append("<p>Contact: " + contactInfo.Name.FullName + "<br/>" +
-            "Phone: " + contactInfo.PhoneNumberList.PhoneNumber[0].Number +
-            " Ext.: " + contactInfo.PhoneNumberList.PhoneNumber[0].Extension +
+        $("#si-contact").append("<p>Contact: " + hideNull(contactInfo.Name.FullName) + "<br/>" +
+            "Phone: " + hideNull(contactInfo.PhoneNumberList.PhoneNumber[0].Number) +
+            " Ext.: " + hideNull(contactInfo.PhoneNumberList.PhoneNumber[0].Extension) +
             ".</p>");
 
     }
 
 
-    $("#si-establishment").append("<p>ACARA (ASL) Id:   " + schoolinfoData.ACARAId + "<br/>" +
-        "Local Id:  " + schoolinfoData.LocalId + "<br/>" +
-        "State/Province Id:  " + schoolinfoData.StateProvinceId + "<br/>" +
-        "District:  " + schoolinfoData.SchoolDistrict + "<br/>" +
-        "Campus:  " + schoolinfoData.Campus.AdminStatus + "<br/>" +
-        "Independent School:  " + schoolinfoData.IndependentSchool + "<br/>" +
-        "School Sector:  " + schoolinfoData.SchoolSector + "<br/>" +
-        "School Type:  " + schoolinfoData.SchoolType + "<br/>" +
+    $("#si-establishment").append("<p>ACARA (ASL) Id:   " + hideNull(schoolinfoData.ACARAId) + "<br/>" +
+        "Local Id:  " + hideNull(schoolinfoData.LocalId) + "<br/>" +
+        "State/Province Id:  " + hideNull(schoolinfoData.StateProvinceId) + "<br/>" +
+        "District:  " + hideNull(schoolinfoData.SchoolDistrict) + "<br/>" +
+        "Campus:  " + hideNull(schoolinfoData.Campus.AdminStatus) + "<br/>" +
+        "Independent School:  " + hideNull(schoolinfoData.IndependentSchool) + "<br/>" +
+        "School Sector:  " + hideNull(schoolinfoData.SchoolSector) + "<br/>" +
+        "School Type:  " + hideNull(schoolinfoData.SchoolType) + "<br/>" +
         "Year Levels:  " + unpackList(schoolinfoData.YearLevels.YearLevel) + "</br>" +
-        "Student Count:  " + schoolinfoData.StudentCount + "<br/>" +
+        "Student Count:  " + hideNull(schoolinfoData.StudentCount) + "<br/>" +
         ".</p>");
 
-    $("#si-extended").append("<p>ARIA:   " + schoolinfoData.ARIA + "<br/>" +
-        "NG Systemic Status:  " + schoolinfoData.NonGovSystemicStatus + "<br/>" +
-        "Operational Status:  " + schoolinfoData.OperationalStatus + "<br/>" +
-        "Co-Ed Status:  " + schoolinfoData.SchoolCoEdStatus + "<br/>" +
-        "LGA:  " + schoolinfoData.LocalGovernmentArea + "<br/>" +
-        "Federal Electorate:  " + schoolinfoData.FederalElectorate + "<br/>" +
-        "Religious Affiliation:  " + schoolinfoData.ReligiousAffiliation + "<br/>" +
-        "Geographic Location:  " + schoolinfoData.SchoolGeographicLocation + "<br/></p>");
+    $("#si-extended").append("<p>ARIA:   " + hideNull(schoolinfoData.ARIA) + "<br/>" +
+        "NG Systemic Status:  " + hideNull(schoolinfoData.NonGovSystemicStatus) + "<br/>" +
+        "Operational Status:  " + hideNull(schoolinfoData.OperationalStatus) + "<br/>" +
+        "Co-Ed Status:  " + hideNull(schoolinfoData.SchoolCoEdStatus) + "<br/>" +
+        "LGA:  " + hideNull(schoolinfoData.LocalGovernmentArea) + "<br/>" +
+        "Federal Electorate:  " + hideNull(schoolinfoData.FederalElectorate) + "<br/>" +
+        "Religious Affiliation:  " + hideNull(schoolinfoData.ReligiousAffiliation) + "<br/>" +
+        "Geographic Location:  " + hideNull(schoolinfoData.SchoolGeographicLocation) + "<br/></p>");
 
     if (contactExists)
     {

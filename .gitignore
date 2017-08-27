@@ -9,6 +9,8 @@ _obj
 _test
 var
 build
+kvs
+out
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -70,3 +72,6 @@ naprrql/app/naprrql/kvs/clog
 naprrql/app/naprrql/kvs
 naprrql/app/naprrql/master_nap.xml
 
+*.old
+
+app/naprrql/naprrql

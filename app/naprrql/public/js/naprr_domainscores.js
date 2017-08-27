@@ -24,7 +24,7 @@ $(document).ready(function()
 function domainScoresQuery() {
 
     return `
-query NAPData($acaraIDs: [String]) {
+query DomainScoresData($acaraIDs: [String]) {
   domain_scores_report_by_school(acaraIDs: $acaraIDs) {
     Test {
       TestID
@@ -168,13 +168,13 @@ function sortDomainScoresData(data)
         // console.log(a);
         // console.log(b);
         
-        var compA = a.Test.TestContent.TestLevel.toUpperCase() +
-            a.Test.TestContent.TestDomain.toUpperCase() +
-            a.Response.DomainScore.StudentDomainBand.toUpperCase();
+        var compA = (a.Test.TestContent.TestLevel || '').toUpperCase() +
+            (a.Test.TestContent.TestDomain || '').toUpperCase() +
+            (a.Response.DomainScore.StudentDomainBand || '').toUpperCase();
 
-        var compB = b.Test.TestContent.TestLevel.toUpperCase() +
-            b.Test.TestContent.TestDomain.toUpperCase() +
-            b.Response.DomainScore.StudentDomainBand.toUpperCase();
+        var compB = (b.Test.TestContent.TestLevel || '').toUpperCase() +
+            (b.Test.TestContent.TestDomain || '').toUpperCase() +
+            (b.Response.DomainScore.StudentDomainBand || '').toUpperCase();
 
         return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
     });
@@ -238,14 +238,14 @@ function createDomainScoresTableBody(data)
     $.each(data, function(index, rds)
     {
         var $row = $("<tr/>");
-        $row.append("<td>" + rds.Test.TestContent.TestLevel + "</td>" +
-            "<td>" + rds.Test.TestContent.TestDomain + "</td>" +
-            "<td>" + rds.Response.PSI + "</td>" +
-            "<td>" + rds.Response.DomainScore.RawScore + "</td>" +
-            "<td>" + rds.Response.DomainScore.ScaledScoreValue + "</td>" +
-            "<td>" + rds.Response.DomainScore.ScaledScoreStandardError + "</td>" +
-            "<td>" + rds.Response.DomainScore.StudentDomainBand + "</td>" +
-            "<td>" + rds.Response.DomainScore.StudentProficiency + "</td>"
+        $row.append("<td>" + hideNull(rds.Test.TestContent.TestLevel) + "</td>" +
+            "<td>" + hideNull(rds.Test.TestContent.TestDomain) + "</td>" +
+            "<td>" + hideNull(rds.Response.PSI) + "</td>" +
+            "<td>" + hideNull(rds.Response.DomainScore.RawScore) + "</td>" +
+            "<td>" + hideNull(rds.Response.DomainScore.ScaledScoreValue) + "</td>" +
+            "<td>" + hideNull(rds.Response.DomainScore.ScaledScoreStandardError) + "</td>" +
+            "<td>" + hideNull(rds.Response.DomainScore.StudentDomainBand) + "</td>" +
+            "<td>" + hideNull(rds.Response.DomainScore.StudentProficiency) + "</td>"
         );
         $row.data("rdsdata", rds);
         $row.attr("yr-level", rds.Test.TestContent.TestLevel);
@@ -283,7 +283,7 @@ function createExtendedDataDomainScores(rdsdata)
 {
     $("#ed-content").empty();
 
-    $("#ed-modal").css("max-height", "80%");
+    $("#ed-modal").css("max-height", "85%");
 
     $("#ed-title").text('Student Domain Score: ' +
         rdsdata.Test.TestContent.TestDomain + ' Yr ' +
@@ -300,19 +300,29 @@ function createExtendedDataDomainScores(rdsdata)
 
     $("#ed-content").append(topRow);
 
-    var threecol = $("<div class='row'></div>");
-    var col1 = $("<div id='ed-col1' class='col s6'></div>");
-    col1.append("<h5>Graph</h5>");
+    // 
+    // row with 4 columns for grouped score info
+    // 
+    var fourcol = $("<div class='row'></div>");
 
     // 
-    // score details
+    // basic score
+    // 
+    var col1 = $("<div id='ed-col1' class='col s3'></div>");
+    col1.append("<h5>Score</h5>");
+    col1.append("<p>Raw Score: " +
+        rdsdata.Response.DomainScore.RawScore + "</p>");
+    col1.append("<p>Scaled Score: " +
+        rdsdata.Response.DomainScore.ScaledScoreValue + "</p>");
+    col1.append("<p>Student Domain Band: " +
+        rdsdata.Response.DomainScore.StudentDomainBand + "</p>");
+
+
+    // 
+    // scaled score details
     // 
     var col2 = $("<div id='ed-col2' class='col s3'></div>");
-    col2.append("<h5>Domain Score</h5>");
-    col2.append("<p>Raw Score: " +
-        rdsdata.Response.DomainScore.RawScore + "</p>");
-    col2.append("<p>Scaled Score: " +
-        rdsdata.Response.DomainScore.ScaledScoreValue + "</p>");
+    col2.append("<h5>Scaled Score</h5>");
     col2.append("<p>Scaled Score Logit: " +
         rdsdata.Response.DomainScore.ScaledScoreLogitValue + "</p>");
     col2.append("<p>Scaled Score Standard Error: " +
@@ -323,36 +333,63 @@ function createExtendedDataDomainScores(rdsdata)
     // 
     // extended score info
     // 
-    var col3 = $("<div id='ed-col2' class='col s3'></div>");
+    var col3 = $("<div id='ed-col3' class='col s3'></div>");
     col3.append("<h5>Score Info</h5>");
     col3.append("<p>Calibration Sample: " +
         rdsdata.Response.CalibrationSampleFlag + "</p>");
     col3.append("<p>Equating Sample: " +
         rdsdata.Response.EquatingSampleFlag + "</p>");
-    col3.append("<p>Path Taken: " +
-        rdsdata.Response.PathTakenForDomain + "</p>");
-    col3.append("<p>Parallel Test Path: " +
-        rdsdata.Response.ParallelTest + "</p>");
-    col3.append("<p>Student Domain Band: " +
-        rdsdata.Response.DomainScore.StudentDomainBand + "</p>");
     col3.append("<p>Proficiency: " +
         rdsdata.Response.DomainScore.StudentProficiency + "</p>");
 
+    // 
+    // Path info
+    // 
+    var col4 = $("<div id='ed-col4' class='col s3'></div>");
+    col4.append("<h5>Path</h5>");
+    col4.append("<p>Path Taken: " +
+        rdsdata.Response.PathTakenForDomain + "</p>");
+    col4.append("<p>Parallel Test Path: " +
+        rdsdata.Response.ParallelTest + "</p>");
 
-    threecol.append(col1);
-    threecol.append(col2);
-    threecol.append(col3);
 
-    $("#ed-content").append(threecol);
+    // 
+    // add columns in desired display order
+    // 
+    fourcol.append(col1); // score
+    fourcol.append(col2); // scaled score
+    fourcol.append(col4); // path
+    fourcol.append(col3); // extra info
+    
+    // 
+    // add whole 4 columm block
+    // 
+    $("#ed-content").append(fourcol);
 
-    col1.append("<div id='graphContainer'></div>");
+    // 
+    // create banded graph display
+    // 
+    var graphRow = $("<div class='row'></div>");
+    var grTitle = $("<div class='col s2'></div>");
+    grTitle.append("<h5>Score Graph:</h5>");
+    graphRow.append(grTitle);
+    var grColumn = $("<div class='col s10'></div>");
+    grColumn.append("<div id='graphContainer'></div>");    
+    graphRow.append(grColumn);
+
+    // 
+    // add the graph dom elements
+    // 
+    $("#ed-content").append(graphRow);
+
+    // 
+    // fill the graph display placeholder
+    // 
     createDomainScoreGraph(rdsdata);
-
 
     // 
     // add score bands display
     // 
-
     $("#ed-content").append(createTestBandsDisplay(rdsdata));
 
 }

@@ -62,6 +62,11 @@ func getIdentifiers(keyPrefix string) []string {
 		log.Println("Iterator error: ", err)
 	}
 
+	// safety assignement of empty key to prevent
+	// any downstream bounds errors
+	if len(objIDs) < 1 {
+		objIDs = make([]string, 1)
+	}
 	return objIDs
 }
 
