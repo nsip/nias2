@@ -36,8 +36,17 @@ func main() {
 	// ingest results data, rebuild reports, and exit to save memory
 	if *ingest {
 		ingestData()
-		startWebServer(true)
-		writeReports()
+		if !naprrql.DataUnfit() {
+			startWebServer(true)
+			writeReports()
+		} else {
+			log.Println(`
+				-- 
+				Data is unfit for reporting, 
+				please correct before running further naprr services
+				--
+				`)
+		}
 		// shut down
 		closeDB()
 		os.Exit(1)

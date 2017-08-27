@@ -109,7 +109,7 @@ function initSchoolChooserHandlerQL() {
         xhrSI.setRequestHeader("Content-Type", "application/json");
         xhrSI.setRequestHeader("Accept", "application/json");
         xhrSI.onload = function() {
-            // console.log('data returned:', xhrSI.response);
+            // console.log('school info data returned:', xhrSI.response);
             schoolinfoData = {};
             schoolinfoData = xhrSI.response.data.school_infos_by_acaraid[0];
         }
@@ -128,7 +128,7 @@ function initSchoolChooserHandlerQL() {
         xhrSP.setRequestHeader("Content-Type", "application/json");
         xhrSP.setRequestHeader("Accept", "application/json");
         xhrSP.onload = function() {
-            // console.log('data returned:', xhrSP.response);
+            // console.log('student data returned:', xhrSP.response);
             studentPersonalData = [];
             studentPersonalData = xhrSP.response.data.students_by_school;
         }
@@ -149,7 +149,7 @@ function initSchoolChooserHandlerQL() {
         xhrSS.setRequestHeader("Content-Type", "application/json");
         xhrSS.setRequestHeader("Accept", "application/json");
         xhrSS.onload = function() {
-            // console.log('data returned:', xhrSS.response);
+            // console.log('score summary data returned:', xhrSS.response);
             scoresummaryData = [];
             scoresummaryData = xhrSS.response.data.score_summary_report_by_school;
             $("#btn-scoresummary").removeClass("disabled");
@@ -172,7 +172,7 @@ function initSchoolChooserHandlerQL() {
         xhrDS.setRequestHeader("Content-Type", "application/json");
         xhrDS.setRequestHeader("Accept", "application/json");
         xhrDS.onload = function() {
-            // console.log('data returned:', xhrDS.response);
+            // console.log('domain scores data returned:', xhrDS.response);
             domainscoresData = [];
             domainscoresData = xhrDS.response.data.domain_scores_report_by_school;
             $("#btn-domainscores").removeClass("disabled");
@@ -194,7 +194,7 @@ function initSchoolChooserHandlerQL() {
         xhrPD.setRequestHeader("Content-Type", "application/json");
         xhrPD.setRequestHeader("Accept", "application/json");
         xhrPD.onload = function() {
-            // console.log('data returned:', xhrPD.response);
+            // console.log('participation data returned:', xhrPD.response);
             participationData = [];
             participationData = xhrPD.response.data.participation_report_by_school;
             $("#btn-participation").removeClass("disabled");
@@ -215,7 +215,7 @@ function initSchoolChooserHandlerQL() {
         xhrCF.setRequestHeader("Content-Type", "application/json");
         xhrCF.setRequestHeader("Accept", "application/json");
         xhrCF.onload = function() {
-            // console.log('data returned:', xhrCF.response);
+            // console.log('codeframe data returned:', xhrCF.response);
             codeframeData = [];
             codeframeData = xhrCF.response.data.codeframe_report;
             $("#btn-codeframe").removeClass("disabled");

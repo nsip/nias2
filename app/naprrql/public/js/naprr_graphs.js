@@ -11,8 +11,7 @@
 // 
 // generate score summary graph
 // 
-function createScoreSummaryGraph(ssdata)
-{
+function createScoreSummaryGraph(ssdata) {
 
     var data = [];
 
@@ -68,142 +67,56 @@ function createScoreSummaryGraph(ssdata)
 
 }
 
+// 
+// linear ds graph with display of student score on bands
+// 
+function createDomainScoreGraph(rdsdata) {
 
-// domain score - cumulative bar with bubble for point value
+    var margin = { top: 5, right: 5, bottom: 25, left: 80 },
+        width = 960 - margin.left - margin.right,
+        height = 80 - margin.top - margin.bottom;
 
-function createDomainScoreGraph(rdsdata)
-{
+    var chart = d3.bullet()
+        .width(width)
+        .height(height);
 
     var testBands = rdsdata.Test.TestContent.DomainBands;
 
-    var data = [
-        {
-            'name': 'band 1',
-            'lower': +testBands.Band1Lower,
-            'upper': +testBands.Band1Upper,
-            'score': -1,
-            'type': 'band'
-        },
-        {
-            'name': 'band 2',
-            'lower': +testBands.Band2Lower,
-            'upper': +testBands.Band2Upper,
-            'score': -1,
-            'type': 'band'
-        },
-        {
-            'name': 'band 3',
-            'lower': +testBands.Band3Lower,
-            'upper': +testBands.Band3Upper,
-            'score': -1,
-            'type': 'band'
-        },
-        {
-            'name': 'band 4',
-            'lower': +testBands.Band4Lower,
-            'upper': +testBands.Band4Upper,
-            'score': -1,
-            'type': 'band'
-        },
-        {
-            'name': 'band 5',
-            'lower': +testBands.Band5Lower,
-            'upper': +testBands.Band5Upper,
-            'score': -1,
-            'type': 'band'
-        },
-        {
-            'name': 'band 6',
-            'lower': +testBands.Band6Lower,
-            'upper': +testBands.Band6Upper,
-            'score': -1,
-            'type': 'band'
-        },
-        {
-            'name': 'band 7',
-            'lower': +testBands.Band7Lower,
-            'upper': +testBands.Band7Upper,
-            'score': -1,
-            'type': 'band'
-        },
-        {
-            'name': 'band 8',
-            'lower': +testBands.Band8Lower,
-            'upper': +testBands.Band8Upper,
-            'score': -1,
-            'type': 'band'
-        },
-        {
-            'name': 'band 9',
-            'lower': +testBands.Band9Lower,
-            'upper': +testBands.Band9Upper,
-            'score': -1,
-            'type': 'band'
-        },
+    var dataset = [];
+    dataset[0] = {};
+    dataset[0].title = " Jrsd. Avg.";
+    dataset[0].subtitle = "School Avg.";
+    dataset[0].ranges = [+testBands.Band1Upper, +testBands.Band2Upper, +testBands.Band3Upper, +testBands.Band4Upper, +testBands.Band5Upper, +testBands.Band6Upper, +testBands.Band7Upper, +testBands.Band8Upper, +testBands.Band9Upper, +testBands.Band10Upper];
+    dataset[0].markers = [+rdsdata.Response.DomainScore.ScaledScoreValue];
+    // get jur & school scores for comparison
+    var tlevel = rdsdata.Test.TestContent.TestLevel;
+    var tdomain = rdsdata.Test.TestContent.TestDomain;
+    dataset[0].measures = getScoreSummaryAverages(tlevel, tdomain);
+    
+    // console.log(data);
 
-        {
-            'name': 'band 10',
-            'lower': +testBands.Band10Lower,
-            'upper': +testBands.Band10Upper,
-            'score': +rdsdata.Response.DomainScore.ScaledScoreValue,
-            'type': 'band'
-        },
+    var svg = d3.select("#graphContainer").selectAll("svg")
+        .data(dataset)
+        .enter().append("svg")
+        .attr("class", "bullet")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .call(chart);
 
-    ];
+    var title = svg.append("g")
+        .style("text-anchor", "end")
+        .attr("transform", "translate(-6," + height / 2 + ")");
 
+    title.append("text")
+        .attr("class", "title")
+        .text(function(d) { return d.title; });
 
-    var svg = dimple.newSvg("#graphContainer", 500, 200);
-    var chart = new dimple.chart(svg, data);
-    chart.setBounds(50, 10, 450, 150);
-
-    chart.defaultColors = [
-        new dimple.color("#90caf9", null, 0.1),
-        new dimple.color("#90caf9", null, 0.2),
-        new dimple.color("#90caf9", null, 0.3),
-        new dimple.color("#90caf9", null, 0.4),
-        new dimple.color("#90caf9", null, 0.5),
-        new dimple.color("#90caf9", null, 0.6),
-        new dimple.color("#90caf9", null, 0.7),
-        new dimple.color("#90caf9", null, 0.8),
-        new dimple.color("#90caf9", null, 0.9),
-        new dimple.color("#90caf9", null, 0.95),
-        new dimple.color("#333333")
-    ];
-
-
-    var xAxis = chart.addCategoryAxis("x", "name");
-    var orderBands = [
-        'band 1',
-        'band 2',
-        'band 3',
-        'band 4',
-        'band 5',
-        'band 6',
-        'band 7',
-        'band 8',
-        'band 9',
-        'band 10'
-    ];
-
-    xAxis.addOrderRule(orderBands);
-    xAxis.title = null;
-
-    var xAxis2 = chart.addMeasureAxis("x", "score")
-    xAxis2.overrideMax = +testBands.Band10Upper;
-    xAxis2.overrideMin = +testBands.Band1Lower;
-    xAxis2.title = null;
-    xAxis2.hidden = true;
-
-    var yAxis = chart.addCategoryAxis("y", "type");
-    yAxis.title = null;
-    yAxis.hidden = true;
-
-    var series = chart.addSeries("upper", dimple.plot.bar);
-    series.barGap = 0.1;
-
-    chart.addSeries("score", dimple.plot.bubble, [xAxis2, yAxis]);
-
-    chart.draw();
+    title.append("text")
+        .attr("class", "subtitle")
+        .attr("dy", "1em")
+        .text(function(d) { return d.subtitle; });
 
 
 }

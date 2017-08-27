@@ -20,7 +20,7 @@ $(document).ready(function() {
 // 
 function participationQuery() {
     return `
-query NAPData($acaraIDs: [String]) {
+query ParticipationData($acaraIDs: [String]) {
   participation_report_by_school(acaraIDs: $acaraIDs) {
     Student {
       FamilyName
@@ -132,8 +132,8 @@ function sortParticipationData(data) {
 
     data.sort(function(a, b) {
 
-        var compA = a.EventInfos[0].Test.TestContent.TestLevel.toUpperCase();
-        var compB = b.EventInfos[0].Test.TestContent.TestLevel.toUpperCase();
+        var compA = (a.EventInfos[0].Test.TestContent.TestLevel || '').toUpperCase();
+        var compB = (b.EventInfos[0].Test.TestContent.TestLevel || '').toUpperCase();
 
         return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
     });
@@ -206,11 +206,11 @@ function createParticipationTableBody(data) {
         var $row = $("<tr/>");
         $row.append("<td>" + test.TestContent.TestLevel + "</td>" +
             "<td>" + event.Event.PSI + "</td>" +
-            "<td class='domain'>" + summary['Grammar and Punctuation'] + "</td>" +
-            "<td class='domain'>" + summary['Numeracy'] + "</td>" +
-            "<td class='domain'>" + summary['Reading'] + "</td>" +
-            "<td class='domain'>" + summary['Spelling'] + "</td>" +
-            "<td class='domain'>" + summary['Writing'] + "</td>"
+            "<td class='domain'>" + hideNull(summary['Grammar and Punctuation']) + "</td>" +
+            "<td class='domain'>" + hideNull(summary['Numeracy']) + "</td>" +
+            "<td class='domain'>" + hideNull(summary['Reading']) + "</td>" +
+            "<td class='domain'>" + hideNull(summary['Spelling']) + "</td>" +
+            "<td class='domain'>" + hideNull(summary['Writing']) + "</td>"
         );
         $row.data("pdsdata", pds);
         $row.attr("yr-level", test.TestContent.TestLevel);
@@ -317,11 +317,11 @@ function createExtendedDataParticipation(pdsdata) {
         var eventInfo = getEventInfo(domains[i], pdsdata);
         var $row = $("<tr/>");
         $row.append("<td>" + domains[i] + "</td>" +
-            "<td>" + eventInfo.Event.Date + "</td>" +
-            "<td>" + eventInfo.Event.StartTime + "</td>" +
-            "<td>" + eventInfo.Event.LapsedTimeTest + "</td>" +
-            "<td>" + eventInfo.Event.ParticipationCode +
-            " (" + eventInfo.Event.ParticipationText + ")</td>" +
+            "<td>" + hideNull(eventInfo.Event.Date) + "</td>" +
+            "<td>" + hideNull(eventInfo.Event.StartTime) + "</td>" +
+            "<td>" + hideNull(eventInfo.Event.LapsedTimeTest) + "</td>" +
+            "<td>" + hideNull(eventInfo.Event.ParticipationCode) +
+            " (" + hideNull(eventInfo.Event.ParticipationText) + ")</td>" +
             "<td>" + hideNull(eventInfo.Event.ExemptionReason) + "</td>" +
             "<td>" + unpackList(eventInfo.Event.TestDisruptionList) + "</td>" +
             "<td>" + unpackList(eventInfo.Event.Adjustment.PNPCodelist) + "</td>" +
@@ -345,6 +345,8 @@ function createExtendedDataParticipation(pdsdata) {
 function getEventInfo(domainName, data) {
 
     ei = {};
+    ei.Event = {};
+    ei.Event.Adjustment = {};
 
     jQuery.each(data.EventInfos, function(index, eventInfo) {
         if (eventInfo.Test.TestContent.TestDomain == domainName) {

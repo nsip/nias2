@@ -1,0 +1,29 @@
+
+
+/*student score indicator*/
+.bullet .marker { stroke: #ffeb3b; stroke-width: 2.5px; } 
+
+.bullet .tick line { stroke: #666; stroke-width: .5px; }
+
+/*score bands colours*/
+.bullet .range.s0 { fill: #e0f2f1; }
+.bullet .range.s1 { fill: #b2dfdb; }
+.bullet .range.s2 { fill: #80cbc4; }
+.bullet .range.s3 { fill: #4db6ac; }
+
+.bullet .range.s4 { fill: #26a67a; }
+.bullet .range.s5 { fill: #26a69a; }
+
+.bullet .range.s6 { fill: #4db6ac; }
+.bullet .range.s7 { fill: #80cbc4; }
+.bullet .range.s8 { fill: #b2dfdb; }
+.bullet .range.s9 { fill: #e0f2f1; }
+
+/*extra data bars, jurisd avg. & school avg.*/
+.bullet .measure.s0 { fill: lightsteelblue; }
+.bullet .measure.s1 { fill: steelblue; }
+
+/*legend for data bars*/
+.bullet .title { font-size: 11px; fill: lightsteelblue; }
+.bullet .subtitle { font-size: 11px; fill: steelblue; }
+
