@@ -72,8 +72,11 @@ func buildReportResolvers() map[string]interface{} {
 		// get the sif refid for each of the acarids supplied
 		refids := make([]string, 0)
 		for _, acaraid := range acaraids {
-			refid := getIdentifiers(acaraid)[0]
-			refids = append(refids, refid)
+			refid := getIdentifiers(acaraid)
+			if len(refid) > 0 {
+				refids = append(refids, refid...)
+			}
+
 		}
 
 		// now construct the composite keys
@@ -122,8 +125,11 @@ func buildReportResolvers() map[string]interface{} {
 		// get the sif refid for each of the acarids supplied
 		refids := make([]string, 0)
 		for _, acaraid := range acaraids {
-			refid := getIdentifiers(acaraid)[0]
-			refids = append(refids, refid)
+			refid := getIdentifiers(acaraid)
+			if len(refid) > 0 {
+				refids = append(refids, refid...)
+			}
+
 		}
 
 		// get the school infos from the datastore
