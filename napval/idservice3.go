@@ -3,12 +3,13 @@ package napval
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/nats-io/go-nats"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
 	"github.com/orcaman/concurrent-map"
 	"gopkg.in/fatih/set.v0"
-	"log"
 )
 
 // id service requires too much overhead using ledis.
@@ -205,7 +206,7 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		// r.Target = VALIDATION_PREFIX
 		r.Body = ve
 		responses = append(responses, r)
-		log.Printf("simplekey: %s\nsimplekey2: %s\ncompllexkey: %s", simpleKey1, simpleKey2, complexKey)
+		// log.Printf("simplekey: %s\nsimplekey2: %s\ncompllexkey: %s", simpleKey1, simpleKey2, complexKey)
 
 	}
 
