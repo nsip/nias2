@@ -12,11 +12,11 @@ do_build() {
 	cd ./app/naprrql
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
-	cd ..
-        cd $CWD
-        cd ./app/napcomp
-        go get
-        GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$AUDITDIFFHARNESS
+	# cd ..
+        # cd $CWD
+        # cd ./app/napcomp
+        # go get
+        # GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$AUDITDIFFHARNESS
         cd $CWD
 	cd ./app
 	rsync -a naprrql/naplan_schema.graphql naprrql/public naprrql/school_templates naprrql/system_templates naprrql/in $OUTPUT/
