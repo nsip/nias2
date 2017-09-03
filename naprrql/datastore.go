@@ -7,6 +7,8 @@ import (
 	"log"
 
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/filter"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
@@ -30,8 +32,13 @@ func openDB() {
 
 	workingDir := "kvs"
 
+	o := &opt.Options{
+		Filter: filter.NewBloomFilter(10),
+		// BlockCacheCapacity: 128 * 1024 * 1024,
+		// NoSync: true,
+	}
 	var dbErr error
-	db, dbErr = leveldb.OpenFile(workingDir, nil)
+	db, dbErr = leveldb.OpenFile(workingDir, o)
 	if dbErr != nil {
 		log.Fatalln("DB Create error: ", dbErr)
 	}
