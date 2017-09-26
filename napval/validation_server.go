@@ -29,6 +29,7 @@ import (
 	"github.com/wildducktheories/go-csv"
 	"golang.org/x/net/websocket"
 	//"time"
+	"encoding/gob"
 )
 
 var naplanconfig = LoadNAPLANConfig()
@@ -54,6 +55,11 @@ func publish(msg *lib.NiasMessage) {
 
 }
 
+// message type for reporting student/school tally
+type StudentSchoolTally struct {
+	Tally map[string]int
+}
+
 //
 // read csv file as stream and post records onto processing queue
 //
@@ -66,6 +72,7 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 
 	i := 0
 	txid := nuid.Next()
+	studentcount := make(map[string]int, 0)
 	for record := range reader.C() {
 
 		i = i + 1
@@ -77,6 +84,7 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 		if decode_err != nil {
 			return ir, decode_err
 		}
+		studentcount[regr.ASLSchoolId]++
 
 		msg := &lib.NiasMessage{}
 		msg.Body = *regr
@@ -97,7 +105,31 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 	// update the tx tracker
 	tt.SetTxSize(txid, i)
 
+	enqueueManifest(studentcount, txid)
 	return ir, nil
+}
+
+func enqueueManifest(studentcount map[string]int, txid string) {
+	tt.SetTxSize("manifest:"+txid, 1)
+	msg := &lib.NiasMessage{}
+	msg.Body = StudentSchoolTally{Tally: studentcount}
+	msg.SeqNo = strconv.Itoa(1)
+	msg.TxID = "manifest:" + txid
+	msg.MsgID = nuid.Next()
+	err := stan_conn.Publish("manifest:"+txid, lib.EncodeNiasMessage(msg))
+	if err != nil {
+		log.Println("publish to store error: ", err)
+	}
+	tt.IncrementTracker(msg.TxID)
+	// get status of transaction and add message to stream
+	// if a notable status change has occurred
+	sigChange, msg1 := tt.GetStatusReport(msg.TxID)
+	if sigChange {
+		err := stan_conn.Publish("manifest:"+txid, lib.EncodeNiasMessage(msg1))
+		if err != nil {
+			log.Println("publish to store error: ", err)
+		}
+	}
 
 }
 
@@ -108,6 +140,7 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 
 	ir := lib.IngestResponse{}
 
+	studentcount := make(map[string]int, 0)
 	decoder := xml.NewDecoder(file)
 	total := 0
 	txid := nuid.Next()
@@ -129,6 +162,7 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 				if decode_err != nil {
 					return ir, decode_err
 				}
+				studentcount[rr.ASLSchoolId]++
 
 				msg := &lib.NiasMessage{}
 				msg.Body = rr
@@ -153,6 +187,7 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 	// update the tx tracker
 	tt.SetTxSize(txid, total)
 
+	enqueueManifest(studentcount, txid)
 	return ir, nil
 
 }
@@ -161,7 +196,7 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 // start the server
 //
 func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
-
+	gob.Register(StudentSchoolTally{})
 	log.Println("NAPLAN: Connecting to message bus")
 	req_ec = lib.CreateNATSConnection(nats_cfg)
 
@@ -399,6 +434,68 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 
 		return nil
 
+	})
+
+	// get manifest of schools and student counts for a transaction
+	e.GET("/naplan/reg/manifest/:txid", func(c echo.Context) error {
+		//e.GET("/naplan/reg/manifest", func(c echo.Context) error {
+
+		txID := c.Param("txid")
+		log.Println(txID)
+
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		c.Response().WriteHeader(http.StatusOK)
+
+		// signal channel to notify asynch stan stream read is complete
+		txComplete := make(chan bool)
+
+		// main message handling callback for the stan stream
+		mcb := func(m *stan.Msg) {
+
+			msg := lib.DecodeNiasMessage(m.Data)
+
+			// convenience type to send results/progress data only
+			// to web clients
+			type VMessage struct {
+				Type    string
+				Payload interface{}
+			}
+
+			switch t := msg.Body.(type) {
+			case StudentSchoolTally:
+				ve := msg.Body.(StudentSchoolTally)
+				if err := json.NewEncoder(c.Response()).Encode(ve); err != nil {
+					//if err := enc.Encode(ve); err != nil {
+					log.Println("error encoding json niasmessage: ", err)
+				}
+				c.Response().Flush()
+			case lib.TxStatusUpdate:
+				txsu := msg.Body.(lib.TxStatusUpdate)
+				if txsu.TxComplete {
+					log.Println("Finished...")
+					txComplete <- true
+				}
+			default:
+				_ = t
+				vmsg := VMessage{Type: "unknown", Payload: ""}
+				log.Printf("unknown message type in handler: %v ", vmsg)
+				log.Printf("message decoded from stan is (type %v):\n\n %+v\n\n", t, msg)
+			}
+
+			//log.Printf("message decoded from stan is:\n\n %+v\n\n", msg)
+
+		}
+
+		sub, err := stan_conn.Subscribe("manifest:"+txID, mcb, stan.DeliverAllAvailable())
+		defer sub.Unsubscribe()
+		if err != nil {
+			log.Println("stan subsciption error results-download: ", err)
+			return err
+		}
+
+		<-txComplete
+
+		return nil
 	})
 
 	//
