@@ -50,10 +50,11 @@ type IDService3 struct {
 
 // transaction id lookups
 type TransactionIDs struct {
-	Locations         cmap.ConcurrentMap
-	SimpleKeysLocalId *set.Set
-	SimpleKeysPSI     *set.Set
-	ExtendedKeys      *set.Set
+	Locations          cmap.ConcurrentMap
+	SimpleKeysLocalId  *set.Set
+	SimpleKeysPSI      *set.Set
+	ExtendedKeys       *set.Set
+	CrossSchoolMatches *set.Set
 }
 
 // create a new id service instance
@@ -91,9 +92,10 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	// see if dataset exists for this transaction, create if not
 	ids.Transactions.SetIfAbsent(req.TxID,
 		TransactionIDs{Locations: cmap.New(),
-			SimpleKeysLocalId: set.New(),
-			SimpleKeysPSI:     set.New(),
-			ExtendedKeys:      set.New()})
+			SimpleKeysLocalId:  set.New(),
+			SimpleKeysPSI:      set.New(),
+			ExtendedKeys:       set.New(),
+			CrossSchoolMatches: set.New()})
 
 	// retrieve the transaction dataset from the store
 	tdata, ok := ids.Transactions.Get(req.TxID)
@@ -129,8 +131,10 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	simpleKey1 := fmt.Sprintf("%v", k11)
 	simpleKey2 := fmt.Sprintf("%v", k12)
 	complexKey := fmt.Sprintf("%v", k2)
+	crossSchoolKey := rr.FieldsKey(config.StudentMatch)
+
 	//log.Printf("simplekey: %s\nsimplekey2: %s\ncompllexkey: %s", simpleKey1, simpleKey2, complexKey)
-	var simpleRecordExists1, simpleRecordExists2, complexRecordExists bool
+	var simpleRecordExists1, simpleRecordExists2, complexRecordExists, crossSchoolRecordExists bool
 
 	if simpleRecordExists1 = (tids.SimpleKeysLocalId.Has(simpleKey1) && len(rr.LocalId) > 0); !simpleRecordExists1 {
 		tids.SimpleKeysLocalId.Add(simpleKey1)
@@ -142,17 +146,40 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	if complexRecordExists = (tids.ExtendedKeys.Has(complexKey) && len(rr.LocalId) > 0); !complexRecordExists {
 		tids.ExtendedKeys.Add(complexKey)
 	}
+	if crossSchoolRecordExists = (tids.CrossSchoolMatches.Has(crossSchoolKey) && len(crossSchoolKey) > 0); !crossSchoolRecordExists {
+		tids.CrossSchoolMatches.Add(crossSchoolKey)
+	}
 	tids.Locations.SetIfAbsent(simpleKey1, req.SeqNo)
 	tids.Locations.SetIfAbsent(simpleKey2, req.SeqNo)
 	tids.Locations.SetIfAbsent(complexKey, req.SeqNo)
+	tids.Locations.SetIfAbsent(crossSchoolKey, req.SeqNo)
 
 	// if record is new then just return
-	if !complexRecordExists && !simpleRecordExists1 && !simpleRecordExists2 {
+	if !complexRecordExists && !simpleRecordExists1 && !simpleRecordExists2 && !crossSchoolRecordExists {
 		return responses, nil
 	}
 
 	// if we have seen it before then construct validation error
-	if complexRecordExists {
+	if crossSchoolRecordExists {
+		loc, _ := tids.Locations.Get(crossSchoolKey)
+		ol, _ := loc.(string)
+		desc := "Potential duplicate of record: " + ol + "\n" +
+			fmt.Sprintf("based on matching: %v", config.StudentMatch)
+		ve := ValidationError{
+			Description:  desc,
+			Field:        "Multiple (see description)",
+			OriginalLine: req.SeqNo,
+			Vtype:        "identity",
+			Severity:     "warning",
+		}
+		r := lib.NiasMessage{}
+		r.TxID = req.TxID
+		r.SeqNo = req.SeqNo
+		// r.Target = VALIDATION_PREFIX
+		r.Body = ve
+		responses = append(responses, r)
+		log.Printf("%v\n", responses)
+	} else if complexRecordExists {
 		loc, _ := tids.Locations.Get(complexKey)
 		ol, _ := loc.(string)
 		desc := "Potential duplicate of record: " + ol + "\n" +

@@ -189,6 +189,132 @@ func (r *RegistrationRecord) Unflatten() RegistrationRecord {
 	return *r
 }
 
+// return key based on concatenation of named fields
+// avoiding reflection for performance reasons
+func (r RegistrationRecord) FieldsKey(keys []string) string {
+	ret := ""
+	for _, k := range keys {
+		switch k {
+		case "RefId":
+			ret += r.RefId
+		case "LocalId":
+			ret += r.LocalId
+		case "StateProvinceId":
+			ret += r.StateProvinceId
+		case "FamilyName":
+			ret += r.FamilyName
+		case "GivenName":
+			ret += r.GivenName
+		case "MiddleName":
+			ret += r.MiddleName
+		case "PreferredName":
+			ret += r.PreferredName
+		case "IndigenousStatus":
+			ret += r.IndigenousStatus
+		case "Sex":
+			ret += r.Sex
+		case "BirthDate":
+			ret += r.BirthDate
+		case "CountryOfBirth":
+			ret += r.CountryOfBirth
+		case "StudentLOTE":
+			ret += r.StudentLOTE
+		case "VisaCode":
+			ret += r.VisaCode
+		case "LBOTE":
+			ret += r.LBOTE
+		case "AddressLine1":
+			ret += r.AddressLine1
+		case "AddressLine2":
+			ret += r.AddressLine2
+		case "Locality":
+			ret += r.Locality
+		case "StateTerritory":
+			ret += r.StateTerritory
+		case "Postcode":
+			ret += r.Postcode
+		case "SchoolLocalId":
+			ret += r.SchoolLocalId
+		case "YearLevel":
+			ret += r.YearLevel
+		case "FTE":
+			ret += r.FTE
+		case "Parent1LOTE":
+			ret += r.Parent1LOTE
+		case "Parent2LOTE":
+			ret += r.Parent2LOTE
+		case "Parent1Occupation":
+			ret += r.Parent1Occupation
+		case "Parent2Occupation":
+			ret += r.Parent2Occupation
+		case "Parent1SchoolEducation":
+			ret += r.Parent1SchoolEducation
+		case "Parent2SchoolEducation":
+			ret += r.Parent2SchoolEducation
+		case "Parent1NonSchoolEducation":
+			ret += r.Parent1NonSchoolEducation
+		case "Parent2NonSchoolEducation":
+			ret += r.Parent2NonSchoolEducation
+		case "LocalCampusId":
+			ret += r.LocalCampusId
+		case "ASLSchoolId":
+			ret += r.ASLSchoolId
+		case "TestLevel":
+			ret += r.TestLevel
+		case "Homegroup":
+			ret += r.Homegroup
+		case "ClassGroup":
+			ret += r.ClassGroup
+		case "MainSchoolFlag":
+			ret += r.MainSchoolFlag
+		case "FFPOS":
+			ret += r.FFPOS
+		case "ReportingSchoolId":
+			ret += r.ReportingSchoolId
+		case "OtherSchoolId":
+			ret += r.OtherSchoolId
+		case "EducationSupport":
+			ret += r.EducationSupport
+		case "HomeSchooledStudent":
+			ret += r.HomeSchooledStudent
+		case "Sensitive":
+			ret += r.Sensitive
+		case "OfflineDelivery":
+			ret += r.OfflineDelivery
+		case "DiocesanId":
+			ret += r.DiocesanId
+		case "JurisdictionId":
+			ret += r.JurisdictionId
+		case "NationalId":
+			ret += r.NationalId
+		case "OtherId":
+			ret += r.OtherId
+		case "PlatformId":
+			ret += r.PlatformId
+		case "PreviousDiocesanId":
+			ret += r.PreviousDiocesanId
+		case "PreviousNationalId":
+			ret += r.PreviousNationalId
+		case "PreviousOtherId":
+			ret += r.PreviousOtherId
+		case "PreviousPlatformId":
+			ret += r.PreviousPlatformId
+		case "PreviousSectorId":
+			ret += r.PreviousSectorId
+		case "PreviousLocalId":
+			ret += r.PreviousLocalId
+		case "PreviousStateProvinceId":
+			ret += r.PreviousStateProvinceId
+		case "SectorId":
+			ret += r.SectorId
+		case "TAAId":
+			ret += r.TAAId
+		}
+		ret += ":::"
+	}
+	return ret
+}
+
 // convenience method to return otherid by type
 func (r RegistrationRecord) GetOtherId(idtype string) string {
 
