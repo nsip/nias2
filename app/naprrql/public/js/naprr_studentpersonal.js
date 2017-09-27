@@ -9,14 +9,17 @@ function getStudentInfoSummaryLine(psi) {
     // data can be found in participation info
     $.each(studentPersonalData, function(index, studentpersonal) {
         // ei = pds.EventInfos[0];
-        sp = studentpersonal;
+        // sp = studentpersonal;
         $.each(studentpersonal.OtherIdList.OtherId, function(index, oid) {
+        if (oid.Type == "NAPPlatformStudentId") {
             if (oid.Value == psi) {
                 // var student = pds.Student;
                 // sp = student;
+                sp = studentpersonal;
                 sp_psi = oid.Value;
-                return false;
+                //return false;
             }
+        }
         });
     });
 

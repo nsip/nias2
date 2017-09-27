@@ -132,8 +132,12 @@ function sortParticipationData(data) {
 
     data.sort(function(a, b) {
 
-        var compA = (a.EventInfos[0].Test.TestContent.TestLevel || '').toUpperCase();
-        var compB = (b.EventInfos[0].Test.TestContent.TestLevel || '').toUpperCase();
+        var compA = (a.EventInfos[0].Test.TestContent.TestLevel || '').toUpperCase() +
+          (a.Student.FamilyName || '').toUpperCase() + 
+          (a.Student.GivenName || '').toUpperCase() ;
+        var compB = (b.EventInfos[0].Test.TestContent.TestLevel || '').toUpperCase() +
+          (b.Student.FamilyName || '').toUpperCase() + 
+          (b.Student.GivenName || '').toUpperCase() ;
 
         return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
     });
@@ -168,7 +172,7 @@ function createParticipationTableHeader() {
 
     var hdr = $("<tr></tr>");
     var hdr_row = $("<th>Level</th>" +
-        "<th>PSI</th>" +
+        "<th>Name</th>" +
         "<th>G and P</th>" +
         "<th>Numeracy</th>" +
         "<th>Reading</th>" +
@@ -205,7 +209,8 @@ function createParticipationTableBody(data) {
 
         var $row = $("<tr/>");
         $row.append("<td>" + test.TestContent.TestLevel + "</td>" +
-            "<td>" + event.Event.PSI + "</td>" +
+            // "<td>" + event.Event.PSI + "</td>" +
+            "<td>" + pds.Student.GivenName + " " + pds.Student.FamilyName +  "</td>" +
             "<td class='domain'>" + hideNull(summary['Grammar and Punctuation']) + "</td>" +
             "<td class='domain'>" + hideNull(summary['Numeracy']) + "</td>" +
             "<td class='domain'>" + hideNull(summary['Reading']) + "</td>" +
