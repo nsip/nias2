@@ -92,6 +92,7 @@ func ingestData() {
 // launch the webserver
 //
 func startWebServer(silent bool) {
+	naprrql.GetDB(false) // Verify that the database is populated; if not will abort
 	go naprrql.RunQLServer()
 	if !silent {
 		fmt.Printf("\n\nBrowse to follwing locations:\n")
@@ -136,7 +137,7 @@ func parseResultsFileDirectory() []string {
 //
 func closeDB() {
 	log.Println("Closing datastore...")
-	naprrql.GetDB().Close()
+	naprrql.GetDB(true).Close()
 	log.Println("Datastore closed.")
 }
 

@@ -17,10 +17,12 @@ var dbOpen bool = false
 
 var ge = GobEncoder{}
 
-func GetDB() *leveldb.DB {
+// if allow_empty is false, abort if database is empty: enforces
+// requirement to run ingest first
+func GetDB(allow_empty bool) *leveldb.DB {
 	if !dbOpen {
 		log.Println("DB not initialised. Opening...")
-		openDB()
+		openDB(allow_empty)
 	}
 	return db
 }
@@ -28,7 +30,7 @@ func GetDB() *leveldb.DB {
 //
 // open the kv store, this must be called before any access is attempted
 //
-func openDB() {
+func openDB(allow_empty bool) {
 
 	workingDir := "kvs"
 
@@ -42,6 +44,15 @@ func openDB() {
 	if dbErr != nil {
 		log.Fatalln("DB Create error: ", dbErr)
 	}
+	// if database is empty, abort
+	if !allow_empty {
+		iter := db.NewIterator(nil, nil)
+		iter.Next()
+		if len(iter.Key()) == 0 {
+			log.Fatalf("DB is Empty. Run naprrql --ingest with an extract file.")
+		}
+	}
+
 	dbOpen = true
 }
 
@@ -52,7 +63,7 @@ func openDB() {
 //
 func getIdentifiers(keyPrefix string) []string {
 
-	db = GetDB()
+	db = GetDB(false)
 	objIDs := make([]string, 0)
 
 	searchKey := []byte(keyPrefix + ":")
@@ -77,7 +88,7 @@ func getIdentifiers(keyPrefix string) []string {
 //
 func getObjects(objIDs []string) ([]interface{}, error) {
 
-	db = GetDB()
+	db = GetDB(false)
 	objects := []interface{}{}
 
 	for _, objID := range objIDs {
