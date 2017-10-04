@@ -49,7 +49,7 @@ func buildReportResolvers() map[string]interface{} {
 	// shorthand lookup objects for basic school info
 	//
 	resolvers["NaplanData/school_details"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("SchoolDetails"))
+		return getObjects(getIdentifiers("SchoolDetails:"))
 	}
 
 	//
@@ -82,7 +82,7 @@ func buildReportResolvers() map[string]interface{} {
 		// now construct the composite keys
 		school_summary_keys := make([]string, 0)
 		for _, refid := range refids {
-			school_summary_keys = append(school_summary_keys, refid+":NAPTestScoreSummary")
+			school_summary_keys = append(school_summary_keys, refid+":NAPTestScoreSummary:")
 		}
 
 		summ_refids := make([]string, 0)
@@ -258,7 +258,7 @@ func buildReportResolvers() map[string]interface{} {
 		results := make([]ParticipationDataSet, 0)
 		for _, studentObj := range studentObjs {
 			student, _ := studentObj.(xml.RegistrationRecord)
-			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink")
+			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
 			if len(studentEventIds) < 1 {
 				// log.Println("no events found for student: ", student.RefId)
 				continue
@@ -307,7 +307,7 @@ func buildReportResolvers() map[string]interface{} {
 	resolvers["NaplanData/codeframe_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		// get the codeframe objects
 		codeframes := make([]xml.NAPCodeFrame, 0)
-		codeframeIds := getIdentifiers("NAPCodeFrame")
+		codeframeIds := getIdentifiers("NAPCodeFrame:")
 		codeFrameObjs, err := getObjects(codeframeIds)
 		if err != nil {
 			return []interface{}{}, err

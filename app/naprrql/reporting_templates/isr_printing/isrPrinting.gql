@@ -1,0 +1,24 @@
+query ISRPrinting($acaraID: String, $yrLevel: String) {
+  reportItems(schoolAcaraID: $acaraID, testYrLevel: $yrLevel) {
+    StudentLocalID
+    StudentFirstName
+    StudentLastName
+    SchoolID
+    SchoolName
+    R_Score
+    R_Mean
+    R_Comment
+    W_Score
+    W_Mean
+    W_Comment
+    S_Score
+    S_Mean
+    S_Comment
+    G_Score
+    G_Mean
+    G_Comment
+    N_Score
+    N_Mean
+    N_Comment
+  }
+}

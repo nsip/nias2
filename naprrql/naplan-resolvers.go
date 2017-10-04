@@ -10,75 +10,75 @@ func buildNaplanResolvers() map[string]interface{} {
 	resolvers := map[string]interface{}{}
 
 	resolvers["NaplanData/score_summaries"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("NAPTestScoreSummary"))
+		return getObjects(getIdentifiers("NAPTestScoreSummary:"))
 	}
 
 	resolvers["NaplanData/score_summaries_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("NAPTestScoreSummary")), nil
+		return len(getIdentifiers("NAPTestScoreSummary:")), nil
 	}
 
 	resolvers["NaplanData/students"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("StudentPersonal"))
+		return getObjects(getIdentifiers("StudentPersonal:"))
 	}
 
 	resolvers["NaplanData/students_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("StudentPersonal")), nil
+		return len(getIdentifiers("StudentPersonal:")), nil
 	}
 
 	resolvers["NaplanData/events"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("NAPEventStudentLink"))
+		return getObjects(getIdentifiers("NAPEventStudentLink:"))
 	}
 
 	resolvers["NaplanData/events_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("NAPEventStudentLink")), nil
+		return len(getIdentifiers("NAPEventStudentLink:")), nil
 	}
 
 	resolvers["NaplanData/responses"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("NAPStudentResponseSet"))
+		return getObjects(getIdentifiers("NAPStudentResponseSet:"))
 	}
 
 	resolvers["NaplanData/responses_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("NAPStudentResponseSet")), nil
+		return len(getIdentifiers("NAPStudentResponseSet:")), nil
 	}
 
 	resolvers["NaplanData/tests_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("NAPTest")), nil
+		return len(getIdentifiers("NAPTest:")), nil
 	}
 
 	resolvers["NaplanData/tests"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("NAPTest"))
+		return getObjects(getIdentifiers("NAPTest:"))
 	}
 
 	resolvers["NaplanData/schools_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("SchoolInfo")), nil
+		return len(getIdentifiers("SchoolInfo:")), nil
 	}
 
 	resolvers["NaplanData/schools"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("SchoolInfo"))
+		return getObjects(getIdentifiers("SchoolInfo:"))
 	}
 
 	resolvers["NaplanData/testlets_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("NAPTestlet")), nil
+		return len(getIdentifiers("NAPTestlet:")), nil
 	}
 
 	resolvers["NaplanData/testlets"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("NAPTestlet"))
+		return getObjects(getIdentifiers("NAPTestlet:"))
 	}
 
 	resolvers["NaplanData/testitems_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("NAPTestItem")), nil
+		return len(getIdentifiers("NAPTestItem:")), nil
 	}
 
 	resolvers["NaplanData/testitems"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("NAPTestItem"))
+		return getObjects(getIdentifiers("NAPTestItem:"))
 	}
 
 	resolvers["NaplanData/codeframes_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return len(getIdentifiers("NAPCodeFrame")), nil
+		return len(getIdentifiers("NAPCodeFrame:")), nil
 	}
 
 	resolvers["NaplanData/codeframes"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return getObjects(getIdentifiers("NAPCodeFrame"))
+		return getObjects(getIdentifiers("NAPCodeFrame:"))
 	}
 
 	//

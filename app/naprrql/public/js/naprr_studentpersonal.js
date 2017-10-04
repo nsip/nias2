@@ -6,18 +6,19 @@ function getStudentInfoSummaryLine(psi) {
     var sp = {};
     var sp_psi = "";
 
-    // data can be found in participation info
+    // data can be found in student info dataset
     $.each(studentPersonalData, function(index, studentpersonal) {
-        // ei = pds.EventInfos[0];
-        sp = studentpersonal;
+        var found = false;
         $.each(studentpersonal.OtherIdList.OtherId, function(index, oid) {
             if (oid.Value == psi) {
-                // var student = pds.Student;
-                // sp = student;
+                found = true;
+                sp = studentpersonal;
                 sp_psi = oid.Value;
                 return false;
             }
         });
+        // stop iterating if we found the student
+        if (found) { return false; }
     });
 
     return $("<p>" +
