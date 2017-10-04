@@ -6,9 +6,9 @@ import (
 	"github.com/playlyfe/go-graphql"
 )
 
-func buildExecutor() *graphql.Executor {
+func buildNAPExecutor() *graphql.Executor {
 
-	executor, err := graphql.NewExecutor(buildSchema(), "NaplanData", "", buildResolvers())
+	executor, err := graphql.NewExecutor(buildNAPSchema(), "NaplanData", "", buildNAPResolvers())
 	if err != nil {
 		log.Fatalln("Cannot create Executor: ", err)
 	}
@@ -16,7 +16,7 @@ func buildExecutor() *graphql.Executor {
 	return executor
 }
 
-func buildResolvers() map[string]interface{} {
+func buildNAPResolvers() map[string]interface{} {
 
 	allResolvers := make(map[string]interface{})
 
@@ -32,5 +32,16 @@ func buildResolvers() map[string]interface{} {
 	}
 
 	return allResolvers
+
+}
+
+func buildISRPrintExecutor() *graphql.Executor {
+
+	executor, err := graphql.NewExecutor(buildISRPrintSchema(), "ISRPrint", "", buildISRPrintResolvers())
+	if err != nil {
+		log.Fatalln("Cannot create Executor: ", err)
+	}
+
+	return executor
 
 }

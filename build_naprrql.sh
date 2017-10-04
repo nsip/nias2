@@ -19,7 +19,7 @@ do_build() {
         # GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$AUDITDIFFHARNESS
         cd $CWD
 	cd ./app
-	rsync -a naprrql/naplan_schema.graphql naprrql/public naprrql/school_templates naprrql/system_templates naprrql/in $OUTPUT/
+	rsync -a naprrql/gql_schemas naprrql/in naprrql/public naprrql/reporting_templates $OUTPUT/
 }
 
 

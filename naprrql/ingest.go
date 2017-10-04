@@ -141,6 +141,10 @@ func IngestResultsFile(resultsFilePath string) {
 				key = []byte(tss.SchoolInfoRefId + ":NAPTestScoreSummary:" + tss.SummaryID)
 				batch.Put(key, []byte(tss.SummaryID))
 
+				// {test}:NAPTestScoreSummary-type:{school}:{id} = {id}
+				key = []byte(tss.NAPTestRefId + ":NAPTestScoreSummary:" + tss.SchoolInfoRefId + ":" + tss.SummaryID)
+				batch.Put(key, []byte(tss.SummaryID))
+
 				totalTestScoreSummarys++
 
 			case "NAPEventStudentLink":
@@ -168,6 +172,10 @@ func IngestResultsFile(resultsFilePath string) {
 
 				// {student}:NAPEventStudentLink-type:{id} = {id}
 				key = []byte(e.SPRefID + ":NAPEventStudentLink:" + e.EventID)
+				batch.Put(key, []byte(e.EventID))
+
+				// {test}:NAPEventStudentLink-type:{school}:{id} = {id}
+				key = []byte(e.TestID + ":NAPEventStudentLink:" + e.SchoolRefID + ":" + e.EventID)
 				batch.Put(key, []byte(e.EventID))
 
 				totalEvents++
@@ -286,18 +294,28 @@ func IngestResultsFile(resultsFilePath string) {
 				key := []byte("StudentPersonal:" + sp.RefId)
 				batch.Put(key, []byte(sp.RefId))
 
-				// student_by_acaraid:{id} = {id}
+				// student_by_acaraid:{asl-id}:{studentpersonal-id} = {id}
 				key = []byte("student_by_acaraid:" + sp.ASLSchoolId + ":" + sp.RefId)
 				batch.Put(key, []byte(sp.RefId))
 
 				totalStudents++
 
 			}
+			// write the batch out regularly to prevent
+			// memory exhaustion for large inputs
+			if (batch.Len() > 0) && (batch.Len()%20000) == 0 {
+				batcherr := db.Write(batch, nil)
+				if batcherr != nil {
+					log.Fatalln("batch error: ", batcherr)
+				}
+			}
 		default:
 		}
 
 	}
 
+	// write any remaining batch entries
+	// since last flush
 	batcherr := db.Write(batch, nil)
 	if batcherr != nil {
 		log.Fatalln("batch error: ", batcherr)

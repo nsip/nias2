@@ -12,7 +12,8 @@ import (
 	"github.com/playlyfe/go-graphql"
 )
 
-var executor *graphql.Executor
+var nap_executor *graphql.Executor
+var isr_executor *graphql.Executor
 
 //
 // wrapper type to capture graphql input
@@ -36,7 +37,30 @@ func graphQLHandler(c echo.Context) error {
 	variables := grq.Variables
 	gqlContext := map[string]interface{}{}
 
-	result, err := executor.Execute(gqlContext, query, variables, "")
+	result, err := nap_executor.Execute(gqlContext, query, variables, "")
+	if err != nil {
+		panic(err)
+	}
+
+	return c.JSON(http.StatusOK, result)
+
+}
+
+//
+// specialist handler for creating isr printing files
+//
+func isrPrintHandler(c echo.Context) error {
+
+	grq := new(GQLRequest)
+	if err := c.Bind(grq); err != nil {
+		return err
+	}
+
+	query := grq.Query
+	variables := grq.Variables
+	gqlContext := map[string]interface{}{}
+
+	result, err := isr_executor.Execute(gqlContext, query, variables, "")
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +74,8 @@ func graphQLHandler(c echo.Context) error {
 //
 func RunQLServer() {
 
-	executor = buildExecutor()
+	nap_executor = buildNAPExecutor()
+	isr_executor = buildISRPrintExecutor()
 
 	e := echo.New()
 
@@ -61,8 +86,11 @@ func RunQLServer() {
 	e.File("/sifql", "public/ql_index.html")
 	e.File("/ui", "public/ui_index.html")
 
-	// the graphql handler
+	// the main graphql handler
 	e.POST("/graphql", graphQLHandler)
+
+	// special handler for isr printing
+	e.POST("/isrprint", isrPrintHandler)
 
 	//
 	// download the requested pre-generated csv file.

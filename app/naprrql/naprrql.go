@@ -19,8 +19,11 @@ import (
 
 var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng data is overwritten.")
 var report = flag.Bool("report", false, "Creates .csv reports. Existing reports are overwritten")
+var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
 
 func main() {
+
+	// runtime.GOMAXPROCS(16) // optional performance improvement for larger systems.
 
 	flag.Parse()
 
@@ -37,8 +40,8 @@ func main() {
 	if *ingest {
 		ingestData()
 		if !naprrql.DataUnfit() {
-			startWebServer(true)
-			writeReports()
+			// startWebServer(true)
+			// writeReports()
 		} else {
 			log.Println(`
 				-- 
@@ -56,10 +59,18 @@ func main() {
 	if *report {
 		// launch web-server
 		startWebServer(true)
-		// if requested regenerate reports
-		if *report {
-			writeReports()
-		}
+		writeReports()
+		writeISRPrintingReports()
+		// shut down
+		closeDB()
+		os.Exit(1)
+	}
+
+	// create the isr printing reports
+	if *isrprint {
+		// launch web-server
+		startWebServer(true)
+		writeISRPrintingReports()
 		// shut down
 		closeDB()
 		os.Exit(1)
@@ -109,6 +120,16 @@ func writeReports() {
 	log.Println("generating reports...")
 	naprrql.GenerateReports()
 	log.Println("reports generated...")
+}
+
+//
+// create isr printing reports
+//
+func writeISRPrintingReports() {
+	// clearReportsDirectory() // - check this
+	log.Println("generating isr printing reports...")
+	naprrql.GenerateISRPrintReports()
+	log.Println("isr printing reports generated...")
 }
 
 //

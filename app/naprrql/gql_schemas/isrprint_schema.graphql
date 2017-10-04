@@ -1,0 +1,62 @@
+# isrprint_schema.graphql
+
+## Collates student results into ISR printing input file
+type ISRPrint {
+	## Request student summaries for the given school and year level of tests
+	reportItems(schoolAcaraID: String!, testYrLevel: String!): [ISRPrintItem]
+}
+
+## Represents each student as a line of results for priniting
+type ISRPrintItem {
+	## The student ID (typically localID)
+	StudentLocalID: String
+	## Platform identifier for student
+	StudentPSI: String
+	## Student given name
+	StudentFirstName: String
+	## Student family name
+	StudentLastName: String
+	## ID of school
+	SchoolID: String
+	## School name
+	SchoolName: String
+	## Reading domainscore, scaled
+	R_Score: Float
+	## Reading mean
+	R_Mean: Float
+	## Reading score comment
+	R_Comment: String
+	## Writing domainscore, scaled
+	W_Score: Float
+	## Writing mean
+	W_Mean: Float
+	## Writing score comment
+	W_Comment: String
+	## Spelling domainscore, scaled
+	S_Score: Float
+	## Spelling mean
+	S_Mean: Float
+	## Spelling score comment
+	S_Comment: String
+	## Grammar domainscore, scaled
+	G_Score: Float
+	## Grammar mean
+	G_Mean: Float
+	## Grammar school comment
+	G_Comment: String
+	## Numearacy domainscore, scaled
+	N_Score: Float
+	## Numearacy mean
+	N_Mean: Float
+	## Numeracy score comment
+	N_Comment: String
+}
+
+
+
+
+
+
+
+
+
