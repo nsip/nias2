@@ -10,12 +10,14 @@ function getStudentInfoSummaryLine(psi) {
     $.each(studentPersonalData, function(index, studentpersonal) {
         var found = false;
         $.each(studentpersonal.OtherIdList.OtherId, function(index, oid) {
+        if (oid.Type == "NAPPlatformStudentId") {
             if (oid.Value == psi) {
                 found = true;
                 sp = studentpersonal;
                 sp_psi = oid.Value;
                 return false;
             }
+        }
         });
         // stop iterating if we found the student
         if (found) { return false; }
