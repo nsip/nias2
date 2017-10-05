@@ -57,7 +57,7 @@ func IngestData() {
 //
 func ingestResultsFile(resultsFilePath string) {
 
-	db := naprrql.GetDB()
+	db := naprrql.GetDB(true)
 	ge := naprrql.GobEncoder{}
 
 	// open the data file for streaming read
@@ -128,7 +128,7 @@ func ingestResultsFile(resultsFilePath string) {
 //
 func ingestRegistrationFile(regFilePath string) {
 
-	db := naprrql.GetDB()
+	db := naprrql.GetDB(true)
 	ge := naprrql.GobEncoder{}
 
 	log.Printf("Reading data file [%s]", regFilePath)
@@ -210,7 +210,7 @@ func makeComparisonKey(r *xml.RegistrationRecord) string {
 func WriteReports() {
 
 	clearReportsDirectory()
-	db := naprrql.GetDB()
+	db := naprrql.GetDB(false)
 	ge := naprrql.GobEncoder{}
 
 	log.Println("generating difference reports...")
@@ -329,7 +329,7 @@ func parseRegistrationFileDirectory() []string {
 //
 func CloseDB() {
 	log.Println("Closing datastore...")
-	naprrql.GetDB().Close()
+	naprrql.GetDB(true).Close()
 	log.Println("Datastore closed.")
 }
 

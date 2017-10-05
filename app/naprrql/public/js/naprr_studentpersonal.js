@@ -15,7 +15,7 @@ function getStudentInfoSummaryLine(psi) {
                 found = true;
                 sp = studentpersonal;
                 sp_psi = oid.Value;
-                return false;
+                //return false;
             }
         }
         });

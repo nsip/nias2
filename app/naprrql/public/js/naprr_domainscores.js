@@ -26,6 +26,10 @@ function domainScoresQuery() {
     return `
 query DomainScoresData($acaraIDs: [String]) {
   domain_scores_report_by_school(acaraIDs: $acaraIDs) {
+    Student {
+      FamilyName
+      GivenName
+    }
     Test {
       TestID
       TestContent {
@@ -156,7 +160,7 @@ function createDomainScoresReport()
 }
 
 // 
-// sort data - by year level & test domain for now
+// sort data - by year level & test domain and student last then first name
 // 
 function sortDomainScoresData(data)
 {
@@ -170,11 +174,15 @@ function sortDomainScoresData(data)
         
         var compA = (a.Test.TestContent.TestLevel || '').toUpperCase() +
             (a.Test.TestContent.TestDomain || '').toUpperCase() +
-            (a.Response.DomainScore.StudentDomainBand || '').toUpperCase();
+            (a.Response.DomainScore.StudentDomainBand || '').toUpperCase() +
+            (a.Student.FamilyName || '').toUpperCase() +
+            (a.Student.GivenName || '').toUpperCase() ;
 
         var compB = (b.Test.TestContent.TestLevel || '').toUpperCase() +
             (b.Test.TestContent.TestDomain || '').toUpperCase() +
-            (b.Response.DomainScore.StudentDomainBand || '').toUpperCase();
+            (b.Response.DomainScore.StudentDomainBand || '').toUpperCase() +
+            (b.Student.FamilyName || '').toUpperCase() +
+            (b.Student.GivenName || '').toUpperCase() ;
 
         return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
     });
@@ -213,7 +221,7 @@ function createDomainScoresTableHeader()
     var hdr = $("<tr></tr>");
     var hdr_row = $("<th>Level</th>" +
         "<th>Domain</th>" +
-        "<th>PSI</th>" +
+        "<th>Name</th>" +
         "<th>Raw Score</th>" +
         "<th>Scaled Score</th>" +
         "<th>Scaled Score Std. Error</th>" +
@@ -240,7 +248,8 @@ function createDomainScoresTableBody(data)
         var $row = $("<tr/>");
         $row.append("<td>" + hideNull(rds.Test.TestContent.TestLevel) + "</td>" +
             "<td>" + hideNull(rds.Test.TestContent.TestDomain) + "</td>" +
-            "<td>" + hideNull(rds.Response.PSI) + "</td>" +
+            //"<td>" + hideNull(rds.Response.PSI) + "</td>" +
+            "<td>" + hideNull(rds.Student.GivenName) + " " + hideNull(rds.Student.FamilyName) + "</td>" +
             "<td>" + hideNull(rds.Response.DomainScore.RawScore) + "</td>" +
             "<td>" + hideNull(rds.Response.DomainScore.ScaledScoreValue) + "</td>" +
             "<td>" + hideNull(rds.Response.DomainScore.ScaledScoreStandardError) + "</td>" +

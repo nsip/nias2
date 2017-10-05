@@ -9,6 +9,9 @@ TestYear = "2017"
 # ValidationRoute = ["schema", "local","schema2", "dob", "id","asl", "psi", "numericvalid"]
 ValidationRoute = ["schema", "schema2", "dob", "id","asl", "psi", "numericvalid"]
 
+# Data match fields for matching across schools
+StudentMatch = ["FamilyName", "GivenName", "BirthDate"]
+
 # Webserver port
 WebServerPort = "1325"
 

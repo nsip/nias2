@@ -26,6 +26,7 @@ func init() {
 // aggregating type used for reporting domain scores
 type ResponseDataSet struct {
 	Test     xml.NAPTest
+	Student  xml.RegistrationRecord
 	Response xml.NAPResponseSet
 }
 

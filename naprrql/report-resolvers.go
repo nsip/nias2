@@ -219,7 +219,12 @@ func buildReportResolvers() map[string]interface{} {
 			if err != nil || !ok {
 				return []interface{}{}, err
 			}
-			rds := ResponseDataSet{Test: test, Response: resp}
+			students, err := getObjects([]string{resp.StudentID})
+			student, ok := students[0].(xml.RegistrationRecord)
+			if err != nil || !ok {
+				return []interface{}{}, err
+			}
+			rds := ResponseDataSet{Test: test, Response: resp, Student: student}
 			results = append(results, rds)
 		}
 

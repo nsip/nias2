@@ -18,7 +18,7 @@ var unfit bool
 func IngestResultsFile(resultsFilePath string) {
 
 	fileGuids = make(map[string]bool)
-	db := GetDB()
+	db := GetDB(true)
 	ge := GobEncoder{}
 
 	// open the data file for streaming read

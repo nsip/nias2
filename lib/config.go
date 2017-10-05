@@ -13,6 +13,7 @@ type NIASConfig struct {
 	WebServerPort    string
 	NATSPort         string
 	ValidationRoute  []string
+	StudentMatch     []string
 	SSFRoute         []string
 	SMSRoute         []string
 	PoolSize         int // number of service processors

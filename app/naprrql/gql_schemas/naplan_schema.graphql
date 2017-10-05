@@ -173,6 +173,8 @@ type ParticipationSummary {
 
 ## Domain scores reporting object
 type ResponseDataSet {
+	## The student who's participation is being reported
+	Student: RegistrationRecord
 	## the related test
 	Test: NAPTest
 	## the response from which the domain score will be derived
