@@ -4,6 +4,7 @@ package napval
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/nats-io/go-nats"
 	"github.com/nsip/nias2/lib"
@@ -55,6 +56,7 @@ type TransactionIDs struct {
 	SimpleKeysPSI      *set.Set
 	ExtendedKeys       *set.Set
 	CrossSchoolMatches *set.Set
+	CrossSchoolFTEs    cmap.ConcurrentMap
 }
 
 // create a new id service instance
@@ -73,6 +75,41 @@ func (ids *IDService3) txMonitor() {
 	log.Println("tx monitor is listening...")
 	go ids.C.QueueSubscribe(lib.TRACK_TOPIC, "id3", func(txID string) {
 		log.Println("Transaction complete message received for tx: ", txID)
+		/*
+			// and now issue report on FTEs of data matched students
+			tdata, ok := ids.Transactions.Get(txID)
+			tids, ok1 := tdata.(TransactionIDs)
+			if ok && ok1 {
+				tids.CrossSchoolMatches.Each(func(item interface{}) bool {
+					crossSchoolKey := item.(string)
+					fte, ok := tids.CrossSchoolFTEs.Get(crossSchoolKey)
+					if ok && fte != 1.0 {
+						loc, _ := tids.Locations.Get(crossSchoolKey)
+						ol, _ := loc.(string)
+						desc := fmt.Sprintf("Student with key %s at %s matched across schools has an FTE of %0.2f across all enrolments\n",
+							crossSchoolKey, ol, fte)
+						ve := ValidationError{
+							Description:  desc,
+							Field:        "FTE",
+							OriginalLine: ol,
+							Vtype:        "identity",
+							Severity:     "warning",
+						}
+						r := lib.NiasMessage{}
+						r.TxID = txID
+						r.SeqNo = ol
+						r.Body = ve
+						r.Source = "id"
+						responses = append(responses, r)
+						log.Printf("%v\n", responses)
+					}
+					return true
+				})
+				for _, r := range responses {
+					ids.C.Publish(lib.STORE_TOPIC, r)
+				}
+			}
+		*/
 		transactionStore.Remove(txID)
 	})
 
@@ -95,7 +132,9 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			SimpleKeysLocalId:  set.New(),
 			SimpleKeysPSI:      set.New(),
 			ExtendedKeys:       set.New(),
-			CrossSchoolMatches: set.New()})
+			CrossSchoolMatches: set.New(),
+			CrossSchoolFTEs:    cmap.New(),
+		})
 
 	// retrieve the transaction dataset from the store
 	tdata, ok := ids.Transactions.Get(req.TxID)
@@ -132,6 +171,18 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	simpleKey2 := fmt.Sprintf("%v", k12)
 	complexKey := fmt.Sprintf("%v", k2)
 	crossSchoolKey := rr.FieldsKey(config.StudentMatch)
+
+	// record all FTEs, preemptively; we will report on those corresponding to cross-school collisions
+	fte, ok := tids.CrossSchoolFTEs.Get(crossSchoolKey)
+	fte_num := 0.0
+	if ok {
+		fte_num = fte.(float64)
+	}
+	fte_new, err := strconv.ParseFloat(rr.FTE, 64)
+	if err != nil {
+		fte_new = 0.0
+	}
+	tids.CrossSchoolFTEs.Set(crossSchoolKey, fte_num+fte_new)
 
 	//log.Printf("simplekey: %s\nsimplekey2: %s\ncompllexkey: %s", simpleKey1, simpleKey2, complexKey)
 	var simpleRecordExists1, simpleRecordExists2, complexRecordExists, crossSchoolRecordExists bool
@@ -179,6 +230,29 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		r.Body = ve
 		responses = append(responses, r)
 		log.Printf("%v\n", responses)
+
+		if fte_num+fte_new != 1.0 {
+			// FTEs for colliding student do not add up to 1.0
+			// This may be a false alarm if there is a third enrolment; but we can only address that if we have STAN queues, and the ability to rewind a queue, so that we can issue a check at the end of a transaction.
+
+			desc1 := fmt.Sprintf("Student with key %s at %s matched across schools has an FTE of %0.2f across all enrolments so far\n",
+				crossSchoolKey, ol, fte_num+fte_new)
+			ve1 := ValidationError{
+				Description:  desc1,
+				Field:        "FTE",
+				OriginalLine: req.SeqNo,
+				Vtype:        "identity",
+				Severity:     "warning",
+			}
+			r1 := lib.NiasMessage{}
+			r1.TxID = req.TxID
+			r1.SeqNo = req.SeqNo
+			r1.Body = ve1
+			r1.Source = "id"
+			responses = append(responses, r1)
+			log.Printf("%v\n", r1)
+		}
+
 	} else if complexRecordExists {
 		loc, _ := tids.Locations.Get(complexKey)
 		ol, _ := loc.(string)
