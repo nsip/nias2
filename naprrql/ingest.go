@@ -308,6 +308,7 @@ func IngestResultsFile(resultsFilePath string) {
 				if batcherr != nil {
 					log.Fatalln("batch error: ", batcherr)
 				}
+				batch.Reset()
 			}
 		default:
 		}
@@ -320,6 +321,7 @@ func IngestResultsFile(resultsFilePath string) {
 	if batcherr != nil {
 		log.Fatalln("batch error: ", batcherr)
 	}
+	batch.Reset()
 
 	log.Println("Data file read complete...")
 	log.Printf("Total tests: %d \n", totalTests)
