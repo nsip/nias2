@@ -10,15 +10,14 @@ import (
 )
 
 // internal check table for guid collisions
-var fileGuids map[string]bool
+var fileGuids = make(map[string]bool)
 
 // internal flag for data quality
 var unfit bool
 
 func IngestResultsFile(resultsFilePath string) {
 
-	fileGuids = make(map[string]bool)
-	db := GetDB(true)
+	db := GetDB()
 	ge := GobEncoder{}
 
 	// open the data file for streaming read

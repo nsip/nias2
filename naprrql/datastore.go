@@ -19,18 +19,41 @@ var ge = GobEncoder{}
 
 // if allow_empty is false, abort if database is empty: enforces
 // requirement to run ingest first
-func GetDB(allow_empty bool) *leveldb.DB {
+func GetDB() *leveldb.DB {
 	if !dbOpen {
 		log.Println("DB not initialised. Opening...")
-		openDB(allow_empty)
+		openDB()
 	}
 	return db
 }
 
 //
+// Check if the databse contains any entries
+//
+func DatabaseIsEmpty() bool {
+
+	iter := GetDB().NewIterator(nil, nil)
+	iter.Next()
+	if len(iter.Key()) == 0 {
+		return true
+	}
+	return false
+}
+
+//
+// run compaction on db, typically post-ingest
+//
+func CompactDatastore() {
+	err := GetDB().CompactRange(util.Range{Limit: nil, Start: nil})
+	if err != nil {
+		log.Println("Error compacting datastore: ", err)
+	}
+}
+
+//
 // open the kv store, this must be called before any access is attempted
 //
-func openDB(allow_empty bool) {
+func openDB() {
 
 	workingDir := "kvs"
 
@@ -38,19 +61,13 @@ func openDB(allow_empty bool) {
 		Filter: filter.NewBloomFilter(10),
 		// BlockCacheCapacity: 128 * 1024 * 1024,
 		// NoSync: true,
+		// OpenFilesCacheCapacity: 1024,
+		CompactionTableSize: (4 * opt.MiB),
 	}
 	var dbErr error
 	db, dbErr = leveldb.OpenFile(workingDir, o)
 	if dbErr != nil {
 		log.Fatalln("DB Create error: ", dbErr)
-	}
-	// if database is empty, abort
-	if !allow_empty {
-		iter := db.NewIterator(nil, nil)
-		iter.Next()
-		if len(iter.Key()) == 0 {
-			log.Fatalf("DB is Empty. Run naprrql --ingest with an extract file.")
-		}
 	}
 
 	dbOpen = true
@@ -63,7 +80,7 @@ func openDB(allow_empty bool) {
 //
 func getIdentifiers(keyPrefix string) []string {
 
-	db = GetDB(false)
+	db = GetDB()
 	objIDs := make([]string, 0)
 
 	searchKey := []byte(keyPrefix)
@@ -88,7 +105,7 @@ func getIdentifiers(keyPrefix string) []string {
 //
 func getObjects(objIDs []string) ([]interface{}, error) {
 
-	db = GetDB(false)
+	db = GetDB()
 	objects := []interface{}{}
 
 	for _, objID := range objIDs {

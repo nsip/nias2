@@ -302,7 +302,7 @@ func getSchoolInfo(acaraid string) (xml.SchoolInfo, error) {
 
 	si := xml.SchoolInfo{}
 
-	schoolInfoObjects, err := getObjects(getIdentifiers(acaraid))
+	schoolInfoObjects, err := getObjects(getIdentifiers(acaraid + ":"))
 	if err != nil {
 		return si, err
 	}

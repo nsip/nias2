@@ -72,7 +72,7 @@ func buildReportResolvers() map[string]interface{} {
 		// get the sif refid for each of the acarids supplied
 		refids := make([]string, 0)
 		for _, acaraid := range acaraids {
-			refid := getIdentifiers(acaraid)
+			refid := getIdentifiers(acaraid + ":")
 			if len(refid) > 0 {
 				refids = append(refids, refid...)
 			}
@@ -125,7 +125,7 @@ func buildReportResolvers() map[string]interface{} {
 		// get the sif refid for each of the acarids supplied
 		refids := make([]string, 0)
 		for _, acaraid := range acaraids {
-			refid := getIdentifiers(acaraid)
+			refid := getIdentifiers(acaraid + ":")
 			if len(refid) > 0 {
 				refids = append(refids, refid...)
 			}
