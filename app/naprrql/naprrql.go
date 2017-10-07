@@ -51,6 +51,15 @@ func main() {
 				`)
 		}
 		// shut down
+		compactDB()
+		closeDB()
+		os.Exit(1)
+	}
+
+	// for all other operations check if the database has data
+	// before proceeding
+	if naprrql.DatabaseIsEmpty() {
+		log.Println("\n\nNo data in datastore...\n\nPlease run naprrql -ingest to load results data\n\n")
 		closeDB()
 		os.Exit(1)
 	}
@@ -60,7 +69,6 @@ func main() {
 		// launch web-server
 		startWebServer(true)
 		writeReports()
-		writeISRPrintingReports()
 		// shut down
 		closeDB()
 		os.Exit(1)
@@ -103,7 +111,6 @@ func ingestData() {
 // launch the webserver
 //
 func startWebServer(silent bool) {
-	naprrql.GetDB(false) // Verify that the database is populated; if not will abort
 	go naprrql.RunQLServer()
 	if !silent {
 		fmt.Printf("\n\nBrowse to follwing locations:\n")
@@ -158,8 +165,17 @@ func parseResultsFileDirectory() []string {
 //
 func closeDB() {
 	log.Println("Closing datastore...")
-	naprrql.GetDB(true).Close()
+	naprrql.GetDB().Close()
 	log.Println("Datastore closed.")
+}
+
+//
+// run compaction to minimise database size
+//
+func compactDB() {
+	log.Println("Compacting datastore...")
+	naprrql.CompactDatastore()
+	log.Println("Datastore compaction completed.")
 }
 
 //
