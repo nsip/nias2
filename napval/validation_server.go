@@ -110,13 +110,13 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 }
 
 func enqueueManifest(studentcount map[string]int, txid string) {
-	tt.SetTxSize("manifest:"+txid, 1)
+	tt.SetTxSize("manifest_"+txid, 1)
 	msg := &lib.NiasMessage{}
 	msg.Body = StudentSchoolTally{Tally: studentcount}
 	msg.SeqNo = strconv.Itoa(1)
-	msg.TxID = "manifest:" + txid
+	msg.TxID = "manifest_" + txid
 	msg.MsgID = nuid.Next()
-	err := stan_conn.Publish("manifest:"+txid, lib.EncodeNiasMessage(msg))
+	err := stan_conn.Publish("manifest_"+txid, lib.EncodeNiasMessage(msg))
 	if err != nil {
 		log.Println("publish to store error: ", err)
 	}
@@ -125,7 +125,7 @@ func enqueueManifest(studentcount map[string]int, txid string) {
 	// if a notable status change has occurred
 	sigChange, msg1 := tt.GetStatusReport(msg.TxID)
 	if sigChange {
-		err := stan_conn.Publish("manifest:"+txid, lib.EncodeNiasMessage(msg1))
+		err := stan_conn.Publish("manifest_"+txid, lib.EncodeNiasMessage(msg1))
 		if err != nil {
 			log.Println("publish to store error: ", err)
 		}
@@ -426,10 +426,8 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 			log.Println((err))
 			return err
 		}
-		log.Println("Aooga 4")
 		//f.Sync()
 		//f.Close()
-		//log.Println("Aooga")
 		//http.ServeFile(c.Response().Writer, c.Request(), tmpname)
 
 		return nil
@@ -486,7 +484,7 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 
 		}
 
-		sub, err := stan_conn.Subscribe("manifest:"+txID, mcb, stan.DeliverAllAvailable())
+		sub, err := stan_conn.Subscribe("manifest_"+txID, mcb, stan.DeliverAllAvailable())
 		defer sub.Unsubscribe()
 		if err != nil {
 			log.Println("stan subsciption error results-download: ", err)

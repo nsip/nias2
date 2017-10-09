@@ -229,7 +229,6 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		// r.Target = VALIDATION_PREFIX
 		r.Body = ve
 		responses = append(responses, r)
-		log.Printf("%v\n", responses)
 
 		if fte_num+fte_new != 1.0 {
 			// FTEs for colliding student do not add up to 1.0
@@ -250,7 +249,6 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 			r1.Body = ve1
 			r1.Source = "id"
 			responses = append(responses, r1)
-			log.Printf("%v\n", r1)
 		}
 
 	} else if complexRecordExists {
