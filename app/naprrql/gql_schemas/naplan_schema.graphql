@@ -51,6 +51,8 @@ type NaplanData {
 	participation_report_by_school(acaraIDs: [String]): [ParticipationDataSet]
 	## reporting (ui) object for codeframes
 	codeframe_report: [CodeFrameDataSet]
+        ## reporting (ui) object for item responses per student
+	item_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
 }
 
 ## Reason why sitting test was interrupted
@@ -173,12 +175,24 @@ type ParticipationSummary {
 
 ## Domain scores reporting object
 type ResponseDataSet {
-	## The student who's participation is being reported
+	## The student whose participation is being reported
 	Student: RegistrationRecord
 	## the related test
 	Test: NAPTest
 	## the response from which the domain score will be derived
 	Response: NAPResponseSet
+}
+
+## Item Response reporting object
+type ItemResponseDataSet {
+	## The student whose participation is being reported
+	Student: RegistrationRecord
+	## the related test item
+	TestItem: NAPTestItem
+	## the response to the item (removing all other item responses from the object)
+	Response: NAPResponseSet
+        ## the related test
+	Test: NAPTest
 }
 
 ## score summary reporting object
@@ -351,7 +365,7 @@ type NAPResponseSet {
 	EquatingSampleFlag: String 
 	## Text description of student testlet path taken
 	PathTakenForDomain: String 
-	## Indicates this was parrllel test
+	## List of specific nodes in testlet path taken
 	ParallelTest: String 
 	## RefID for Student
 	StudentID: String 

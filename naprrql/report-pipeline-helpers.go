@@ -42,7 +42,7 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 
 		for record := range in {
 
-			// if no row template estbalished derive one from the data
+			// if no row template established derive one from the data
 			if len(rowFormat) == 0 {
 				rowFormat, dataKeys = deriveRowFormat(record)
 			}

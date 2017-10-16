@@ -118,8 +118,8 @@ func systemParametersSource(ctx context.Context, schools ...string) (<-chan syst
 }
 
 //
-// query executor transform stage takes query params in, excutes gql query
-// and writes results to output chaneel
+// query executor transform stage takes query params in, executes gql query
+// and writes results to output channel
 //
 func systemQueryExecutor(ctx context.Context, query, url string, in <-chan systemQueryParams) (<-chan gjson.Result, <-chan error, error) {
 
@@ -146,7 +146,7 @@ func systemQueryExecutor(ctx context.Context, query, url string, in <-chan syste
 					return
 				}
 			}
-			// handle edge cases where data is not returned as ana array
+			// handle edge cases where data is not returned as an array
 			if len(json.Array()) == 0 {
 				select {
 				case out <- json:

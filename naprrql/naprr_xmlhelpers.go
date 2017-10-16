@@ -23,6 +23,32 @@ func init() {
 // used in reporting and support types for sorting results.
 //
 
+// aggregating type used for reporting item responses against items
+type ItemResponseDataSet struct {
+	Test     xml.NAPTest
+	TestItem xml.NAPTestItem
+	Student  xml.RegistrationRecord
+	Response xml.NAPResponseSet
+}
+
+// struct for sorting support
+type ItemResponseComparator []ItemResponseDataSet
+
+// sort interface implementation for itemresponsedatasets
+func (resps ItemResponseComparator) Len() int {
+	return len(resps)
+}
+
+// sort interface implementation for responsedatasets
+func (resps ItemResponseComparator) Swap(i, j int) {
+	resps[i], resps[j] = resps[j], resps[i]
+}
+
+// sort interface implementation for responsedatasets
+func (resps ItemResponseComparator) Less(i, j int) bool {
+	return resps[i].TestItem.TestItemContent.ItemName < resps[j].TestItem.TestItemContent.ItemName
+}
+
 // aggregating type used for reporting domain scores
 type ResponseDataSet struct {
 	Test     xml.NAPTest

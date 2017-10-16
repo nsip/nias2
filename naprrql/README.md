@@ -1,4 +1,4 @@
-# NAPLAN Results Rpeorting Tools (GraphQL Version)
+# NAPLAN Results Reporting Tools (GraphQL Version)
 
 ## Usage
 

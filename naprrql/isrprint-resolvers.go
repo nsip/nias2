@@ -58,8 +58,8 @@ func (isrpi *ISRPrintItem) initialiseISRItem(schoolInfo xml.SchoolInfo, event xm
 
 //
 // allocates the domain score from the response
-// and the school men from the score summary
-// to the appropriate values in the ISRPrintItm
+// and the school mean from the score summary
+// to the appropriate values in the ISRPrintItem
 //
 func (isrpi *ISRPrintItem) allocateDomainScoreAndMean(event *xml.NAPEvent,
 	testLookup map[string]xml.NAPTest,
