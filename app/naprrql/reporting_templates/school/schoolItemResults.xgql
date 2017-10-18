@@ -1,4 +1,4 @@
-query NAPDomainScores($acaraIDs: [String]) {
+query NAPItemResults($acaraIDs: [String]) {
   item_results_report_by_school(acaraIDs: $acaraIDs) {
     Test {
       TestContent {
