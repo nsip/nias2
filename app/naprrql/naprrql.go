@@ -20,6 +20,7 @@ import (
 var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng data is overwritten.")
 var report = flag.Bool("report", false, "Creates .csv reports. Existing reports are overwritten")
 var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
+var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
 
 func main() {
 
@@ -84,6 +85,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	// create the item reports
+	if *itemprint {
+		// launch web-server
+		startWebServer(true)
+		writeItemPrintingReports()
+		// shut down
+		closeDB()
+		os.Exit(1)
+	}
+
 	// otherwise just start the webserver
 	startWebServer(false)
 
@@ -138,6 +149,16 @@ func writeISRPrintingReports() {
 	log.Println("generating isr printing reports...")
 	naprrql.GenerateISRPrintReports()
 	log.Println("isr printing reports generated...")
+}
+
+//
+// create item printing reports
+//
+func writeItemPrintingReports() {
+	// clearReportsDirectory() // - check this
+	log.Println("generating item printing reports...")
+	naprrql.GenerateItemPrintReports()
+	log.Println("item printing reports generated...")
 }
 
 //

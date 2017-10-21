@@ -67,6 +67,31 @@ func GenerateISRPrintReports() {
 	wg.Wait()
 }
 
+//
+// generates a specific 'report' which is the input
+// file for item printing processes
+//
+func GenerateItemPrintReports() {
+
+	schools, err := getSchoolsList()
+	if err != nil {
+		log.Fatalln("Cannot connect to naprrql server: ", err)
+	}
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = runItemPrintReports(schools)
+		if err != nil {
+			log.Println("Error creating isr printing reports: ", err)
+		}
+	}()
+
+	wg.Wait()
+}
+
 func runISRPrintReports(schools []string) error {
 
 	var pipelinError error
@@ -76,6 +101,16 @@ func runISRPrintReports(schools []string) error {
 		pipelinError = runISRPipeline(year, schools)
 
 	}
+
+	return pipelinError
+
+}
+
+func runItemPrintReports(schools []string) error {
+
+	var pipelinError error
+
+	pipelinError = runItemPipeline(schools)
 
 	return pipelinError
 

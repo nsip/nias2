@@ -360,7 +360,6 @@ func getTestsForYearLevel(yrLvl string) ([]xml.NAPTest, error) {
 // of the api call
 //
 func checkISRReportParams(params *graphql.ResolveParams) error {
-
 	//check presence of schoolAcarid
 	if len(params.Args) < 2 {
 		log.Println("no query params")

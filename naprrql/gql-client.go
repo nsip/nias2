@@ -14,6 +14,7 @@ import (
 
 var DEF_GQL_URL = "http://localhost:1329/graphql"
 var DEF_ISR_URL = "http://localhost:1329/isrprint"
+var DEF_ITEM_URL = "http://localhost:1329/itemprint"
 
 //
 // this module provides a golang client that

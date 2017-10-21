@@ -20,3 +20,11 @@ func buildISRPrintSchema() string {
 	}
 	return string(dat)
 }
+
+func buildItemPrintSchema() string {
+	dat, err := ioutil.ReadFile("./gql_schemas/itemprint_schema.graphql")
+	if err != nil {
+		log.Fatalln("Unable to load schema from file: ", err)
+	}
+	return string(dat)
+}

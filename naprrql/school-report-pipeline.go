@@ -46,6 +46,7 @@ func runSchoolReportPipeline(queryFileName string, query string, school string) 
 	}
 	errcList = append(errcList, errc)
 
+	log.Println("systemQueryExecutor()")
 	// transform stage
 	jsonc, errc, err := systemQueryExecutor(ctx, query, DEF_GQL_URL, varsc)
 	if err != nil {
@@ -53,6 +54,7 @@ func runSchoolReportPipeline(queryFileName string, query string, school string) 
 	}
 	errcList = append(errcList, errc)
 
+	log.Println("send to sink")
 	// sink stage
 	// create working directory if not there
 	outFileDir := "./out/school_reports/" + school

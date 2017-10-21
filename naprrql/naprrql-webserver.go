@@ -5,6 +5,7 @@
 package naprrql
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -14,6 +15,7 @@ import (
 
 var nap_executor *graphql.Executor
 var isr_executor *graphql.Executor
+var item_executor *graphql.Executor
 
 //
 // wrapper type to capture graphql input
@@ -37,7 +39,9 @@ func graphQLHandler(c echo.Context) error {
 	variables := grq.Variables
 	gqlContext := map[string]interface{}{}
 
+	log.Printf("Executing Query %v Variables %v\n", query, variables)
 	result, err := nap_executor.Execute(gqlContext, query, variables, "")
+	log.Println("Executed Query")
 	if err != nil {
 		panic(err)
 	}
@@ -70,12 +74,36 @@ func isrPrintHandler(c echo.Context) error {
 }
 
 //
+// specialist handler for creating item result printing files
+//
+func itemPrintHandler(c echo.Context) error {
+
+	grq := new(GQLRequest)
+	if err := c.Bind(grq); err != nil {
+		return err
+	}
+
+	query := grq.Query
+	variables := grq.Variables
+	gqlContext := map[string]interface{}{}
+
+	result, err := item_executor.Execute(gqlContext, query, variables, "")
+	if err != nil {
+		panic(err)
+	}
+
+	return c.JSON(http.StatusOK, result)
+
+}
+
+//
 // launches the server
 //
 func RunQLServer() {
 
 	nap_executor = buildNAPExecutor()
 	isr_executor = buildISRPrintExecutor()
+	item_executor = buildItemPrintExecutor()
 
 	e := echo.New()
 
@@ -91,6 +119,9 @@ func RunQLServer() {
 
 	// special handler for isr printing
 	e.POST("/isrprint", isrPrintHandler)
+
+	// special handler for item printing
+	e.POST("/itemprint", itemPrintHandler)
 
 	//
 	// download the requested pre-generated csv file.

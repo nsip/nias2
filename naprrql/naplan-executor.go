@@ -45,3 +45,14 @@ func buildISRPrintExecutor() *graphql.Executor {
 	return executor
 
 }
+
+func buildItemPrintExecutor() *graphql.Executor {
+
+	executor, err := graphql.NewExecutor(buildItemPrintSchema(), "ItemPrint", "", buildItemPrintResolvers())
+	if err != nil {
+		log.Fatalln("Cannot create Executor: ", err)
+	}
+
+	return executor
+
+}

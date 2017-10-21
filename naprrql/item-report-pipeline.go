@@ -1,31 +1,28 @@
-// system-report-pipeline.go
+// query-report-writer.go
 
 package naprrql
 
 import (
 	"context"
+	"log"
 	"os"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 )
 
 //
-// printing pipeline for system-level reports
-//
-
-//
 // helper type to capture query parameters
 //
-type systemQueryParams struct {
-	schoolAcaraID string
+type itemQueryParams struct {
+	//year   string
+	school string
 }
 
 //
-// create and run a system-level report printing pipeline.
+// create and run an item printing pipeline.
 //
-// Pipeline streams requests a given report, school by school
+// Pipeline streams requests at a school by school
 // feeding results to the ouput csv file.
 //
 // This means the server & parser never have to deal with query data
@@ -34,7 +31,9 @@ type systemQueryParams struct {
 // Overall round-trip latency is less than querying for all data at once
 // and ensures we can't run out of memory
 //
-func runSystemReportPipeline(queryFileName string, query string, schools []string) error {
+
+// TODO may need to reintroduce year here
+func runItemPipeline(schools []string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -42,19 +41,19 @@ func runSystemReportPipeline(queryFileName string, query string, schools []strin
 	var errcList []<-chan error
 
 	// input stage
-	// check if system query needs to iterate schools, if not
-	// pass single dummy school to fire the query
-	if !strings.Contains(query, "$acaraIDs") {
-		schools = []string{"no-op"}
-	}
-	varsc, errc, err := systemParametersSource(ctx, schools...)
+	varsc, errc, err := itemParametersSource(ctx, schools...)
 	if err != nil {
 		return err
 	}
 	errcList = append(errcList, errc)
 
 	// transform stage
-	jsonc, errc, err := systemQueryExecutor(ctx, query, DEF_GQL_URL, varsc)
+	queryTemplates := getTemplates("./reporting_templates/item_printing/")
+	var query string
+	for _, queryText := range queryTemplates {
+		query = queryText
+	}
+	jsonc, errc, err := itemQueryExecutor(ctx, query, DEF_ITEM_URL, varsc)
 	if err != nil {
 		return err
 	}
@@ -62,36 +61,38 @@ func runSystemReportPipeline(queryFileName string, query string, schools []strin
 
 	// sink stage
 	// create working directory if not there
-	outFileDir := "./out/system_reports"
+	outFileDir := "./out/item_printing"
 	err = os.MkdirAll(outFileDir, os.ModePerm)
 	if err != nil {
 		return err
 	}
-	csvFileName := deriveCSVFileName(queryFileName)
+	csvFileName := "itemResults.csv"
 	outFileName := outFileDir + "/" + csvFileName
-	mapFileName := deriveMapFileName(queryFileName)
+	mapFileName := "./reporting_templates/item_printing/itemPrinting_map.csv"
 	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
 	if err != nil {
 		return err
 	}
 	errcList = append(errcList, errc)
 
+	log.Println("Item print file writing... " + outFileName)
 	return WaitForPipeline(errcList...)
 }
 
 //
 // acts as input feed to the pipeline, sends parameters to retrieve data for
-// each school in turn, for the given year level.
+// each school in turn
 //
-func systemParametersSource(ctx context.Context, schools ...string) (<-chan systemQueryParams, <-chan error, error) {
+func itemParametersSource(ctx context.Context, schools ...string) (<-chan itemQueryParams, <-chan error, error) {
 
 	{ //check input variables, handle errors before goroutine starts
 		if len(schools) == 0 {
 			return nil, nil, errors.Errorf("no schools provided")
 		}
+
 	}
 
-	out := make(chan systemQueryParams)
+	out := make(chan itemQueryParams)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(out)
@@ -102,7 +103,7 @@ func systemParametersSource(ctx context.Context, schools ...string) (<-chan syst
 				errc <- errors.Errorf("school %v is empty string", schoolIndex+1)
 				return
 			}
-			vars := systemQueryParams{schoolAcaraID: school}
+			vars := itemQueryParams{school: school}
 			// Send the data to the output channel but return early
 			// if the context has been cancelled.
 			select {
@@ -116,10 +117,10 @@ func systemParametersSource(ctx context.Context, schools ...string) (<-chan syst
 }
 
 //
-// query executor transform stage takes query params in, executes gql query
-// and writes results to output channel
+// query executor transform stage takes query params in, excutes gql query
+// and writes results to output chaneel
 //
-func systemQueryExecutor(ctx context.Context, query, url string, in <-chan systemQueryParams) (<-chan gjson.Result, <-chan error, error) {
+func itemQueryExecutor(ctx context.Context, query string, url string, in <-chan itemQueryParams) (<-chan gjson.Result, <-chan error, error) {
 
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
@@ -128,7 +129,7 @@ func systemQueryExecutor(ctx context.Context, query, url string, in <-chan syste
 		defer close(errc)
 		gql := NewGqlClient()
 		for params := range in {
-			vars := map[string]interface{}{"acaraIDs": []string{params.schoolAcaraID}}
+			vars := map[string]interface{}{"acaraID": params.school}
 			json, err := gql.DoQuery(url, query, vars)
 			if err != nil {
 				// Handle an error that occurs during the goroutine.
@@ -143,16 +144,8 @@ func systemQueryExecutor(ctx context.Context, query, url string, in <-chan syste
 				case <-ctx.Done():
 					return
 				}
-			}
-			// handle edge cases where data is not returned as an array
-			if len(json.Array()) == 0 {
-				select {
-				case out <- json:
-				case <-ctx.Done():
-					return
-				}
-			}
 
+			}
 		}
 	}()
 	return out, errc, nil

@@ -1,0 +1,108 @@
+query NAPItemResults($acaraID: String) {
+  item_results_report_by_school(acaraID: $acaraID) {
+    Test {
+      TestContent {
+        LocalId
+        TestName
+        TestLevel
+        TestDomain
+        TestYear
+        StagesCount
+        TestType
+      }
+    }
+    TestItem {
+      TestItemContent {
+        NAPTestItemLocalId
+        ItemName
+        ItemType
+        Subdomain
+        WritingGenre
+        ItemDescriptor
+        ReleasedStatus
+        MarkingType
+        MultipleChoiceOptionCount
+        CorrectAnswer
+        MaximumScore
+        ItemDifficulty
+        ItemDifficultyLogit5
+        ItemDifficultyLogit62
+        ItemDifficultyLogit5SE
+        ItemDifficultyLogit62SE
+        ItemProficiencyBand
+        ItemProficiencyLevel
+        ExemplarURL
+        ItemSubstitutedForList {
+          SubstituteItem
+        }
+        ContentDescriptionList {
+          ContentDescription
+        }
+        StimulusList {
+          Stimulus {
+            LocalId
+            TextGenre
+            TextType
+            WordCount
+            TextDescriptor
+            Content
+          }
+        }
+        NAPWritingRubricList {
+          NAPWritingRubric {
+            RubricType
+            Descriptor
+            ScoreList {
+              Score
+            }
+          }
+        }
+      }
+    }
+    Student {
+      BirthDate
+      Sex
+      IndigenousStatus
+      LBOTE
+      YearLevel
+      ASLSchoolId
+      HomeSchooledStudent
+      Parent1SchoolEducation
+      Parent1NonSchoolEducation
+      Parent1Occupation
+      Parent2SchoolEducation
+      Parent2NonSchoolEducation
+      Parent2Occupation
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      } 
+    }   
+    Response {
+      PathTakenForDomain
+      ParallelTest
+      PSI
+      TestletList {
+        Testlet {
+          ItemResponseList {
+            ItemResponse {
+              LocalID
+              Response
+              ResponseCorrectness
+              Score
+              LapsedTimeItem
+              SequenceNumber
+              ItemWeight
+              SubscoreList {
+                Subscore
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
