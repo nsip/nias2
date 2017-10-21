@@ -145,7 +145,7 @@ func writeReports() {
 // create isr printing reports
 //
 func writeISRPrintingReports() {
-	// clearReportsDirectory() // - check this
+	clearISRPrintingDirectory()
 	log.Println("generating isr printing reports...")
 	naprrql.GenerateISRPrintReports()
 	log.Println("isr printing reports generated...")
@@ -217,12 +217,24 @@ func clearDBWorkingDirectory() {
 //
 func clearReportsDirectory() {
 	// remove existing logs and recreate the directory
-	err := os.RemoveAll("out")
+	err := os.RemoveAll("out/school_reports")
+	err = os.RemoveAll("out/system_reports")
 	if err != nil {
 		log.Println("Error trying to reset reports directory: ", err)
 	}
 	createReportsDirectory()
+}
 
+//
+// remove the isr printing report directory
+//
+func clearISRPrintingDirectory() {
+	// remove existing logs and recreate the directory
+	err := os.RemoveAll("out/isr_printing")
+	if err != nil {
+		log.Println("Error trying to reset isr printing reports directory: ", err)
+	}
+	createISRPrintingDirectory()
 }
 
 //
@@ -230,8 +242,22 @@ func clearReportsDirectory() {
 //
 func createReportsDirectory() {
 	err := os.Mkdir("out", os.ModePerm)
+	err = os.Mkdir("out/school_reports", os.ModePerm)
+	err = os.Mkdir("out/system_reports", os.ModePerm)
 	if !os.IsExist(err) && err != nil {
 		log.Fatalln("Error trying to create reports directory: ", err)
+	}
+
+}
+
+//
+// create the folder for isr printing reports
+//
+func createISRPrintingDirectory() {
+	err := os.Mkdir("out", os.ModePerm)
+	err = os.Mkdir("out/isr_printing", os.ModePerm)
+	if !os.IsExist(err) && err != nil {
+		log.Fatalln("Error trying to create isr printing reports directory: ", err)
 	}
 
 }
