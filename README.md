@@ -1,4 +1,4 @@
-*All files in this repository are subject to copyright under the Apache 2.0 license. For a full description of the license [click this link](LICENSE).*
+*All files in this repository are licensed under Apache 2.0. For a full description of the license [click this link](LICENSE).*
 
 
 # nias2
