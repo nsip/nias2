@@ -1,0 +1,27 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  domain_scores_report_by_school(acaraIDs: $acaraIDs) {
+    Student {
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      }
+    }
+    Test {
+      TestContent {
+        TestLevel
+        TestDomain
+        TestYear
+      }
+    }
+    Response {
+      DomainScore {
+        RawScore
+        ScaledScoreValue
+        StudentDomainBand
+      }
+    }
+  }
+}
+

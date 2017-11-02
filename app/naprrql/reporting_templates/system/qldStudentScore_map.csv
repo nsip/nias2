@@ -1,0 +1,2 @@
+Student ID,Strand,Year,Year_Level,Raw_Score,Scale_Score,Band
+Student.OtherIdList.OtherId.#[Type==TAAStudentId].Value,Test.TestContent.TestDomain,Test.TestContent.TestLevel,Test.TestContent.TestYear,Response.DomainScore.RawScore,Response.DomainScore.ScaledScoreValue,Response.DomainScore.StudentDomainBand
