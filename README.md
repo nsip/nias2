@@ -1,3 +1,6 @@
+*All files in this repository are licensed under Apache 2.0. For a full description of the license [click this link](LICENSE).*
+
+
 # nias2
 NIAS: NSIP Integration As A Service.
 
