@@ -39,7 +39,6 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 	go func() {
 		defer close(errc)
 		defer file.Close()
-		log.Println("csvFileSink: Start received records")
 
 		for record := range in {
 
@@ -75,7 +74,6 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 			}
 			w.Flush()
 		}
-		log.Println("csvFileSink: End received records")
 	}()
 	return errc, nil
 }

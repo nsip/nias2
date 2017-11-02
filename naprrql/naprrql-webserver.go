@@ -5,7 +5,6 @@
 package naprrql
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -39,9 +38,7 @@ func graphQLHandler(c echo.Context) error {
 	variables := grq.Variables
 	gqlContext := map[string]interface{}{}
 
-	log.Printf("Executing Query %v Variables %v\n", query, variables)
 	result, err := nap_executor.Execute(gqlContext, query, variables, "")
-	log.Println("Executed Query")
 	if err != nil {
 		panic(err)
 	}

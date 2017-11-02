@@ -4,6 +4,7 @@ package naprrql
 
 import (
 	"context"
+	"log"
 	"os"
 	"strings"
 
@@ -76,6 +77,7 @@ func runSystemReportPipeline(queryFileName string, query string, schools []strin
 	}
 	errcList = append(errcList, errc)
 
+	log.Println("System report file writing... " + outFileName)
 	return WaitForPipeline(errcList...)
 }
 

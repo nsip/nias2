@@ -21,6 +21,7 @@ var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng 
 var report = flag.Bool("report", false, "Creates .csv reports. Existing reports are overwritten")
 var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
 var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
+var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 
 func main() {
 
@@ -95,6 +96,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	// create the item reports
+	if *qa {
+		// launch web-server
+		startWebServer(true)
+		writeQAPrintingReports()
+		// shut down
+		closeDB()
+		os.Exit(1)
+	}
+
 	// otherwise just start the webserver
 	startWebServer(false)
 
@@ -159,6 +170,15 @@ func writeItemPrintingReports() {
 	log.Println("generating item printing reports...")
 	naprrql.GenerateItemPrintReports()
 	log.Println("item printing reports generated...")
+}
+
+// create QA reports
+//
+func writeQAPrintingReports() {
+	clearQADirectory()
+	log.Println("generating QA reports...")
+	naprrql.GenerateQAReports()
+	log.Println("QA reports generated...")
 }
 
 //
@@ -237,6 +257,17 @@ func clearISRPrintingDirectory() {
 	createISRPrintingDirectory()
 }
 
+// remove the isr printing report directory
+//
+func clearQADirectory() {
+	// remove existing logs and recreate the directory
+	err := os.RemoveAll("out/qa")
+	if err != nil {
+		log.Println("Error trying to reset QA reports directory: ", err)
+	}
+	createQADirectory()
+}
+
 //
 // create folder for .csv reports
 //
@@ -258,6 +289,18 @@ func createISRPrintingDirectory() {
 	err = os.Mkdir("out/isr_printing", os.ModePerm)
 	if !os.IsExist(err) && err != nil {
 		log.Fatalln("Error trying to create isr printing reports directory: ", err)
+	}
+
+}
+
+//
+// create the folder for QA reports
+//
+func createQADirectory() {
+	err := os.Mkdir("out", os.ModePerm)
+	err = os.Mkdir("out/qa", os.ModePerm)
+	if !os.IsExist(err) && err != nil {
+		log.Fatalln("Error trying to create QA reports directory: ", err)
 	}
 
 }

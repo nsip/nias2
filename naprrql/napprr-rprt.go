@@ -92,27 +92,60 @@ func GenerateItemPrintReports() {
 	wg.Wait()
 }
 
+// generates a specific 'report' which is the input
+// file for item printing processes
+//
+func GenerateQAReports() {
+
+	schools, err := getSchoolsList()
+	if err != nil {
+		log.Fatalln("Cannot connect to naprrql server: ", err)
+	}
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = runQAReports(schools)
+		if err != nil {
+			log.Println("Error creating QA reports: ", err)
+		}
+	}()
+
+	wg.Wait()
+}
+
 func runISRPrintReports(schools []string) error {
 
-	var pipelinError error
+	var pipelineError error
 
 	years := []string{"3", "5", "7", "9"}
 	for _, year := range years {
-		pipelinError = runISRPipeline(year, schools)
+		pipelineError = runISRPipeline(year, schools)
 
 	}
 
-	return pipelinError
+	return pipelineError
 
 }
 
 func runItemPrintReports(schools []string) error {
 
-	var pipelinError error
+	var pipelineError error
+	pipelineError = runItemPipeline(schools)
+	return pipelineError
 
-	pipelinError = runItemPipeline(schools)
+}
 
-	return pipelinError
+func runQAReports(schools []string) error {
+
+	var pipelineError error
+	systemTemplates := getTemplates("./reporting_templates/qa/")
+	for filename, query := range systemTemplates {
+		pipelineError = runSystemReportPipeline(filename, query, schools)
+	}
+	return pipelineError
 
 }
 
