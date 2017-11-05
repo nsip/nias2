@@ -15,6 +15,7 @@ func init() {
 	gob.Register(SchoolDetails{})
 	gob.Register(ScoreSummaryDataSet{})
 	gob.Register(ResponseDataSet{})
+	gob.Register(EventResponseDataSet{})
 	gob.Register(CodeFrameDataSet{})
 	gob.Register(ResultsByStudent{})
 }
@@ -25,10 +26,11 @@ func init() {
 
 // aggregating type used for reporting item responses against items
 type ItemResponseDataSet struct {
-	Test     xml.NAPTest
-	TestItem xml.NAPTestItem
-	Student  xml.RegistrationRecord
-	Response xml.NAPResponseSet
+	Test              xml.NAPTest
+	TestItem          xml.NAPTestItem
+	Student           xml.RegistrationRecord
+	Response          xml.NAPResponseSet
+	ParticipationCode string
 }
 
 // struct for sorting support
@@ -47,6 +49,33 @@ func (resps ItemResponseComparator) Swap(i, j int) {
 // sort interface implementation for responsedatasets
 func (resps ItemResponseComparator) Less(i, j int) bool {
 	return resps[i].TestItem.TestItemContent.ItemName < resps[j].TestItem.TestItemContent.ItemName
+}
+
+// aggregating type used for reporting domain scores and events
+type EventResponseDataSet struct {
+	Event         xml.NAPEvent
+	Test          xml.NAPTest
+	Student       xml.RegistrationRecord
+	Response      xml.NAPResponseSet
+	SchoolDetails SchoolDetails
+}
+
+// struct for sorting support
+type EventResponseComparator []EventResponseDataSet
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseComparator) Len() int {
+	return len(resps)
+}
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseComparator) Swap(i, j int) {
+	resps[i], resps[j] = resps[j], resps[i]
+}
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseComparator) Less(i, j int) bool {
+	return resps[i].Test.TestContent.TestName < resps[j].Test.TestContent.TestName
 }
 
 // aggregating type used for reporting domain scores

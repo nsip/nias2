@@ -45,6 +45,8 @@ type NaplanData {
 	students_by_school(acaraIDs: [String]): [RegistrationRecord]
 	## reporting (ui) object for domain scores
 	domain_scores_report_by_school(acaraIDs: [String]): [ResponseDataSet]
+	## reporting (ui) object for domain scores and participation
+	domain_scores_event_report_by_school(acaraIDs: [String]): [EventResponseDataSet]
 	## reporting (ui) object for score summaries
 	score_summary_report_by_school(acaraIDs: [String]): [ScoreSummaryDataSet]
 	## reporting (ui) object for participation data
@@ -173,6 +175,20 @@ type ParticipationSummary {
 	ParticipationCode: String
 }
 
+## Domain scores and events reporting object
+type EventResponseDataSet {
+	## The event participated in
+	Event: NAPEvent
+	## The student whose participation is being reported
+	Student: RegistrationRecord
+	## the related test
+	Test: NAPTest
+	## the response from which the domain score will be derived
+	Response: NAPResponseSet
+        ## The school involved
+        SchoolDetails: SchoolDetails
+}
+
 ## Domain scores reporting object
 type ResponseDataSet {
 	## The student whose participation is being reported
@@ -193,6 +209,8 @@ type ItemResponseDataSet {
 	Response: NAPResponseSet
         ## the related test
 	Test: NAPTest
+        ## Participation Code for the response
+        ParticipationCode: String
 }
 
 ## score summary reporting object

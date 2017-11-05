@@ -1,0 +1,67 @@
+query NAPItemResults($acaraIDs: [String]) {
+  item_results_report_by_school(acaraIDs: $acaraIDs) {
+    Test {
+      TestContent {
+        LocalId
+        TestName
+        TestLevel
+        TestDomain
+        TestYear
+        StagesCount
+        TestType
+      }
+    }
+    TestItem {
+      TestItemContent {
+        NAPTestItemLocalId
+        ItemName
+        ItemType
+        Subdomain
+        WritingGenre
+      }
+    }
+    Student {
+      BirthDate
+      Sex
+      IndigenousStatus
+      LBOTE
+      YearLevel
+      ASLSchoolId
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      } 
+    }   
+    ParticipationCode
+    Response {
+      PathTakenForDomain
+      ParallelTest
+      PSI
+      TestletList {
+        Testlet {
+          TestletScore
+          ItemResponseList {
+            ItemResponse {
+              LocalID
+              Response
+              ResponseCorrectness
+              Score
+              LapsedTimeItem
+              SequenceNumber
+              ItemWeight
+              SubscoreList {
+                Subscore {
+                  SubscoreType
+                  SubscoreValue
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

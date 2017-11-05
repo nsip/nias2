@@ -81,6 +81,55 @@ func runSystemReportPipeline(queryFileName string, query string, schools []strin
 	return WaitForPipeline(errcList...)
 }
 
+// Do a single query, then run a series of reports off that query
+func runQASystemSingleQueryReportPipeline(query string, queryFileNames []string, schools []string) error {
+
+	// setup pipeline cancellation
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+	var errcList []<-chan error
+
+	// input stage
+	// check if system query needs to iterate schools, if not
+	// pass single dummy school to fire the query
+	if !strings.Contains(query, "$acaraIDs") {
+		schools = []string{"no-op"}
+	}
+	varsc, errc, err := systemParametersSource(ctx, schools...)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+
+	// transform stage
+	jsonc, errc, err := systemQueryExecutor(ctx, query, DEF_GQL_URL, varsc)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+
+	// sink stage
+	// create working directory if not there
+	outFileDir := "./out/qa"
+	err = os.MkdirAll(outFileDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	for _, queryFileName := range queryFileNames {
+		csvFileName := deriveCSVFileName(queryFileName)
+		outFileName := outFileDir + "/" + csvFileName
+		mapFileName := deriveMapFileName(queryFileName)
+		errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
+		if err != nil {
+			return err
+		}
+		errcList = append(errcList, errc)
+
+		log.Println("System report file writing... " + outFileName)
+	}
+	return WaitForPipeline(errcList...)
+}
+
 //
 // acts as input feed to the pipeline, sends parameters to retrieve data for
 // each school in turn, for the given year level.

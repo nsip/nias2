@@ -173,6 +173,10 @@ func IngestResultsFile(resultsFilePath string) {
 				key = []byte(e.SPRefID + ":NAPEventStudentLink:" + e.EventID)
 				batch.Put(key, []byte(e.EventID))
 
+				// event_by_student_test:{student}:{test}:{id} = {id}
+				key = []byte("event_by_student_test:" + e.SPRefID + ":" + e.TestID + ":" + e.EventID)
+				batch.Put(key, []byte(e.EventID))
+
 				// {test}:NAPEventStudentLink-type:{school}:{id} = {id}
 				key = []byte(e.TestID + ":NAPEventStudentLink:" + e.SchoolRefID + ":" + e.EventID)
 				batch.Put(key, []byte(e.EventID))

@@ -142,8 +142,15 @@ func runQAReports(schools []string) error {
 
 	var pipelineError error
 	systemTemplates := getTemplates("./reporting_templates/qa/")
+	querymap := make(map[string][]string)
 	for filename, query := range systemTemplates {
-		pipelineError = runSystemReportPipeline(filename, query, schools)
+		if _, ok := querymap[query]; !ok {
+			querymap[query] = make([]string, 0)
+		}
+		querymap[query] = append(querymap[query], filename)
+	}
+	for query := range querymap {
+		pipelineError = runQASystemSingleQueryReportPipeline(query, querymap[query], schools)
 	}
 	return pipelineError
 

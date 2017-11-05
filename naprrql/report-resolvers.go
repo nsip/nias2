@@ -229,6 +229,89 @@ func buildReportResolvers() map[string]interface{} {
 		}
 
 		return results, nil
+	}
+
+	resolvers["NaplanData/domain_scores_event_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get school names
+		schoolnames := make(map[string]string)
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			studentids = append(studentids, studentRefIds...)
+
+			schoolrefid := getIdentifiers(acaraid + ":")
+			siObjects, err := getObjects(schoolrefid)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			for _, sio := range siObjects {
+				si, _ := sio.(xml.SchoolInfo)
+				schoolnames[acaraid] = si.SchoolName
+			}
+		}
+
+		studentObjs, err := getObjects(studentids)
+		if err != nil {
+			return []interface{}{}, err
+		}
+
+		// iterate students and assemble Event/Response Data Set
+		results := make([]EventResponseDataSet, 0)
+		for _, studentObj := range studentObjs {
+			student, _ := studentObj.(xml.RegistrationRecord)
+			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
+			if len(studentEventIds) < 1 {
+				// log.Println("no events found for student: ", student.RefId)
+				continue
+			}
+			eventObjs, err := getObjects(studentEventIds)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			for _, eventObj := range eventObjs {
+				event := eventObj.(xml.NAPEvent)
+				testObj, err := getObjects([]string{event.TestID})
+				if err != nil {
+					return []interface{}{}, err
+				}
+				test := testObj[0].(xml.NAPTest)
+
+				responseIds := getIdentifiers(test.TestID + ":NAPStudentResponseSet:" + student.RefId)
+				response := xml.NAPResponseSet{}
+				if len(responseIds) > 0 {
+					responseObjs, err := getObjects(responseIds)
+					if err != nil {
+						return []interface{}{}, err
+					}
+					response = responseObjs[0].(xml.NAPResponseSet)
+				}
+
+				erds := EventResponseDataSet{Student: student,
+					Event:         event,
+					Test:          test,
+					Response:      response,
+					SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+				}
+				results = append(results, erds)
+			}
+		}
+
+		return results, nil
 
 	}
 
@@ -362,7 +445,6 @@ func buildReportResolvers() map[string]interface{} {
 		if reqErr != nil {
 			return nil, reqErr
 		}
-
 		// get the acara ids from the request params
 		acaraids := make([]string, 0)
 		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
@@ -392,6 +474,19 @@ func buildReportResolvers() map[string]interface{} {
 			return []interface{}{}, err
 		}
 
+		// convenience map to avoid revisiting db for tests
+		testLookup := make(map[string]xml.NAPTest) // key string = test refid
+		// get tests for yearLevel
+		for _, yrLvl := range []string{"3", "5", "7", "9"} {
+			tests, err := getTestsForYearLevel(yrLvl)
+			if err != nil {
+				return nil, err
+			}
+			for _, test := range tests {
+				t := test
+				testLookup[t.TestID] = t
+			}
+		}
 		// construct RDS by including referenced test
 		results := make([]ItemResponseDataSet, 0)
 		for _, response := range responses {
@@ -402,8 +497,13 @@ func buildReportResolvers() map[string]interface{} {
 			if err != nil || !ok {
 				return []interface{}{}, err
 			}
-			tests, err := getObjects([]string{resp.TestID})
-			test, ok := tests[0].(xml.NAPTest)
+			student.Flatten()
+
+			test := testLookup[resp.TestID]
+
+			eventsRefId := getIdentifiers("event_by_student_test:" + resp.StudentID + ":" + resp.TestID + ":")
+			events, err := getObjects(eventsRefId)
+			event, ok := events[0].(xml.NAPEvent)
 			if err != nil || !ok {
 				return []interface{}{}, err
 			}
@@ -423,14 +523,13 @@ func buildReportResolvers() map[string]interface{} {
 						return []interface{}{}, err
 					}
 
-					irds := ItemResponseDataSet{TestItem: item, Response: resp1, Student: student, Test: test}
+					irds := ItemResponseDataSet{TestItem: item, Response: resp1,
+						Student: student, Test: test, ParticipationCode: event.ParticipationCode}
 					results = append(results, irds)
 				}
 			}
 		}
-
 		return results, nil
-
 	}
 
 	return resolvers

@@ -59,8 +59,6 @@ func buildItemPrintResolvers() map[string]interface{} {
 			if err != nil {
 				return nil, err
 			}
-			// convenience map to avoid revisiting db for tests
-			testLookup := make(map[string]xml.NAPTest) // key string = test refid
 			for _, test := range tests {
 				t := test
 				testLookup[t.TestID] = t
