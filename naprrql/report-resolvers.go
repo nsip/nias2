@@ -298,16 +298,26 @@ func buildReportResolvers() map[string]interface{} {
 					if err != nil {
 						return []interface{}{}, err
 					}
-					response = responseObjs[0].(xml.NAPResponseSet)
-				}
+					for _, responseObj := range responseObjs {
+						response = responseObj.(xml.NAPResponseSet)
+						erds := EventResponseDataSet{Student: student,
+							Event:         event,
+							Test:          test,
+							Response:      response,
+							SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+						}
+						results = append(results, erds)
+					}
+				} else {
 
-				erds := EventResponseDataSet{Student: student,
-					Event:         event,
-					Test:          test,
-					Response:      response,
-					SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+					erds := EventResponseDataSet{Student: student,
+						Event:         event,
+						Test:          test,
+						Response:      response,
+						SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+					}
+					results = append(results, erds)
 				}
-				results = append(results, erds)
 			}
 		}
 

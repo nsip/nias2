@@ -21,6 +21,7 @@ query NAPDomainScores($acaraIDs: [String]) {
        ParticipationCode
     }
     Response {
+       ResponseID
        PathTakenForDomain
        ParallelTest
        DomainScore {
