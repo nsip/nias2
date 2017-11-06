@@ -442,7 +442,6 @@ func buildReportResolvers() map[string]interface{} {
 				}
 			}
 		}
-
 		return cfds, nil
 
 	}
@@ -459,6 +458,8 @@ func buildReportResolvers() map[string]interface{} {
 			acaraid, _ := a_id.(string)
 			acaraids = append(acaraids, acaraid)
 		}
+
+		// get the codeframe
 
 		// get students for the schools
 		studentids := make([]string, 0)

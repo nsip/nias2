@@ -12,6 +12,7 @@ query NAPItemResults($acaraIDs: [String]) {
       }
     }
     TestItem {
+      ItemID
       TestItemContent {
         NAPTestItemLocalId
         ItemName
@@ -41,6 +42,7 @@ query NAPItemResults($acaraIDs: [String]) {
       PSI
       TestletList {
         Testlet {
+          NapTestletLocalId
           TestletScore
           ItemResponseList {
             ItemResponse {
