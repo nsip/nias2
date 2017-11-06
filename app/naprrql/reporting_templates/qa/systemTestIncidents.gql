@@ -25,6 +25,14 @@ query NAPDomainScores($acaraIDs: [String]) {
          }
        }
     }
+    Response {
+       ResponseID
+       PathTakenForDomain
+       ParallelTest
+       DomainScore {
+         RawScore
+       }
+    }
     SchoolDetails {
       ACARAId
       SchoolName

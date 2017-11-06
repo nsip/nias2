@@ -55,6 +55,12 @@ type NaplanData {
 	codeframe_report: [CodeFrameDataSet]
         ## reporting (ui) object for item responses per student
 	item_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
+        ## report of all school summaries not linked to one of the acaraIDs
+        orphan_school_summary_report(acaraIDs: [String]): [ScoreSummary]
+        ## report of all events not linked to one of the acaraIDs
+        orphan_event_report(acaraIDs: [String]): [NAPEvent]
+        ## report of all students not linked to one of the acaraIDs
+        orphan_student_report(acaraIDs: [String]): [RegistrationRecord]
 }
 
 ## Reason why sitting test was interrupted

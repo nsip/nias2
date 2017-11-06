@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"regexp"
 	"sync"
 
 	"github.com/tidwall/gjson"
@@ -143,14 +144,27 @@ func runQAReports(schools []string) error {
 	var pipelineError error
 	systemTemplates := getTemplates("./reporting_templates/qa/")
 	querymap := make(map[string][]string)
+	orphan_queries := make(map[string]string)
 	for filename, query := range systemTemplates {
-		if _, ok := querymap[query]; !ok {
-			querymap[query] = make([]string, 0)
+		// query filenames prefixed with "orphan" need to be run once with their entire acaraIDs argument list,
+		// rather than once per acaraID instance
+		matched, _ := regexp.MatchString("(/orphan|^orphan)[^/]*$", filename)
+		if matched {
+			orphan_queries[filename] = query
+		} else {
+			if _, ok := querymap[query]; !ok {
+				querymap[query] = make([]string, 0)
+			}
+			querymap[query] = append(querymap[query], filename)
 		}
-		querymap[query] = append(querymap[query], filename)
 	}
 	for query := range querymap {
+		// log.Printf("Running reports %+v from the query: %+v\n", querymap[query], query)
 		pipelineError = runQASystemSingleQueryReportPipeline(query, querymap[query], schools)
+	}
+	for filename, query := range orphan_queries {
+		// log.Printf("Running report %s across all ACARA IDs\n", filename)
+		pipelineError = runQASystemReportAllSchoolsPipeline(filename, query, schools)
 	}
 	return pipelineError
 

@@ -1,6 +1,8 @@
 require "csv"
 require "pp"
 
+# 9. Test completeness
+
 counts = {}
 CSV.foreach("../../out/qa/systemTestAttempts.csv", headers: true) do |row|
   counts[row["ACARA ID"]] = {} if counts[row["ACARA ID"]].nil?

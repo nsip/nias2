@@ -1,6 +1,8 @@
 require "csv"
 require "pp"
 
+# 15. Test type impacts
+
 CSV.open("../../out/qa/systemTestTypeImpacts.rpt.csv", "wb",write_headers: true,
         headers: ["ACARA ID","School Name","Test Level","Test Domain","Participation Code","Family Name","Given Name","Birth Date","PSI","Path Taken For Domain","Parallel Test","Raw Score","Error"]) do |rpt|
   CSV.foreach("../../out/qa/systemResponses.csv", headers: true) do |row|

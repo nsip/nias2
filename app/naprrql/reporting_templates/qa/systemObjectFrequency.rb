@@ -1,6 +1,8 @@
 require "csv"
 require "pp"
 
+# 13. Test object frequency
+
 summaries = {}
 CSV.foreach("../../out/qa/systemScoreSummaries.csv", headers: true) do |row|
   summaries[row["School ACARA ID"]] = [] if summaries[row["School ACARA ID"]].nil?

@@ -1,0 +1,7 @@
+query NAPStudents($acaraIDs: [String]) {
+  orphan_student_report(acaraIDs: $acaraIDs){
+      RefId
+      ASLSchoolId
+  }
+}
+

@@ -19,6 +19,11 @@ query NAPDomainScores($acaraIDs: [String]) {
     } 
     Event {
        ParticipationCode
+       TestDisruptionList {
+         TestDisruption {
+           Event
+         }
+       }
     }
     Response {
        ResponseID

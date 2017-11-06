@@ -542,5 +542,178 @@ func buildReportResolvers() map[string]interface{} {
 		return results, nil
 	}
 
+	resolvers["NaplanData/orphan_school_summary_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get the sif refid for each of the acarids supplied
+		refids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			refid := getIdentifiers(acaraid + ":")
+			if len(refid) > 0 {
+				refids = append(refids, refid...)
+			}
+		}
+
+		// all school summary IDs ingested
+		all_school_summary_keys := getIdentifiers("NAPTestScoreSummary:")
+
+		// all school summary IDs linked to one of the acaraIDs
+		linked_school_summary_keys := make([]string, 0)
+		for _, refid := range refids {
+			linked_school_summary_keys = append(linked_school_summary_keys, refid+":NAPTestScoreSummary:")
+		}
+
+		summ_refids := make([]string, 0)
+		for _, summary_key := range linked_school_summary_keys {
+			ids := getIdentifiers(summary_key)
+			for _, id := range ids {
+				summ_refids = append(summ_refids, id)
+			}
+		}
+		seen := map[string]bool{}
+		for _, x := range summ_refids {
+			seen[x] = true
+		}
+		orphans := make([]string, 0)
+		for _, x := range all_school_summary_keys {
+			if !seen[x] {
+				orphans = append(orphans, x)
+			}
+		}
+		log.Printf("Found: %d orphan score summaries\n", len(orphans))
+
+		summaries, err := getObjects(orphans)
+		summary_datasets := make([]xml.NAPTestScoreSummary, 0)
+		for _, summary := range summaries {
+			summ, _ := summary.(xml.NAPTestScoreSummary)
+			summary_datasets = append(summary_datasets, summ)
+		}
+
+		return summary_datasets, err
+
+	}
+
+	resolvers["NaplanData/orphan_event_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get the sif refid for each of the acarids supplied
+		refids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			refid := getIdentifiers(acaraid + ":")
+			if len(refid) > 0 {
+				refids = append(refids, refid...)
+			}
+		}
+
+		// all event IDs ingested
+		all_keys := getIdentifiers("NAPEventStudentLink:")
+
+		// all event IDs linked to one of the acaraIDs
+		linked_keys := make([]string, 0)
+		for _, refid := range refids {
+			linked_keys = append(linked_keys, refid+":NAPEventStudentLink:")
+		}
+
+		summ_refids := make([]string, 0)
+		for _, summary_key := range linked_keys {
+			ids := getIdentifiers(summary_key)
+			for _, id := range ids {
+				summ_refids = append(summ_refids, id)
+			}
+		}
+		seen := map[string]bool{}
+		for _, x := range summ_refids {
+			seen[x] = true
+		}
+		orphans := make([]string, 0)
+		for _, x := range all_keys {
+			if !seen[x] {
+				orphans = append(orphans, x)
+			}
+		}
+		log.Printf("Found: %d orphan events\n", len(orphans))
+
+		events, err := getObjects(orphans)
+		summary_datasets := make([]xml.NAPEvent, 0)
+		for _, summary := range events {
+			summ, _ := summary.(xml.NAPEvent)
+			summary_datasets = append(summary_datasets, summ)
+		}
+
+		return summary_datasets, err
+
+	}
+
+	resolvers["NaplanData/orphan_student_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// all student IDs ingested
+		all_keys := getIdentifiers("StudentPersonal:")
+
+		linked_keys := make([]string, 0)
+		for _, acaraid := range acaraids {
+			linked_keys = append(linked_keys, "student_by_acaraid:"+acaraid+":")
+		}
+
+		summ_refids := make([]string, 0)
+		for _, summary_key := range linked_keys {
+			ids := getIdentifiers(summary_key)
+			for _, id := range ids {
+				summ_refids = append(summ_refids, id)
+			}
+		}
+		seen := map[string]bool{}
+		for _, x := range summ_refids {
+			seen[x] = true
+		}
+		orphans := make([]string, 0)
+		for _, x := range all_keys {
+			if !seen[x] {
+				orphans = append(orphans, x)
+			}
+		}
+		log.Printf("Found: %d orphan students\n", len(orphans))
+
+		students, err := getObjects(orphans)
+		summary_datasets := make([]xml.RegistrationRecord, 0)
+		for _, summary := range students {
+			summ, _ := summary.(xml.RegistrationRecord)
+			summary_datasets = append(summary_datasets, summ)
+		}
+
+		return summary_datasets, err
+
+	}
+
 	return resolvers
 }
