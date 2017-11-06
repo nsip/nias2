@@ -269,7 +269,6 @@ func buildReportResolvers() map[string]interface{} {
 		if err != nil {
 			return []interface{}{}, err
 		}
-
 		// iterate students and assemble Event/Response Data Set
 		results := make([]EventResponseDataSet, 0)
 		for _, studentObj := range studentObjs {
@@ -320,7 +319,6 @@ func buildReportResolvers() map[string]interface{} {
 				}
 			}
 		}
-
 		return results, nil
 
 	}

@@ -37,6 +37,7 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 
 	errc := make(chan error, 1)
 	go func() {
+		i := 0
 		defer close(errc)
 		defer file.Close()
 
@@ -60,14 +61,17 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 				if err != nil {
 					// Handle an error that occurs during the goroutine.
 					errc <- err
+					log.Printf("%+v\n", err)
 					return
 				}
 				headerWritten = true
 			} else {
+				i++
 				err := w.Write(resultRow)
 				if err != nil {
 					// Handle an error that occurs during the goroutine.
 					errc <- err
+					log.Printf("%+v\n", err)
 					return
 				}
 

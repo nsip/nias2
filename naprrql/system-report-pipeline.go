@@ -115,15 +115,29 @@ func runQASystemSingleQueryReportPipeline(query string, queryFileNames []string,
 	if err != nil {
 		return err
 	}
-	for _, queryFileName := range queryFileNames {
+	jsonc1 := make([]chan gjson.Result, len(queryFileNames))
+	for i, _ := range jsonc1 {
+		jsonc1[i] = make(chan gjson.Result, 0)
+	}
+	go func() {
+		for i := range jsonc {
+			for _, c := range jsonc1 {
+				c <- i
+			}
+		}
+		for _, c := range jsonc1 {
+			close(c)
+		}
+	}()
+	for i, queryFileName := range queryFileNames {
 		csvFileName := deriveCSVFileName(queryFileName)
 		outFileName := outFileDir + "/" + csvFileName
 		mapFileName := deriveMapFileName(queryFileName)
-		errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
+		errc1, err := csvFileSink(ctx, outFileName, mapFileName, jsonc1[i])
 		if err != nil {
 			return err
 		}
-		errcList = append(errcList, errc)
+		errcList = append(errcList, errc1)
 
 		log.Println("QA file writing... " + outFileName)
 	}
