@@ -19,13 +19,13 @@ CSV.open("../../out/qa/systemTestTypeImpacts.rpt.csv", "wb",write_headers: true,
 end
 CSV.open("../../out/qa/systemTestTypeItemImpacts.rpt.csv", "wb",
         write_headers:true,
-        headers: ["Test Name","Test level","Test Domain","Test Item Local Id","Test Item Name","Subdomain","Writing Genre","Birth Date","ACARA ID","PSI","Testlet Score","Item Score","Item Lapsed Time","Item Subscores","Item Response","Participation Code"]) do |rpt|
+        headers: ["Test Name","Test level","Test Domain","Test Item Local Id","Test Item Name","Subdomain","Writing Genre","Birth Date","ACARA ID","PSI","Testlet Score","Item Score","Item Lapsed Time","Item Subscores","Item Response","Participation Code","Error"]) do |rpt|
   CSV.foreach("../../out/qa/itemPrinting.csv", headers: true) do |row|
     if (row["Item Subscores"] == "[]" ) && row["Test Domain"] == "Writing"
       row["Error"] = "No subscores for Writing test"
     end
     if (row["Item Subscores"] != "[]" ) && row["Test Domain"] != "Writing"
-      row["Error"] = "No subscores for Writing test"
+      row["Error"] = "Subscores for Non-Writing test"
     end
     if !row["Error"].nil?
       rpt << row
