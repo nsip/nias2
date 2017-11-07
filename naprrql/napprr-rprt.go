@@ -146,6 +146,7 @@ func runQAReports(schools []string) error {
 	querymap := make(map[string][]string)
 	orphan_queries := make(map[string]string)
 	erds_queries := make(map[string]string)
+	itemresp_queries := make(map[string]string)
 	for filename, query := range systemTemplates {
 		// query filenames prefixed with "orphan" need to be run once with their entire acaraIDs argument list,
 		// rather than once per acaraID instance
@@ -162,6 +163,10 @@ func runQAReports(schools []string) error {
 				filename1 == "systemTestCompleteness.gql" ||
 				filename1 == "systemTestIncidents.gql" {
 				erds_queries[filename] = query
+			} else if filename1 == "systemTestTypeItemImpacts.gql" ||
+				filename1 == "systemItemCounts.gql" ||
+				filename1 == "systemParticipationCodeItemImpacts.gql" {
+				itemresp_queries[filename] = query
 			} else {
 
 				if _, ok := querymap[query]; !ok {
@@ -173,6 +178,9 @@ func runQAReports(schools []string) error {
 	}
 	if len(erds_queries) > 0 {
 		pipelineError = runQAErdsReportPipeline(erds_queries, schools)
+	}
+	if len(itemresp_queries) > 0 {
+		pipelineError = runQAItemRespReportPipeline(itemresp_queries, schools)
 	}
 	for query := range querymap {
 		// log.Printf("Running reports %+v from the query: %+v\n", querymap[query], query)
