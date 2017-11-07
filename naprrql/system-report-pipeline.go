@@ -901,7 +901,7 @@ func systemItemCounts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error
 			testdomain := record.Get("Test.TestContent.TestDomain").String()
 			testlevel := record.Get("Test.TestContent.TestLevel").String()
 			itemlocalid := record.Get("TestItem.TestItemContent.NAPTestItemLocalId").String()
-			participationcode := record.Get("Event.ParticipationCode").String()
+			participationcode := record.Get("ParticipationCode").String()
 			if record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.ResponseCorrectness").String() == "Not In Path" {
 				continue
 			}
