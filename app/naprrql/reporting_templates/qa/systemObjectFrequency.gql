@@ -1,0 +1,11 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  object_frequency_per_student_report(acaraIDs: $acaraIDs) {
+    PSI
+    Events_Count
+    PRS_Events_Count
+    Responses_Count
+    Events
+    PRS_Events
+    Responses
+  }
+}

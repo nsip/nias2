@@ -145,6 +145,8 @@ func runQAReports(schools []string) error {
 	systemTemplates := getTemplates("./reporting_templates/qa/")
 	querymap := make(map[string][]string)
 	orphan_queries := make(map[string]string)
+	erds_queries := make(map[string]string)
+	itemresp_queries := make(map[string]string)
 	for filename, query := range systemTemplates {
 		// query filenames prefixed with "orphan" need to be run once with their entire acaraIDs argument list,
 		// rather than once per acaraID instance
@@ -152,11 +154,33 @@ func runQAReports(schools []string) error {
 		if matched {
 			orphan_queries[filename] = query
 		} else {
-			if _, ok := querymap[query]; !ok {
-				querymap[query] = make([]string, 0)
+			re := regexp.MustCompile("^.*/")
+			filename1 := re.ReplaceAllString(filename, "")
+			if filename1 == "systemTestAttempts.gql" ||
+				filename1 == "systemParticipationCodeImpacts.gql" ||
+				filename1 == "systemTestTypeImpacts.gql" ||
+				filename1 == "systemObjectFrequency.gql" ||
+				filename1 == "systemTestCompleteness.gql" ||
+				filename1 == "systemTestIncidents.gql" {
+				erds_queries[filename] = query
+			} else if filename1 == "systemTestTypeItemImpacts.gql" ||
+				filename1 == "systemItemCounts.gql" ||
+				filename1 == "systemParticipationCodeItemImpacts.gql" {
+				itemresp_queries[filename] = query
+			} else {
+
+				if _, ok := querymap[query]; !ok {
+					querymap[query] = make([]string, 0)
+				}
+				querymap[query] = append(querymap[query], filename)
 			}
-			querymap[query] = append(querymap[query], filename)
 		}
+	}
+	if len(erds_queries) > 0 {
+		pipelineError = runQAErdsReportPipeline(erds_queries, schools)
+	}
+	if len(itemresp_queries) > 0 {
+		pipelineError = runQAItemRespReportPipeline(itemresp_queries, schools)
 	}
 	for query := range querymap {
 		// log.Printf("Running reports %+v from the query: %+v\n", querymap[query], query)
