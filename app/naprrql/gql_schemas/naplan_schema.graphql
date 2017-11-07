@@ -61,6 +61,24 @@ type NaplanData {
         orphan_event_report(acaraIDs: [String]): [NAPEvent]
         ## report of all students not linked to one of the acaraIDs
         orphan_student_report(acaraIDs: [String]): [RegistrationRecord]
+        ## report on GUID integrity within data set
+        guid_check_report: [GuidCheckDataSet]
+}
+
+## List of problematic GUIDs in data set
+type GuidCheckDataSet {
+        # GUID of Object that faulty GUID is found in
+        ObjectName: String
+        # Type of Object that faulty GUID is found in
+        ObjectType: String
+        # GUID whose reference is problematic
+        Guid: String
+        # Expected type referent of GUID
+        ShouldPointTo: String
+        # Found type referent of GUID 
+        # (nil if GUID not present in dataset)
+        # (duplicate if GUID is RefID of multiple objects)
+        PointsTo: String
 }
 
 ## Reason why sitting test was interrupted

@@ -41,6 +41,26 @@ func checkRequiredParams(params *graphql.ResolveParams) error {
 
 }
 
+func checkGuid(issues []GuidCheckDataSet, objectguid string, objecttype string, guid string, expected_type string, idmap map[string]string) []GuidCheckDataSet {
+	found, ok := idmap[guid]
+	if ok {
+		if found != expected_type {
+			issues = append(issues, GuidCheckDataSet{ObjectName: objectguid,
+				ObjectType:    objecttype,
+				Guid:          guid,
+				ShouldPointTo: expected_type,
+				PointsTo:      found})
+		}
+	} else {
+		issues = append(issues, GuidCheckDataSet{ObjectName: objectguid,
+			ObjectType:    objecttype,
+			Guid:          guid,
+			ShouldPointTo: expected_type,
+			PointsTo:      "nil"})
+	}
+	return issues
+}
+
 func buildReportResolvers() map[string]interface{} {
 
 	resolvers := map[string]interface{}{}
@@ -711,6 +731,116 @@ func buildReportResolvers() map[string]interface{} {
 		}
 
 		return summary_datasets, err
+
+	}
+
+	resolvers["NaplanData/guid_check_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		// all student IDs ingested
+		test_ids := getIdentifiers("NAPTest:")
+		testlet_ids := getIdentifiers("NAPTestlet:")
+		testitem_ids := getIdentifiers("NAPTestItem:")
+		scoresummary_ids := getIdentifiers("NAPTestScoreSummary:")
+		event_ids := getIdentifiers("NAPEventStudentLink:")
+		response_ids := getIdentifiers("NAPStudentResponseSet:")
+		codeframe_ids := getIdentifiers("NAPCodeFrame:")
+		school_ids := getIdentifiers("SchoolInfo:")
+		student_ids := getIdentifiers("StudentPersonal:")
+
+		ids := make(map[string]string)
+		for _, x := range test_ids {
+			ids[x] = "test"
+		}
+		for _, x := range testlet_ids {
+			ids[x] = "testlet"
+		}
+		for _, x := range testitem_ids {
+			ids[x] = "testitem"
+		}
+		for _, x := range scoresummary_ids {
+			ids[x] = "scoresummary"
+		}
+		for _, x := range event_ids {
+			ids[x] = "event"
+		}
+		for _, x := range response_ids {
+			ids[x] = "response"
+		}
+		for _, x := range codeframe_ids {
+			ids[x] = "codeframe"
+		}
+		for _, x := range school_ids {
+			ids[x] = "school"
+		}
+		for _, x := range student_ids {
+			ids[x] = "student"
+		}
+		results := make([]GuidCheckDataSet, 0)
+
+		codeframes, err := getObjects(codeframe_ids)
+		for _, codeframe := range codeframes {
+			t, _ := codeframe.(xml.NAPCodeFrame)
+			results = checkGuid(results, t.RefId, "codeframe", t.NAPTestRefId, "test", ids)
+			for _, tl := range t.TestletList.Testlet {
+				results = checkGuid(results, t.RefId, "codeframe", tl.NAPTestletRefId, "testlet", ids)
+				for _, ti := range tl.TestItemList.TestItem {
+					results = checkGuid(results, t.RefId, "codeframe", ti.TestItemRefId, "testitem", ids)
+				}
+			}
+		}
+		codeframes = nil
+
+		events, err := getObjects(event_ids)
+		for _, event := range events {
+			t, _ := event.(xml.NAPEvent)
+			results = checkGuid(results, t.EventID, "event", t.SPRefID, "student", ids)
+			results = checkGuid(results, t.EventID, "event", t.SchoolRefID, "school", ids)
+			results = checkGuid(results, t.EventID, "event", t.TestID, "test", ids)
+		}
+		events = nil
+
+		responses, err := getObjects(response_ids)
+		for _, response := range responses {
+			t, _ := response.(xml.NAPResponseSet)
+			results = checkGuid(results, t.ResponseID, "response", t.StudentID, "student", ids)
+			results = checkGuid(results, t.ResponseID, "response", t.TestID, "test", ids)
+			for _, tl := range t.TestletList.Testlet {
+				results = checkGuid(results, t.ResponseID, "response", tl.NapTestletRefId, "testlet", ids)
+				for _, ti := range tl.ItemResponseList.ItemResponse {
+					results = checkGuid(results, t.ResponseID, "response", ti.ItemRefID, "testitem", ids)
+				}
+			}
+		}
+		responses = nil
+
+		testitems, err := getObjects(testitem_ids)
+		for _, testitem := range testitems {
+			t, _ := testitem.(xml.NAPTestItem)
+			for _, s := range t.TestItemContent.ItemSubstitutedForList.SubstituteItem {
+				results = checkGuid(results, t.ItemID, "testitem", s.SubstituteItemRefId, "testitem", ids)
+			}
+		}
+		testitems = nil
+
+		testlets, err := getObjects(testlet_ids)
+		for _, testlet := range testlets {
+			t, _ := testlet.(xml.NAPTestlet)
+			results = checkGuid(results, t.TestletID, "testlet", t.NAPTestRefId, "test", ids)
+			for _, ti := range t.TestItemList.TestItem {
+				results = checkGuid(results, t.TestletID, "testlet", ti.TestItemRefId, "testitem", ids)
+			}
+		}
+		testlets = nil
+
+		summarys, err := getObjects(scoresummary_ids)
+		for _, summary := range summarys {
+			t, _ := summary.(xml.NAPTestScoreSummary)
+			results = checkGuid(results, t.SummaryID, "scoresummary", t.SchoolInfoRefId, "school", ids)
+			results = checkGuid(results, t.SummaryID, "test", t.NAPTestRefId, "test", ids)
+		}
+		summarys = nil
+
+		log.Printf("%d GUID mismatches\n", len(results))
+		return results, err
 
 	}
 
