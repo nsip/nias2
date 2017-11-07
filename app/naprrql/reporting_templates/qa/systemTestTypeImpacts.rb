@@ -25,11 +25,10 @@ CSV.open("../../out/qa/systemTestTypeItemImpacts.rpt.csv", "wb",
       row["Error"] = "No subscores for Writing test"
     end
     if (row["Item Subscores"] != "[]" ) && row["Test Domain"] != "Writing"
-      row["Error"] = "No subscores for Writing test"
+      row["Error"] = "Subscores for Non-Writing test"
     end
     if !row["Error"].nil?
       rpt << row
     end
   end
 end
-
