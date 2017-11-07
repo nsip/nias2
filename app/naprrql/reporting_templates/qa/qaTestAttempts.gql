@@ -1,0 +1,11 @@
+query NAPTestAttempts($acaraIDs: [String]) {
+  domain_scores_report_by_school(acaraIDs: $acaraIDs) {
+    Test {
+      TestContent {
+        TestLevel
+        TestDomain
+      }
+    }
+  }
+}
+

@@ -1,0 +1,18 @@
+query NAPParticipation($acaraIDs: [String]) {
+  participation_report_by_school(acaraIDs: $acaraIDs)
+  {
+    Summary {
+      ParticipationCode
+    }
+    EventInfos{
+      Event{
+        TestDisruptionList{
+          TestDisruption {
+            Event
+          }
+        }
+      }
+    }
+  }
+}
+

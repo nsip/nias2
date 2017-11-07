@@ -141,10 +141,13 @@ func runItemPrintReports(schools []string) error {
 func runQAReports(schools []string) error {
 
 	var pipelineError error
-	systemTemplates := getTemplates("./reporting_templates/qa/")
-	for filename, query := range systemTemplates {
-		pipelineError = runSystemReportPipeline(filename, query, schools)
-	}
+	// systemTemplates := getTemplates("./reporting_templates/qa/")
+	// for filename, query := range systemTemplates {
+	// 	pipelineError = runSystemReportPipeline(filename, query, schools)
+	// }
+
+	pipelineError = runQASchoolSummaryPipeline(schools)
+
 	return pipelineError
 
 }
