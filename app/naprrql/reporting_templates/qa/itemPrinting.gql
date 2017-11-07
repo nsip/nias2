@@ -19,6 +19,15 @@ query NAPItemResults($acaraIDs: [String]) {
         ItemType
         Subdomain
         WritingGenre
+        ItemSubstitutedForList {
+          SubstituteItem {
+            SubstituteItemRefId
+            LocalId
+            PNPCodeList {
+              PNPCode
+            }
+          } 
+        }
       }
     }
     Student {

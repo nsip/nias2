@@ -553,7 +553,8 @@ func buildReportResolvers() map[string]interface{} {
 					}
 
 					irds := ItemResponseDataSet{TestItem: item, Response: resp1,
-						Student: student, Test: test, ParticipationCode: event.ParticipationCode}
+						Student: student, Test: test,
+						ParticipationCode: event.ParticipationCode}
 					results = append(results, irds)
 				}
 			}
