@@ -1,20 +1,40 @@
 require "csv"
 require "pp"
 
+codeframe = {}
+$substitute = {}
+$itemlocalid = {}
+
+def normalise_testitems(testitems)
+  norm_testitems = []
+  testitems.each do |t|
+    t1 = if $substitute.has_key?(t)
+           if $itemlocalid.has_key?($substitute[t])
+             $itemlocalid[$substitute[t]]
+           else
+             $substitute[t]
+           end
+         else
+           $itemlocalid.has_key?(t) ? $itemlocalid[t] : t
+         end
+    norm_testitems << t1
+  end
+  norm_testitems
+end
+
+
 # 3. Student test results to codeframe comparison
 
-codeframe = {}
-substitute = {}
-itemlocalid = {}
 CSV.foreach("../../out/qa/systemCodeframe.csv", headers: true) do |row|
   codeframe[row["Test"]] = {} if codeframe[row["Test"]].nil?
   codeframe[row["Test"]][row["NAPTestletLocalId"]] = [] if codeframe[row["Test"]][row["NAPTestletLocalId"]].nil?
-  codeframe[row["Test"]][row["NAPTestletLocalId"]] << row["NAPTestItemLocalId"]
-  itemlocalid[row["ItemRefID"]] = row["NAPTestletLocalId"]
-  if row["ItemSubstitutedForList"] != "{\"SubstituteItem\":[]}"
+  $itemlocalid[row["ItemRefID"]] = row["NAPTestItemLocalId"]
+  if row["ItemSubstitutedForList"] == "{\"SubstituteItem\":[]}"
+    codeframe[row["Test"]][row["NAPTestletLocalId"]] << row["NAPTestItemLocalId"]
+  else
     sub_items = row["ItemSubstitutedForList"].gsub(/\{"SubstituteItem":\[/,"").gsub(/\]\}/,"").split(",")
     sub_items.each do |s|
-      substitute[s.gsub(/\{"SubstituteItemRefId":"/,"").gsub(/"\}/,"")] = row["NAPTestItemLocalId"]
+      $substitute[row["ItemRefID"]] = s.gsub(/\{"SubstituteItemRefId":"/,"").gsub(/"\}/,"")
     end
   end
 end
@@ -31,16 +51,14 @@ psi = ""
 participationcode = ""
 testitems = nil
 CSV.open("../../out/qa/systemCodeframeMap.rpt.csv", "wb",write_headers: true,
-         headers: ["PSI","Test","Testlet Name","Participation Code","Expected Items","Found Items"]) do |rpt|
+         headers: ["PSI","Test","Testlet Name","Participation Code","Expected Items Not Found","Found Items Not Expected"]) do |rpt|
   CSV.foreach("../../out/qa/itemPrinting.csv", headers: true) do |row|
     if ( testlet != row["NAPTestletLocalId"] || test != row["Test Name"] ) && !testitems.nil?
-      norm_testitems = []
-      testitems.each do |t|
-        norm_testitems << (substitute.has_key?(t) ? substitute[t] : itemlocalid[t])
-      end
-      norm_testitems.sort! 
-      if codeframe[test][testlet] != norm_testitems
-        rpt << [psi, test, testlet, participationcode, norm_testitems.join(";"), codeframe[test][testlet].join(";")]
+      norm_testitems = normalise_testitems(testitems)
+      expected_not_found = codeframe[test][testlet] - norm_testitems
+      found_not_expected = norm_testitems - codeframe[test][testlet]
+      if !expected_not_found.empty? || !found_not_expected.empty?
+        rpt << [psi, test, testlet, participationcode, expected_not_found.join(";"), found_not_expected.join(";")]
       end
     end
     if ( testlet != row["NAPTestletLocalId"] || test != row["Test Name"] ) 
@@ -52,9 +70,11 @@ CSV.open("../../out/qa/systemCodeframeMap.rpt.csv", "wb",write_headers: true,
     participationcode = row["Participation Code"]
     testitems << row["ItemRefID"]
   end
-  testitems.sort!
-  if !testitems.nil? && codeframe[test][testlet] != testitems
-    rpt << [psi, test, testlet, participationcode, testitems.join(";"), codeframe[test][testlet].join(";")]
+  norm_testitems = normalise_testitems(testitems)
+  expected_not_found = codeframe[test][testlet] - norm_testitems
+  found_not_expected = norm_testitems - codeframe[test][testlet]
+  if !expected_not_found.empty? || !found_not_expected.empty?
+    rpt << [psi, test, testlet, participationcode, expected_not_found.join(";"), found_not_expected.join(";")]
   end
 end
 
