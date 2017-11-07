@@ -1,6 +1,5 @@
 query NAPDomainScores($acaraIDs: [String]) {
   domain_scores_event_report_by_school(acaraIDs: $acaraIDs) {
-    TestDisruption
     Student {
       FamilyName
       GivenName
@@ -39,6 +38,7 @@ query NAPDomainScores($acaraIDs: [String]) {
       ACARAId
       SchoolName
     }
+    Error
   }
 }
 

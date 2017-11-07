@@ -2,7 +2,7 @@ require "csv"
 require "pp"
 
 # 15. Test type impacts
-
+=begin
 CSV.open("../../out/qa/systemTestTypeImpacts.rpt.csv", "wb",write_headers: true,
         headers: ["ACARA ID","School Name","Test Level","Test Domain","Participation Code","Family Name","Given Name","Birth Date","PSI","Path Taken For Domain","Parallel Test","Raw Score","Error"]) do |rpt|
   CSV.foreach("../../out/qa/systemResponses.csv", headers: true) do |row|
@@ -17,6 +17,7 @@ CSV.open("../../out/qa/systemTestTypeImpacts.rpt.csv", "wb",write_headers: true,
     end
   end
 end
+=end
 CSV.open("../../out/qa/systemTestTypeItemImpacts.rpt.csv", "wb",
         write_headers:true,
         headers: ["Test Name","Test level","Test Domain","Test Item Local Id","Test Item Name","Subdomain","Writing Genre","Birth Date","ACARA ID","PSI","Testlet Score","Item Score","Item Lapsed Time","Item Subscores","Item Response","Participation Code","Error"]) do |rpt|

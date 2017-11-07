@@ -1,6 +1,14 @@
-query NAPDomainScores($acaraIDs: [String]) {
-  domain_scores_event_report_by_school(acaraIDs: $acaraIDs) {
-    TestDisruption
+query TestTypeItemImpacts($acaraIDs: [String]) {
+  test_type_item_impacts(acaraIDs: $acaraIDs) {
+    TestName   
+    TestLevel
+    TestDomain
+
+
+"Test Name","Test level","Test Domain","Test Item Local Id","Test Item Name","Subdomain","Writing Genre","Birth Date","ACARA ID","PSI","Testlet Score","Item Score","Item Lapsed Time","Item Subscores","Item Response","Participation Code","Error"
+
+
+
     Student {
       FamilyName
       GivenName
@@ -11,13 +19,13 @@ query NAPDomainScores($acaraIDs: [String]) {
           Value
         }
       }
-    } 
+    }
     Test {
       TestContent {
         TestLevel
         TestDomain
-      } 
-    } 
+      }
+    }
     Event {
        EventID
        ParticipationCode
@@ -41,4 +49,5 @@ query NAPDomainScores($acaraIDs: [String]) {
     }
   }
 }
+
 
