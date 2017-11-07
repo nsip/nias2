@@ -454,14 +454,18 @@ func buildReportResolvers() map[string]interface{} {
 					ti, _ := tiObj[0].(xml.NAPTestItem)
 					// log.Printf("\t\t%s", ti.TestItemContent.ItemName)
 					cfd := CodeFrameDataSet{
-						Test:    test,
-						Testlet: tl,
-						Item:    ti,
+						Test:           test,
+						Testlet:        tl,
+						Item:           ti,
+						SequenceNumber: "unknown",
 					}
+					cfd.SequenceNumber = cfd.GetItemLocationInTestlet(ti.ItemID)
+
 					cfds = append(cfds, cfd)
 				}
 			}
 		}
+
 		return cfds, nil
 
 	}

@@ -30,9 +30,19 @@ query CodeFrame {
         ItemDifficulty
         ItemType
         MarkingType
-        StimulusList
+        StimulusList {
+          Stimulus {
+            LocalId
+            TextGenre
+            TextType
+            WordCount
+            TextDescriptor
+            Content
+          }
+        }
       }
     }
+    SequenceNumber
   }
 }
 

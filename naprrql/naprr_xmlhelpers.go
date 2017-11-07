@@ -183,9 +183,10 @@ type SchoolDetails struct {
 
 // summary object from codeframe
 type CodeFrameDataSet struct {
-	Test    xml.NAPTest
-	Testlet xml.NAPTestlet
-	Item    xml.NAPTestItem
+	Test           xml.NAPTest
+	Testlet        xml.NAPTestlet
+	Item           xml.NAPTestItem
+	SequenceNumber string
 }
 
 // aggregate all objects referencing students for a single test

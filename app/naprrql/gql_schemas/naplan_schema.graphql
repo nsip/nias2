@@ -168,6 +168,8 @@ type CodeFrameDataSet {
 	Testlet: NAPTestlet
 	## The item associated with the testlet
 	Item: NAPTestItem
+        ## The sequence number of the item in the testlet
+        SequenceNumber: Int
 }
 
 
