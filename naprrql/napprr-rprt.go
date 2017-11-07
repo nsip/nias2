@@ -167,6 +167,11 @@ func runQAReports(schools []string) error {
 				filename1 == "systemItemCounts.gql" ||
 				filename1 == "systemParticipationCodeItemImpacts.gql" {
 				itemresp_queries[filename] = query
+			} else if filename1 == "qaSchoolInfo.gql" ||
+				filename1 == "qaStudentsByYrLevel.gql" ||
+				filename1 == "qaTestAttempts.gql" ||
+				filename1 == "qaParticipation.gql" {
+				// ignore, they're addressed by runQASchoolSummaryPipeline
 			} else {
 
 				if _, ok := querymap[query]; !ok {
@@ -190,6 +195,7 @@ func runQAReports(schools []string) error {
 		// log.Printf("Running report %s across all ACARA IDs\n", filename)
 		pipelineError = runQASystemReportAllSchoolsPipeline(filename, query, schools)
 	}
+	pipelineError = runQASchoolSummaryPipeline(schools)
 	return pipelineError
 
 }
