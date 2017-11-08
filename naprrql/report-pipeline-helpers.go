@@ -197,3 +197,33 @@ func deriveMapFileName(queryFileName string) string {
 	return mapFilename
 
 }
+
+// splits a channel of GJSON into an array of channels of GJSON
+func splitter(ctx context.Context, in <-chan gjson.Result, size int) (
+	[]chan gjson.Result, <-chan error, error) {
+	jsonc1 := make([]chan gjson.Result, size)
+	for i := range jsonc1 {
+		jsonc1[i] = make(chan gjson.Result)
+	}
+	errc := make(chan error, 1)
+	go func() {
+		for i := range jsonc1 {
+			defer close(jsonc1[i])
+		}
+		defer close(errc)
+		for n := range in {
+			// Send the data to the output channel 1 but return early
+			// if the context has been cancelled.
+			for _, c := range jsonc1 {
+				select {
+				case c <- n:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+
+	}()
+	return jsonc1, errc, nil
+
+}
