@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 
 	"encoding/json"
 	"github.com/tidwall/gjson"
@@ -17,7 +16,13 @@ import (
 // printing pipeline for QA reports depending on the item report query
 //
 
-func runQAItemRespReportPipeline(querymap map[string]string, schools []string) error {
+func runQAItemRespReportPipeline(schools []string) error {
+
+	reports := []string{"systemTestTypeItemImpacts.gql",
+		"systemParticipationCodeItemImpacts.gql",
+		"systemItemCounts.gql",
+	}
+	reports_path := "./reporting_templates/qa/"
 
 	itemresp_query := `query NAPItemResults($acaraIDs: [String]) {
   item_results_report_by_school(acaraIDs: $acaraIDs) {
@@ -121,37 +126,26 @@ func runQAItemRespReportPipeline(querymap map[string]string, schools []string) e
 	if err != nil {
 		return err
 	}
-	jsonc1, errc, err := splitter(ctx, jsonc, len(querymap))
-	errcList = append(errcList, errc)
-	/*
-		jsonc1 := make([]chan gjson.Result, len(querymap))
-		for i, _ := range jsonc1 {
-			jsonc1[i] = make(chan gjson.Result, 0)
-		}
-		go func() {
-			for i := range jsonc {
-				for _, c := range jsonc1 {
-					c <- i
-				}
-			}
-			for _, c := range jsonc1 {
-				close(c)
-			}
-		}()
-	*/
+	out_error_rpt_FileDir := "./out/qa/error_reports"
+	err = os.MkdirAll(out_error_rpt_FileDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
 
-	i := 0
-	for queryFileName, _ := range querymap {
+	jsonc1, errc, err := splitter(ctx, jsonc, len(reports))
+	errcList = append(errcList, errc)
+
+	for i, queryFileName := range reports {
 		var jsonc2 <-chan gjson.Result
 		// for now, I'm merely hardcoding the query names
 		// These are transforms on the CSV
-		if strings.HasSuffix(queryFileName, "systemTestTypeItemImpacts.gql") {
+		if queryFileName == "systemTestTypeItemImpacts.gql" {
 			jsonc2, errc, _ = qaTestTypeItemImpacts(jsonc1[i])
 			errcList = append(errcList, errc)
-		} else if strings.HasSuffix(queryFileName, "systemParticipationCodeItemImpacts.gql") {
+		} else if queryFileName == "systemParticipationCodeItemImpacts.gql" {
 			jsonc2, errc, _ = qaParticipationCodeItemImpacts(jsonc1[i])
 			errcList = append(errcList, errc)
-		} else if strings.HasSuffix(queryFileName, "systemItemCounts.gql") {
+		} else if queryFileName == "systemItemCounts.gql" {
 			jsonc2, errc, _ = qaItemCounts(jsonc1[i])
 			errcList = append(errcList, errc)
 		} else {
@@ -159,8 +153,8 @@ func runQAItemRespReportPipeline(querymap map[string]string, schools []string) e
 		}
 		if jsonc2 != nil {
 			csvFileName := deriveCSVFileName(queryFileName)
-			outFileName := outFileDir + "/" + csvFileName
-			mapFileName := deriveMapFileName(queryFileName)
+			outFileName := out_error_rpt_FileDir + "/" + csvFileName
+			mapFileName := deriveMapFileName(reports_path + queryFileName)
 			errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc2)
 			if err != nil {
 				return err
@@ -169,7 +163,6 @@ func runQAItemRespReportPipeline(querymap map[string]string, schools []string) e
 
 			log.Println("ITEM RESP QA report file writing... " + outFileName)
 		}
-		i++
 	}
 	return WaitForPipeline(errcList...)
 }

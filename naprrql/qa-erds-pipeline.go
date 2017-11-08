@@ -19,7 +19,17 @@ import (
 // (event-response-data-set)
 //
 
-func runQAErdsReportPipeline(querymap map[string]string, schools []string) error {
+func runQAErdsReportPipeline(schools []string) error {
+
+	reports_path := "./reporting_templates/qa/"
+
+	reports := []string{"systemTestAttempts.gql",
+		"systemParticipationCodeImpacts.gql",
+		"systemTestTypeImpacts.gql",
+		"systemObjectFrequency.gql",
+		"systemTestCompleteness.gql",
+		"systemTestIncidents.gql",
+	}
 
 	erds_query := `query NAPDomainScores($acaraIDs: [String]) {
   domain_scores_event_report_by_school(acaraIDs: $acaraIDs) {
@@ -89,30 +99,33 @@ func runQAErdsReportPipeline(querymap map[string]string, schools []string) error
 	if err != nil {
 		return err
 	}
-	jsonc1, errc, err := splitter(ctx, jsonc, len(querymap))
+	out_error_rpt_FileDir := "./out/qa/error_reports"
+	err = os.MkdirAll(out_error_rpt_FileDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	jsonc1, errc, err := splitter(ctx, jsonc, len(reports))
 	errcList = append(errcList, errc)
 
-	i := 0
-	for queryFileName, _ := range querymap {
+	for i, queryFileName := range reports {
 		var jsonc2 <-chan gjson.Result
-		// for now, I'm merely hardcoding the query names
 		// These are transforms on the CSV
-		if strings.HasSuffix(queryFileName, "systemTestAttempts.gql") {
+		if queryFileName == "systemTestAttempts.gql" {
 			jsonc2, errc, _ = qaTestAttempts(jsonc1[i])
 			errcList = append(errcList, errc)
-		} else if strings.HasSuffix(queryFileName, "systemTestTypeImpacts.gql") {
+		} else if queryFileName == "systemTestTypeImpacts.gql" {
 			jsonc2, errc, _ = qaTestTypeImpacts(jsonc1[i])
 			errcList = append(errcList, errc)
-		} else if strings.HasSuffix(queryFileName, "systemTestIncidents.gql") {
+		} else if queryFileName == "systemTestIncidents.gql" {
 			jsonc2, errc, _ = qaTestIncidents(jsonc1[i])
 			errcList = append(errcList, errc)
-		} else if strings.HasSuffix(queryFileName, "systemParticipationCodeImpacts.gql") {
+		} else if queryFileName == "systemParticipationCodeImpacts.gql" {
 			jsonc2, errc, _ = qaParticipationCodeImpacts(jsonc1[i])
 			errcList = append(errcList, errc)
-		} else if strings.HasSuffix(queryFileName, "systemTestCompleteness.gql") {
+		} else if queryFileName == "systemTestCompleteness.gql" {
 			jsonc2, errc, _ = qaTestCompleteness(jsonc1[i])
 			errcList = append(errcList, errc)
-		} else if strings.HasSuffix(queryFileName, "systemObjectFrequency.gql") {
+		} else if queryFileName == "systemObjectFrequency.gql" {
 			jsonc2, errc, _ = qaObjectFrequency(jsonc1[i])
 			errcList = append(errcList, errc)
 		} else {
@@ -120,8 +133,8 @@ func runQAErdsReportPipeline(querymap map[string]string, schools []string) error
 		}
 		if jsonc2 != nil {
 			csvFileName := deriveCSVFileName(queryFileName)
-			outFileName := outFileDir + "/" + csvFileName
-			mapFileName := deriveMapFileName(queryFileName)
+			outFileName := out_error_rpt_FileDir + "/" + csvFileName
+			mapFileName := deriveMapFileName(reports_path + queryFileName)
 			errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc2)
 			if err != nil {
 				return err
@@ -130,7 +143,6 @@ func runQAErdsReportPipeline(querymap map[string]string, schools []string) error
 
 			log.Println("ERDS QA file writing... " + outFileName)
 		}
-		i++
 	}
 	return WaitForPipeline(errcList...)
 }
