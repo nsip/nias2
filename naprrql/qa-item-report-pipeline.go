@@ -16,15 +16,8 @@ import (
 // printing pipeline for QA reports depending on the item report query
 //
 
-func runQAItemRespReportPipeline(schools []string) error {
-
-	reports := []string{"systemTestTypeItemImpacts.gql",
-		"systemParticipationCodeItemImpacts.gql",
-		"systemItemCounts.gql",
-	}
-	reports_path := "./reporting_templates/qa/"
-
-	itemresp_query := `query NAPItemResults($acaraIDs: [String]) {
+func itemresults_query() string {
+	return `query NAPItemResults($acaraIDs: [String]) {
   item_results_report_by_school(acaraIDs: $acaraIDs) {
     Test {
       TestContent {
@@ -33,7 +26,6 @@ func runQAItemRespReportPipeline(schools []string) error {
         TestLevel
         TestDomain
         TestYear
-        StagesCount
         TestType
       }
     }
@@ -49,9 +41,6 @@ func runQAItemRespReportPipeline(schools []string) error {
           SubstituteItem {
             SubstituteItemRefId
             LocalId
-            PNPCodeList {
-              PNPCode
-            }
           }
         }
       }
@@ -59,8 +48,6 @@ func runQAItemRespReportPipeline(schools []string) error {
     Student {
       BirthDate
       Sex
-      IndigenousStatus
-      LBOTE
       YearLevel
       ASLSchoolId
       OtherIdList {
@@ -87,7 +74,6 @@ func runQAItemRespReportPipeline(schools []string) error {
               Score
               LapsedTimeItem
               SequenceNumber
-              ItemWeight
               SubscoreList {
                 Subscore {
                   SubscoreType
@@ -101,6 +87,17 @@ func runQAItemRespReportPipeline(schools []string) error {
     }
   }
 }`
+}
+
+func runQAItemRespReportPipeline(schools []string) error {
+
+	reports := []string{"systemTestTypeItemImpacts.gql",
+		"systemParticipationCodeItemImpacts.gql",
+		"systemItemCounts.gql",
+	}
+	reports_path := "./reporting_templates/qa/"
+
+	itemresp_query := itemresults_query()
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
@@ -140,13 +137,13 @@ func runQAItemRespReportPipeline(schools []string) error {
 		// for now, I'm merely hardcoding the query names
 		// These are transforms on the CSV
 		if queryFileName == "systemTestTypeItemImpacts.gql" {
-			jsonc2, errc, _ = qaTestTypeItemImpacts(jsonc1[i])
+			jsonc2, errc, _ = qaTestTypeItemImpacts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemParticipationCodeItemImpacts.gql" {
-			jsonc2, errc, _ = qaParticipationCodeItemImpacts(jsonc1[i])
+			jsonc2, errc, _ = qaParticipationCodeItemImpacts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemItemCounts.gql" {
-			jsonc2, errc, _ = qaItemCounts(jsonc1[i])
+			jsonc2, errc, _ = qaItemCounts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else {
 			jsonc2 = nil
@@ -167,38 +164,47 @@ func runQAItemRespReportPipeline(schools []string) error {
 	return WaitForPipeline(errcList...)
 }
 
-func qaTestTypeItemImpacts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaTestTypeItemImpacts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(out)
 		defer close(errc)
+		var j []byte
 		for record := range in {
+			j = nil
+			subscores := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()
 			if record.Get("Test.TestContent.TestDomain").String() == "Writing" &&
 				len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Score").String()) > 0 &&
-				len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()) == 0 {
+				len(subscores) == 0 {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "No subscores for Writing test"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
 			} else if record.Get("Test.TestContent.TestDomain").String() != "Writing" &&
-				len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()) > 0 {
+				len(subscores) > 0 {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Subscores for Non-Writing test"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
+			}
+			if j != nil {
+				select {
+				case out <- gjson.ParseBytes(j):
+				case <-ctx.Done():
+					return
+				}
 			}
 		}
 	}()
 	return out, errc, nil
 }
 
-func qaParticipationCodeItemImpacts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(out)
 		defer close(errc)
+		var j []byte
 		for record := range in {
 			participationcode := record.Get("ParticipationCode").String()
 			lapsedtimeitem := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.LapsedTimeItem").String()
@@ -206,50 +212,52 @@ func qaParticipationCodeItemImpacts(in <-chan gjson.Result) (<-chan gjson.Result
 			testletscore_num, _ := strconv.Atoi(testletscore)
 			itemscore := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Score").String()
 			itemscore_num, _ := strconv.Atoi(itemscore)
-
+			subscores := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()
+			j = nil
 			if (len(lapsedtimeitem) > 0 ||
 				len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Response").String()) > 0) &&
 				participationcode != "P" && participationcode != "S" {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Response captured without student writing test"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
 			} else if (len(testletscore) > 0 ||
 				len(itemscore) > 0 ||
-				len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()) > 0) &&
+				len(subscores) > 0) &&
 				participationcode != "P" && participationcode != "R" {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Scored test with status other than P or R"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
 			} else if ((len(testletscore) > 0 && testletscore_num != 0) ||
-				(len(itemscore) > 0 && itemscore_num != 0) ||
-				len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()) > 0) &&
+				(len(itemscore) > 0 && itemscore_num != 0) || len(subscores) > 0) &&
 				participationcode == "R" {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Non-zero Scored test with status of R"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
 			} else if (len(testletscore) == 0 || len(itemscore) == 0) &&
 				(participationcode == "R" || participationcode == "P") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Unscored test with status of P or R"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
-			} else if len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()) == 0 &&
+				j, _ = json.Marshal(m)
+			} else if len(subscores) == 0 &&
 				record.Get("Test.TestContent.TestDomain").String() == "Writing" &&
 				participationcode == "P" {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Unscored writing test with status of P"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
+			}
+			if j != nil {
+				select {
+				case out <- gjson.ParseBytes(j):
+				case <-ctx.Done():
+					return
+				}
 			}
 		}
 	}()
 	return out, errc, nil
 }
 
-func qaItemCounts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaItemCounts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
@@ -305,7 +313,11 @@ func qaItemCounts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, er
 						}
 						result["Count"] = strconv.Itoa(v3["count"])
 						j, _ := json.Marshal(result)
-						out <- gjson.Parse(string(j))
+						select {
+						case out <- gjson.ParseBytes(j):
+						case <-ctx.Done():
+							return
+						}
 					}
 				}
 			}

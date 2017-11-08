@@ -19,19 +19,8 @@ import (
 // (event-response-data-set)
 //
 
-func runQAErdsReportPipeline(schools []string) error {
-
-	reports_path := "./reporting_templates/qa/"
-
-	reports := []string{"systemTestAttempts.gql",
-		"systemParticipationCodeImpacts.gql",
-		"systemTestTypeImpacts.gql",
-		"systemObjectFrequency.gql",
-		"systemTestCompleteness.gql",
-		"systemTestIncidents.gql",
-	}
-
-	erds_query := `query NAPDomainScores($acaraIDs: [String]) {
+func erds_query() string {
+	return `query NAPDomainScores($acaraIDs: [String]) {
   domain_scores_event_report_by_school(acaraIDs: $acaraIDs) {
     Student {
       FamilyName
@@ -73,6 +62,22 @@ func runQAErdsReportPipeline(schools []string) error {
     }
   }
 }`
+}
+
+func runQAErdsReportPipeline(schools []string) error {
+
+	reports_path := "./reporting_templates/qa/"
+
+	reports := []string{"systemTestAttempts.gql",
+		"systemParticipationCodeImpacts.gql",
+		"systemTestTypeImpacts.gql",
+		"systemObjectFrequency.gql",
+		"systemTestCompleteness.gql",
+		"systemTestIncidents.gql",
+		//"systemResponses.gql",
+	}
+
+	erds_query := erds_query()
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -110,30 +115,35 @@ func runQAErdsReportPipeline(schools []string) error {
 	for i, queryFileName := range reports {
 		var jsonc2 <-chan gjson.Result
 		// These are transforms on the CSV
+		output_prefix := out_error_rpt_FileDir
 		if queryFileName == "systemTestAttempts.gql" {
-			jsonc2, errc, _ = qaTestAttempts(jsonc1[i])
+			jsonc2, errc, _ = qaTestAttempts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemTestTypeImpacts.gql" {
-			jsonc2, errc, _ = qaTestTypeImpacts(jsonc1[i])
+			jsonc2, errc, _ = qaTestTypeImpacts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemTestIncidents.gql" {
-			jsonc2, errc, _ = qaTestIncidents(jsonc1[i])
+			jsonc2, errc, _ = qaTestIncidents(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemParticipationCodeImpacts.gql" {
-			jsonc2, errc, _ = qaParticipationCodeImpacts(jsonc1[i])
+			jsonc2, errc, _ = qaParticipationCodeImpacts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemTestCompleteness.gql" {
-			jsonc2, errc, _ = qaTestCompleteness(jsonc1[i])
+			jsonc2, errc, _ = qaTestCompleteness(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemObjectFrequency.gql" {
-			jsonc2, errc, _ = qaObjectFrequency(jsonc1[i])
+			jsonc2, errc, _ = qaObjectFrequency(ctx, jsonc1[i])
+			errcList = append(errcList, errc)
+		} else if queryFileName == "systemResponses.gql" {
+			jsonc2, errc, _ = qaResponses(ctx, jsonc1[i])
+			output_prefix = outFileDir
 			errcList = append(errcList, errc)
 		} else {
 			jsonc2 = nil
 		}
 		if jsonc2 != nil {
 			csvFileName := deriveCSVFileName(queryFileName)
-			outFileName := out_error_rpt_FileDir + "/" + csvFileName
+			outFileName := output_prefix + "/" + csvFileName
 			mapFileName := deriveMapFileName(reports_path + queryFileName)
 			errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc2)
 			if err != nil {
@@ -147,7 +157,7 @@ func runQAErdsReportPipeline(schools []string) error {
 	return WaitForPipeline(errcList...)
 }
 
-func qaTestAttempts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaTestAttempts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
@@ -155,43 +165,55 @@ func qaTestAttempts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, 
 		defer close(errc)
 		for record := range in {
 			if record.Get("Event.ParticipationCode").String() == "S" {
-				out <- record
+				select {
+				case out <- record:
+				case <-ctx.Done():
+					return
+				}
 			}
 		}
 	}()
 	return out, errc, nil
 }
 
-func qaTestTypeImpacts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaTestTypeImpacts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(out)
 		defer close(errc)
 		for record := range in {
-			if record.Get("Test.TestContent.TestDomain").String() == "Writing" &&
-				(len(record.Get("Response.PathTakenForDomain").String()) > 0 ||
-					len(record.Get("Response.ParallelTest").String()) > 0) {
+			domain := record.Get("Test.TestContent.TestDomain").String()
+			participationcode := record.Get("Event.ParticipationCode").String()
+			pathtakenfordomain := record.Get("Response.PathTakenForDomain").String()
+			paralleltest := record.Get("Response.ParallelTest").String()
+
+			if domain == "Writing" &&
+				(len(pathtakenfordomain) > 0 ||
+					len(paralleltest) > 0) {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Writing test with adaptive structure"
 				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
-			} else if record.Get("Test.TestContent.TestDomain").String() != "Writing" &&
-				(record.Get("Event.ParticipationCode").String() == "P" ||
-					record.Get("Event.ParticipationCode").String() == "S") &&
-				(len(record.Get("Response.PathTakenForDomain").String()) == 0 ||
-					len(record.Get("Response.ParallelTest").String()) == 0) {
+				out <- gjson.ParseBytes(j)
+			} else if domain != "Writing" &&
+				(participationcode == "P" || participationcode == "S") &&
+				(len(pathtakenfordomain) == 0 ||
+					len(paralleltest) == 0) {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Non-Writing test with non-adaptive structure"
 				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				select {
+				case out <- gjson.ParseBytes(j):
+				case <-ctx.Done():
+					return
+				}
 			}
 		}
 	}()
 	return out, errc, nil
 }
 
-func qaTestIncidents(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaTestIncidents(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
@@ -204,7 +226,11 @@ func qaTestIncidents(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error,
 				for _, e := range disruptions {
 					m["TestDisruption"] = e.Get("Event").String()
 					j, _ := json.Marshal(m)
-					out <- gjson.Parse(string(j))
+					select {
+					case out <- gjson.ParseBytes(j):
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
 		}
@@ -212,50 +238,54 @@ func qaTestIncidents(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error,
 	return out, errc, nil
 }
 
-func qaParticipationCodeImpacts(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaParticipationCodeImpacts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(out)
 		defer close(errc)
 		for record := range in {
+			var j []byte
 			participationCode := record.Get("Event.ParticipationCode").String()
 			rawscore := record.Get("Response.DomainScore.RawScore").String()
 			rawscore_num, _ := strconv.Atoi(rawscore)
+			j = nil
 			if (len(record.Get("Response.PathTakenForDomain").String()) > 0 ||
 				len(record.Get("Response.ParallelTest").String()) > 0) &&
 				(participationCode != "P" && participationCode != "S") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Adaptive pathway without student undertaking test"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
 			} else if len(rawscore) > 0 &&
 				(participationCode != "P" && participationCode != "R") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Scored test with status other than P or R"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
 			} else if len(rawscore) > 0 &&
 				participationCode == "R" &&
 				rawscore_num != 0 {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Scored test with status other than P or R"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
 			} else if len(rawscore) == 0 &&
 				(participationCode == "P" || participationCode == "R") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Unscored test with status of P or R"
-				j, _ := json.Marshal(m)
-				out <- gjson.Parse(string(j))
+				j, _ = json.Marshal(m)
 			}
-
+			if j != nil {
+				select {
+				case out <- gjson.ParseBytes(j):
+				case <-ctx.Done():
+					return
+				}
+			}
 		}
 	}()
 	return out, errc, nil
 }
 
-func qaTestCompleteness(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaTestCompleteness(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
@@ -306,7 +336,11 @@ func qaTestCompleteness(in <-chan gjson.Result) (<-chan gjson.Result, <-chan err
 					result["Attempts_With_No_Response"] = set.Difference(attempts, v3["responses"]).String()
 					result["Responses_With_No_Attempt"] = set.Difference(v3["responses"], attempts).String()
 					j, _ := json.Marshal(result)
-					out <- gjson.Parse(string(j))
+					select {
+					case out <- gjson.ParseBytes(j):
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
 		}
@@ -314,7 +348,7 @@ func qaTestCompleteness(in <-chan gjson.Result) (<-chan gjson.Result, <-chan err
 	return out, errc, nil
 }
 
-func qaObjectFrequency(in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaObjectFrequency(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
@@ -352,7 +386,28 @@ func qaObjectFrequency(in <-chan gjson.Result) (<-chan gjson.Result, <-chan erro
 			result["PRS_Events"] = strings.Join(v["events_with_response"], ";")
 			result["Responses"] = strings.Join(v["responses"], ";")
 			j, _ := json.Marshal(result)
-			out <- gjson.Parse(string(j))
+			select {
+			case out <- gjson.ParseBytes(j):
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+	return out, errc, nil
+}
+
+func qaResponses(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+	out := make(chan gjson.Result)
+	errc := make(chan error, 1)
+	go func() {
+		defer close(out)
+		defer close(errc)
+		for record := range in {
+			select {
+			case out <- record:
+			case <-ctx.Done():
+				return
+			}
 		}
 	}()
 	return out, errc, nil

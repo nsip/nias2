@@ -32,7 +32,7 @@ type itemQueryParams struct {
 // and ensures we can't run out of memory
 //
 
-// TODO may need to reintroduce year here
+// TODO may need to reintroduce year level here to break payload size down further
 func runItemPipeline(schools []string) error {
 
 	// setup pipeline cancellation
