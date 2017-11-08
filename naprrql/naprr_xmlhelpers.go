@@ -55,6 +55,7 @@ func (resps GuidCheckComparator) Less(i, j int) bool {
 // aggregating type used for reporting item responses against items
 type ItemResponseDataSet struct {
 	Test              xml.NAPTest
+	Testlet           xml.NAPTestlet
 	TestItem          xml.NAPTestItem
 	Student           xml.RegistrationRecord
 	Response          xml.NAPResponseSet

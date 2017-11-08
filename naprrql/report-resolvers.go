@@ -556,8 +556,14 @@ func buildReportResolvers() map[string]interface{} {
 						return []interface{}{}, err
 					}
 
+					testlets, err := getObjects([]string{testlet.NapTestletRefId})
+					tl := testlets[0].(xml.NAPTestlet)
+					if err != nil || !ok {
+						return []interface{}{}, err
+					}
+
 					irds := ItemResponseDataSet{TestItem: item, Response: resp1,
-						Student: student, Test: test,
+						Student: student, Test: test, Testlet: tl,
 						ParticipationCode: event.ParticipationCode}
 					results = append(results, irds)
 				}

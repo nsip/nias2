@@ -74,7 +74,7 @@ func runQAErdsReportPipeline(schools []string) error {
 		"systemObjectFrequency.gql",
 		"systemTestCompleteness.gql",
 		"systemTestIncidents.gql",
-		//"systemResponses.gql",
+		"systemResponses.gql",
 	}
 
 	erds_query := erds_query()
@@ -113,9 +113,9 @@ func runQAErdsReportPipeline(schools []string) error {
 	errcList = append(errcList, errc)
 
 	for i, queryFileName := range reports {
-		var jsonc2 <-chan gjson.Result
 		// These are transforms on the CSV
 		output_prefix := out_error_rpt_FileDir
+		var jsonc2 <-chan gjson.Result
 		if queryFileName == "systemTestAttempts.gql" {
 			jsonc2, errc, _ = qaTestAttempts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)

@@ -206,6 +206,10 @@ func splitter(ctx context.Context, in <-chan gjson.Result, size int) (
 		jsonc1[i] = make(chan gjson.Result)
 	}
 	errc := make(chan error, 1)
+	/*
+		var wg sync.WaitGroup
+		wg.Add(size)
+	*/
 	go func() {
 		for i := range jsonc1 {
 			defer close(jsonc1[i])
@@ -224,6 +228,23 @@ func splitter(ctx context.Context, in <-chan gjson.Result, size int) (
 		}
 
 	}()
+	/*
+		go func() {
+			defer close(errc)
+			for n := range in {
+				for _, c := range jsonc1 {
+					select {
+					case c <- n:
+					case <-ctx.Done():
+						return
+					}
+				}
+			}
+			for _, c := range jsonc1 {
+				close(c)
+			}
+		}()
+	*/
 	return jsonc1, errc, nil
 
 }

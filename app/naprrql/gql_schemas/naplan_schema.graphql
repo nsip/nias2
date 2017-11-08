@@ -229,6 +229,8 @@ type ResponseDataSet {
 type ItemResponseDataSet {
 	## The student whose participation is being reported
 	Student: RegistrationRecord
+	## the related testlet
+	Testlet: NAPTestlet
 	## the related test item
 	TestItem: NAPTestItem
 	## the response to the item (removing all other item responses from the object)

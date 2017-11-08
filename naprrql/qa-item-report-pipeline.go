@@ -10,6 +10,7 @@ import (
 
 	"encoding/json"
 	"github.com/tidwall/gjson"
+	"gopkg.in/fatih/set.v0"
 )
 
 //
@@ -27,6 +28,15 @@ func itemresults_query() string {
         TestDomain
         TestYear
         TestType
+      }
+    }
+    Testlet {
+      TestletContent {
+        LocalId
+        Node
+        LocationInStage
+        TestletName
+        LocalId
       }
     }
     TestItem {
@@ -89,11 +99,53 @@ func itemresults_query() string {
 }`
 }
 
+func codeframeQuery() string {
+	return `query CodeFrame {
+  codeframe_report {
+    Test {
+      TestContent {
+	LocalId
+        TestName
+        TestType
+        TestLevel
+        TestDomain
+      }
+    }
+    Testlet {
+      TestletContent {
+        LocalId
+        Node
+        LocationInStage
+        TestletName
+        LocalId
+      }
+    }
+    Item {
+      ItemID
+      TestItemContent {
+        NAPTestItemLocalId
+        Subdomain
+        MarkingType
+        ItemSubstitutedForList {
+          SubstituteItem {
+            SubstituteItemRefId
+	    LocalId
+          }
+        }
+      }
+    }
+  }
+}`
+}
+
 func runQAItemRespReportPipeline(schools []string) error {
 
-	reports := []string{"systemTestTypeItemImpacts.gql",
-		"systemParticipationCodeItemImpacts.gql",
-		"systemItemCounts.gql",
+	reports := []string{
+		//"systemTestTypeItemImpacts.gql",
+		//"systemParticipationCodeItemImpacts.gql",
+		//"systemItemCounts.gql",
+		//"itemExpectedResponses.gql",
+		"itemPrinting.gql",
 	}
 	reports_path := "./reporting_templates/qa/"
 
@@ -116,6 +168,16 @@ func runQAItemRespReportPipeline(schools []string) error {
 	}
 	errcList = append(errcList, errc)
 
+	// get codeframe
+	/*
+		codeframec, errc, err := systemQueryExecutor(ctx, codeframeQuery(), DEF_GQL_URL, varsc)
+		if err != nil {
+			return err
+		}
+		errcList = append(errcList, errc)
+		cf, sub := qaReadCodeframe(ctx, codeframec)
+	*/
+
 	// sink stage
 	// create working directory if not there
 	outFileDir := "./out/qa"
@@ -128,14 +190,13 @@ func runQAItemRespReportPipeline(schools []string) error {
 	if err != nil {
 		return err
 	}
-
 	jsonc1, errc, err := splitter(ctx, jsonc, len(reports))
 	errcList = append(errcList, errc)
-
 	for i, queryFileName := range reports {
-		var jsonc2 <-chan gjson.Result
 		// for now, I'm merely hardcoding the query names
 		// These are transforms on the CSV
+		output_prefix := out_error_rpt_FileDir
+		var jsonc2 <-chan gjson.Result
 		if queryFileName == "systemTestTypeItemImpacts.gql" {
 			jsonc2, errc, _ = qaTestTypeItemImpacts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
@@ -145,12 +206,21 @@ func runQAItemRespReportPipeline(schools []string) error {
 		} else if queryFileName == "systemItemCounts.gql" {
 			jsonc2, errc, _ = qaItemCounts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
+		} else if queryFileName == "itemExpectedResponses.gql" {
+			// block on reading codeframe
+			//cf, sub := qaReadCodeframe(ctx, codeframec)
+			//jsonc2, errc, _ = qaItemExpectedResponses(ctx, cf, sub, jsonc1[i])
+			//errcList = append(errcList, errc)
+		} else if queryFileName == "itemPrinting.gql" {
+			jsonc2, errc, _ = qaItemResponses(ctx, jsonc1[i])
+			output_prefix = outFileDir
+			errcList = append(errcList, errc)
 		} else {
 			jsonc2 = nil
 		}
-		if jsonc2 != nil {
+		/*if jsonc2 != nil*/ {
 			csvFileName := deriveCSVFileName(queryFileName)
-			outFileName := out_error_rpt_FileDir + "/" + csvFileName
+			outFileName := output_prefix + "/" + csvFileName
 			mapFileName := deriveMapFileName(reports_path + queryFileName)
 			errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc2)
 			if err != nil {
@@ -322,6 +392,186 @@ func qaItemCounts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Res
 				}
 			}
 		}
+	}()
+	return out, errc, nil
+}
+
+func qaItemResponses(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+	out := make(chan gjson.Result)
+	errc := make(chan error, 1)
+	go func() {
+		for record := range in {
+			select {
+			case out <- record:
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+	return out, errc, nil
+}
+
+type QaItemExpectedResponseType struct {
+	PSI                   string
+	TestName              string
+	ParticipationCode     string
+	TestletName           map[string]string
+	ExpectedItemsCount    map[string]int
+	FoundItems            map[string]map[string]int
+	ExpectedItemsNotFound map[string]string
+	FoundItemsNotExpected map[string]string
+}
+
+func QaItemExpectedResponseTypeNew() QaItemExpectedResponseType {
+	s := QaItemExpectedResponseType{}
+	s.PSI = ""
+	s.TestName = ""
+	s.ParticipationCode = ""
+	s.TestletName = make(map[string]string)
+	s.ExpectedItemsCount = make(map[string]int)
+	s.FoundItems = make(map[string]map[string]int)
+	s.FoundItems["Correct"] = make(map[string]int)
+	s.FoundItems["Incorrect"] = make(map[string]int)
+	s.FoundItems["NotResponded"] = make(map[string]int)
+	s.FoundItems["NotInPath"] = make(map[string]int)
+	s.ExpectedItemsNotFound = make(map[string]string)
+	s.FoundItemsNotExpected = make(map[string]string)
+	return s
+}
+
+func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[string]map[string]*set.Set, map[string]map[string]map[string]string) {
+	done := make(chan bool, 1)
+	// read codeframe
+	cf := make(map[string]map[string]*set.Set)
+	// track substitute items
+	sub := make(map[string]map[string]map[string]string)
+	go func() {
+		for record := range codeframe {
+			testid := record.Get("Test.TestContent.LocalId").String()
+			testletid := record.Get("Testlet.TestletContent.LocalId").String()
+			substitutes := record.Get("Item.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()
+			itemid := record.Get("Item.TestItemContent.NAPTestItemLocalId").String()
+			if _, ok := cf[testid]; !ok {
+				cf[testid] = make(map[string]*set.Set)
+			}
+			if _, ok := cf[testid][testletid]; !ok {
+				cf[testid][testletid] = set.New()
+			}
+			if len(substitutes) == 0 {
+				cf[testid][testletid].Add(itemid)
+			} else {
+				if _, ok := sub[testid]; !ok {
+					sub[testid] = make(map[string]map[string]string)
+				}
+				if _, ok := sub[testid][testletid]; !ok {
+					sub[testid][testletid] = make(map[string]string)
+				}
+				// hoping that there is only one substitution within the testlet per substitute!
+				sub[testid][testletid][itemid] = substitutes[0].Get("LocalId").String()
+			}
+		}
+		done <- true
+	}()
+	<-done
+	log.Printf("%+v\n", sub)
+	return cf, sub
+}
+
+func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.Set, sub map[string]map[string]map[string]string, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+	out := make(chan gjson.Result)
+	errc := make(chan error, 1)
+	go func() {
+		log.Println("CF1")
+		defer close(out)
+		defer close(errc)
+		// we are assuming the records come in for item results report in sorted order
+		curr_testletid := ""
+		curr_testid := ""
+		curr_psi := ""
+		curr_locationinstage := ""
+		locationinstage := 0
+		locationinstage_str := ""
+		testitems := set.New()
+		result := QaItemExpectedResponseTypeNew()
+		for record := range in {
+			psi := record.Get("Response.PSI").String()
+			testletid := record.Get("Testlet.TestletContent.LocalId").String()
+			testletname := record.Get("Testlet.TestletContent.TestletName").String()
+			testid := record.Get("Test.TestContent.LocalId").String()
+			testname := record.Get("Test.TestContent.TestName").String()
+			itemid := record.Get("TestItem.TestItemContent.NAPTestItemLocalId").String()
+			correctness := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.ResponseCorrectness").String()
+			participationcode := record.Get("ParticipationCode").String()
+			// we're assuming LocationInStage is only 1, 2, 3
+			// locationinstage := record.Get("Testlet.TestletContent.LocationInStage").String()
+			// We're just incrementing testlets
+			//if len(locationinstage) == 0 {
+			//	locationinstage = "1"
+			//}
+
+			if !testitems.IsEmpty() && (testletid != curr_testletid || testid != curr_testid || psi != curr_psi) {
+				result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(cf[curr_testid][curr_testletid], testitems).String()
+				result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, cf[curr_testid][curr_testletid]).String()
+			}
+			if psi != curr_psi || testid != curr_testid {
+				if psi != curr_psi {
+					log.Println(psi)
+				}
+				if !testitems.IsEmpty() {
+					j, _ := json.Marshal(result)
+					select {
+					case out <- gjson.ParseBytes(j):
+					case <-ctx.Done():
+						return
+					}
+				}
+				result = QaItemExpectedResponseTypeNew()
+				result.PSI = psi
+				result.TestName = testname
+				result.ParticipationCode = participationcode
+			}
+			if testletid != curr_testletid || testid != curr_testid || psi != curr_psi {
+				if testid != curr_testid || psi != curr_psi {
+					locationinstage = 1
+				} else {
+					locationinstage++
+				}
+				locationinstage_str = strconv.Itoa(locationinstage)
+				result.TestletName[locationinstage_str] = testletname
+				result.ExpectedItemsCount[locationinstage_str] = cf[testid][testletid].Size()
+				testitems.Clear()
+			}
+			switch correctness {
+			case "Correct":
+				result.FoundItems["Correct"][locationinstage_str]++
+			case "Incorrect":
+				result.FoundItems["Incorrect"][locationinstage_str]++
+			case "Not Responded":
+				result.FoundItems["NotResponded"][locationinstage_str]++
+			case "Not In Path":
+				result.FoundItems["NotInPath"][locationinstage_str]++
+			}
+			if substituted_item, ok := sub[testid][testletid][itemid]; ok {
+				testitems.Add(substituted_item)
+			} else {
+				testitems.Add(itemid)
+			}
+			curr_testletid = testletid
+			curr_testid = testid
+			curr_psi = psi
+			curr_locationinstage = locationinstage_str
+			// log.Printf("%s\t%s\t%s\t%s\t%d\n", psi, testname, testletname, itemid, locationinstage)
+			// log.Printf("%+v\n", result)
+		}
+		result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(cf[curr_testid][curr_testletid], testitems).String()
+		result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, cf[curr_testid][curr_testletid]).String()
+		j, _ := json.Marshal(result)
+		select {
+		case out <- gjson.ParseBytes(j):
+		case <-ctx.Done():
+			return
+		}
+		log.Println("Done")
 	}()
 	return out, errc, nil
 }
