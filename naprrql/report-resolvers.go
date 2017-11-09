@@ -520,6 +520,7 @@ func buildReportResolvers() map[string]interface{} {
 				testLookup[t.TestID] = t
 			}
 		}
+
 		// construct RDS by including referenced test
 		results := make([]ItemResponseDataSet, 0)
 		for _, response := range responses {

@@ -141,10 +141,10 @@ func codeframeQuery() string {
 func runQAItemRespReportPipeline(schools []string) error {
 
 	reports := []string{
-		//"systemTestTypeItemImpacts.gql",
-		//"systemParticipationCodeItemImpacts.gql",
-		//"systemItemCounts.gql",
-		//"itemExpectedResponses.gql",
+		"systemTestTypeItemImpacts.gql",
+		"systemParticipationCodeItemImpacts.gql",
+		"systemItemCounts.gql",
+		"itemExpectedResponses.gql",
 		"itemPrinting.gql",
 	}
 	reports_path := "./reporting_templates/qa/"
@@ -160,6 +160,11 @@ func runQAItemRespReportPipeline(schools []string) error {
 		return err
 	}
 	errcList = append(errcList, errc)
+	varsc1, errc, err := systemParametersSource(ctx, schools...)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
 
 	// transform stage
 	jsonc, errc, err := systemQueryExecutor(ctx, itemresp_query, DEF_GQL_URL, varsc)
@@ -169,14 +174,12 @@ func runQAItemRespReportPipeline(schools []string) error {
 	errcList = append(errcList, errc)
 
 	// get codeframe
-	/*
-		codeframec, errc, err := systemQueryExecutor(ctx, codeframeQuery(), DEF_GQL_URL, varsc)
-		if err != nil {
-			return err
-		}
-		errcList = append(errcList, errc)
-		cf, sub := qaReadCodeframe(ctx, codeframec)
-	*/
+	codeframec, errc, err := systemQueryExecutor(ctx, codeframeQuery(), DEF_GQL_URL, varsc1)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+	//cf, sub := qaReadCodeframe(ctx, codeframec)
 
 	// sink stage
 	// create working directory if not there
@@ -208,9 +211,9 @@ func runQAItemRespReportPipeline(schools []string) error {
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemExpectedResponses.gql" {
 			// block on reading codeframe
-			//cf, sub := qaReadCodeframe(ctx, codeframec)
-			//jsonc2, errc, _ = qaItemExpectedResponses(ctx, cf, sub, jsonc1[i])
-			//errcList = append(errcList, errc)
+			cf, sub := qaReadCodeframe(ctx, codeframec)
+			jsonc2, errc, _ = qaItemExpectedResponses(ctx, cf, sub, jsonc1[i])
+			errcList = append(errcList, errc)
 		} else if queryFileName == "itemPrinting.gql" {
 			jsonc2, errc, _ = qaItemResponses(ctx, jsonc1[i])
 			output_prefix = outFileDir
@@ -400,6 +403,8 @@ func qaItemResponses(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
+		defer close(out)
+		defer close(errc)
 		for record := range in {
 			select {
 			case out <- record:
@@ -473,7 +478,6 @@ func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[st
 		done <- true
 	}()
 	<-done
-	log.Printf("%+v\n", sub)
 	return cf, sub
 }
 
@@ -481,7 +485,6 @@ func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
-		log.Println("CF1")
 		defer close(out)
 		defer close(errc)
 		// we are assuming the records come in for item results report in sorted order
@@ -515,7 +518,7 @@ func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.
 			}
 			if psi != curr_psi || testid != curr_testid {
 				if psi != curr_psi {
-					log.Println(psi)
+					//log.Println(psi)
 				}
 				if !testitems.IsEmpty() {
 					j, _ := json.Marshal(result)
@@ -538,7 +541,13 @@ func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.
 				}
 				locationinstage_str = strconv.Itoa(locationinstage)
 				result.TestletName[locationinstage_str] = testletname
-				result.ExpectedItemsCount[locationinstage_str] = cf[testid][testletid].Size()
+				if _, ok := cf[testid][testletid]; ok {
+					result.ExpectedItemsCount[locationinstage_str] = cf[testid][testletid].Size()
+				} else {
+					result.ExpectedItemsCount[locationinstage_str] = 0
+					log.Printf("NOT IN CODEFRAME: %s\t%s\n", testid, testletid)
+				}
+
 				testitems.Clear()
 			}
 			switch correctness {
@@ -560,18 +569,22 @@ func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.
 			curr_testid = testid
 			curr_psi = psi
 			curr_locationinstage = locationinstage_str
-			// log.Printf("%s\t%s\t%s\t%s\t%d\n", psi, testname, testletname, itemid, locationinstage)
+			//log.Printf("%s\t%s\t%s\t%s\t%d\n", psi, testname, testletname, itemid, locationinstage)
 			// log.Printf("%+v\n", result)
 		}
-		result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(cf[curr_testid][curr_testletid], testitems).String()
-		result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, cf[curr_testid][curr_testletid]).String()
+		if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
+			result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(expected_testitems, testitems).String()
+			result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, expected_testitems).String()
+		} else {
+			result.ExpectedItemsNotFound[curr_locationinstage] = ""
+			result.FoundItemsNotExpected[curr_locationinstage] = testitems.String()
+		}
 		j, _ := json.Marshal(result)
 		select {
 		case out <- gjson.ParseBytes(j):
 		case <-ctx.Done():
 			return
 		}
-		log.Println("Done")
 	}()
 	return out, errc, nil
 }
