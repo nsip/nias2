@@ -211,8 +211,8 @@ func runQAItemRespReportPipeline(schools []string) error {
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemExpectedResponses.gql" {
 			// block on reading codeframe
-			cf, sub := qaReadCodeframe(ctx, codeframec)
-			jsonc2, errc, _ = qaItemExpectedResponses(ctx, cf, sub, jsonc1[i])
+			//cf, sub := qaReadCodeframe(ctx, codeframec)
+			jsonc2, errc, _ = qaItemExpectedResponses(ctx, codeframec, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemPrinting.gql" {
 			jsonc2, errc, _ = qaItemResponses(ctx, jsonc1[i])
@@ -306,7 +306,12 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Non-zero Scored test with status of R"
 				j, _ = json.Marshal(m)
-			} else if (len(testletscore) == 0 || len(itemscore) == 0) &&
+			} else if (len(testletscore) == 0) &&
+				(participationcode == "R" || participationcode == "P") {
+				m := record.Value().(map[string]interface{})
+				m["Error"] = "Missing testlet score with status of P or R"
+				j, _ = json.Marshal(m)
+			} else if (len(itemscore) == 0) &&
 				(participationcode == "R" || participationcode == "P") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Unscored test with status of P or R"
@@ -437,19 +442,19 @@ func QaItemExpectedResponseTypeNew() QaItemExpectedResponseType {
 	s.FoundItems = make(map[string]map[string]int)
 	s.FoundItems["Correct"] = make(map[string]int)
 	s.FoundItems["Incorrect"] = make(map[string]int)
-	s.FoundItems["NotResponded"] = make(map[string]int)
+	s.FoundItems["NotAttempted"] = make(map[string]int)
 	s.FoundItems["NotInPath"] = make(map[string]int)
 	s.ExpectedItemsNotFound = make(map[string]string)
 	s.FoundItemsNotExpected = make(map[string]string)
 	return s
 }
 
-func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[string]map[string]*set.Set, map[string]map[string]map[string]string) {
+func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[string]map[string]*set.Set, map[string]string) {
 	done := make(chan bool, 1)
 	// read codeframe
 	cf := make(map[string]map[string]*set.Set)
 	// track substitute items
-	sub := make(map[string]map[string]map[string]string)
+	sub := make(map[string]string)
 	go func() {
 		for record := range codeframe {
 			testid := record.Get("Test.TestContent.LocalId").String()
@@ -465,14 +470,10 @@ func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[st
 			if len(substitutes) == 0 {
 				cf[testid][testletid].Add(itemid)
 			} else {
-				if _, ok := sub[testid]; !ok {
-					sub[testid] = make(map[string]map[string]string)
-				}
-				if _, ok := sub[testid][testletid]; !ok {
-					sub[testid][testletid] = make(map[string]string)
-				}
-				// hoping that there is only one substitution within the testlet per substitute!
-				sub[testid][testletid][itemid] = substitutes[0].Get("LocalId").String()
+				// TODO assuming that there is only one substitution per substitute!
+				// if that is not the case, we will have to do some sort of equivalence classes comparison
+				// That applies in our sample data already: NAPLAN-2017-0020-Spelling-S1-01-01-AIA subs -01-00 and -01-01
+				sub[itemid] = substitutes[0].Get("LocalId").String()
 			}
 		}
 		done <- true
@@ -481,10 +482,12 @@ func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[st
 	return cf, sub
 }
 
-func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.Set, sub map[string]map[string]map[string]string, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+//func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.Set, sub map[string]string, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
+		cf, sub := qaReadCodeframe(ctx, codeframec)
 		defer close(out)
 		defer close(errc)
 		// we are assuming the records come in for item results report in sorted order
@@ -555,12 +558,13 @@ func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.
 				result.FoundItems["Correct"][locationinstage_str]++
 			case "Incorrect":
 				result.FoundItems["Incorrect"][locationinstage_str]++
-			case "Not Responded":
-				result.FoundItems["NotResponded"][locationinstage_str]++
-			case "Not In Path":
+			case "NotAttempted":
+				result.FoundItems["NotAttempted"][locationinstage_str]++
+			case "NotInPath":
 				result.FoundItems["NotInPath"][locationinstage_str]++
 			}
-			if substituted_item, ok := sub[testid][testletid][itemid]; ok {
+			// TODO replace by equivalence classes
+			if substituted_item, ok := sub[itemid]; ok {
 				testitems.Add(substituted_item)
 			} else {
 				testitems.Add(itemid)
@@ -573,6 +577,7 @@ func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.
 			// log.Printf("%+v\n", result)
 		}
 		if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
+			// TODO rewrite to use equivalence classes
 			result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(expected_testitems, testitems).String()
 			result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, expected_testitems).String()
 		} else {
