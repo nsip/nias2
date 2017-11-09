@@ -449,18 +449,19 @@ func QaItemExpectedResponseTypeNew() QaItemExpectedResponseType {
 	return s
 }
 
-func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[string]map[string]*set.Set, map[string]string) {
+func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[string]map[string]*set.Set, map[string]*set.Set) {
 	done := make(chan bool, 1)
 	// read codeframe
 	cf := make(map[string]map[string]*set.Set)
 	// track substitute items
-	sub := make(map[string]string)
+	sub := make(map[string]*set.Set)
 	go func() {
 		for record := range codeframe {
 			testid := record.Get("Test.TestContent.LocalId").String()
 			testletid := record.Get("Testlet.TestletContent.LocalId").String()
 			substitutes := record.Get("Item.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()
 			itemid := record.Get("Item.TestItemContent.NAPTestItemLocalId").String()
+			//log.Printf("%s\t%+v\n", itemid, substitutes)
 			if _, ok := cf[testid]; !ok {
 				cf[testid] = make(map[string]*set.Set)
 			}
@@ -470,15 +471,17 @@ func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[st
 			if len(substitutes) == 0 {
 				cf[testid][testletid].Add(itemid)
 			} else {
-				// TODO assuming that there is only one substitution per substitute!
-				// if that is not the case, we will have to do some sort of equivalence classes comparison
-				// That applies in our sample data already: NAPLAN-2017-0020-Spelling-S1-01-01-AIA subs -01-00 and -01-01
-				sub[itemid] = substitutes[0].Get("LocalId").String()
+				sub[itemid] = set.New()
+				for _, s := range substitutes {
+					//substitutes[0].Get("LocalId").String()
+					sub[itemid].Add(s.Get("LocalId").String())
+				}
 			}
 		}
 		done <- true
 	}()
 	<-done
+	//log.Printf("%+v\n", sub)
 	return cf, sub
 }
 
@@ -516,8 +519,52 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			//}
 
 			if !testitems.IsEmpty() && (testletid != curr_testletid || testid != curr_testid || psi != curr_psi) {
-				result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(cf[curr_testid][curr_testletid], testitems).String()
-				result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, cf[curr_testid][curr_testletid]).String()
+				/*
+					result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(cf[curr_testid][curr_testletid], testitems).String()
+					result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, cf[curr_testid][curr_testletid]).String()
+				*/
+				result = checkExpectedItems(result, cf, sub, curr_testid, curr_testletid, curr_locationinstage, testitems)
+				/*
+					if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
+
+						// TODO rewrite to use equivalence classes
+						foundNotExp := set.New()
+						testitems_expansion := set.New()
+						//log.Printf("Expected: %+v\n", expected_testitems)
+						//log.Printf("Found   : %+v\n", testitems)
+						for _, t := range set.StringSlice(testitems) {
+							if s, ok := sub[t]; ok {
+								testitems_expansion.Merge(s)
+							} else {
+								testitems_expansion.Add(t)
+							}
+						}
+						//log.Printf("Expanded : %+v\n", testitems_expansion)
+						result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(expected_testitems, testitems_expansion).String()
+						for _, t := range set.StringSlice(testitems) {
+							if s, ok := sub[t]; ok {
+								found := false
+								for _, s1 := range s.List() {
+									if expected_testitems.Has(s1) {
+										found = true
+									}
+								}
+								if !found {
+									foundNotExp.Add(t)
+								}
+							} else {
+								if !expected_testitems.Has(t) {
+									foundNotExp.Add(t)
+								}
+							}
+						}
+						//log.Printf("FoundNEx : %+v\n", foundNotExp)
+						result.ExpectedItemsNotFound[curr_locationinstage] = foundNotExp.String()
+					} else {
+						result.ExpectedItemsNotFound[curr_locationinstage] = ""
+						result.FoundItemsNotExpected[curr_locationinstage] = testitems.String()
+					}
+				*/
 			}
 			if psi != curr_psi || testid != curr_testid {
 				if psi != curr_psi {
@@ -564,11 +611,13 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 				result.FoundItems["NotInPath"][locationinstage_str]++
 			}
 			// TODO replace by equivalence classes
-			if substituted_item, ok := sub[itemid]; ok {
-				testitems.Add(substituted_item)
-			} else {
-				testitems.Add(itemid)
-			}
+			/*
+				if substituted_item, ok := sub[itemid]; ok {
+					testitems.Add(substituted_item)
+				} else {
+					testitems.Add(itemid)
+				}*/
+			testitems.Add(itemid)
 			curr_testletid = testletid
 			curr_testid = testid
 			curr_psi = psi
@@ -576,14 +625,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			//log.Printf("%s\t%s\t%s\t%s\t%d\n", psi, testname, testletname, itemid, locationinstage)
 			// log.Printf("%+v\n", result)
 		}
-		if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
-			// TODO rewrite to use equivalence classes
-			result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(expected_testitems, testitems).String()
-			result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, expected_testitems).String()
-		} else {
-			result.ExpectedItemsNotFound[curr_locationinstage] = ""
-			result.FoundItemsNotExpected[curr_locationinstage] = testitems.String()
-		}
+		result = checkExpectedItems(result, cf, sub, curr_testid, curr_testletid, curr_locationinstage, testitems)
 		j, _ := json.Marshal(result)
 		select {
 		case out <- gjson.ParseBytes(j):
@@ -592,4 +634,46 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 		}
 	}()
 	return out, errc, nil
+}
+
+func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[string]*set.Set, sub map[string]*set.Set, curr_testid string, curr_testletid string, curr_locationinstage string, testitems *set.Set) QaItemExpectedResponseType {
+	if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
+
+		foundNotExp := set.New()
+		testitems_expansion := set.New()
+		//log.Printf("Expected: %+v\n", expected_testitems)
+		//log.Printf("Found   : %+v\n", testitems)
+		for _, t := range set.StringSlice(testitems) {
+			if s, ok := sub[t]; ok {
+				testitems_expansion.Merge(s)
+			} else {
+				testitems_expansion.Add(t)
+			}
+		}
+		//log.Printf("Expanded : %+v\n", testitems_expansion)
+		result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(expected_testitems, testitems_expansion).String()
+		for _, t := range set.StringSlice(testitems) {
+			if s, ok := sub[t]; ok {
+				found := false
+				for _, s1 := range s.List() {
+					if expected_testitems.Has(s1) {
+						found = true
+					}
+				}
+				if !found {
+					foundNotExp.Add(t)
+				}
+			} else {
+				if !expected_testitems.Has(t) {
+					foundNotExp.Add(t)
+				}
+			}
+		}
+		//log.Printf("FoundNEx : %+v\n", foundNotExp)
+		result.ExpectedItemsNotFound[curr_locationinstage] = foundNotExp.String()
+	} else {
+		result.ExpectedItemsNotFound[curr_locationinstage] = ""
+		result.FoundItemsNotExpected[curr_locationinstage] = testitems.String()
+	}
+	return result
 }
