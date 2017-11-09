@@ -63,6 +63,8 @@ type NaplanData {
         orphan_student_report(acaraIDs: [String]): [RegistrationRecord]
         ## report on GUID integrity within data set
         guid_check_report: [GuidCheckDataSet]
+        ## report on test items, testlets, tests extraneous to codeframe
+        codeframe_check_report: [CodeframeCheckDataSet]
 }
 
 ## List of problematic GUIDs in data set
@@ -79,6 +81,16 @@ type GuidCheckDataSet {
         # (nil if GUID not present in dataset)
         # (duplicate if GUID is RefID of multiple objects)
         PointsTo: String
+}
+
+## List of tests, test items, testlets not in Codeframe 
+type CodeframeCheckDataSet {
+        # GUID of extraneous item
+        ObjectID: String
+        # LocalID of extraneous item
+        LocalID: String
+        # Type of Object that faulty GUID is found in
+        ObjectType: String
 }
 
 ## Reason why sitting test was interrupted

@@ -856,5 +856,65 @@ func buildReportResolvers() map[string]interface{} {
 
 	}
 
+	resolvers["NaplanData/codeframe_check_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		// all student IDs ingested
+		test_ids := getIdentifiers("NAPTest:")
+		testlet_ids := getIdentifiers("NAPTestlet:")
+		testitem_ids := getIdentifiers("NAPTestItem:")
+		codeframe_ids := getIdentifiers("NAPCodeFrame:")
+
+		results := make([]CodeframeCheckDataSet, 0)
+		seen := make(map[string]bool)
+
+		codeframes, err := getObjects(codeframe_ids)
+		for _, codeframe := range codeframes {
+			t, _ := codeframe.(xml.NAPCodeFrame)
+			seen[t.NAPTestRefId] = true
+			for _, tl := range t.TestletList.Testlet {
+				seen[tl.NAPTestletRefId] = true
+				for _, ti := range tl.TestItemList.TestItem {
+					seen[ti.TestItemRefId] = true
+				}
+			}
+		}
+		codeframes = nil
+		for _, t := range test_ids {
+			if _, ok := seen[t]; !ok {
+				tests, err := getObjects([]string{t})
+				if err != nil {
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "test"})
+				} else {
+					t1 := tests[0].(xml.NAPTest)
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestContent.LocalId, ObjectType: "test"})
+				}
+			}
+		}
+		for _, t := range testlet_ids {
+			if _, ok := seen[t]; !ok {
+				testlets, err := getObjects([]string{t})
+				if err != nil {
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "testlet"})
+				} else {
+					t1 := testlets[0].(xml.NAPTestlet)
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestletContent.LocalId, ObjectType: "testlet"})
+				}
+			}
+		}
+		for _, t := range testitem_ids {
+			if _, ok := seen[t]; !ok {
+				testitems, err := getObjects([]string{t})
+				if err != nil {
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "testitem"})
+				} else {
+					t1 := testitems[0].(xml.NAPTestItem)
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestItemContent.NAPTestItemLocalId, ObjectType: "testitem"})
+				}
+			}
+		}
+
+		return results, err
+
+	}
+
 	return resolvers
 }

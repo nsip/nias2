@@ -19,11 +19,38 @@ func init() {
 	gob.Register(CodeFrameDataSet{})
 	gob.Register(ResultsByStudent{})
 	gob.Register(GuidCheckDataSet{})
+	gob.Register(CodeframeCheckDataSet{})
 }
 
 // convenience types for aggregating response information sets
 // used in reporting and support types for sorting results.
 //
+
+// Codeframe validity check
+
+type CodeframeCheckDataSet struct {
+	ObjectID   string
+	LocalID    string
+	ObjectType string
+}
+
+// struct for sorting support
+type CodeframeCheckComparator []GuidCheckDataSet
+
+// sort interface implementation for itemresponsedatasets
+func (resps CodeframeCheckComparator) Len() int {
+	return len(resps)
+}
+
+// sort interface implementation for responsedatasets
+func (resps CodeframeCheckComparator) Swap(i, j int) {
+	resps[i], resps[j] = resps[j], resps[i]
+}
+
+// sort interface implementation for responsedatasets
+func (resps CodeframeCheckComparator) Less(i, j int) bool {
+	return resps[i].Guid < resps[j].Guid
+}
 
 // GUID validity check
 type GuidCheckDataSet struct {
