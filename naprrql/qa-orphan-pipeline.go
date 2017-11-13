@@ -23,7 +23,7 @@ func runQAOrphanPipeline(schools []string) error {
 	for filename, query := range systemTemplates {
 		// query filenames prefixed with "orphan" need to be run once with their entire acaraIDs argument list,
 		// rather than once per acaraID instance
-		matched, _ := regexp.MatchString("(/orphan|^orphan)[^/]*$", filename)
+		matched, _ := regexp.MatchString(`([/\\]orphan|^orphan)[^/\\]*$`, filename)
 		if matched {
 			orphan_queries[filename] = query
 		}

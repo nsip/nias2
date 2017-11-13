@@ -19,9 +19,9 @@ func runQAMiscReportPipeline(schools []string) error {
 	systemTemplates := getTemplates("./reporting_templates/qa/")
 	querymap := make(map[string][]string)
 	for filename, query := range systemTemplates {
-		re := regexp.MustCompile("^.*/")
+		re := regexp.MustCompile(`^.*[/\\]`)
 		filename1 := re.ReplaceAllString(filename, "")
-		matched, _ := regexp.MatchString("^orphan[^/]*$", filename1)
+		matched, _ := regexp.MatchString(`^orphan[^/\\]*$`, filename1)
 		if matched || filename1 == "systemTestAttempts.gql" ||
 			filename1 == "systemParticipationCodeImpacts.gql" ||
 			filename1 == "systemTestTypeImpacts.gql" ||
@@ -29,6 +29,7 @@ func runQAMiscReportPipeline(schools []string) error {
 			filename1 == "systemTestCompleteness.gql" ||
 			filename1 == "systemTestIncidents.gql" ||
 			filename1 == "systemTestTypeItemImpacts.gql" ||
+			filename1 == "itemPrinting.gql" ||
 			filename1 == "systemItemCounts.gql" ||
 			filename1 == "systemParticipationCodeItemImpacts.gql" ||
 			filename1 == "qaSchoolInfo.gql" ||
