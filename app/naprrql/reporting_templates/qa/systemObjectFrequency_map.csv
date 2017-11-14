@@ -1,2 +1,2 @@
-PSI,Events_Count,PRS_Events_Count,Responses_Count,Events,PRS_Events,Responses
-PSI,Events_Count,PRS_Events_Count,Responses_Count,Events,PRS_Events,Responses
+PSI,Events_Count,PRS_Events_Count,Responses_Count,Events,PRS_Events_Without_Responses,Responses_Without_PRS_Events
+PSI,Events_Count,PRS_Events_Count,Responses_Count,Events,PRS_Events_Without_Responses,Responses_Without_PRS_Events

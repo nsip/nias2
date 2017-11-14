@@ -33,6 +33,7 @@ query NAPDomainScores($acaraIDs: [String]) {
        ParallelTest
        DomainScore {
          RawScore
+         ScaledScoreValue
        }
     }
     SchoolDetails {

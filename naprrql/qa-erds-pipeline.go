@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 
 	"encoding/json"
 	"github.com/tidwall/gjson"
@@ -54,6 +53,7 @@ func erds_query() string {
        ParallelTest
        DomainScore {
          RawScore
+	 ScaledScoreValue
        }
     }
     SchoolDetails {
@@ -248,6 +248,7 @@ func qaParticipationCodeImpacts(ctx context.Context, in <-chan gjson.Result) (<-
 			var j []byte
 			participationCode := record.Get("Event.ParticipationCode").String()
 			rawscore := record.Get("Response.DomainScore.RawScore").String()
+			scaledscore := record.Get("Response.DomainScore.ScaledScoreValue").String()
 			rawscore_num, _ := strconv.Atoi(rawscore)
 			j = nil
 			if (len(record.Get("Response.PathTakenForDomain").String()) > 0 ||
@@ -256,7 +257,7 @@ func qaParticipationCodeImpacts(ctx context.Context, in <-chan gjson.Result) (<-
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Adaptive pathway without student undertaking test"
 				j, _ = json.Marshal(m)
-			} else if len(rawscore) > 0 &&
+			} else if (len(rawscore) > 0 || len(scaledscore) > 0) &&
 				(participationCode != "P" && participationCode != "R") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Scored test with status other than P or R"
@@ -265,9 +266,9 @@ func qaParticipationCodeImpacts(ctx context.Context, in <-chan gjson.Result) (<-
 				participationCode == "R" &&
 				rawscore_num != 0 {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Scored test with status other than P or R"
+				m["Error"] = "Non-zero score with status of R"
 				j, _ = json.Marshal(m)
-			} else if len(rawscore) == 0 &&
+			} else if (len(rawscore) == 0 || len(scaledscore) == 0) &&
 				(participationCode == "P" || participationCode == "R") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Unscored test with status of P or R"
@@ -310,14 +311,17 @@ func qaTestCompleteness(ctx context.Context, in <-chan gjson.Result) (<-chan gjs
 				counts[acaraid][testdomain][testlevel] = make(map[string]*set.Set)
 				counts[acaraid][testdomain][testlevel]["P_attempts"] = set.New()
 				counts[acaraid][testdomain][testlevel]["S_attempts"] = set.New()
+				counts[acaraid][testdomain][testlevel]["R_attempts"] = set.New()
 				counts[acaraid][testdomain][testlevel]["responses"] = set.New()
 			}
 			if participationcode == "P" {
 				counts[acaraid][testdomain][testlevel]["P_attempts"].Add(psi)
 			} else if participationcode == "S" {
 				counts[acaraid][testdomain][testlevel]["S_attempts"].Add(psi)
+			} else if participationcode == "R" {
+				counts[acaraid][testdomain][testlevel]["R_attempts"].Add(psi)
 			}
-			if (participationcode == "P" || participationcode == "S") && len(responseid) > 0 {
+			if (participationcode == "P" || participationcode == "S" || participationcode == "R") && len(responseid) > 0 {
 				counts[acaraid][testdomain][testlevel]["responses"].Add(psi)
 			}
 		}
@@ -331,8 +335,9 @@ func qaTestCompleteness(ctx context.Context, in <-chan gjson.Result) (<-chan gjs
 					result["TestLevel"] = k2
 					result["P_Attempts_Count"] = strconv.Itoa(v3["P_attempts"].Size())
 					result["S_Attempts_Count"] = strconv.Itoa(v3["S_attempts"].Size())
+					result["R_Attempts_Count"] = strconv.Itoa(v3["R_attempts"].Size())
 					result["Responses_Count"] = strconv.Itoa(v3["responses"].Size())
-					attempts := set.Union(v3["P_attempts"], v3["S_attempts"])
+					attempts := set.Union(v3["P_attempts"], v3["S_attempts"], v3["R_attempts"])
 					result["Attempts_With_No_Response"] = set.Difference(attempts, v3["responses"]).String()
 					result["Responses_With_No_Attempt"] = set.Difference(v3["responses"], attempts).String()
 					j, _ := json.Marshal(result)
@@ -358,7 +363,7 @@ func qaObjectFrequency(ctx context.Context, in <-chan gjson.Result) (<-chan gjso
 		for record := range in {
 			psi := record.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
 			participationcode := record.Get("Event.ParticipationCode").String()
-			eventcode := record.Get("Test.TestContent.TestLevel").String() + ":" + record.Get("Test.TestContent.TestDomain").String()
+			eventcode := record.Get("SchoolDetails.ACARAId").String() + ":" + record.Get("Test.TestContent.TestLevel").String() + ":" + record.Get("Test.TestContent.TestDomain").String()
 			responseid := record.Get("Response.ResponseID").String()
 
 			if _, ok := counts[psi]; !ok {
@@ -382,9 +387,21 @@ func qaObjectFrequency(ctx context.Context, in <-chan gjson.Result) (<-chan gjso
 			result["Events_Count"] = strconv.Itoa(len(v["events"]))
 			result["PRS_Events_Count"] = strconv.Itoa(len(v["events_with_response"]))
 			result["Responses_Count"] = strconv.Itoa(len(v["responses"]))
-			result["Events"] = strings.Join(v["events"], ";")
-			result["PRS_Events"] = strings.Join(v["events_with_response"], ";")
-			result["Responses"] = strings.Join(v["responses"], ";")
+			events_set := set.New()
+			for _, e := range v["events"] {
+				events_set.Add(e)
+			}
+			result["Events"] = events_set.String()
+			prs_events_set := set.New()
+			for _, e := range v["events_with_response"] {
+				prs_events_set.Add(e)
+			}
+			response_set := set.New()
+			for _, e := range v["responses"] {
+				response_set.Add(e)
+			}
+			result["PRS_Events_Without_Responses"] = set.Difference(prs_events_set, response_set).String()
+			result["Responses_Without_PRS_Events"] = set.Difference(response_set, prs_events_set).String()
 			j, _ := json.Marshal(result)
 			select {
 			case out <- gjson.ParseBytes(j):

@@ -195,6 +195,8 @@ func runQAItemRespReportPipeline(schools []string) error {
 	}
 	jsonc1, errc, err := splitter(ctx, jsonc, len(reports))
 	errcList = append(errcList, errc)
+	codeframec1, errc, err := splitter(ctx, codeframec, 2)
+	errcList = append(errcList, errc)
 	for i, queryFileName := range reports {
 		// for now, I'm merely hardcoding the query names
 		// These are transforms on the CSV
@@ -207,12 +209,11 @@ func runQAItemRespReportPipeline(schools []string) error {
 			jsonc2, errc, _ = qaParticipationCodeItemImpacts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemItemCounts.gql" {
-			jsonc2, errc, _ = qaItemCounts(ctx, jsonc1[i])
+			jsonc2, errc, _ = qaItemCounts(ctx, codeframec1[0], jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemExpectedResponses.gql" {
 			// block on reading codeframe
-			//cf, sub := qaReadCodeframe(ctx, codeframec)
-			jsonc2, errc, _ = qaItemExpectedResponses(ctx, codeframec, jsonc1[i])
+			jsonc2, errc, _ = qaItemExpectedResponses(ctx, codeframec1[1], jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemPrinting.gql" {
 			jsonc2, errc, _ = qaItemResponses(ctx, jsonc1[i])
@@ -335,13 +336,43 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 	return out, errc, nil
 }
 
-func qaItemCounts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaItemCountsRowInit(counts map[string]map[string]map[string]map[string]map[string]int, testname string, testdomain string,
+	testlevel string, itemlocalid string, hasSubstituteItems bool) map[string]map[string]map[string]map[string]map[string]int {
+	if _, ok := counts[testname]; !ok {
+		counts[testname] = make(map[string]map[string]map[string]map[string]int)
+	}
+	if _, ok := counts[testname][testdomain]; !ok {
+		counts[testname][testdomain] = make(map[string]map[string]map[string]int)
+	}
+	if _, ok := counts[testname][testdomain][testlevel]; !ok {
+		counts[testname][testdomain][testlevel] = make(map[string]map[string]int)
+	}
+	if _, ok := counts[testname][testdomain][testlevel][itemlocalid]; !ok {
+		counts[testname][testdomain][testlevel][itemlocalid] = make(map[string]int)
+		counts[testname][testdomain][testlevel][itemlocalid]["substitute"] = 0
+		counts[testname][testdomain][testlevel][itemlocalid]["count"] = 0
+	}
+	if hasSubstituteItems {
+		counts[testname][testdomain][testlevel][itemlocalid]["substitute"] = 1
+	}
+	return counts
+}
+
+func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(out)
 		defer close(errc)
 		counts := make(map[string]map[string]map[string]map[string]map[string]int)
+		for record := range codeframe {
+			testname := record.Get("Test.TestContent.TestName").String()
+			testdomain := record.Get("Test.TestContent.TestDomain").String()
+			testlevel := record.Get("Test.TestContent.TestLevel").String()
+			itemlocalid := record.Get("Item.TestItemContent.NAPTestItemLocalId").String()
+			counts = qaItemCountsRowInit(counts, testname, testdomain, testlevel, itemlocalid,
+				len(record.Get("Item.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()) > 0)
+		}
 		for record := range in {
 			testname := record.Get("Test.TestContent.TestName").String()
 			testdomain := record.Get("Test.TestContent.TestDomain").String()
@@ -354,25 +385,9 @@ func qaItemCounts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Res
 			if participationcode != "P" && participationcode != "S" {
 				continue
 			}
-
-			if _, ok := counts[testname]; !ok {
-				counts[testname] = make(map[string]map[string]map[string]map[string]int)
-			}
-			if _, ok := counts[testname][testdomain]; !ok {
-				counts[testname][testdomain] = make(map[string]map[string]map[string]int)
-			}
-			if _, ok := counts[testname][testdomain][testlevel]; !ok {
-				counts[testname][testdomain][testlevel] = make(map[string]map[string]int)
-			}
-			if _, ok := counts[testname][testdomain][testlevel][itemlocalid]; !ok {
-				counts[testname][testdomain][testlevel][itemlocalid] = make(map[string]int)
-				counts[testname][testdomain][testlevel][itemlocalid]["substitute"] = 0
-				counts[testname][testdomain][testlevel][itemlocalid]["count"] = 0
-			}
+			counts = qaItemCountsRowInit(counts, testname, testdomain, testlevel, itemlocalid,
+				len(record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()) > 0)
 			counts[testname][testdomain][testlevel][itemlocalid]["count"] = counts[testname][testdomain][testlevel][itemlocalid]["count"] + 1
-			if len(record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()) > 0 {
-				counts[testname][testdomain][testlevel][itemlocalid]["substitute"] = 1
-			}
 		}
 
 		result := make(map[string]string)
@@ -381,8 +396,8 @@ func qaItemCounts(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Res
 				for k2, v2 := range v1 {
 					for k3, v3 := range v2 {
 						result["TestName"] = k
-						result["TestLevel"] = k1
-						result["TestDomain"] = k2
+						result["TestLevel"] = k2
+						result["TestDomain"] = k1
 						result["TestItemLocalId"] = k3
 						if v3["substitute"] == 1 {
 							result["Substitute"] = "true"
@@ -519,52 +534,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			//}
 
 			if !testitems.IsEmpty() && (testletid != curr_testletid || testid != curr_testid || psi != curr_psi) {
-				/*
-					result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(cf[curr_testid][curr_testletid], testitems).String()
-					result.FoundItemsNotExpected[curr_locationinstage] = set.Difference(testitems, cf[curr_testid][curr_testletid]).String()
-				*/
 				result = checkExpectedItems(result, cf, sub, curr_testid, curr_testletid, curr_locationinstage, testitems)
-				/*
-					if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
-
-						// TODO rewrite to use equivalence classes
-						foundNotExp := set.New()
-						testitems_expansion := set.New()
-						//log.Printf("Expected: %+v\n", expected_testitems)
-						//log.Printf("Found   : %+v\n", testitems)
-						for _, t := range set.StringSlice(testitems) {
-							if s, ok := sub[t]; ok {
-								testitems_expansion.Merge(s)
-							} else {
-								testitems_expansion.Add(t)
-							}
-						}
-						//log.Printf("Expanded : %+v\n", testitems_expansion)
-						result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(expected_testitems, testitems_expansion).String()
-						for _, t := range set.StringSlice(testitems) {
-							if s, ok := sub[t]; ok {
-								found := false
-								for _, s1 := range s.List() {
-									if expected_testitems.Has(s1) {
-										found = true
-									}
-								}
-								if !found {
-									foundNotExp.Add(t)
-								}
-							} else {
-								if !expected_testitems.Has(t) {
-									foundNotExp.Add(t)
-								}
-							}
-						}
-						//log.Printf("FoundNEx : %+v\n", foundNotExp)
-						result.ExpectedItemsNotFound[curr_locationinstage] = foundNotExp.String()
-					} else {
-						result.ExpectedItemsNotFound[curr_locationinstage] = ""
-						result.FoundItemsNotExpected[curr_locationinstage] = testitems.String()
-					}
-				*/
 			}
 			if psi != curr_psi || testid != curr_testid {
 				if psi != curr_psi {
@@ -610,13 +580,6 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			case "NotInPath":
 				result.FoundItems["NotInPath"][locationinstage_str]++
 			}
-			// TODO replace by equivalence classes
-			/*
-				if substituted_item, ok := sub[itemid]; ok {
-					testitems.Add(substituted_item)
-				} else {
-					testitems.Add(itemid)
-				}*/
 			testitems.Add(itemid)
 			curr_testletid = testletid
 			curr_testid = testid
