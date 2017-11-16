@@ -50,7 +50,7 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 
 			resultRow := make([]string, 0)
 			for _, key := range dataKeys {
-				resultRow = append(resultRow, record.Get(key).String())
+				resultRow = append(resultRow, strings.Replace(record.Get(key).String(), "\n", "\\n", -1))
 			}
 
 			// if the header hasn't been written then create it

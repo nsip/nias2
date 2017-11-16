@@ -633,7 +633,7 @@ func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[str
 			}
 		}
 		//log.Printf("FoundNEx : %+v\n", foundNotExp)
-		result.ExpectedItemsNotFound[curr_locationinstage] = foundNotExp.String()
+		result.FoundItemsNotExpected[curr_locationinstage] = foundNotExp.String()
 	} else {
 		result.ExpectedItemsNotFound[curr_locationinstage] = ""
 		result.FoundItemsNotExpected[curr_locationinstage] = testitems.String()
