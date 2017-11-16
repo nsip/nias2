@@ -347,10 +347,11 @@ func getTestsForYearLevel(yrLvl string) ([]xml.NAPTest, error) {
 		}
 	}
 
-	if len(tests) == 0 {
-		return tests, errors.New("No tests found for supplied year level")
-	}
-
+	/*
+		if len(tests) == 0 {
+			return tests, errors.New("No tests found for supplied year level")
+		}
+	*/
 	return tests, nil
 
 }
