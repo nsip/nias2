@@ -53,6 +53,11 @@ func itemresults_query() string {
             LocalId
           }
         }
+	NAPWritingRubricList {
+	  NAPWritingRubric {
+	    RubricType
+	  }
+	}
       }
     }
     Student {
@@ -137,6 +142,39 @@ func codeframeQuery() string {
   }
 }`
 }
+func NonCodeframeItemsQuery() string {
+	return `query CodeFrame {
+  codeframe_check_report {
+    ObjectID
+    LocalID
+    ObjectType
+  Test {
+      TestContent {
+        LocalId
+        TestName
+        TestType
+        TestLevel
+        TestDomain
+      }
+    }
+    TestItem {
+      ItemID
+      TestItemContent {
+        NAPTestItemLocalId
+        Subdomain
+        MarkingType
+        ItemSubstitutedForList {
+          SubstituteItem {
+            SubstituteItemRefId
+            LocalId
+          }
+        }
+      }
+    }
+  }
+}
+`
+}
 
 func runQAItemRespReportPipeline(schools []string) error {
 
@@ -146,6 +184,8 @@ func runQAItemRespReportPipeline(schools []string) error {
 		"systemItemCounts.gql",
 		"itemExpectedResponses.gql",
 		"itemPrinting.gql",
+		"itemWritingPrinting.gql",
+		"systemRubricSubscoreMatches.gql",
 	}
 	reports_path := "./reporting_templates/qa/"
 
@@ -160,12 +200,6 @@ func runQAItemRespReportPipeline(schools []string) error {
 		return err
 	}
 	errcList = append(errcList, errc)
-	varsc1, errc, err := systemParametersSource(ctx, schools...)
-	if err != nil {
-		return err
-	}
-	errcList = append(errcList, errc)
-
 	// transform stage
 	jsonc, errc, err := systemQueryExecutor(ctx, itemresp_query, DEF_GQL_URL, varsc)
 	if err != nil {
@@ -174,12 +208,18 @@ func runQAItemRespReportPipeline(schools []string) error {
 	errcList = append(errcList, errc)
 
 	// get codeframe
-	codeframec, errc, err := systemQueryExecutor(ctx, codeframeQuery(), DEF_GQL_URL, varsc1)
+	codeframec, errc, err := systemQueryExecutorNoBreakdown(ctx, codeframeQuery(), DEF_GQL_URL, nil)
 	if err != nil {
 		return err
 	}
 	errcList = append(errcList, errc)
-	//cf, sub := qaReadCodeframe(ctx, codeframec)
+
+	// get list of items not in codeframe
+	noncodeframec, errc, err := systemQueryExecutorNoBreakdown(ctx, NonCodeframeItemsQuery(), DEF_GQL_URL, nil)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
 
 	// sink stage
 	// create working directory if not there
@@ -208,8 +248,13 @@ func runQAItemRespReportPipeline(schools []string) error {
 		} else if queryFileName == "systemParticipationCodeItemImpacts.gql" {
 			jsonc2, errc, _ = qaParticipationCodeItemImpacts(ctx, jsonc1[i])
 			errcList = append(errcList, errc)
+		} else if queryFileName == "systemRubricSubscoreMatches.gql" {
+			// TODO This query relies on subscores, and may need to go to a different pipeline
+			jsonc2, errc, _ = qaRubricSubscoreMatches(ctx, jsonc1[i])
+			errcList = append(errcList, errc)
 		} else if queryFileName == "systemItemCounts.gql" {
-			jsonc2, errc, _ = qaItemCounts(ctx, codeframec1[0], jsonc1[i])
+			// block on reading codeframe
+			jsonc2, errc, _ = qaItemCounts(ctx, codeframec1[0], noncodeframec, jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemExpectedResponses.gql" {
 			// block on reading codeframe
@@ -217,6 +262,11 @@ func runQAItemRespReportPipeline(schools []string) error {
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemPrinting.gql" {
 			jsonc2, errc, _ = qaItemResponses(ctx, jsonc1[i])
+			output_prefix = outFileDir
+			errcList = append(errcList, errc)
+		} else if queryFileName == "itemWritingPrinting.gql" {
+			// TODO This query relies on subscores, and may need to go to a different pipeline
+			jsonc2, errc, _ = qaWritingItemResponses(ctx, jsonc1[i])
 			output_prefix = outFileDir
 			errcList = append(errcList, errc)
 		} else {
@@ -336,6 +386,54 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 	return out, errc, nil
 }
 
+func qaRubricSubscoreMatches(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+	out := make(chan gjson.Result)
+	errc := make(chan error, 1)
+	expectedRubricTypesStr := []string{"Spelling", "Audience", "Text Structure", "Paragraphs",
+		"Sentence structure", "Punctuation", "Ideas", "Persuasive Devices", "Vocabulary", "Cohesion"}
+	expectedRubricTypes := set.New()
+	for _, s := range expectedRubricTypesStr {
+		expectedRubricTypes.Add(s)
+	}
+	go func() {
+		defer close(out)
+		defer close(errc)
+		var j []byte
+		for record := range in {
+			testdomain := record.Get("Test.TestContent.TestDomain").String()
+			if testdomain != "Writing" {
+				continue
+			}
+			rubrics := record.Get("TestItem.TestItemContent.NAPWritingRubricList.NAPWritingRubric").Array()
+			subscores := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()
+			rubrictypes := set.New()
+			for _, s := range rubrics {
+				rubrictypes.Add(s.Get("RubricType").String())
+			}
+			subscoretypes := set.New()
+			for _, s := range subscores {
+				subscoretypes.Add(s.Get("SubscoreType").String())
+			}
+			rubricNotScored := set.Difference(rubrictypes, subscoretypes)
+			subscoreNotDefined := set.Difference(expectedRubricTypes, rubrictypes)
+
+			if rubricNotScored.Size() > 0 || subscoreNotDefined.Size() > 0 {
+				m := record.Value().(map[string]interface{})
+				m["RubricsNotScored"] = rubricNotScored.String()
+				m["SubscoresNotDefined"] = subscoreNotDefined.String()
+				j, _ = json.Marshal(m)
+
+				select {
+				case out <- gjson.ParseBytes(j):
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+	return out, errc, nil
+}
+
 func qaItemCountsRowInit(counts map[string]map[string]map[string]map[string]map[string]int, testname string, testdomain string,
 	testlevel string, itemlocalid string, hasSubstituteItems bool) map[string]map[string]map[string]map[string]map[string]int {
 	if _, ok := counts[testname]; !ok {
@@ -358,7 +456,7 @@ func qaItemCountsRowInit(counts map[string]map[string]map[string]map[string]map[
 	return counts
 }
 
-func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, noncodeframe <-chan gjson.Result, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
@@ -372,6 +470,20 @@ func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, in <-chan 
 			itemlocalid := record.Get("Item.TestItemContent.NAPTestItemLocalId").String()
 			counts = qaItemCountsRowInit(counts, testname, testdomain, testlevel, itemlocalid,
 				len(record.Get("Item.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()) > 0)
+		}
+		for record := range noncodeframe {
+			objectType := record.Get("ObjectType").String()
+			if objectType != "testitem" {
+				continue
+			}
+			// test information not recoverable for noncodeframe items
+			testname := "?"
+			testdomain := "?"
+			testlevel := "?"
+			itemlocalid := record.Get("TestItem.TestItemContent.NAPTestItemLocalId").String()
+			// log.Printf("%+v\n", record)
+			counts = qaItemCountsRowInit(counts, testname, testdomain, testlevel, itemlocalid,
+				len(record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()) > 0)
 		}
 		for record := range in {
 			testname := record.Get("Test.TestContent.TestName").String()
@@ -426,8 +538,64 @@ func qaItemResponses(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.
 		defer close(out)
 		defer close(errc)
 		for record := range in {
+			testdomain := record.Get("Test.TestContent.TestDomain").String()
+			if testdomain == "Writing" {
+				continue
+			}
 			select {
 			case out <- record:
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+	return out, errc, nil
+}
+
+func qaWritingItemResponses(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+	out := make(chan gjson.Result)
+	errc := make(chan error, 1)
+	go func() {
+		defer close(out)
+		defer close(errc)
+		for record := range in {
+			testdomain := record.Get("Test.TestContent.TestDomain").String()
+			if testdomain != "Writing" {
+				continue
+			}
+			m := record.Value().(map[string]interface{})
+			subscores := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()
+			for _, s := range subscores {
+				rubric := s.Get("SubscoreType").String()
+				value := s.Get("SubscoreValue").String()
+				switch rubric {
+				case "Spelling":
+					m["Spelling"] = value
+				case "Audience":
+					m["Audience"] = value
+				case "Text Structure":
+					m["TextStructure"] = value
+				case "Paragraphs":
+					m["Paragraphs"] = value
+				case "Sentence structure":
+					m["SentenceStructure"] = value
+				case "Punctuation":
+					m["Punctuation"] = value
+				case "Ideas":
+					m["Ideas"] = value
+				case "Persuasive Devices":
+					m["PersuasiveDevices"] = value
+				case "Vocabulary":
+					m["Vocabulary"] = value
+				case "Cohesion":
+					m["Cohesion"] = value
+				}
+				// if not matched, this will be picked up in  qaRubricSubscoreMatches
+			}
+			j, _ := json.Marshal(m)
+
+			select {
+			case out <- gjson.ParseBytes(j):
 			case <-ctx.Done():
 				return
 			}
@@ -565,7 +733,6 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 					result.ExpectedItemsCount[locationinstage_str] = cf[testid][testletid].Size()
 				} else {
 					result.ExpectedItemsCount[locationinstage_str] = 0
-					log.Printf("NOT IN CODEFRAME: %s\t%s\n", testid, testletid)
 				}
 
 				testitems.Clear()

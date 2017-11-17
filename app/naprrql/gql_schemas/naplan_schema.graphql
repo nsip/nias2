@@ -91,6 +91,12 @@ type CodeframeCheckDataSet {
         LocalID: String
         # Type of Object that faulty GUID is found in
         ObjectType: String
+        ## the related testlet if any
+        Testlet: NAPTestlet
+        ## the related test item if any
+        TestItem: NAPTestItem
+        ## the related test if any
+        Test: NAPTest
 }
 
 ## Reason why sitting test was interrupted

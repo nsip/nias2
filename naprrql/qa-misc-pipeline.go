@@ -30,12 +30,14 @@ func runQAMiscReportPipeline(schools []string) error {
 			filename1 == "systemTestIncidents.gql" ||
 			filename1 == "systemTestTypeItemImpacts.gql" ||
 			filename1 == "itemPrinting.gql" ||
+			filename1 == "itemWritingPrinting.gql" ||
 			filename1 == "systemItemCounts.gql" ||
 			filename1 == "systemParticipationCodeItemImpacts.gql" ||
 			filename1 == "qaSchoolInfo.gql" ||
 			filename1 == "qaStudentsByYrLevel.gql" ||
 			filename1 == "qaTestAttempts.gql" ||
-			filename1 == "qaParticipation.gql" {
+			filename1 == "qaParticipation.gql" ||
+			filename1 == "systemRubricSubscoreMatches.gql" {
 			// ignore, they're addressed by one of the other pipelines
 		} else {
 

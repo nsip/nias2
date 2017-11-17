@@ -882,10 +882,10 @@ func buildReportResolvers() map[string]interface{} {
 			if _, ok := seen[t]; !ok {
 				tests, err := getObjects([]string{t})
 				if err != nil {
-					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "test"})
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "test", Test: xml.NAPTest{}, Testlet: xml.NAPTestlet{}, TestItem: xml.NAPTestItem{}})
 				} else {
 					t1 := tests[0].(xml.NAPTest)
-					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestContent.LocalId, ObjectType: "test"})
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestContent.LocalId, ObjectType: "test", Test: t1, Testlet: xml.NAPTestlet{}, TestItem: xml.NAPTestItem{}})
 				}
 			}
 		}
@@ -893,10 +893,16 @@ func buildReportResolvers() map[string]interface{} {
 			if _, ok := seen[t]; !ok {
 				testlets, err := getObjects([]string{t})
 				if err != nil {
-					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "testlet"})
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "testlet", Test: xml.NAPTest{}, Testlet: xml.NAPTestlet{}, TestItem: xml.NAPTestItem{}})
 				} else {
 					t1 := testlets[0].(xml.NAPTestlet)
-					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestletContent.LocalId, ObjectType: "testlet"})
+					tests, err := getObjects([]string{t1.NAPTestRefId})
+					if err != nil {
+						test := tests[0].(xml.NAPTest)
+						results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestletContent.LocalId, ObjectType: "testlet", Test: test, Testlet: t1, TestItem: xml.NAPTestItem{}})
+					} else {
+						results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestletContent.LocalId, ObjectType: "testlet", Test: xml.NAPTest{}, Testlet: t1, TestItem: xml.NAPTestItem{}})
+					}
 				}
 			}
 		}
@@ -904,10 +910,11 @@ func buildReportResolvers() map[string]interface{} {
 			if _, ok := seen[t]; !ok {
 				testitems, err := getObjects([]string{t})
 				if err != nil {
-					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "testitem"})
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: "nil", ObjectType: "testitem", Test: xml.NAPTest{}, Testlet: xml.NAPTestlet{}, TestItem: xml.NAPTestItem{}})
 				} else {
 					t1 := testitems[0].(xml.NAPTestItem)
-					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestItemContent.NAPTestItemLocalId, ObjectType: "testitem"})
+					results = append(results, CodeframeCheckDataSet{ObjectID: t, LocalID: t1.TestItemContent.NAPTestItemLocalId, ObjectType: "testitem", Test: xml.NAPTest{}, Testlet: xml.NAPTestlet{}, TestItem: t1})
+					// note that TestItems don't link back to tests, and are in fact not unique to them. If they are not in a codeframe, we cannot trace them
 				}
 			}
 		}

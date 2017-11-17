@@ -3,6 +3,16 @@ query CodeFrame {
     ObjectID
     LocalID
     ObjectType
+    TestItem {
+      TestItemContent {
+        ItemSubstitutedForList {
+          SubstituteItem {
+            SubstituteItemRefId
+            LocalId
+          }
+        }
+      }
+    }
   }
 }
 

@@ -32,6 +32,9 @@ type CodeframeCheckDataSet struct {
 	ObjectID   string
 	LocalID    string
 	ObjectType string
+	Test       xml.NAPTest
+	Testlet    xml.NAPTestlet
+	TestItem   xml.NAPTestItem
 }
 
 // struct for sorting support
