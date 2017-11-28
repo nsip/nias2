@@ -55,6 +55,8 @@ type NaplanData {
 	codeframe_report: [CodeFrameDataSet]
         ## reporting (ui) object for item responses per student
 	item_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
+        ## reporting (ui) object for writing item responses per student
+	item_writing_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
         ## report of all school summaries not linked to one of the acaraIDs
         orphan_school_summary_report(acaraIDs: [String]): [ScoreSummary]
         ## report of all events not linked to one of the acaraIDs
@@ -257,6 +259,8 @@ type ItemResponseDataSet {
 	Test: NAPTest
         ## Participation Code for the response
         ParticipationCode: String
+        ## The school involved
+        SchoolDetails: SchoolDetails
 }
 
 ## score summary reporting object

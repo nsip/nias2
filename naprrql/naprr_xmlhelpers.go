@@ -90,6 +90,7 @@ type ItemResponseDataSet struct {
 	Student           xml.RegistrationRecord
 	Response          xml.NAPResponseSet
 	ParticipationCode string
+	SchoolDetails     SchoolDetails
 }
 
 // struct for sorting support
