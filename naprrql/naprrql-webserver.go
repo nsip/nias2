@@ -134,7 +134,7 @@ func RunQLServer() {
 		c.Response().Header().Set("Content-Disposition", "attachment; filename="+uniqFileName)
 		c.Response().Header().Set("Content-Type", "text/csv")
 
-		localFileName := "./out/" + acaraID + "/" + fileName
+		localFileName := "./out/school_reports/" + acaraID + "/" + fileName
 		// log.Println("csv local file: ", localFileName)
 
 		return c.File(localFileName)
@@ -149,7 +149,7 @@ func RunQLServer() {
 		c.Response().Header().Set("Content-Disposition", "attachment; filename="+"codeframe.csv")
 		c.Response().Header().Set("Content-Type", "text/csv")
 
-		localFileName := "./out/systemCodeframe.csv"
+		localFileName := "./out/system_reports/systemCodeframe.csv"
 		// log.Println("csv local file: ", localFileName)
 
 		return c.File(localFileName)
