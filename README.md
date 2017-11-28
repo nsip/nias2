@@ -4,7 +4,15 @@
 # nias2
 NIAS: NSIP Integration As A Service.
 
-This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components. This version incorporates NAPLAN validation and post-processing functionality, as well as the generic  functionality of NIAS.
+This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components. This version incorporates [NAPLAN](https://www.nap.edu.au) validation and post-processing functionality, as well as the generic functionality of NIAS.
+
+If you are using NIAS for the purposes of NAPLAN validation or postprocessing, you do not need to build the NIAS application from scratch. Download the [latest binary release applicable to your operating system](https://github.com/nsip/nias2/releases). For guidance on how to use NIAS for NAPLAN, see
+* [NAPVAL Readme](https://github.com/nsip/nias2/blob/master/napval/README.md) (NAPLAN registration data validation)
+* [NAPVAL User guide](https://github.com/nsip/nias2/blob/master/app/napval/nias8help.pdf)
+* [NAPRRQL Readme](https://github.com/nsip/nias2/blob/master/naprrql/README.md) (NAPLAN reporting data UI, GraphQL endpoint and CSV exporter)
+* [NAPRRQL User guide](https://github.com/nsip/nias2/blob/master/app/naprrql/NIAS_NAPLAN_UserGuide_v05.pdf)
+* [NAPRRQL CSV and Reporting Output Outline](https://github.com/nsip/nias2/blob/master/app/naprrql/NAPRRQLToolsetCsvAndReportingOutput_v05.pdf)
+* [NAPCOMP Readme](https://github.com/nsip/nias2/blob/master/napcomp/README.md) (Audit of registration data against reporting data)
 
 # 1. Overview
 
@@ -20,7 +28,7 @@ Over these components, two main modules have been built:
 
 The software also uses these components as architecture to support Test Administration Authorities' interaction with NAPLAN Online:
 * __napval__ validates NAPLAN registration records, in either SIF/XML or CSV format.
-* __naprr__ post-processes the NAPLAN results & reporting dataset, including generating local reports, and aligning Year 3 Writing results to the codeframe.
+* __naprrql__ post-processes the NAPLAN results & reporting dataset, including generating local reports, and aligning Year 3 Writing results to the codeframe.
 
 The code is open source, and is released through the NSIP Github repository. 
 
