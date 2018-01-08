@@ -20,8 +20,7 @@ do_build() {
         cd $CWD
 	cd ./app
         mkdir -p naprrql/in 
-	rsync -a naprrql/gql_schemas naprrql/in naprrql/public naprrql/reporting_templates naprrql/naprrql.sh $OUTPUT/
-        rsync -a ../naprrql/app/naprrql/master_nap.xml.zip $OUTPUT/in/
+	rsync -a naprrql/gql_schemas naprrql/in naprrql/public naprrql/reporting_templates $OUTPUT/
 }
 
 

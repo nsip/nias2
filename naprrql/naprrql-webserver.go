@@ -110,6 +110,7 @@ func RunQLServer() {
 	e.Static("/", "public")
 	e.File("/sifql", "public/ql_index.html")
 	e.File("/ui", "public/ui_index.html")
+	e.File("/datamodel", "public/vy_index.html")
 
 	// the main graphql handler
 	e.POST("/graphql", graphQLHandler)
