@@ -304,6 +304,7 @@ func buildReportResolvers() map[string]interface{} {
 			}
 			for _, eventObj := range eventObjs {
 				event := eventObj.(xml.NAPEvent)
+
 				testObj, err := getObjects([]string{event.TestID})
 				if err != nil {
 					return []interface{}{}, err
@@ -338,6 +339,111 @@ func buildReportResolvers() map[string]interface{} {
 					results = append(results, erds)
 				}
 			}
+		}
+		return results, nil
+
+	}
+	resolvers["NaplanData/domain_scores_summary_event_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get school infos and school summaries
+		schools := make(map[string]xml.SchoolInfo)                             // key string = acara id
+		schoolsummaries := make(map[string]map[string]xml.NAPTestScoreSummary) // key string = acara id + test refid
+
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			studentids = append(studentids, studentRefIds...)
+
+			schoolrefid := getIdentifiers(acaraid + ":")
+			siObjects, err := getObjects(schoolrefid)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			for _, sio := range siObjects {
+				si, _ := sio.(xml.SchoolInfo)
+				schools[acaraid] = si
+				summaryrefid := getIdentifiers(si.RefId + ":NAPTestScoreSummary:")
+				ssObjects, err := getObjects(summaryrefid)
+				if err != nil {
+					return []interface{}{}, err
+				}
+				for _, sso := range ssObjects {
+					ss := sso.(xml.NAPTestScoreSummary)
+					if _, ok := schoolsummaries[acaraid]; !ok {
+						schoolsummaries[acaraid] = make(map[string]xml.NAPTestScoreSummary)
+					}
+					schoolsummaries[acaraid][si.RefId] = ss
+				}
+			}
+		}
+
+		studentObjs, err := getObjects(studentids)
+		if err != nil {
+			return []interface{}{}, err
+		}
+		// iterate students and assemble Event/Response Data Set
+		results := make([]EventResponseSummaryAllDomainsDataSet, 0)
+		for _, studentObj := range studentObjs {
+			student, _ := studentObj.(xml.RegistrationRecord)
+			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
+			if len(studentEventIds) < 1 {
+				// log.Println("no events found for student: ", student.RefId)
+				continue
+			}
+			eventObjs, err := getObjects(studentEventIds)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			perdomain_slice := make([]EventResponseSummaryPerDomain, 0)
+			schoolid := ""
+			for _, eventObj := range eventObjs {
+				event := eventObj.(xml.NAPEvent)
+				// report assumes that the school is the same across all domains; it may not be
+				schoolid = event.SchoolID
+				pnpcodelistmap := pnpcodelistmap(event)
+				testObj, err := getObjects([]string{event.TestID})
+				if err != nil {
+					return []interface{}{}, err
+				}
+				test := testObj[0].(xml.NAPTest)
+				responseIds := getIdentifiers(test.TestID + ":NAPStudentResponseSet:" + student.RefId)
+				response := xml.NAPResponseSet{}
+				if len(responseIds) > 0 {
+					responseObjs, err := getObjects(responseIds)
+					if err != nil {
+						return []interface{}{}, err
+					}
+					response = responseObjs[0].(xml.NAPResponseSet)
+				}
+				perdomain := EventResponseSummaryPerDomain{Domain: test.TestContent.TestDomain,
+					Event:          event,
+					Test:           test,
+					PNPCodeListMap: pnpcodelistmap,
+					Summary:        schoolsummaries[event.SchoolID][test.TestID],
+					Response:       response,
+				}
+				perdomain_slice = append(perdomain_slice, perdomain)
+			}
+			erds := EventResponseSummaryAllDomainsDataSet{Student: student,
+				School: schools[schoolid],
+				EventResponseSummaryPerDomain: perdomain_slice,
+			}
+			results = append(results, erds)
+
 		}
 		return results, nil
 

@@ -47,6 +47,8 @@ type NaplanData {
 	domain_scores_report_by_school(acaraIDs: [String]): [ResponseDataSet]
 	## reporting (ui) object for domain scores and participation
 	domain_scores_event_report_by_school(acaraIDs: [String]): [EventResponseDataSet]
+	## reporting (ui) object for domain scores and participation with score summary info
+	domain_scores_summary_event_report_by_school(acaraIDs: [String]): [EventResponseSummaryAllDomainsDataSet]
 	## reporting (ui) object for score summaries
 	score_summary_report_by_school(acaraIDs: [String]): [ScoreSummaryDataSet]
 	## reporting (ui) object for participation data
@@ -233,6 +235,70 @@ type EventResponseDataSet {
 	Response: NAPResponseSet
         ## The school involved
         SchoolDetails: SchoolDetails
+}
+
+## Domain scores and events reporting object with score summaries
+type EventResponseSummaryDataSet {
+        ## The event participated in
+        Event: NAPEvent
+        ## The student whose participation is being reported
+        Student: RegistrationRecord
+        ## the related test
+        Test: NAPTest
+        ## the response from which the domain score will be derived
+        Response: NAPResponseSet
+	## the score summary
+	Summary: ScoreSummary
+        ## The school involved
+        School: SchoolInfo
+        ## Expansion of PNP Code list
+        PNPCodeListMap: PNPCodeListMap
+}
+
+## Domain scores and events reporting object with score summaries, one row for all domains
+type EventResponseSummaryAllDomainsDataSet {
+        ## The student whose participation is being reported
+        Student: RegistrationRecord
+        ## The school involved
+        School: SchoolInfo
+        ## EventResponseSummaryAllDomains
+        EventResponseSummaryPerDomain: [EventResponseSummaryPerDomain]
+}
+
+type EventResponseSummaryPerDomain {
+        Domain: String
+        ## The event participated in
+        Event: NAPEvent
+        ## the related test
+        Test: NAPTest
+        ## the response from which the domain score will be derived
+        Response: NAPResponseSet
+        ## the score summary
+        Summary: ScoreSummary
+        ## Expansion of PNP Code list
+        PNPCodeListMap: PNPCodeListMap
+}
+
+
+## Expansion of PNPCodeList into a map of values to boolean
+type PNPCodeListMap {
+        Domain: String
+        AAM: String
+        AIA: String
+        AIM: String
+        AIV: String
+        ALL: String
+        AST: String
+        AVM: String
+        BRA: String
+        COL: String
+        ETA: String
+        ETB: String
+        ETC: String
+        OSS: String
+        RBK: String
+        SCR: String
+        SUP: String
 }
 
 ## Domain scores reporting object

@@ -1,0 +1,90 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  domain_scores_summary_event_report_by_school(acaraIDs: $acaraIDs) {
+    Student {
+      LocalId
+      FamilyName
+      GivenName
+      Sex
+      BirthDate
+      CountryOfBirth
+      StudentLOTE
+      IndigenousStatus
+      Parent1LOTE
+      Parent1SchoolEducation
+      Parent1NonSchoolEducation
+      Parent1Occupation
+      Parent2LOTE
+      Parent2SchoolEducation
+      Parent2NonSchoolEducation
+      Parent2Occupation
+      LBOTE
+      FFPOS
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      }
+    }
+    School {
+      LocalId
+      ACARAId
+      SchoolName
+      Campus {
+        SchoolCampusId
+      }
+    }
+    EventResponseSummaryPerDomain {
+    Domain
+    Test {
+      TestContent {
+        TestLevel
+        TestDomain
+      }
+    }
+    Event {
+       NAPJurisdiction
+       SchoolSector
+       SchoolGeolocation
+       EventID
+       ParticipationCode
+       Adjustment {
+         PNPCodelist {
+           PNPCode
+         }
+       }
+    }
+    Response {
+       ResponseID
+       PathTakenForDomain
+       ParallelTest
+       DomainScore {
+         RawScore
+         ScaledScoreValue
+         StudentDomainBand
+       }
+    }
+    Summary {
+      DomainSchoolAverage
+    }
+    PNPCodeListMap {
+      AAM
+      AIA
+      AIM
+      AIV
+      ALL
+      AST
+      AVM
+      BRA
+      COL
+      ETA
+      ETB
+      ETC
+      OSS
+      RBK
+      SCR
+      SUP
+    }
+  }
+}
+}

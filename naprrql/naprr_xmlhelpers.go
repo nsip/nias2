@@ -16,6 +16,9 @@ func init() {
 	gob.Register(ScoreSummaryDataSet{})
 	gob.Register(ResponseDataSet{})
 	gob.Register(EventResponseDataSet{})
+	gob.Register(EventResponseSummaryDataSet{})
+	gob.Register(EventResponseSummaryAllDomainsDataSet{})
+	gob.Register(PNPCodeListMap{})
 	gob.Register(CodeFrameDataSet{})
 	gob.Register(ResultsByStudent{})
 	gob.Register(GuidCheckDataSet{})
@@ -138,6 +141,60 @@ func (resps EventResponseComparator) Less(i, j int) bool {
 	return resps[i].Test.TestContent.TestName < resps[j].Test.TestContent.TestName
 }
 
+// aggregating type used for reporting domain scores and events, with summary data
+type EventResponseSummaryDataSet struct {
+	Event          xml.NAPEvent
+	Test           xml.NAPTest
+	Student        xml.RegistrationRecord
+	Response       xml.NAPResponseSet
+	Summary        xml.NAPTestScoreSummary
+	School         xml.SchoolInfo
+	PNPCodeListMap PNPCodeListMap
+}
+
+// struct for sorting support
+type EventResponseSummaryComparator []EventResponseSummaryDataSet
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseSummaryComparator) Len() int {
+	return len(resps)
+}
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseSummaryComparator) Swap(i, j int) {
+	resps[i], resps[j] = resps[j], resps[i]
+}
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseSummaryComparator) Less(i, j int) bool {
+	return resps[i].Test.TestContent.TestName < resps[j].Test.TestContent.TestName
+}
+
+// aggregating type used for reporting domain scores and events, with summary data, across all domains
+type EventResponseSummaryAllDomainsDataSet struct {
+	Student                       xml.RegistrationRecord
+	School                        xml.SchoolInfo
+	EventResponseSummaryPerDomain []EventResponseSummaryPerDomain
+}
+
+// struct for sorting support
+type EventResponseSummaryAllDomainsComparator []EventResponseSummaryAllDomainsDataSet
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseSummaryAllDomainsComparator) Len() int {
+	return len(resps)
+}
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseSummaryAllDomainsComparator) Swap(i, j int) {
+	resps[i], resps[j] = resps[j], resps[i]
+}
+
+// sort interface implementation for responsedatasets
+func (resps EventResponseSummaryAllDomainsComparator) Less(i, j int) bool {
+	return resps[i].Student.LocalId < resps[j].Student.LocalId
+}
+
 // aggregating type used for reporting domain scores
 type ResponseDataSet struct {
 	Test     xml.NAPTest
@@ -211,6 +268,93 @@ type EventInfo struct {
 type SchoolDetails struct {
 	ACARAId    string
 	SchoolName string
+}
+
+// expand PNPCodeList into map to boolean
+type PNPCodeListMap struct {
+	Domain string
+	AAM    bool
+	AIA    bool
+	AIM    bool
+	AIV    bool
+	ALL    bool
+	AST    bool
+	AVM    bool
+	BRA    bool
+	COL    bool
+	ETA    bool
+	ETB    bool
+	ETC    bool
+	OSS    bool
+	RBK    bool
+	SCR    bool
+	SUP    bool
+}
+
+// map domain to event, test, response, summary, PNPs
+type EventResponseSummaryPerDomain struct {
+	Domain         string
+	Event          xml.NAPEvent
+	Test           xml.NAPTest
+	Response       xml.NAPResponseSet
+	Summary        xml.NAPTestScoreSummary
+	PNPCodeListMap PNPCodeListMap
+}
+
+func pnpcodelistmap(e xml.NAPEvent) PNPCodeListMap {
+	ret := PNPCodeListMap{}
+	// Domain will be provisioned downstream
+	for _, p := range e.Adjustment.PNPCodelist.PNPCode {
+		if p == "AAM" {
+			ret.AAM = true
+		}
+		if p == "AIA" {
+			ret.AIA = true
+		}
+		if p == "AIM" {
+			ret.AIM = true
+		}
+		if p == "AIV" {
+			ret.AIV = true
+		}
+		if p == "ALL" {
+			ret.ALL = true
+		}
+		if p == "AST" {
+			ret.AST = true
+		}
+		if p == "AVM" {
+			ret.AVM = true
+		}
+		if p == "BRA" {
+			ret.BRA = true
+		}
+		if p == "COL" {
+			ret.COL = true
+		}
+		if p == "ETA" {
+			ret.ETA = true
+		}
+		if p == "ETB" {
+			ret.ETB = true
+		}
+		if p == "ETC" {
+			ret.ETC = true
+		}
+		if p == "OSS" {
+			ret.OSS = true
+		}
+		if p == "RBK" {
+			ret.RBK = true
+		}
+		if p == "SCR" {
+			ret.SCR = true
+		}
+		if p == "SUP" {
+			ret.SUP = true
+		}
+	}
+	return ret
 }
 
 // summary object from codeframe
