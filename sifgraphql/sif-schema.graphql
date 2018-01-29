@@ -1,0 +1,3107 @@
+
+
+    type Activity {
+        RefId: RefIdType 
+      Title: String 
+      Preamble: String 
+      TechnicalRequirements: TechnicalRequirementsType 
+      SoftwareRequirementList: SoftwareRequirementListType 
+      EssentialMaterials: EssentialMaterialsType 
+      LearningObjectives: LearningObjectivesType 
+      LearningStandards: LearningStandardsType 
+      SubjectArea: SubjectAreaType 
+      Prerequisites: PrerequisitesType 
+      Students: StudentsType 
+      SourceObjects: SourceObjectsType 
+      Points: String 
+      ActivityTime: ActivityTimeType 
+      AssessmentRefId: IdRefType 
+      MaxAttemptsAllowed: String 
+      ActivityWeight: String 
+      Evaluation: Activity_Evaluation 
+      LearningResources: LearningResourcesType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type Activity_Evaluation {
+      EvaluationType: String 
+       Description: String 
+}
+
+    type AggregateCharacteristicInfo {
+        RefId: RefIdType 
+      Description: String 
+      Definition: String 
+      ElementName: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type AggregateStatisticFact {
+        RefId: RefIdType 
+      AggregateStatisticInfoRefId: IdRefType 
+      Characteristics: CharacteristicsType 
+      Excluded: String 
+      Value: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type AggregateStatisticInfo {
+        RefId: RefIdType 
+      StatisticName: String 
+      CalculationRule: AggregateStatisticInfo_CalculationRule 
+      ApprovalDate: String 
+      ExpirationDate: String 
+      ExclusionRules: ExclusionRulesType 
+      Source: String 
+      EffectiveDate: String 
+      DiscontinueDate: String 
+      Location: LocationType 
+      Measure: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type AggregateStatisticInfo_CalculationRule {
+      Type: String 
+      Value: String 
+}
+
+    type CalendarDate {
+        CalendarDateRefId: IdRefType 
+      Date: String 
+      CalendarSummaryRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      CalendarDateType: CalendarDateInfoType 
+      CalendarDateNumber: String 
+      StudentAttendance: AttendanceInfoType 
+      TeacherAttendance: AttendanceInfoType 
+      AdministratorAttendance: AttendanceInfoType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type CalendarSummary {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      LocalId: LocalIdType 
+      Description: String 
+      DaysInSession: String 
+      StartDate: String 
+      EndDate: String 
+      FirstInstructionDate: String 
+      LastInstructionDate: String 
+      GraduationDate: GraduationDateType 
+      InstructionalMinutes: String 
+      MinutesPerDay: String 
+      YearLevels: YearLevelsType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type EquipmentInfo {
+        RefId: RefIdType 
+      Name: String 
+      Description: String 
+      LocalId: LocalIdType 
+      AssetNumber: LocalIdType 
+      InvoiceRefId: IdRefType 
+      PurchaseOrderRefId: IdRefType 
+      EquipmentType: String 
+      SIF_RefId: EquipmentInfo_SIF_RefId 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type EquipmentInfo_SIF_RefId {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+
+    type GradingAssignment {
+        RefId: RefIdType 
+      TeachingGroupRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      GradingCategory: String 
+      Description: String 
+      PointsPossible: String 
+      CreateDate: String 
+      DueDate: String 
+      Weight: String 
+      MaxAttemptsAllowed: String 
+      DetailedDescriptionURL: String 
+      DetailedDescriptionBinary: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type GradingAssignmentScore {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      StudentPersonalLocalId: LocalIdType 
+      TeachingGroupRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      GradingAssignmentRefId: IdRefType 
+      ScorePoints: String 
+      ScorePercent: String 
+      ScoreLetter: String 
+      ScoreDescription: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type Identity {
+        RefId: RefIdType 
+      SIF_RefId: Identity_SIF_RefId 
+      AuthenticationSource: String 
+      IdentityAssertions: IdentityAssertionsType 
+      PasswordList: PasswordListType 
+      AuthenticationSourceGlobalUID: IdRefType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type Identity_SIF_RefId {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+
+    type LEAInfo {
+        RefId: RefIdType 
+      LocalId: LocalIdType 
+      StateProvinceId: StateProvinceIdType 
+      CommonwealthId: String 
+      LEAName: String 
+      LEAURL: String 
+      EducationAgencyType: AgencyType 
+      LEAContactList: LEAContactListType 
+      PhoneNumberList: PhoneNumberListType 
+      AddressList: AddressListType 
+      OperationalStatus: OperationalStatusType 
+      JurisdictionLowerHouse: String 
+      SLA: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type LearningResource {
+        RefId: RefIdType 
+      Name: String 
+      Author: String 
+      Contacts: ContactsType 
+      Location: LearningResource_Location 
+      Status: String 
+      Description: String 
+      YearLevels: YearLevelsType 
+      SubjectAreas: ACStrandAreaListType 
+      MediaTypes: MediaTypesType 
+      UseAgreement: String 
+      AgreementDate: String 
+      Approvals: ApprovalsType 
+      Evaluations: EvaluationsType 
+      Components: ComponentsType 
+      LearningStandards: LearningStandardsType 
+      LearningResourcePackageRefId: IdRefType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type LearningResource_Location {
+      ReferenceType: String 
+      Value: String 
+}
+
+    type LearningResourcePackage AbstractContentPackageType
+    type LearningStandardDocument {
+        RefId: RefIdType 
+      Title: String 
+      Description: String 
+      RichDescription: AbstractContentElementType 
+      Source: String 
+      Organizations: OrganizationsType 
+      Authors: AuthorsType 
+      OrganizationContactPoint: String 
+      SubjectAreas: ACStrandAreaListType 
+      DocumentStatus: String 
+      DocumentDate: String 
+      LocalAdoptionDate: String 
+      LocalArchiveDate: String 
+      EndOfLifeDate: String 
+      Copyright: LearningStandardDocument_Copyright 
+      YearLevels: YearLevelsType 
+      RepositoryDate: String 
+      LearningStandardItemRefId: IdRefType 
+      RelatedLearningStandards: LearningStandardsDocumentType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type LearningStandardDocument_Copyright {
+       Date: String 
+       Holder: String 
+}
+
+    type LearningStandardItem {
+        RefId: RefIdType 
+      Resources: LResourcesType 
+      StandardSettingBody: LearningStandardItem_StandardSettingBody 
+      StandardHierarchyLevel: LearningStandardItem_StandardHierarchyLevel 
+      PredecessorItems: LearningStandardsType 
+      StatementCodes: StatementCodesType 
+      Statements: StatementsType 
+      YearLevels: YearLevelsType 
+      ACStrandSubjectArea: ACStrandSubjectAreaType 
+      StandardIdentifier: LearningStandardItem_StandardIdentifier 
+      LearningStandardDocumentRefId: IdRefType 
+      RelatedLearningStandardItems: LearningStandardItem_RelatedLearningStandardItems 
+      Level4: String 
+      Level5: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type LearningStandardItem_StandardSettingBody {
+       Country: CountryType 
+       StateProvince: StateProvinceType 
+       SettingBodyName: String 
+}
+type LearningStandardItem_StandardHierarchyLevel {
+       Number: String 
+       Description: String 
+}
+type LearningStandardItem_StandardIdentifier {
+       YearCreated: String 
+       ACStrandSubjectArea: ACStrandSubjectAreaType 
+       StandardNumber: String 
+       YearLevels: YearLevelsType 
+       Benchmark: String 
+       YearLevel: YearLevelType 
+       IndicatorNumber: String 
+      AlternateIdentificationCodes: LearningStandardItem_AlternateIdentificationCodes 
+       Organization: String 
+}
+type LearningStandardItem_RelatedLearningStandardItems {
+      LearningStandardItemRefId: [LearningStandardItem_LearningStandardItemRefId] 
+}
+type LearningStandardItem_AlternateIdentificationCodes {
+       AlternateIdentificationCode: [String] 
+}
+type LearningStandardItem_LearningStandardItemRefId {
+      RelationshipType: String 
+      Value: IdRefType 
+}
+
+    type PersonPicture {
+        RefId: RefIdType 
+      ParentObjectRefId: PersonPicture_ParentObjectRefId 
+      SchoolYear: String 
+      PictureSource: PersonPicture_PictureSource 
+      OKToPublish: String 
+      SIF_Metadata: String 
+      SIF_ExtendedElements: String 
+      
+      }
+    type PersonPicture_ParentObjectRefId {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+type PersonPicture_PictureSource {
+      Type: String 
+      Value: URIOrBinaryType 
+}
+
+    type PersonalisedPlan {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      PersonalisedPlanCategory: String 
+      PersonalisedPlanStartDate: String 
+      PersonalisedPlanEndDate: String 
+      PersonalisedPlanReviewDate: String 
+      PersonalisedPlanNotes: String 
+      DocumentList: WellbeingDocumentListType 
+      AssociatedAttachment: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type ReportAuthorityInfo {
+        RefId: RefIdType 
+      AuthorityName: String 
+      AuthorityId: String 
+      AuthorityDepartment: String 
+      AuthorityLevel: String 
+      ContactInfo: ContactInfoType 
+      Address: AddressType 
+      PhoneNumber: PhoneNumberType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type ResourceBooking {
+        RefId: RefIdType 
+      ResourceRefId: ResourceBooking_ResourceRefId 
+      ResourceLocalId: LocalIdType 
+      StartDateTime: String 
+      FinishDateTime: String 
+      FromPeriod: LocalIdType 
+      ToPeriod: LocalIdType 
+      Booker: IdRefType 
+      Reason: String 
+      ScheduledActivityRefId: IdRefType 
+      KeepOld: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type ResourceBooking_ResourceRefId {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+
+    type ResourceUsage {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      ResourceUsageContentType: ResourceUsage_ResourceUsageContentType 
+      ResourceReportColumnList: ResourceUsage_ResourceReportColumnList 
+      ResourceReportLineList: ResourceUsage_ResourceReportLineList 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type ResourceUsage_ResourceUsageContentType {
+       Code: String 
+       LocalDescription: String 
+}
+type ResourceUsage_ResourceReportColumnList {
+      ResourceReportColumn: [ResourceUsage_ResourceReportColumn] 
+}
+type ResourceUsage_ResourceReportLineList {
+      ResourceReportLine: [ResourceUsage_ResourceReportLine] 
+}
+type ResourceUsage_ResourceReportColumn {
+       ColumnName: String 
+       ColumnDescription: String 
+       ColumnDelimiter: String 
+}
+type ResourceUsage_ResourceReportLine {
+      SIF_RefId: ResourceUsage_SIF_RefId 
+       StartDate: String 
+       EndDate: String 
+       CurrentCost: MonetaryAmountType 
+       ReportRow: String 
+}
+type ResourceUsage_SIF_RefId {
+      SIF_RefObject: String 
+      Value: String 
+}
+
+    type RoomInfo {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      LocalId: LocalIdType 
+      RoomNumber: String 
+      StaffList: StaffListType 
+      Description: String 
+      Building: String 
+      HomeroomNumber: String 
+      Size: String 
+      Capacity: String 
+      PhoneNumber: PhoneNumberType 
+      RoomType: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type ScheduledActivity {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      TimeTableCellRefId: IdRefType 
+      DayId: LocalIdType 
+      PeriodId: LocalIdType 
+      TimeTableRefId: IdRefType 
+      ActivityDate: String 
+      StartTime: String 
+      FinishTime: String 
+      CellType: String 
+      TimeTableSubjectRefId: IdRefType 
+      TeacherList: ScheduledTeacherListType 
+      RoomList: RoomListType 
+      AddressList: AddressListType 
+      Location: String 
+      ActivityType: String 
+      ActivityName: String 
+      ActivityComment: String 
+      StudentList: StudentsType 
+      TeachingGroupList: TeachingGroupListType 
+      YearLevels: YearLevelsType 
+      Override: ScheduledActivityOverrideType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type SchoolCourseInfo {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      SchoolLocalId: LocalIdType 
+      SchoolYear: SchoolYearType 
+      TermInfoRefId: IdRefType 
+      CourseCode: String 
+      StateCourseCode: String 
+      DistrictCourseCode: String 
+      SubjectAreaList: SubjectAreaListType 
+      CourseTitle: String 
+      Description: String 
+      InstructionalLevel: String 
+      CourseCredits: String 
+      CoreAcademicCourse: String 
+      GraduationRequirement: String 
+      Department: String 
+      CourseContent: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type SchoolInfo {
+        RefId: RefIdType 
+      LocalId: LocalIdType 
+      StateProvinceId: StateProvinceIdType 
+      CommonwealthId: String 
+      ACARAId: String 
+      OtherIdList: OtherIdListType 
+      SchoolName: String 
+      LEAInfoRefId: RefIdType 
+      OtherLEA: SchoolInfo_OtherLEA 
+      SchoolDistrict: String 
+      SchoolDistrictLocalId: LocalIdType 
+      SchoolType: String 
+      SchoolFocusList: SchoolFocusListType 
+      SchoolURL: SchoolURLType 
+      SchoolEmailList: EmailListType 
+      PrincipalInfo: PrincipalInfoType 
+      SchoolContactList: SchoolContactListType 
+      AddressList: AddressListType 
+      PhoneNumberList: PhoneNumberListType 
+      SessionType: String 
+      YearLevels: YearLevelsType 
+      ARIA: String 
+      OperationalStatus: OperationalStatusType 
+      FederalElectorate: String 
+      Campus: CampusContainerType 
+      SchoolSector: String 
+      IndependentSchool: String 
+      NonGovSystemicStatus: String 
+      System: String 
+      ReligiousAffiliation: String 
+      SchoolGeographicLocation: String 
+      LocalGovernmentArea: String 
+      JurisdictionLowerHouse: String 
+      SLA: String 
+      SchoolCoEdStatus: String 
+      BoardingSchoolStatus: String 
+      YearLevelEnrollmentList: YearLevelEnrollmentListType 
+      TotalEnrollments: TotalEnrollmentsType 
+      Entity_Open: String 
+      Entity_Close: String 
+      SchoolGroupList: SchoolGroupListType 
+      SchoolTimeZone: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type SchoolInfo_OtherLEA {
+      SIF_RefObject: String 
+      Value: RefIdType 
+}
+
+    type SchoolPrograms {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      SchoolProgramList: SchoolProgramListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type SectionInfo {
+        RefId: RefIdType 
+      SchoolCourseInfoRefId: IdRefType 
+      LocalId: LocalIdType 
+      Description: String 
+      SchoolYear: SchoolYear 
+      TermInfoRefId: IdRefType 
+      MediumOfInstruction: MediumOfInstructionType 
+      LanguageOfInstruction: LanguageOfInstructionType 
+      LocationOfInstruction: LocationOfInstructionType 
+      SummerSchool: String 
+      SchoolCourseInfoOverride: SchoolCourseInfoOverrideType 
+      CourseSectionCode: String 
+      SectionCode: String 
+      CountForAttendance: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type SessionInfo {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      TimeTableCellRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      LocalId: LocalIdType 
+      TimeTableSubjectLocalId: LocalIdType 
+      TeachingGroupLocalId: LocalIdType 
+      SchoolLocalId: LocalIdType 
+      StaffPersonalLocalId: LocalIdType 
+      RoomNumber: String 
+      DayId: LocalIdType 
+      PeriodId: LocalIdType 
+      SessionDate: String 
+      StartTime: String 
+      FinishTime: String 
+      RollMarked: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StaffAssignment {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      StaffPersonalRefId: IdRefType 
+      Description: String 
+      PrimaryAssignment: String 
+      JobStartDate: String 
+      JobEndDate: String 
+      JobFTE: String 
+      JobFunction: String 
+      EmploymentStatus: String 
+      StaffSubjectList: StaffSubjectListType 
+      StaffActivity: StaffActivityExtensionType 
+      YearLevels: YearLevelsType 
+      CasualReliefTeacher: String 
+      Homegroup: String 
+      House: String 
+      CalendarSummaryList: CalendarSummaryListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StaffPersonal {
+        RefId: RefIdType 
+      LocalId: LocalIdType 
+      StateProvinceId: StateProvinceIdType 
+      ElectronicIdList: ElectronicIdListType 
+      OtherIdList: OtherIdListType 
+      PersonInfo: PersonInfoType 
+      Title: String 
+      EmploymentStatus: String 
+      MostRecent: StaffMostRecentContainerType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentActivityInfo {
+        RefId: RefIdType 
+      Title: String 
+      Description: String 
+      StudentActivityType: StudentActivityType 
+      StudentActivityLevel: String 
+      YearLevels: YearLevelsType 
+      CurricularStatus: String 
+      Location: LocationType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentActivityParticipation {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      StudentActivityInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      ParticipationComment: String 
+      StartDate: String 
+      EndDate: String 
+      Role: String 
+      RecognitionList: RecognitionListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentAttendanceSummary {
+        StudentAttendanceSummaryRefId: IdRefType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      StartDate: String 
+      EndDate: String 
+      StartDay: String 
+      EndDay: String 
+      FTE: String 
+      DaysAttended: String 
+      ExcusedAbsences: String 
+      UnexcusedAbsences: String 
+      DaysTardy: String 
+      DaysInMembership: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentAttendanceTimeList {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      Date: String 
+      SchoolYear: SchoolYearType 
+      AttendanceTimes: AttendanceTimesType 
+      PeriodAttendances: PeriodAttendancesType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentContactPersonal {
+        RefId: RefIdType 
+      LocalId: LocalIdType 
+      OtherIdList: OtherIdListType 
+      PersonInfo: PersonInfoType 
+      EmploymentType: String 
+      SchoolEducationalLevel: EducationalLevelType 
+      NonSchoolEducation: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentContactRelationship {
+        StudentContactRelationshipRefId: IdRefType 
+      StudentPersonalRefId: RefIdType 
+      StudentContactPersonalRefId: RefIdType 
+      Relationship: RelationshipType 
+      ParentRelationshipStatus: String 
+      HouseholdList: HouseholdList 
+      ContactFlags: ContactFlagsType 
+      MainlySpeaksEnglishAtHome: String 
+      ContactSequence: String 
+      ContactSequenceSource: String 
+      SchoolInfoRefId: IdRefType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentDailyAttendance {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      Date: String 
+      SchoolYear: SchoolYearType 
+      DayValue: String 
+      AttendanceCode: AttendanceCodeType 
+      AttendanceStatus: String 
+      TimeIn: String 
+      TimeOut: String 
+      AbsenceValue: String 
+      AttendanceNote: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentParticipation {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      StudentParticipationAsOfDate: String 
+      ProgramType: String 
+      ProgramFundingSources: ProgramFundingSourcesType 
+      ManagingSchool: StudentParticipation_ManagingSchool 
+      ReferralDate: String 
+      ReferralSource: ReferralSourceType 
+      ProgramStatus: ProgramStatusType 
+      GiftedEligibilityCriteria: String 
+      EvaluationParentalConsentDate: String 
+      EvaluationDate: String 
+      EvaluationExtensionDate: String 
+      ExtensionComments: String 
+      ReevaluationDate: String 
+      ProgramEligibilityDate: String 
+      ProgramPlanDate: String 
+      ProgramPlanEffectiveDate: String 
+      NOREPDate: String 
+      PlacementParentalConsentDate: String 
+      ProgramPlacementDate: String 
+      ExtendedSchoolYear: String 
+      ExtendedDay: String 
+      ProgramAvailability: ProgramAvailabilityType 
+      EntryPerson: String 
+      StudentSpecialEducationFTE: String 
+      ParticipationContact: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type StudentParticipation_ManagingSchool {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+
+    type StudentPeriodAttendance {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      Date: String 
+      SessionInfoRefId: IdRefType 
+      ScheduledActivityRefId: IdRefType 
+      TimetablePeriod: String 
+      TimeIn: String 
+      TimeOut: String 
+      AttendanceCode: AttendanceCodeType 
+      AttendanceStatus: String 
+      SchoolYear: SchoolYearType 
+      AuditInfo: AuditInfoType 
+      AttendanceComment: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentPersonal {
+        RefId: RefIdType 
+      AlertMessages: AlertMessagesType 
+      MedicalAlertMessages: MedicalAlertMessagesType 
+      LocalId: LocalId 
+      StateProvinceId: StateProvinceId 
+      ElectronicIdList: ElectronicIdListType 
+      OtherIdList: OtherIdListType 
+      PersonInfo: PersonInfoType 
+      ProjectedGraduationYear: ProjectedGraduationYearType 
+      OnTimeGraduationYear: OnTimeGraduationYearType 
+      GraduationDate: GraduationDateType 
+      MostRecent: StudentMostRecentContainerType 
+      AcceptableUsePolicy: String 
+      GiftedTalented: String 
+      EconomicDisadvantage: String 
+      ESL: String 
+      ESLDateAssessed: String 
+      YoungCarersRole: String 
+      Disability: String 
+      IntegrationAide: String 
+      EducationSupport: String 
+      HomeSchooledStudent: String 
+      Sensitive: String 
+      OfflineDelivery: String 
+      PrePrimaryEducation: String 
+      FirstAUSchoolEnrollment: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentSchoolEnrollment {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      LocalId: LocalId 
+      MembershipType: String 
+      TimeFrame: String 
+      SchoolYear: SchoolYearType 
+      EntryDate: String 
+      EntryType: StudentEntryContainerType 
+      YearLevel: YearLevelType 
+      Homeroom: StudentSchoolEnrollment_Homeroom 
+      Advisor: StudentSchoolEnrollment_Advisor 
+      Counselor: StudentSchoolEnrollment_Counselor 
+      Homegroup: String 
+      ACARASchoolId: LocalIdType 
+      ClassCode: String 
+      TestLevel: YearLevelType 
+      ReportingSchool: String 
+      House: String 
+      IndividualLearningPlan: String 
+      Calendar: StudentSchoolEnrollment_Calendar 
+      ExitDate: String 
+      ExitStatus: StudentExitStatusContainerType 
+      ExitType: StudentExitContainerType 
+      FTE: String 
+      FTPTStatus: String 
+      FFPOS: String 
+      CatchmentStatus: CatchmentStatusContainerType 
+      RecordClosureReason: String 
+      PromotionInfo: PromotionInfoType 
+      PreviousSchool: LocalIdType 
+      DestinationSchool: LocalIdType 
+      StudentSubjectChoiceList: StudentSubjectChoiceListType 
+      StartedAtSchoolDate: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type StudentSchoolEnrollment_Homeroom {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+type StudentSchoolEnrollment_Advisor {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+type StudentSchoolEnrollment_Counselor {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+type StudentSchoolEnrollment_Calendar {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+
+    type StudentScoreSet {
+        RefId: RefIdType 
+      ScoreMetric: String 
+      AssessmentAdministrationRefId: IdRefType 
+      StudentPersonalRefId: IdRefType 
+      AssessmentRegistrationRefId: IdRefType 
+      Scores: ScoresType 
+      StartDateTime: String 
+      FinishDateTime: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type StudentSectionEnrollment {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SectionInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      EntryDate: String 
+      ExitDate: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type SystemRole {
+        RefId: RefIdType 
+      SIF_RefId: SystemRole_SIF_RefId 
+      SystemContextList: SystemRole_SystemContextList 
+      SIF_Metadata: String 
+      SIF_ExtendedElements: String 
+      
+      }
+    type SystemRole_SIF_RefId {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+type SystemRole_SystemContextList {
+      SystemContext: [SystemRole_SystemContext] 
+}
+type SystemRole_SystemContext {
+      SystemId: String 
+      RoleList: SystemRole_RoleList 
+}
+type SystemRole_RoleList {
+      Role: [SystemRole_Role] 
+}
+type SystemRole_Role {
+      RoleId: String 
+      RoleScopeList: SystemRole_RoleScopeList 
+}
+type SystemRole_RoleScopeList {
+      RoleScope: [SystemRole_RoleScope] 
+}
+type SystemRole_RoleScope {
+       RoleScopeName: String 
+      RoleScopeRefId: SystemRole_RoleScopeRefId 
+}
+type SystemRole_RoleScopeRefId {
+      SIF_RefObject: String 
+      Value: String 
+}
+
+    type TeachingGroup {
+        RefId: RefIdType 
+      SchoolYear: SchoolYearType 
+      LocalId: LocalIdType 
+      ShortName: String 
+      LongName: String 
+      GroupType: String 
+      Set: String 
+      Block: String 
+      CurriculumLevel: String 
+      SchoolInfoRefId: RefIdType 
+      SchoolLocalId: LocalIdType 
+      SchoolCourseInfoRefId: RefIdType 
+      SchoolCourseLocalId: LocalIdType 
+      TimeTableSubjectRefId: RefIdType 
+      TimeTableSubjectLocalId: LocalIdType 
+      Semester: String 
+      StudentList: StudentListType 
+      TeacherList: TeacherListType 
+      MinClassSize: String 
+      MaxClassSize: String 
+      TeachingGroupPeriodList: TeachingGroupPeriodListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type TermInfo {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      StartDate: String 
+      EndDate: String 
+      Description: String 
+      RelativeDuration: String 
+      TermCode: String 
+      Track: String 
+      TermSpan: String 
+      MarkingTerm: String 
+      SchedulingTerm: String 
+      AttendanceTerm: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type TimeTable {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      SchoolYear: SchoolYearType 
+      LocalId: LocalIdType 
+      Title: String 
+      DaysPerCycle: String 
+      PeriodsPerDay: String 
+      TeachingPeriodsPerDay: String 
+      SchoolLocalId: LocalIdType 
+      SchoolName: String 
+      TimeTableCreationDate: String 
+      StartDate: String 
+      EndDate: String 
+      TimeTableDayList: TimeTableDayListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type TimeTableCell {
+        RefId: RefIdType 
+      TimeTableRefId: IdRefType 
+      TimeTableSubjectRefId: IdRefType 
+      TeachingGroupRefId: IdRefType 
+      RoomInfoRefId: IdRefType 
+      StaffPersonalRefId: IdRefType 
+      TimeTableLocalId: LocalIdType 
+      SubjectLocalId: LocalIdType 
+      TeachingGroupLocalId: LocalIdType 
+      RoomNumber: HomeroomNumberType 
+      StaffLocalId: LocalIdType 
+      DayId: LocalIdType 
+      PeriodId: LocalIdType 
+      CellType: String 
+      SchoolInfoRefId: IdRefType 
+      SchoolLocalId: LocalIdType 
+      TeacherList: ScheduledTeacherListType 
+      RoomList: RoomListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type TimeTableSubject {
+        RefId: RefIdType 
+      SubjectLocalId: LocalIdType 
+      AcademicYear: YearLevelType 
+      AcademicYearRange: YearRangeType 
+      CourseLocalId: LocalIdType 
+      SchoolCourseInfoRefId: RefIdType 
+      Faculty: String 
+      SubjectShortName: String 
+      SubjectLongName: String 
+      SubjectType: String 
+      ProposedMaxClassSize: String 
+      ProposedMinClassSize: String 
+      SchoolInfoRefId: IdRefType 
+      SchoolLocalId: LocalIdType 
+      Semester: String 
+      SchoolYear: SchoolYearType 
+      OtherCodeList: OtherCodeListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type WellbeingAlert {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      Date: String 
+      WellbeingAlertStartDate: String 
+      WellbeingAlertEndDate: String 
+      WellbeingAlertCategory: String 
+      WellbeingAlertDescription: String 
+      EnrolmentRestricted: String 
+      AlertAudience: String 
+      AlertSeverity: String 
+      AlertKeyContact: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type WellbeingAppeal {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      WellbeingResponseRefId: IdRefType 
+      LocalAppealId: LocalIdType 
+      AppealStatusCode: String 
+      Date: String 
+      AppealNotes: String 
+      AppealOutcome: String 
+      DocumentList: WellbeingDocumentListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type WellbeingCharacteristic {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      WellbeingCharacteristicClassification: String 
+      WellbeingCharacteristicStartDate: String 
+      WellbeingCharacteristicEndDate: String 
+      WellbeingCharacteristicReviewDate: String 
+      WellbeingCharacteristicNotes: String 
+      WellbeingCharacteristicCategory: String 
+      WellbeingCharacteristicSubCategory: String 
+      LocalCharacteristicCode: LocalId 
+      CharacteristicSeverity: String 
+      DailyManagement: String 
+      EmergencyManagement: String 
+      EmergencyResponsePlan: String 
+      Trigger: String 
+      ConfidentialFlag: String 
+      Alert: String 
+      MedicationList: MedicationListType 
+      DocumentList: WellbeingDocumentListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type WellbeingEvent {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      EventId: LocalId 
+      WellbeingEventNotes: String 
+      WellbeingEventCategoryClass: String 
+      WellbeingEventCategoryList: WellbeingEventCategoryListType 
+      ReportingStaffRefId: IdRefType 
+      WellbeingEventLocationDetails: WellbeingEventLocationDetailsType 
+      WellbeingEventCreationTimeStamp: String 
+      WellbeingEventDate: String 
+      WellbeingEventTime: String 
+      WellbeingEventDescription: String 
+      WellbeingEventTimePeriod: String 
+      ConfidentialFlag: String 
+      PersonInvolvementList: PersonInvolvementListType 
+      FollowUpActionList: FollowUpActionListType 
+      Status: String 
+      DocumentList: WellbeingDocumentListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type WellbeingResponse {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      Date: String 
+      WellbeingResponseStartDate: String 
+      WellbeingResponseEndDate: String 
+      WellbeingResponseCategory: String 
+      WellbeingResponseNotes: String 
+      PersonInvolvementList: PersonInvolvementListType 
+      Suspension: SuspensionContainerType 
+      Detention: DetentionContainerType 
+      PlanRequired: PlanRequiredContainerType 
+      Award: AwardContainerType 
+      OtherResponse: OtherWellbeingResponseContainerType 
+      DocumentList: WellbeingDocumentListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type ChargedLocationInfo {
+        RefId: RefIdType 
+      LocationType: String 
+      SiteCategory: String 
+      Name: String 
+      Description: String 
+      LocalId: LocalIdType 
+      StateProvinceId: StateProvinceIdType 
+      ParentChargedLocationInfoRefId: IdRefType 
+      SchoolInfoRefId: IdRefType 
+      AddressList: AddressListType 
+      PhoneNumberList: PhoneNumberListType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type Debtor {
+        RefId: RefIdType 
+      BilledEntity: Debtor_BilledEntity 
+      AddressList: String 
+      BillingName: String 
+      BillingNote: String 
+      Discount: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type Debtor_BilledEntity {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+
+    type FinancialAccount {
+        RefId: RefIdType 
+      ParentAccountRefId: IdRefType 
+      ChargedLocationInfoRefId: IdRefType 
+      AccountNumber: String 
+      Name: String 
+      Description: String 
+      ClassType: String 
+      CreationDate: String 
+      CreationTime: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type Invoice {
+        RefId: RefIdType 
+      InvoicedEntity: Invoice_InvoicedEntity 
+      FormNumber: LocalIdType 
+      BillingDate: String 
+      TransactionDescription: String 
+      BilledAmount: DebitOrCreditAmountType 
+      Ledger: String 
+      ChargedLocationInfoRefId: IdRefType 
+      NetAmount: MonetaryAmountType 
+      TaxRate: String 
+      TaxType: String 
+      TaxAmount: MonetaryAmountType 
+      CreatedBy: String 
+      ApprovedBy: String 
+      ItemDetail: String 
+      DueDate: String 
+      FinancialAccountRefIdList: FinancialAccountRefIdListType 
+      AccountingPeriod: LocalIdType 
+      RelatedPurchaseOrderRefId: IdRefType 
+      PurchasingItems: PurchasingItemsType 
+      Voluntary: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type Invoice_InvoicedEntity {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+
+    type Journal {
+        RefId: RefIdType 
+      DebitFinancialAccountRefId: IdRefType 
+      CreditFinancialAccountRefId: IdRefType 
+      OriginatingTransactionRefId: Journal_OriginatingTransactionRefId 
+      Amount: MonetaryAmountType 
+      GSTCodeOriginal: String 
+      GSTCodeReplacement: String 
+      Note: String 
+      CreatedDate: String 
+      ApprovedDate: String 
+      CreatedBy: String 
+      ApprovedBy: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    type Journal_OriginatingTransactionRefId {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+
+    type NAPCodeFrame {
+        RefId: RefIdType 
+      NAPTestRefId: IdRefType 
+      TestContent: NAPTestContentType 
+      TestletList: NAPCodeFrameTestletListType 
+      SIF_Metadata: SIF_Metadata 
+      SIF_ExtendedElements: SIF_ExtendedElements 
+      
+      }
+    
+    type NAPEventStudentLink {
+        RefId: RefIdType 
+      StudentPersonalRefId: IdRefType 
+      PlatformStudentIdentifier: LocalId 
+      SchoolInfoRefId: IdRefType 
+      SchoolACARAId: LocalIdType 
+      NAPTestRefId: IdRefType 
+      NAPTestLocalId: LocalId 
+      SchoolSector: String 
+      System: String 
+      SchoolGeolocation: String 
+      ReportingSchoolName: String 
+      NAPJurisdiction: String 
+      ParticipationCode: String 
+      ParticipationText: String 
+      Device: String 
+      Date: String 
+      StartTime: String 
+      LapsedTimeTest: String 
+      ExemptionReason: String 
+      PersonalDetailsChanged: String 
+      PSIOtherIdMatch: String 
+      PossibleDuplicate: String 
+      DOBRange: String 
+      TestDisruptionList: TestDisruptionListType 
+      Adjustment: AdjustmentContainerType 
+      SIF_Metadata: SIF_Metadata 
+      SIF_ExtendedElements: SIF_ExtendedElements 
+      
+      }
+    
+    type NAPStudentResponseSet {
+        RefId: RefIdType 
+      ReportExclusionFlag: String 
+      CalibrationSampleFlag: String 
+      EquatingSampleFlag: String 
+      PathTakenForDomain: String 
+      ParallelTest: String 
+      StudentPersonalRefId: IdRefType 
+      PlatformStudentIdentifier: LocalId 
+      NAPTestRefId: IdRefType 
+      NAPTestLocalId: LocalId 
+      DomainScore: DomainScoreType 
+      TestletList: NAPStudentResponseTestletListType 
+      SIF_Metadata: SIF_Metadata 
+      SIF_ExtendedElements: SIF_ExtendedElements 
+      
+      }
+    
+    type NAPTest {
+        RefId: RefIdType 
+      TestContent: NAPTestContentType 
+      SIF_Metadata: SIF_Metadata 
+      SIF_ExtendedElements: SIF_ExtendedElements 
+      
+      }
+    
+    type NAPTestItem {
+        RefId: RefIdType 
+      TestItemContent: NAPTestItemContentType 
+      SIF_Metadata: SIF_Metadata 
+      SIF_ExtendedElements: SIF_ExtendedElements 
+      
+      }
+    
+    type NAPTestScoreSummary {
+        RefId: RefIdType 
+      SchoolInfoRefId: IdRefType 
+      SchoolACARAId: LocalIdType 
+      NAPTestRefId: IdRefType 
+      NAPTestLocalId: LocalId 
+      DomainNationalAverage: String 
+      DomainSchoolAverage: String 
+      DomainJurisdictionAverage: String 
+      DomainTopNational60Percent: String 
+      DomainBottomNational60Percent: String 
+      SIF_Metadata: SIF_Metadata 
+      SIF_ExtendedElements: SIF_ExtendedElements 
+      
+      }
+    
+    type NAPTestlet {
+        RefId: RefIdType 
+      NAPTestRefId: IdRefType 
+      NAPTestLocalId: LocalId 
+      TestletContent: NAPTestletContentType 
+      TestItemList: NAPTestItemListType 
+      SIF_Metadata: SIF_Metadata 
+      SIF_ExtendedElements: SIF_ExtendedElements 
+      
+      }
+    
+    type PaymentReceipt {
+        RefId: RefIdType 
+      TransactionType: String 
+      InvoiceRefId: IdRefType 
+      VendorInfoRefId: IdRefType 
+      DebtorRefId: IdRefType 
+      ChargedLocationInfoRefId: IdRefType 
+      TransactionDate: String 
+      TransactionAmount: DebitOrCreditAmountType 
+      ReceivedTransactionId: String 
+      FinancialAccountRefIdList: FinancialAccountRefIdListType 
+      TransactionDescription: String 
+      TaxRate: String 
+      TaxAmount: MonetaryAmountType 
+      TransactionMethod: String 
+      ChequeNumber: String 
+      TransactionNote: String 
+      AccountingPeriod: LocalIdType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type PurchaseOrder {
+        RefId: RefIdType 
+      FormNumber: String 
+      VendorInfoRefId: IdRefType 
+      ChargedLocationInfoRefId: IdRefType 
+      EmployeePersonalRefId: IdRefType 
+      PurchasingItems: PurchasingItemsType 
+      CreationDate: String 
+      TaxRate: String 
+      TaxAmount: MonetaryAmountType 
+      TotalAmount: MonetaryAmountType 
+      UpdateDate: String 
+      FullyDelivered: String 
+      OriginalPurchaseOrderRefId: IdRefType 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type VendorInfo {
+        RefId: RefIdType 
+      Name: String 
+      ContactInfo: ContactInfoType 
+      CustomerId: String 
+      ABN: String 
+      RegisteredForGST: String 
+      PaymentTerms: String 
+      BPay: String 
+      BSB: String 
+      AccountNumber: String 
+      AccountName: String 
+      SIF_Metadata: SIF_MetadataType 
+      SIF_ExtendedElements: SIF_ExtendedElementsType 
+      
+      }
+    
+    type ReportPackageType AbstractContentPackageType
+    type AbstractContentPackageType {
+        RefId: String 
+      XMLData: AbstractContentPackageType_XMLData 
+      TextData: AbstractContentPackageType_TextData 
+      BinaryData: AbstractContentPackageType_BinaryData 
+      Reference: AbstractContentPackageType_Reference 
+      
+      }
+    
+    type AbstractContentElementType {
+      XMLData: AbstractContentElementType_XMLData 
+      TextData: AbstractContentElementType_TextData 
+      BinaryData: AbstractContentElementType_BinaryData 
+      Reference: AbstractContentElementType_Reference 
+      
+      }
+    
+    type MonetaryAmountType {
+          Currency: String 
+      
+        Value: String 
+      }
+    
+    type ObjectNameType String
+    type ServiceNameType String
+    type ObjectType String
+    type ReportDataObjectType String
+    type URIOrBinaryType String
+    type GUIDType String
+    type MsgIdType String
+    type RefIdType String
+    type IdRefType String
+    type VersionType String
+    type VersionWithWildcardsType String
+    type DefinedProtocolsType String
+    type ExtendedContentType String
+    type SelectedContentType String
+    type MedicationListType {
+        Medication: [MedicationType] 
+      
+      }
+    
+    type MedicationType {
+        Dosage: String 
+      Frequency: String 
+      AdministrationInformation: String 
+      Method: String 
+      
+      }
+    
+    type WellbeingEventCategoryListType {
+        WellbeingEventCategory: [WellbeingEventCategoryType] 
+      
+      }
+    
+    type WellbeingEventCategoryType {
+        EventCategory: String 
+      WellbeingEventSubCategoryList: WellbeingEventSubCategoryListType 
+      
+      }
+    
+    type WellbeingEventSubCategoryListType {
+        WellbeingEventSubCategory: [String] 
+      
+      }
+    
+    type WellbeingEventLocationDetailsType {
+        EventLocation: String 
+      Class: String 
+      FurtherLocationNotes: String 
+      
+      }
+    
+    type FollowUpActionListType {
+        FollowUpAction: [FollowUpActionType] 
+      
+      }
+    
+    type FollowUpActionType {
+        WellbeingResponseRefId: IdRefType 
+      FollowUpDetails: String 
+      FollowUpActionCategory: String 
+      
+      }
+    
+    type PersonInvolvementListType {
+        PersonInvolvement: [PersonInvolvementType] 
+      
+      }
+    
+    type PersonInvolvementType {
+      PersonRefId: PersonInvolvementType_PersonRefId 
+      ShortName: String 
+      HowInvolved: String 
+      
+      }
+    
+    type WithdrawalTimeListType {
+        Withdrawal: [WithdrawalType] 
+      
+      }
+    
+    type WithdrawalType {
+        WithdrawalDate: String 
+      WithdrawalStartTime: String 
+      WithdrawalEndTime: String 
+      TimeTableSubjectRefId: IdRefType 
+      ScheduledActivityRefId: IdRefType 
+      TimeTableCellRefId: IdRefType 
+      
+      }
+    
+    type SuspensionContainerType {
+        SuspensionCategory: String 
+      WithdrawalTimeList: WithdrawalTimeListType 
+      Duration: String 
+      AdvisementDate: String 
+      ResolutionMeetingTime: String 
+      ResolutionNotes: String 
+      EarlyReturnDate: String 
+      Status: String 
+      
+      }
+    
+    type DetentionContainerType {
+        DetentionCategory: String 
+      DetentionDate: String 
+      DetentionLocation: String 
+      DetentionNotes: String 
+      Status: String 
+      
+      }
+    
+    type PlanRequiredContainerType {
+        PlanRequiredList: PlanRequiredListType 
+      Status: String 
+      
+      }
+    
+    type PlanRequiredListType {
+        Plan: [WellbeingPlanType] 
+      
+      }
+    
+    type WellbeingPlanType {
+        PersonalisedPlanRefId: IdRefType 
+      PlanNotes: String 
+      
+      }
+    
+    type AwardContainerType {
+        AwardDate: String 
+      AwardType: String 
+      AwardDescription: String 
+      AwardNotes: String 
+      Status: String 
+      
+      }
+    
+    type OtherWellbeingResponseContainerType {
+        OtherResponseDate: String 
+      OtherResponseType: String 
+      OtherResponseDescription: String 
+      OtherResponseNotes: String 
+      Status: String 
+      
+      }
+    
+    type WellbeingDocumentListType {
+        Document: [WellbeingDocumentType] 
+      
+      }
+    
+    type WellbeingDocumentType {
+        Location: String 
+      Sensitivity: String 
+      URL: String 
+      DocumentType: String 
+      DocumentReviewDate: String 
+      DocumentDescription: String 
+      
+      }
+    
+    type NAPTestItemContentType {
+        NAPTestItemLocalId: LocalId 
+      ItemName: String 
+      ItemType: String 
+      Subdomain: String 
+      WritingGenre: String 
+      ItemDescriptor: String 
+      ReleasedStatus: String 
+      MarkingType: String 
+      MultipleChoiceOptionCount: String 
+      CorrectAnswer: String 
+      MaximumScore: String 
+      ItemDifficulty: String 
+      ItemDifficultyLogit5: String 
+      ItemDifficultyLogit62: String 
+      ItemDifficultyLogit5SE: String 
+      ItemDifficultyLogit62SE: String 
+      ItemProficiencyBand: String 
+      ItemProficiencyLevel: String 
+      ExemplarURL: String 
+      ItemSubstitutedForList: SubstituteItemListType 
+      ContentDescriptionList: ContentDescriptionListType 
+      StimulusList: StimulusListType 
+      NAPWritingRubricList: NAPWritingRubricListType 
+      
+      }
+    
+    type NAPTestletContentType {
+        NAPTestletLocalId: LocalIdType 
+      TestletName: String 
+      Node: String 
+      LocationInStage: String 
+      TestletMaximumScore: String 
+      
+      }
+    
+    type NAPTestContentType {
+        NAPTestLocalId: LocalIdType 
+      TestName: String 
+      TestLevel: YearLevelType 
+      TestType: String 
+      Domain: String 
+      TestYear: SchoolYearType 
+      StagesCount: String 
+      DomainBands: DomainBandsContainerType 
+      DomainProficiency: DomainProficiencyContainerType 
+      
+      }
+    
+    type PlausibleScaledValueListType {
+        PlausibleScaledValue: [String] 
+      
+      }
+    
+    type SubstituteItemListType {
+        SubstituteItem: [SubstituteItemType] 
+      
+      }
+    
+    type SubstituteItemType {
+        SubstituteItemRefId: IdRefType 
+      SubstituteItemLocalId: LocalIdType 
+      PNPCodeList: PNPCodeListType 
+      
+      }
+    
+    type CodeFrameTestItemListType {
+        TestItem: [CodeFrameTestItemType] 
+      
+      }
+    
+    type CodeFrameTestItemType {
+        TestItemRefId: IdRefType 
+      SequenceNumber: String 
+      TestItemContent: NAPTestItemContentType 
+      
+      }
+    
+    type StimulusLocalIdListType {
+        StimulusLocalId: [LocalIdType] 
+      
+      }
+    
+    type DomainBandsContainerType {
+        Band1Lower: String 
+      Band1Upper: String 
+      Band2Lower: String 
+      Band2Upper: String 
+      Band3Lower: String 
+      Band3Upper: String 
+      Band4Lower: String 
+      Band4Upper: String 
+      Band5Lower: String 
+      Band5Upper: String 
+      Band6Lower: String 
+      Band6Upper: String 
+      Band7Lower: String 
+      Band7Upper: String 
+      Band8Lower: String 
+      Band8Upper: String 
+      Band9Lower: String 
+      Band9Upper: String 
+      Band10Lower: String 
+      Band10Upper: String 
+      
+      }
+    
+    type DomainProficiencyContainerType {
+        Level1Lower: String 
+      Level1Upper: String 
+      Level2Lower: String 
+      Level2Upper: String 
+      Level3Lower: String 
+      Level3Upper: String 
+      Level4Lower: String 
+      Level4Upper: String 
+      
+      }
+    
+    type NAPTestItemListType {
+        TestItem: [NAPTestItem2Type] 
+      
+      }
+    
+    type NAPTestItem2Type {
+        TestItemRefId: IdRefType 
+      TestItemLocalId: LocalIdType 
+      SequenceNumber: String 
+      
+      }
+    
+    type NAPCodeFrameTestletListType {
+        Testlet: [NAPTestletCodeFrameType] 
+      
+      }
+    
+    type NAPTestletCodeFrameType {
+        NAPTestletRefId: IdRefType 
+      TestletContent: NAPTestletContentType 
+      TestItemList: CodeFrameTestItemListType 
+      
+      }
+    
+    type NAPStudentResponseTestletListType {
+        Testlet: [NAPTestletResponseType] 
+      
+      }
+    
+    type NAPTestletResponseType {
+        NAPTestletRefId: IdRefType 
+      NAPTestletLocalId: LocalIdType 
+      TestletSubScore: String 
+      ItemResponseList: NAPTestletItemResponseListType 
+      
+      }
+    
+    type NAPTestletItemResponseListType {
+        ItemResponse: [NAPTestletResponseItemType] 
+      
+      }
+    
+    type NAPTestletResponseItemType {
+        NAPTestItemRefId: IdRefType 
+      NAPTestItemLocalId: LocalIdType 
+      Response: String 
+      ResponseCorrectness: String 
+      Score: String 
+      LapsedTimeItem: String 
+      SequenceNumber: String 
+      ItemWeight: String 
+      SubscoreList: NAPSubscoreListType 
+      
+      }
+    
+    type NAPSubscoreListType {
+        Subscore: [NAPSubscoreType] 
+      
+      }
+    
+    type NAPSubscoreType {
+        SubscoreType: String 
+      SubscoreValue: String 
+      
+      }
+    
+    type DomainScoreType {
+        RawScore: String 
+      ScaledScoreValue: String 
+      ScaledScoreLogitValue: String 
+      ScaledScoreStandardError: String 
+      ScaledScoreLogitStandardError: String 
+      StudentDomainBand: String 
+      StudentProficiency: String 
+      PlausibleScaledValueList: [PlausibleScaledValueListType] 
+      
+      }
+    
+    type NAPWritingRubricListType {
+        NAPWritingRubric: [NAPWritingRubricType] 
+      
+      }
+    
+    type NAPWritingRubricType {
+        RubricType: String 
+      ScoreList: ScoreListType 
+      Descriptor: String 
+      
+      }
+    
+    type ScoreListType {
+        Score: [ScoreType] 
+      
+      }
+    
+    type ScoreType {
+        MaxScoreValue: String 
+      ScoreDescriptionList: ScoreDescriptionListType 
+      
+      }
+    
+    type ScoreDescriptionListType {
+        ScoreDescription: [ScoreDescriptionType] 
+      
+      }
+    
+    type ScoreDescriptionType {
+        ScoreValue: String 
+      Descriptor: String 
+      
+      }
+    
+    type StimulusListType {
+        Stimulus: [StimulusType] 
+      
+      }
+    
+    type StimulusType {
+        StimulusLocalId: LocalIdType 
+      TextGenre: String 
+      TextType: String 
+      WordCount: String 
+      TextDescriptor: String 
+      Content: String 
+      
+      }
+    
+    type ContentDescriptionListType {
+        ContentDescription: [String] 
+      
+      }
+    
+    type PNPCodeListType {
+        PNPCode: [String] 
+      
+      }
+    
+    type AdjustmentContainerType {
+        PNPCodeList: PNPCodeListType 
+      BookletType: String 
+      
+      }
+    
+    type TestDisruptionListType {
+        TestDisruption: [TestDisruptionType] 
+      
+      }
+    
+    type TestDisruptionType {
+        Event: String 
+      
+      }
+    
+    type CalendarSummaryListType {
+        CalendarSummaryRefId: [IdRefType] 
+      
+      }
+    
+    type VisaSubClassType {
+        Code: VisaSubClassCodeType 
+      VisaExpiryDate: String 
+      ATEExpiryDate: String 
+      ATEStartDate: String 
+      VisaStatisticalCode: String 
+      
+      }
+    
+    type VisaSubClassListType {
+        VisaSubClass: [VisaSubClassType] 
+      
+      }
+    
+    type VisaSubClassCodeType String
+    type LanguageBaseType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      LanguageType: String 
+      Dialect: String 
+      
+      }
+    
+    type ReligiousEventListType {
+        ReligiousEvent: [ReligiousEventType] 
+      
+      }
+    
+    type ReligiousEventType {
+        Type: String 
+      Date: String 
+      
+      }
+    
+    type ReligionType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type DwellingArrangementType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type CountryListType {
+        CountryOfCitizenship: [CountryType] 
+      
+      }
+    
+    type CountryList2Type {
+        CountryOfResidency: [CountryType] 
+      
+      }
+    
+    type DebitOrCreditAmountType {
+          Type: String 
+      
+        MonetaryAmountType MonetaryAmountType 
+      }
+    
+    type ScheduledActivityOverrideType {
+          DateOfOverride: String 
+      
+        Value: String 
+      }
+    
+    type ActivityTimeType {
+        CreationDate: String 
+      Duration: ActivityTimeType_Duration 
+      StartDate: String 
+      FinishDate: String 
+      DueDate: String 
+      
+      }
+    
+    type SchoolCourseInfoOverrideType {
+        Override: String 
+      CourseCode: String 
+      StateCourseCode: String 
+      DistrictCourseCode: String 
+      SubjectArea: SubjectAreaType 
+      CourseTitle: String 
+      InstructionalLevel: String 
+      CourseCredits: String 
+      
+      }
+    
+    type LocationOfInstructionType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type LanguageOfInstructionType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type MediumOfInstructionType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type StudentActivityType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type ContactFlagsType {
+        ParentLegalGuardian: String 
+      PickupRights: String 
+      LivesWith: String 
+      AccessToRecords: String 
+      ReceivesAssessmentReport: String 
+      EmergencyContact: String 
+      HasCustody: String 
+      DisciplinaryContact: String 
+      AttendanceContact: String 
+      PrimaryCareProvider: String 
+      FeesBilling: String 
+      FeesAccess: String 
+      FamilyMail: String 
+      InterventionOrder: String 
+      
+      }
+    
+    type AgencyType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type YearRangeType {
+        Start: YearLevelType 
+      End: YearLevelType 
+      
+      }
+    
+    type CreationUserType {
+        Type: String 
+      UserId: String 
+      
+      }
+    
+    type AuditInfoType {
+        CreationUser: CreationUserType 
+      CreationDateTime: String 
+      
+      }
+    
+    type AttendanceInfoType {
+        CountsTowardAttendance: String 
+      AttendanceValue: String 
+      
+      }
+    
+    type CalendarDateInfoType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type ProgramAvailabilityType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type ReferralSourceType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type PromotionInfoType {
+        PromotionStatus: String 
+      
+      }
+    
+    type CatchmentStatusContainerType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type StudentExitStatusContainerType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type StudentExitContainerType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type StudentEntryContainerType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type StudentMostRecentContainerType {
+        SchoolLocalId: LocalIdType 
+      HomeroomLocalId: LocalIdType 
+      YearLevel: YearLevelType 
+      FTE: String 
+      Parent1Language: String 
+      Parent2Language: String 
+      Parent1EmploymentType: String 
+      Parent2EmploymentType: String 
+      Parent1SchoolEducationLevel: String 
+      Parent2SchoolEducationLevel: String 
+      Parent1NonSchoolEducation: String 
+      Parent2NonSchoolEducation: String 
+      LocalCampusId: LocalIdType 
+      SchoolACARAId: LocalIdType 
+      TestLevel: YearLevelType 
+      Homegroup: String 
+      ClassCode: String 
+      MembershipType: String 
+      FFPOS: String 
+      ReportingSchoolId: LocalIdType 
+      OtherEnrollmentSchoolACARAId: LocalIdType 
+      
+      }
+    
+    type StaffMostRecentContainerType {
+        SchoolLocalId: LocalIdType 
+      SchoolACARAId: LocalIdType 
+      LocalCampusId: LocalIdType 
+      NAPLANClassList: NAPLANClassListType 
+      HomeGroup: String 
+      
+      }
+    
+    type StaffActivityExtensionType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type TotalEnrollmentsType {
+        Girls: String 
+      Boys: String 
+      TotalStudents: String 
+      
+      }
+    
+    type CampusContainerType {
+        ParentSchoolId: String 
+      SchoolCampusId: String 
+      CampusType: String 
+      AdminStatus: String 
+      
+      }
+    
+    type HouseholdContactInfoListType {
+        HouseholdContactInfo: [HouseholdContactInfoType] 
+      
+      }
+    
+    type HouseholdContactInfoType {
+        PreferenceNumber: String 
+      HouseholdContactId: LocalIdType 
+      HouseholdSalutation: String 
+      AddressList: AddressListType 
+      EmailList: EmailListType 
+      PhoneNumberList: PhoneNumberListType 
+      
+      }
+    
+    type StatementCodesType {
+        StatementCode: [String] 
+      
+      }
+    
+    type StatementsType {
+        Statement: [String] 
+      
+      }
+    
+    type ProgramFundingSourcesType {
+        ProgramFundingSource: [ProgramFundingSourceType] 
+      
+      }
+    
+    type ProgramFundingSourceType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type AttendanceTimesType {
+        AttendanceTime: [AttendanceTimeType] 
+      
+      }
+    
+    type AttendanceTimeType {
+        AttendanceType: String 
+      AttendanceCode: AttendanceCodeType 
+      AttendanceStatus: String 
+      StartTime: String 
+      EndTime: String 
+      DurationValue: String 
+      TimeTableSubjectRefId: RefIdType 
+      AttendanceNote: String 
+      
+      }
+    
+    type PeriodAttendancesType {
+        PeriodAttendance: [PeriodAttendanceType] 
+      
+      }
+    
+    type PeriodAttendanceType {
+        AttendanceType: String 
+      AttendanceCode: AttendanceCodeType 
+      AttendanceStatus: String 
+      Date: String 
+      SessionInfoRefId: IdRefType 
+      ScheduledActivityRefId: IdRefType 
+      TimetablePeriod: String 
+      DayId: LocalIdType 
+      StartTime: String 
+      EndTime: String 
+      TimeIn: String 
+      TimeOut: String 
+      TimeTableCellRefId: IdRefType 
+      TimeTableSubjectRefId: RefIdType 
+      TeacherList: ScheduledTeacherListType 
+      RoomList: RoomListType 
+      AttendanceNote: String 
+      
+      }
+    
+    type StaffSubjectListType {
+        StaffSubject: [StaffSubjectType] 
+      
+      }
+    
+    type StaffSubjectType {
+        PreferenceNumber: String 
+      SubjectLocalId: LocalIdType 
+      TimeTableSubjectRefId: RefIdType 
+      
+      }
+    
+    type TeachingGroupListType {
+        TeachingGroupRefId: [IdRefType] 
+      
+      }
+    
+    type ScheduledTeacherListType {
+        TeacherCover: [TeacherCoverType] 
+      
+      }
+    
+    type TeacherCoverType {
+        StaffPersonalRefId: IdRefType 
+      StaffLocalId: LocalIdType 
+      StartTime: String 
+      FinishTime: String 
+      Credit: String 
+      Supervision: String 
+      Weighting: String 
+      
+      }
+    
+    type RoomListType {
+        RoomInfoRefId: [IdRefType] 
+      
+      }
+    
+    type StaffListType {
+        StaffPersonalRefId: [IdRefType] 
+      
+      }
+    
+    type AlternateIdentificationCodes {
+        AlternateIdentificationCode: [String] 
+      
+      }
+    
+    type AuthorsType {
+        Author: [String] 
+      
+      }
+    
+    type OrganizationsType {
+        Organization: [String] 
+      
+      }
+    
+    type PurchasingItemsType {
+        PurchasingItem: [PurchasingItemType] 
+      
+      }
+    
+    type PurchasingItem {
+        ItemNumber: String 
+      ItemDescription: String 
+      Quantity: String 
+      UnitCost: MonetaryAmountType 
+      TotalCost: MonetaryAmountType 
+      QuantityDelivered: String 
+      CancelledOrder: String 
+      TaxRate: String 
+      ExpenseAccounts: ExpenseAccountsType 
+      
+      }
+    
+    type ExpenseAccountType {
+        ExpenseAccount: [ExpenseAccountType] 
+      
+      }
+    
+    type ExpenseAccountType {
+        AccountCode: String 
+      Amount: MonetaryAmountType 
+      FinancialAccountRefId: IdRefType 
+      AccountingPeriod: LocalIdType 
+      
+      }
+    
+    type SchoolProgramListType {
+        Program: [SchoolProgramType] 
+      
+      }
+    
+    type SchoolProgramType {
+        Category: String 
+      Type: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type LearningObjectivesType {
+        LearningObjective: [String] 
+      
+      }
+    
+    type RecognitionListType {
+        Recognition: [String] 
+      
+      }
+    
+    type LResourcesType {
+        LearningResourceRefId: [ResourcesType] 
+      
+      }
+    
+    type ResourcesType {
+          ResourceType: String 
+      
+        IdRefType IdRefType 
+      }
+    
+    type SourceObjectsType {
+      SourceObject: [SourceObjectsType_SourceObject] 
+      
+      }
+    
+    type StudentsType {
+        StudentPersonalRefId: [IdRefType] 
+      
+      }
+    
+    type PrerequisitesType {
+        Prerequisite: [String] 
+      
+      }
+    
+    type EssentialMaterialsType {
+        EssentialMaterial: [String] 
+      
+      }
+    
+    type TechnicalRequirementsType {
+        TechnicalRequirement: String 
+      
+      }
+    
+    type SoftwareRequirementListType {
+        SoftwareRequirement: [SoftwareRequirementType] 
+      
+      }
+    
+    type SoftwareRequirementType {
+        SoftwareTitle: String 
+      Version: String 
+      Vendor: String 
+      OS: String 
+      
+      }
+    
+    type HouseholdListType {
+        Household: [LocalIdType] 
+      
+      }
+    
+    type StudentSubjectChoiceListType {
+        StudentSubjectChoice: [StudentSubjectChoiceType] 
+      
+      }
+    
+    type StudentSubjectChoiceType {
+        PreferenceNumber: String 
+      SubjectLocalId: LocalIdType 
+      StudyDescription: SubjectAreaType 
+      OtherSchoolLocalId: LocalIdType 
+      
+      }
+    
+    type IdentityAssertionsType {
+      IdentityAssertion: [IdentityAssertionsType_IdentityAssertion] 
+      
+      }
+    
+    type LearningStandardsType {
+        LearningStandardItemRefId: [IdRefType] 
+      
+      }
+    
+    type LearningResourcesType {
+        LearningResourceRefId: [IdRefType] 
+      
+      }
+    
+    type LearningStandardsDocumentType {
+        LearningStandardDocumentRefId: [IdRefType] 
+      
+      }
+    
+    type ComponentsType {
+        Component: [ComponentType] 
+      
+      }
+    
+    type ComponentType {
+        Name: String 
+      Reference: String 
+      Description: String 
+      Strategies: StrategiesType 
+      AssociatedObjects: AssociatedObjectsType 
+      
+      }
+    
+    type StrategiesType {
+        Strategy: [String] 
+      
+      }
+    
+    type AssociatedObjectsType {
+      AssociatedObject: [AssociatedObjectsType_AssociatedObject] 
+      
+      }
+    
+    type EvaluationsType {
+        Evaluation: [EvaluationType] 
+      
+      }
+    
+    type EvaluationType {
+        RefId: RefIdType 
+      Description: String 
+      Date: String 
+      Name: NameType 
+      
+      }
+    
+    type ApprovalsType {
+        Approval: [ApprovalType] 
+      
+      }
+    
+    type ApprovalType {
+        Organization: String 
+      Date: String 
+      
+      }
+    
+    type MediaTypesType {
+        MediaType: [String] 
+      
+      }
+    
+    type LEAContactListType {
+        LEAContact: [LEAContactType] 
+      
+      }
+    
+    type LEAContactType {
+        PublishInDirectory: PublishInDirectoryType 
+      ContactInfo: ContactInfoType 
+      
+      }
+    
+    type FinancialAccountRefIdListType {
+        FinancialAccountRefId: [IdRefType] 
+      
+      }
+    
+    type PasswordListType {
+      Password: [PasswordListType_Password] 
+      
+      }
+    
+    type ExclusionRulesType {
+        ExclusionRule: [ExclusionRuleType] 
+      
+      }
+    
+    type ExclusionRuleType {
+          Type: String 
+      
+        Value: String 
+      }
+    
+    type CharacteristicsType {
+        AggregateCharacteristicInfoRefId: [IdRefType] 
+      
+      }
+    
+    type ContactsType {
+        Contact: [ContactType] 
+      
+      }
+    
+    type ContactType {
+        Name: NameType 
+      Address: AddressType 
+      PhoneNumber: PhoneNumberType 
+      Email: EmailType 
+      
+      }
+    
+    type TeachingGroupPeriodListType {
+        TeachingGroupPeriod: [TeachingGroupPeriodType] 
+      
+      }
+    
+    type TeachingGroupPeriodType {
+        TimeTableCellRefId: IdRefType 
+      RoomNumber: HomeroomNumberType 
+      StaffLocalId: LocalIdType 
+      DayId: LocalIdType 
+      PeriodId: LocalIdType 
+      StartTime: String 
+      CellType: String 
+      
+      }
+    
+    type TeacherListType {
+        TeachingGroupTeacher: [TeachingGroupTeacherType] 
+      
+      }
+    
+    type TeachingGroupTeacherType {
+        StaffPersonalRefId: IdRefType 
+      StaffLocalId: LocalIdType 
+      Name: NameOfRecordType 
+      Association: String 
+      
+      }
+    
+    type StudentListType {
+        TeachingGroupStudent: [TeachingGroupStudentType] 
+      
+      }
+    
+    type TeachingGroupStudentType {
+        StudentPersonalRefId: IdRefType 
+      StudentLocalId: LocalIdType 
+      Name: NameOfRecordType 
+      
+      }
+    
+    type TimeTableDayListType {
+        TimeTableDay: [TimeTableDayType] 
+      
+      }
+    
+    type TimeTableDayType {
+        DayId: LocalIdType 
+      DayTitle: String 
+      TimeTablePeriodList: TimeTablePeriodListType 
+      
+      }
+    
+    type TimeTablePeriodListType {
+        TimeTablePeriod: [TimeTablePeriodType] 
+      
+      }
+    
+    type TimeTablePeriodType {
+        PeriodId: LocalIdType 
+      PeriodTitle: String 
+      BellPeriod: String 
+      StartTime: String 
+      EndTime: String 
+      RegularSchoolPeriod: String 
+      InstructionalMinutes: String 
+      UseInAttendanceCalculations: String 
+      
+      }
+    
+    type NAPLANClassListType {
+        ClassCode: [String] 
+      
+      }
+    
+    type SchoolGroupListType {
+        SchoolGroup: [LocalIdType] 
+      
+      }
+    
+    type YearLevelEnrollmentListType {
+        YearLevelEnrollment: [YearLevelEnrollmentType] 
+      
+      }
+    
+    type YearLevelEnrollmentType {
+        Year: String 
+      Enrollment: String 
+      
+      }
+    
+    type SchoolFocusListType {
+        SchoolFocus: [String] 
+      
+      }
+    
+    type AlertMessagesType {
+        AlertMessage: [AlertMessageType] 
+      
+      }
+    
+    type AlertMessageType {
+          Type: String 
+      
+        Value: String 
+      }
+    
+    type MedicalAlertMessagesType {
+        MedicalAlertMessage: [MedicalAlertMessageType] 
+      
+      }
+    
+    type MedicalAlertMessageType {
+          Severity: String 
+      
+        Value: String 
+      }
+    
+    type OtherIdListType {
+        OtherId: [OtherIdType] 
+      
+      }
+    
+    type OtherIdType {
+          Type: String 
+      
+        Value: String 
+      }
+    
+    type BaseNameType {
+        Title: String 
+      FamilyName: String 
+      GivenName: String 
+      MiddleName: String 
+      FamilyNameFirst: String 
+      PreferredFamilyName: String 
+      PreferredFamilyNameFirst: String 
+      PreferredGivenName: String 
+      Suffix: String 
+      FullName: String 
+      
+      }
+    
+    type NameOfRecordType {
+          Type: String 
+      
+        Value: String 
+      }
+    
+    type OtherNameType {
+          Type: String 
+      
+        Value: String 
+      }
+    
+    type PartialDateType String
+    type LocalIdType String
+    type LocationType {
+        Type: String 
+      LocationName: String 
+      LocationRefId: LocationType_LocationRefId 
+      
+      }
+    
+    type StateProvinceIdType String
+    type AttendanceCodeType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type YearLevelType {
+        Code: String 
+      
+      }
+    
+    type PersonInfoType {
+        Name: NameOfRecordType 
+      OtherNames: OtherNamesType 
+      Demographics: DemographicsType 
+      AddressList: AddressListType 
+      PhoneNumberList: PhoneNumberListType 
+      EmailList: EmailListType 
+      HouseholdContactInfoList: HouseholdContactInfoListType 
+      
+      }
+    
+    type YearLevelsType {
+        YearLevel: [YearLevelType] 
+      
+      }
+    
+    type SchoolURLType String
+    type PrincipalInfoType {
+        ContactName: NameOfRecordType 
+      ContactTitle: String 
+      PhoneNumberList: PhoneNumberListType 
+      EmailList: EmailListType 
+      
+      }
+    
+    type SchoolContactType {
+        PublishInDirectory: PublishInDirectoryType 
+      ContactInfo: ContactInfoType 
+      
+      }
+    
+    type SchoolContactListType {
+        SchoolContact: [SchoolContactType] 
+      
+      }
+    
+    type PublishInDirectoryType String
+    type ContactInfoType {
+        Name: NameType 
+      PositionTitle: String 
+      Role: String 
+      Address: AddressType 
+      EmailList: EmailListType 
+      PhoneNumberList: PhoneNumberListType 
+      
+      }
+    
+    type AddressStreetType {
+        Line1: String 
+      Line2: String 
+      Line3: String 
+      Complex: String 
+      StreetNumber: String 
+      StreetPrefix: String 
+      StreetName: String 
+      StreetType: String 
+      StreetSuffix: String 
+      ApartmentType: String 
+      ApartmentNumberPrefix: String 
+      ApartmentNumber: String 
+      ApartmentNumberSuffix: String 
+      
+      }
+    
+    type AddressType {
+        Type: String 
+      Role: String 
+      EffectiveFromDate: String 
+      EffectiveToDate: String 
+      Street: AddressStreetType 
+      City: String 
+      StateProvince: StateProvinceType 
+      Country: CountryType 
+      PostalCode: String 
+      GridLocation: GridLocationType 
+      MapReference: MapReferenceType 
+      RadioContact: String 
+      Community: String 
+      LocalId: LocalIdType 
+      AddressGlobalUID: GUIDType 
+      StatisticalAreas: StatisticalAreasType 
+      
+      }
+    
+    type MapReferenceType {
+        Type: String 
+      XCoordinate: String 
+      YCoordinate: String 
+      
+      }
+    
+    type StatisticalAreasType {
+        StatisticalArea: [StatisticalAreaType] 
+      
+      }
+    
+    type StatisticalAreaType {
+          SpatialUnitType: String 
+      
+        Value: String 
+      }
+    
+    type AddressListType {
+        Address: [AddressType] 
+      
+      }
+    
+    type EmailListType {
+        Email: [EmailType] 
+      
+      }
+    
+    type EmailType {
+          Type: String 
+      
+        Value: String 
+      }
+    
+    type PhoneNumberListType {
+        PhoneNumber: [PhoneNumberType] 
+      
+      }
+    
+    type PhoneNumberType {
+        Type: String 
+      Number: String 
+      Extension: String 
+      ListedStatus: String 
+      Preference: String 
+      
+      }
+    
+    type CountryType String
+    type GridLocationType {
+        Latitude: String 
+      Longitude: String 
+      
+      }
+    
+    type OperationalStatusType String
+    type StateProvinceType String
+    type SchoolYearType String
+    type ElectronicIdListType {
+        ElectronicId: [ElectronicIdType] 
+      
+      }
+    
+    type ElectronicIdType {
+          Type: String 
+      
+        Value: String 
+      }
+    
+    type OtherNamesType {
+        Name: [OtherNameType] 
+      
+      }
+    
+    type DemographicsType {
+        IndigenousStatus: String 
+      Sex: String 
+      BirthDate: BirthDateType 
+      DateOfDeath: String 
+      BirthDateVerification: String 
+      PlaceOfBirth: String 
+      StateOfBirth: StateProvinceType 
+      CountryOfBirth: CountryType 
+      CountriesOfCitizenship: CountryListType 
+      CountriesOfResidency: CountryList2Type 
+      CountryArrivalDate: String 
+      AustralianCitizenshipStatus: String 
+      EnglishProficiency: EnglishProficiencyType 
+      LanguageList: LanguageListType 
+      DwellingArrangement: DwellingArrangementType 
+      Religion: ReligionType 
+      ReligiousEventList: ReligiousEventListType 
+      ReligiousRegion: String 
+      PermanentResident: String 
+      VisaSubClass: VisaSubClassCodeType 
+      VisaStatisticalCode: String 
+      VisaExpiryDate: String 
+      VisaSubClassList: VisaSubClassListType 
+      LBOTE: String 
+      ImmunisationCertificateStatus: String 
+      CulturalBackground: String 
+      MaritalStatus: String 
+      MedicareNumber: String 
+      
+      }
+    
+    type EnglishProficiencyType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type LanguageListType {
+        Language: [LanguageBaseType] 
+      
+      }
+    
+    type BirthDateType String
+    type ProjectedGraduationYearType String
+    type OnTimeGraduationYearType String
+    type RelationshipType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type EducationalLevelType String
+    type GraduationDateType PartialDateType
+    type NameType {
+          Type: String 
+      
+        BaseNameType BaseNameType 
+      }
+    
+    type HomeroomNumberType String
+    type TimeElementType {
+        Type: String 
+      Code: String 
+      Name: String 
+      Value: String 
+      StartDateTime: String 
+      EndDateTime: String 
+      SpanGaps: TimeElementType_SpanGaps 
+      IsCurrent: String 
+      
+      }
+    
+    type LifeCycleType {
+      Created: LifeCycleType_Created 
+      ModificationHistory: LifeCycleType_ModificationHistory 
+      TimeElements: LifeCycleType_TimeElements 
+      
+      }
+    
+    type OtherCodeListType {
+      OtherCode: [OtherCodeListType_OtherCode] 
+      
+      }
+    
+    type ProgramStatusType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type SubjectAreaListType {
+        SubjectArea: [SubjectAreaType] 
+      
+      }
+    
+    type ACStrandAreaListType {
+        ACStrandSubjectArea: [ACStrandSubjectAreaType] 
+      
+      }
+    
+    type SubjectAreaType {
+        Code: String 
+      OtherCodeList: OtherCodeListType 
+      
+      }
+    
+    type ACStrandSubjectAreaType {
+        ACStrand: String 
+      SubjectArea: SubjectAreaType 
+      
+      }
+    
+    type EducationFilterType {
+        LearningStandardItems: LearningStandardsType 
+      
+      }
+    
+    type SIF_ExtendedElementsType {
+      SIF_ExtendedElement: [SIF_ExtendedElementsType_SIF_ExtendedElement] 
+      
+      }
+    
+    type SIF_MetadataType {
+      TimeElements: SIF_MetadataType_TimeElements 
+      LifeCycle: LifeCycleType 
+      EducationFilter: EducationFilterType 
+      
+      }
+    type AbstractContentPackageType_XMLData {
+      Description: String 
+      Value: String 
+}
+type AbstractContentPackageType_TextData {
+      MIMEType: String 
+      FileName: String 
+      Description: String 
+      Value: String 
+}
+type AbstractContentPackageType_BinaryData {
+      MIMEType: String 
+      FileName: String 
+      Description: String 
+      Value: String 
+}
+type AbstractContentPackageType_Reference {
+      MIMEType: String 
+      Description: String 
+       URL: String 
+}
+type AbstractContentElementType_XMLData {
+      Description: String 
+      Value: String 
+}
+type AbstractContentElementType_TextData {
+      MIMEType: String 
+      FileName: String 
+      Description: String 
+      Value: String 
+}
+type AbstractContentElementType_BinaryData {
+      MIMEType: String 
+      FileName: String 
+      Description: String 
+      Value: String 
+}
+type AbstractContentElementType_Reference {
+      MIMEType: String 
+      Description: String 
+       URL: String 
+}
+type PersonInvolvementType_PersonRefId {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+type ActivityTimeType_Duration {
+      Units: String 
+      Value: String 
+}
+type SourceObjectsType_SourceObject {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+type IdentityAssertionsType_IdentityAssertion {
+      SchemaName: String 
+      Value: String 
+}
+type AssociatedObjectsType_AssociatedObject {
+      SIF_RefObject: ObjectNameType 
+      Value: IdRefType 
+}
+type PasswordListType_Password {
+      Algorithm: String 
+      KeyName: String 
+      Value: String 
+}
+type LocationType_LocationRefId {
+      SIF_RefObject: String 
+      Value: IdRefType 
+}
+type TimeElementType_SpanGaps {
+      SpanGap: [TimeElementType_SpanGap] 
+}
+type LifeCycleType_Created {
+       DateTime: String 
+      Creators: LifeCycleType_Creators 
+}
+type LifeCycleType_ModificationHistory {
+      Modified: [LifeCycleType_Modified] 
+}
+type LifeCycleType_TimeElements {
+       TimeElement: [String] 
+}
+type OtherCodeListType_OtherCode {
+      Codeset: String 
+      Value: String 
+}
+type SIF_ExtendedElementsType_SIF_ExtendedElement {
+      Name: String 
+      Type: String 
+      SIF_Action: String 
+      Value: ExtendedContentType 
+}
+type SIF_MetadataType_TimeElements {
+       TimeElement: [TimeElementType] 
+}
+type TimeElementType_SpanGap {
+       Type: String 
+       Code: String 
+       Name: String 
+       Value: String 
+       StartDateTime: String 
+       EndDateTime: String 
+}
+type LifeCycleType_Creators {
+      Creator: [LifeCycleType_Creator] 
+}
+type LifeCycleType_Modified {
+       By: String 
+       DateTime: String 
+       Description: String 
+}
+type LifeCycleType_Creator {
+       Name: String 
+       ID: String 
+}
