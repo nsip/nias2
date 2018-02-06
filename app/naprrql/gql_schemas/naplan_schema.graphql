@@ -7,7 +7,7 @@ type NaplanData {
 	tests_count: Int
 	## Testlets used within this NAPLAN Test 
 	testlets: [NAPTestlet]
-	## Number of teslets used in this NAPLAN test
+	## Number of testlets used in this NAPLAN test
 	testlets_count: Int
 	## Test Items used in this NAPLAN test
 	testitems: [NAPTestItem]
@@ -19,19 +19,19 @@ type NaplanData {
 	codeframes_count: Int
 	## Students at this school
 	students: [RegistrationRecord]
-	## number of student records in resuluts set
+	## number of student records in this results set
 	students_count: Int
 	## Test events students participated in
 	events: [NAPEvent]
-	## number of student-test events in results set
+	## number of student-test events in this results set
 	events_count: Int
 	## The student responses from this school
 	responses: [NAPResponseSet]
-	## The number of student responses in the reults set
+	## The number of student responses in this results set
 	responses_count: Int
 	## summary of scores for school
 	score_summaries: [ScoreSummary]
-	## number of score summary objects in results set
+	## number of score summary objects in this results set
 	score_summaries_count: Int
 	## School info of schools in this result set
 	schools: [SchoolInfo]
@@ -195,13 +195,13 @@ type CodeFrameDataSet {
 }
 
 
-## Particpation reporting onject
+## Participation reporting object
 type ParticipationDataSet {
-	## The student who's participation is being reported
+	## The student whose participation is being reported
 	Student: RegistrationRecord
 	## The school they belong to
 	School: SchoolInfo
-	## The events they particpated in
+	## The events they participated in
 	EventInfos: [EventInfo]
 	## A summary of their participation by domain
 	Summary: [ParticipationSummary]
