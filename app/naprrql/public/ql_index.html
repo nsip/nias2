@@ -134,6 +134,9 @@
     // alternative fetch method that adds lodash support
     // to the returned query result
     function graphQLFetcherLoDash(graphQLParams) {
+        
+        // console.log(graphQLParams);
+
         // This example expects a GraphQL server at the path /graphql.
         // Change this to point wherever you host your GraphQL server.
         let { query, transform } = window.GQLLodash.graphqlLodash(
@@ -147,7 +150,7 @@
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({graphQLParams, query}),
+            body: JSON.stringify(graphQLParams),
             credentials: 'include',
         }).then(responce => {
             if (responce.ok)
