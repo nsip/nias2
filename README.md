@@ -14,6 +14,8 @@ If you are using NIAS for the purposes of NAPLAN validation or postprocessing, y
 * [NAPRRQL CSV and Reporting Output Outline](https://github.com/nsip/nias2/blob/master/app/naprrql/NAPRRQLToolsetCsvAndReportingOutput_v05.pdf)
 * [NAPCOMP Readme](https://github.com/nsip/nias2/blob/master/napcomp/README.md) (Audit of registration data against reporting data)
 
+If you  need a simple Java-based reader for SIF NAPLAN data, consider using https://github.com/rcaldous/naplan-sif34-to-csv (developed at the VCAA).
+
 # 1. Overview
 
 NIAS is a suite of open-source components designed to enable as many different users as possible to quickly and easily solve issues of system integration using the Australian [SIF Data Model](http://specification.sifassociation.org/Implementation/AU/1.4/html/) for school education.
