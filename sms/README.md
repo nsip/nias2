@@ -56,6 +56,6 @@ This service extracts SIF data from the SMS via query (all attendance records fo
 
 D3-based clients are then easily instantiated in html pages for lightweight dashboarding and basic reporting. These same services can be used to provide interactive data analysis support to NAPLAN results users where no systemic BI capability is available.
 
-###2.3.4. CSV-SIF Conversion
+### 2.3.4. CSV-SIF Conversion
 
 This is a simple service to support NAPLAN Online integrations. Validating CSV files is significantly harder than validating XML, but there will be a strong preference in schools and jurisdictions initially to produce registration data in CSV format. This service converts CSV input to the relevant SIF objects for onward transmission to the National Assessment Platform.
