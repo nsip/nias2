@@ -89,7 +89,7 @@ Configuration files:
   * `serviceregister.go` : registry of microservices, mapping Route keys to service instances, and with code for processing messages according to their Route attribute
 
 
-#API
+# API
 
 ## Supported Queries
 * `POST /naplan/reg/validate` : validate the record(s), whether in XML or CSV. This involves publishing the records received onto the microservice bus, with the configured list of validators as the message route. Blank entries are stripped.
