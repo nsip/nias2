@@ -63,6 +63,9 @@ The product does not incorporate authentication or authorisation.
 
 * The product is released with the SIF-AU 3.4 XSD schema, and validates against it. Other schemas can be used, but may require re-coding of some modules.
 
+* The key-value database in the product needs to be able to process a large number of open files; if you will be running NIAS on Mac/Linux with production-scale
+numbers of students in the results & reporting file, you will need  to increase your `ulimit` setting; we recommend 2048.
+  * For Mac, see https://blog.dekstroza.io/ulimit-shenanigans-on-osx-el-capitan/ 
 
 # 2. Installation
 
