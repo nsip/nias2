@@ -114,11 +114,17 @@ func buildReportResolvers() map[string]interface{} {
 		}
 
 		summaries, err := getObjects(summ_refids)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		summary_datasets := make([]ScoreSummaryDataSet, 0)
 		for _, summary := range summaries {
 			summ, _ := summary.(xml.NAPTestScoreSummary)
 			testid := []string{summ.NAPTestRefId}
-			obj, _ := getObjects(testid)
+			obj, err := getObjects(testid)
+			if err != nil {
+				return []interface{}{}, err
+			}
 			test, _ := obj[0].(xml.NAPTest)
 			sds := ScoreSummaryDataSet{Summ: summ, Test: test}
 			summary_datasets = append(summary_datasets, sds)
@@ -547,7 +553,7 @@ func buildReportResolvers() map[string]interface{} {
 			}
 			test, _ := testObj[0].(xml.NAPTest)
 			for _, cf_testlet := range codeframe.TestletList.Testlet {
-				tlObj, _ := getObjects([]string{cf_testlet.NAPTestletRefId})
+				tlObj, err := getObjects([]string{cf_testlet.NAPTestletRefId})
 				if err != nil {
 					return []interface{}{}, err
 				}
@@ -858,6 +864,9 @@ func buildReportResolvers() map[string]interface{} {
 		log.Printf("Found: %d orphan score summaries\n", len(orphans))
 
 		summaries, err := getObjects(orphans)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		summary_datasets := make([]xml.NAPTestScoreSummary, 0)
 		for _, summary := range summaries {
 			summ, _ := summary.(xml.NAPTestScoreSummary)
@@ -919,6 +928,9 @@ func buildReportResolvers() map[string]interface{} {
 		log.Printf("Found: %d orphan events\n", len(orphans))
 
 		events, err := getObjects(orphans)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		summary_datasets := make([]xml.NAPEvent, 0)
 		for _, summary := range events {
 			summ, _ := summary.(xml.NAPEvent)
@@ -970,6 +982,9 @@ func buildReportResolvers() map[string]interface{} {
 		log.Printf("Found: %d orphan students\n", len(orphans))
 
 		students, err := getObjects(orphans)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		summary_datasets := make([]xml.RegistrationRecord, 0)
 		for _, summary := range students {
 			summ, _ := summary.(xml.RegistrationRecord)
@@ -1023,6 +1038,9 @@ func buildReportResolvers() map[string]interface{} {
 		results := make([]GuidCheckDataSet, 0)
 
 		codeframes, err := getObjects(codeframe_ids)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		for _, codeframe := range codeframes {
 			t, _ := codeframe.(xml.NAPCodeFrame)
 			results = checkGuid(results, t.RefId, "codeframe", t.NAPTestRefId, "test", ids)
@@ -1036,6 +1054,9 @@ func buildReportResolvers() map[string]interface{} {
 		codeframes = nil
 
 		events, err := getObjects(event_ids)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		for _, event := range events {
 			t, _ := event.(xml.NAPEvent)
 			results = checkGuid(results, t.EventID, "event", t.SPRefID, "student", ids)
@@ -1045,6 +1066,9 @@ func buildReportResolvers() map[string]interface{} {
 		events = nil
 
 		responses, err := getObjects(response_ids)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		for _, response := range responses {
 			t, _ := response.(xml.NAPResponseSet)
 			results = checkGuid(results, t.ResponseID, "response", t.StudentID, "student", ids)
@@ -1059,6 +1083,9 @@ func buildReportResolvers() map[string]interface{} {
 		responses = nil
 
 		testitems, err := getObjects(testitem_ids)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		for _, testitem := range testitems {
 			t, _ := testitem.(xml.NAPTestItem)
 			for _, s := range t.TestItemContent.ItemSubstitutedForList.SubstituteItem {
@@ -1068,6 +1095,9 @@ func buildReportResolvers() map[string]interface{} {
 		testitems = nil
 
 		testlets, err := getObjects(testlet_ids)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		for _, testlet := range testlets {
 			t, _ := testlet.(xml.NAPTestlet)
 			results = checkGuid(results, t.TestletID, "testlet", t.NAPTestRefId, "test", ids)
@@ -1078,6 +1108,9 @@ func buildReportResolvers() map[string]interface{} {
 		testlets = nil
 
 		summarys, err := getObjects(scoresummary_ids)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		for _, summary := range summarys {
 			t, _ := summary.(xml.NAPTestScoreSummary)
 			results = checkGuid(results, t.SummaryID, "scoresummary", t.SchoolInfoRefId, "school", ids)
@@ -1101,6 +1134,9 @@ func buildReportResolvers() map[string]interface{} {
 		seen := make(map[string]bool)
 
 		codeframes, err := getObjects(codeframe_ids)
+		if err != nil {
+			return []interface{}{}, err
+		}
 		for _, codeframe := range codeframes {
 			t, _ := codeframe.(xml.NAPCodeFrame)
 			seen[t.NAPTestRefId] = true
