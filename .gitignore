@@ -11,6 +11,7 @@ var
 build
 kvs
 out
+.idea
 
 # Architecture specific extensions/prefixes
 *.[568vq]
