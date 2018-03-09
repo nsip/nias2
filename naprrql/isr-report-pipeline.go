@@ -48,32 +48,32 @@ func runISRPipeline(year string, schools []string) error {
 	// transform stage
 	queryTemplates := getTemplates("./reporting_templates/isr_printing/")
 	var query string
-	for _, queryText := range queryTemplates {
+	for queryFileName, queryText := range queryTemplates {
 		query = queryText
-	}
-	jsonc, errc, err := isrQueryExecutor(ctx, query, DEF_ISR_URL, varsc)
-	if err != nil {
-		return err
-	}
-	errcList = append(errcList, errc)
+		jsonc, errc, err := isrQueryExecutor(ctx, query, DEF_ISR_URL, varsc)
+		if err != nil {
+			return err
+		}
+		errcList = append(errcList, errc)
 
-	// sink stage
-	// create working directory if not there
-	outFileDir := "./out/isr_printing"
-	err = os.MkdirAll(outFileDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	csvFileName := "isrprint_yr" + year + ".csv"
-	outFileName := outFileDir + "/" + csvFileName
-	mapFileName := "./reporting_templates/isr_printing/isrPrinting_map.csv"
-	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
-	if err != nil {
-		return err
-	}
-	errcList = append(errcList, errc)
+		// sink stage
+		// create working directory if not there
+		outFileDir := "./out/isr_printing"
+		err = os.MkdirAll(outFileDir, os.ModePerm)
+		if err != nil {
+			return err
+		}
+		csvFileName := deriveQueryFileName(queryFileName) + "_yr" + year + ".csv"
+		outFileName := outFileDir + "/" + csvFileName
+		mapFileName := deriveMapFileName(queryFileName)
+		errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
+		if err != nil {
+			return err
+		}
+		errcList = append(errcList, errc)
 
-	log.Println("ISR print file writing... " + outFileName)
+		log.Println("ISR print file writing... " + outFileName)
+	}
 	return WaitForPipeline(errcList...)
 }
 

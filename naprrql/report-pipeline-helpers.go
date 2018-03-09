@@ -198,6 +198,19 @@ func deriveMapFileName(queryFileName string) string {
 
 }
 
+//
+// from a given report file name, create a base filename stripping suffix
+// and directory
+//
+func deriveQueryFileName(queryFileName string) string {
+
+	reportFilename := filepath.Base(queryFileName)
+	csvFilename := strings.Replace(reportFilename, ".gql", "", 1)
+
+	return csvFilename
+
+}
+
 // splits a channel of GJSON into an array of channels of GJSON
 func splitter(ctx context.Context, in <-chan gjson.Result, size int) (
 	[]chan gjson.Result, <-chan error, error) {

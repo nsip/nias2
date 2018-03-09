@@ -38,6 +38,33 @@ type ISRPrintItem struct {
 	N_Comment        string
 }
 
+// type to hold isr print item data, plus containers for Student and Attendances
+type ISRPrintItemExpanded struct {
+	Student         xml.RegistrationRecord
+	SchoolID        string
+	SchoolName      string
+	R_Score         float64
+	R_Mean          float64
+	R_Comment       string
+	R_Participation string
+	W_Score         float64
+	W_Mean          float64
+	W_Comment       string
+	W_Participation string
+	S_Score         float64
+	S_Mean          float64
+	S_Comment       string
+	S_Participation string
+	G_Score         float64
+	G_Mean          float64
+	G_Comment       string
+	G_Participation string
+	N_Score         float64
+	N_Mean          float64
+	N_Comment       string
+	N_Participation string
+}
+
 //
 // if no isr item exists for this student create one and fill with
 // known information
@@ -54,6 +81,20 @@ func (isrpi *ISRPrintItem) initialiseISRItem(schoolInfo xml.SchoolInfo, event xm
 	isrpi.StudentLocalID = student.LocalId
 	isrpi.StudentPSI = student.PlatformId
 
+}
+
+//
+// if no isr item exists for this student create one and fill with
+// known information
+//
+func (isrpi *ISRPrintItemExpanded) initialiseISRItemExpanded(schoolInfo xml.SchoolInfo, event xml.NAPEvent) {
+
+	isrpi.SchoolID = schoolInfo.LocalId
+	isrpi.SchoolName = schoolInfo.SchoolName
+
+	student := getStudent(event.SPRefID)
+	student.Flatten()
+	isrpi.Student = student
 }
 
 //
@@ -94,6 +135,50 @@ func (isrpi *ISRPrintItem) allocateDomainScoreAndMean(event *xml.NAPEvent,
 	case strings.Contains(domain, "spell"):
 		isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+	default:
+		log.Println("Unknown test domain supplied (allocateDomainScore): ", domain)
+	}
+
+}
+
+func (isrpi *ISRPrintItemExpanded) allocateDomainScoreAndMeanAndParticipation(event *xml.NAPEvent,
+	testLookup map[string]xml.NAPTest,
+	summaryLookup map[string]xml.NAPTestScoreSummary) {
+
+	test, ok := testLookup[event.TestID]
+	if !ok {
+		test = xml.NAPTest{}
+	}
+
+	summary, ok := summaryLookup[event.TestID]
+	if !ok {
+		summary = xml.NAPTestScoreSummary{}
+	}
+
+	resp := getResponseDomainScore(test.TestID, event.SPRefID)
+
+	domain := strings.ToLower(test.TestContent.TestDomain)
+	switch {
+	case strings.Contains(domain, "gramm"):
+		isrpi.G_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.G_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		isrpi.G_Participation = event.ParticipationCode
+	case strings.Contains(domain, "num"):
+		isrpi.N_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.N_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		isrpi.N_Participation = event.ParticipationCode
+	case strings.Contains(domain, "read"):
+		isrpi.R_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.R_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		isrpi.R_Participation = event.ParticipationCode
+	case strings.Contains(domain, "writ"):
+		isrpi.W_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.W_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		isrpi.W_Participation = event.ParticipationCode
+	case strings.Contains(domain, "spell"):
+		isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		isrpi.S_Participation = event.ParticipationCode
 	default:
 		log.Println("Unknown test domain supplied (allocateDomainScore): ", domain)
 	}
@@ -179,6 +264,84 @@ func buildISRPrintResolvers() map[string]interface{} {
 			}
 			s := studentISRItems[event.SPRefID]
 			s.allocateDomainScoreAndMean(&event, testLookup, summaryLookup)
+			studentISRItems[event.SPRefID] = s
+		}
+
+		// once collated return the isr print items
+		for _, isrpi := range studentISRItems {
+			isrPrintItems = append(isrPrintItems, isrpi)
+		}
+
+		return isrPrintItems, nil
+
+	}
+
+	resolvers["ISRPrint/reportItemsExpanded"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		isrPrintItems := make([]ISRPrintItemExpanded, 0)
+
+		// validate input params
+		reqErr := checkISRReportParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara id from the request params
+		acaraid := params.Args["schoolAcaraID"].(string)
+
+		// get the test year level from the request params
+		yrLvl := params.Args["testYrLevel"].(string)
+
+		// get the school info for the acarid supplied
+		schoolInfo, err := getSchoolInfo(acaraid)
+		if err != nil {
+			return isrPrintItems, err
+		}
+		// log.Println("School: ", schoolInfo.SchoolName)
+
+		// get tests for yearLevel
+		tests, err := getTestsForYearLevel(yrLvl)
+		if err != nil {
+			return isrPrintItems, err
+		}
+		// convenience map to avoid revisiting db for tests
+		testLookup := make(map[string]xml.NAPTest) // key string = test refid
+		for _, test := range tests {
+			t := test
+			testLookup[t.TestID] = t
+		}
+
+		// get events for each test at this school
+		events := make([]xml.NAPEvent, 0)
+		events, err = getTestEvents(tests, schoolInfo.RefId)
+		if err != nil {
+			return isrPrintItems, err
+		}
+
+		// get score summaries for tests at this school
+		summaries := make([]xml.NAPTestScoreSummary, 0)
+		summaries, err = getScoreSummaries(tests, schoolInfo.RefId)
+		if err != nil {
+			return isrPrintItems, nil
+		}
+		// convenience map to avoid revisiting db for summaries
+		summaryLookup := make(map[string]xml.NAPTestScoreSummary)
+		for _, summary := range summaries {
+			s := summary
+			summaryLookup[s.NAPTestRefId] = s
+		}
+
+		// iterate events creating collated items for students
+		studentISRItems := make(map[string]ISRPrintItemExpanded) // index is string = student refid
+		for _, event := range events {
+			_, present := studentISRItems[event.SPRefID]
+			if !present {
+				s := ISRPrintItemExpanded{}
+				s.initialiseISRItemExpanded(schoolInfo, event)
+				studentISRItems[event.SPRefID] = s
+			}
+			s := studentISRItems[event.SPRefID]
+			s.allocateDomainScoreAndMeanAndParticipation(&event, testLookup, summaryLookup)
 			studentISRItems[event.SPRefID] = s
 		}
 
