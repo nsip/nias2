@@ -1,6 +1,6 @@
 *All files in this repository are licensed under Apache 2.0. For a full description of the license [click this link](LICENSE).*
 
-# NIAS
+# NIAS2
 NSIP Integration As A Service.
 
 This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components. This version incorporates [NAPLAN](https://www.nap.edu.au) validation and post-processing functionality, as well as the generic functionality of NIAS.
