@@ -149,7 +149,7 @@ Golang structs corresponding to SIF XML objects relevant to executables. Current
 
 `lib/`
 Library code shared between all executables:
-* `config.go`: read configuration files (in [toml](github.com/BurntSushi/toml) format)
+* `config.go`: read configuration files (in [toml](https://github.com/BurntSushi/toml) format)
 * `encoding.go`: encode NIAS messages
 * `nats.go`: create NATS connections and process chains
 * `niasmessage.go`: message wrapper types
