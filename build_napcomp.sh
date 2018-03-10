@@ -14,8 +14,8 @@ do_build() {
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
 	rsync -a napcomp/in $OUTPUT/
-        mkdir -p $OUTPUT/in/results
-        rsync -a ../naprrql/app/naprrql/master_nap.xml.zip  $OUTPUT/in/results
+	#mkdir -p $OUTPUT/in/results
+	#rsync -a ../naprrql/app/naprrql/master_nap.xml.zip  $OUTPUT/in/results
 }
 
 do_zip() {
@@ -114,9 +114,26 @@ build_linux32() {
 # TODO ARM
 # GOOS=linux GOARCH=arm GOARM=7 go build -o $CWD/build/LinuxArm7/go-nias/aggregator
 
-build_mac64
-build_windows64
-build_windows32
-build_linux64
-build_linux32
+if [ "$1" = "L32" ]
+then
+    build_linux32
+elif [ "$1" = "L64"  ]
+then
+    build_linux64
+elif [ "$1" = "W32"  ]
+then
+    build_windows32
+elif [ "$1" = "W64"  ]
+then
+    build_windows64
+elif [ "$1" = "M64"  ]
+then
+    build_mac64
+else
+    build_mac64
+    build_windows64
+    build_windows32
+    build_linux64
+    build_linux32
+fi
 
