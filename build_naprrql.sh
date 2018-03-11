@@ -9,7 +9,9 @@ do_build() {
 	echo "Building NAPRRQL..."
 	mkdir -p $OUTPUT
 	cd $CWD
-	cd ./app/naprrql
+	cd ./app/naprrql/in
+	wget -qnc https://github.com/nsip/naplan-results-reporting/raw/master/master_nap.xml.zip
+	cd ..
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	# cd ..
@@ -149,10 +151,3 @@ else
     build_linux64
     build_linux32
 fi
-
-#build_mac64
-#build_windows64
-#build_windows32
-#build_linux64
-#build_linux32
-

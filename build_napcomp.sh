@@ -14,8 +14,8 @@ do_build() {
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
 	rsync -a napcomp/in $OUTPUT/
-	#mkdir -p $OUTPUT/in/results
-	#rsync -a ../naprrql/app/naprrql/master_nap.xml.zip  $OUTPUT/in/results
+	mkdir -p $OUTPUT/in/results
+	rsync -a naprrql/in/master_nap.xml.zip  $OUTPUT/in/results
 }
 
 do_zip() {
