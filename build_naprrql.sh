@@ -9,9 +9,7 @@ do_build() {
 	echo "Building NAPRRQL..."
 	mkdir -p $OUTPUT
 	cd $CWD
-	cd ./app/naprrql/in
-	wget -qnc https://github.com/nsip/naplan-results-reporting/raw/master/master_nap.xml.zip
-	cd ..
+	cd ./app/naprrql
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	# cd ..
@@ -21,7 +19,7 @@ do_build() {
         # GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$AUDITDIFFHARNESS
         cd $CWD
 	cd ./app
-        mkdir -p naprrql/in 
+    mkdir -p naprrql/in
 	rsync -a naprrql/gql_schemas naprrql/in naprrql/public naprrql/reporting_templates $OUTPUT/
 }
 
