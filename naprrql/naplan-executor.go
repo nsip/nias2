@@ -35,7 +35,8 @@ func buildNAPResolvers() map[string]interface{} {
 
 }
 
-func buildISRPrintExecutor() *graphql.Executor {
+/*
+func buildISRPrintExecutorDISABLE() *graphql.Executor {
 
 	executor, err := graphql.NewExecutor(buildISRPrintSchema(), "ISRPrint", "", buildISRPrintResolvers())
 	if err != nil {
@@ -45,6 +46,7 @@ func buildISRPrintExecutor() *graphql.Executor {
 	return executor
 
 }
+*/
 
 func buildItemPrintExecutor() *graphql.Executor {
 

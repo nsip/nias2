@@ -13,8 +13,10 @@ import (
 )
 
 var nap_executor *graphql.Executor
-var isr_executor *graphql.Executor
-var item_executor *graphql.Executor
+var report_executor *graphql.Executor
+
+// var isr_executor *graphql.Executor
+// var item_executor *graphql.Executor
 
 //
 // wrapper type to capture graphql input
@@ -48,9 +50,34 @@ func graphQLHandler(c echo.Context) error {
 }
 
 //
+// the graphql handler routine for reports: kept separate since it will be static,
+// whereas the main graphql handler can have its contents experimented with
+//
+func reportHandler(c echo.Context) error {
+
+	grq := new(GQLRequest)
+	if err := c.Bind(grq); err != nil {
+		return err
+	}
+
+	query := grq.Query
+	variables := grq.Variables
+	gqlContext := map[string]interface{}{}
+
+	result, err := report_executor.Execute(gqlContext, query, variables, "")
+	if err != nil {
+		panic(err)
+	}
+
+	return c.JSON(http.StatusOK, result)
+
+}
+
+//
 // specialist handler for creating isr printing files
 //
-func isrPrintHandler(c echo.Context) error {
+/*
+func isrPrintHandlerDISABLE(c echo.Context) error {
 
 	grq := new(GQLRequest)
 	if err := c.Bind(grq); err != nil {
@@ -69,10 +96,12 @@ func isrPrintHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 
 }
+*/
 
 //
 // specialist handler for creating item result printing files
 //
+/*
 func itemPrintHandler(c echo.Context) error {
 
 	grq := new(GQLRequest)
@@ -92,6 +121,7 @@ func itemPrintHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 
 }
+*/
 
 //
 // launches the server
@@ -99,8 +129,9 @@ func itemPrintHandler(c echo.Context) error {
 func RunQLServer() {
 
 	nap_executor = buildNAPExecutor()
-	isr_executor = buildISRPrintExecutor()
-	item_executor = buildItemPrintExecutor()
+	report_executor = buildNAPExecutor()
+	// isr_executor = buildISRPrintExecutor()
+	// item_executor = buildItemPrintExecutor()
 
 	e := echo.New()
 
@@ -115,11 +146,14 @@ func RunQLServer() {
 	// the main graphql handler
 	e.POST("/graphql", graphQLHandler)
 
+	// the graphql handler for reports
+	e.POST("/report", reportHandler)
+
 	// special handler for isr printing
-	e.POST("/isrprint", isrPrintHandler)
+	// e.POST("/isrprint", isrPrintHandler)
 
 	// special handler for item printing
-	e.POST("/itemprint", itemPrintHandler)
+	// e.POST("/itemprint", itemPrintHandler)
 
 	//
 	// download the requested pre-generated csv file.

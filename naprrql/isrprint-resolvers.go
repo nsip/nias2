@@ -19,6 +19,7 @@ type ISRPrintItem struct {
 	StudentPSI       string
 	StudentFirstName string
 	StudentLastName  string
+	YearLevel        string
 	SchoolID         string
 	SchoolName       string
 	R_Score          float64
@@ -63,13 +64,18 @@ type ISRPrintItemExpanded struct {
 	N_Mean          float64
 	N_Comment       string
 	N_Participation string
+	G_Pathway       string
+	R_Pathway       string
+	W_Pathway       string
+	S_Pathway       string
+	N_Pathway       string
 }
 
 //
 // if no isr item exists for this student create one and fill with
 // known information
 //
-func (isrpi *ISRPrintItem) initialiseISRItem(schoolInfo xml.SchoolInfo, event xml.NAPEvent) {
+func (isrpi *ISRPrintItem) initialiseISRItem(schoolInfo xml.SchoolInfo, event xml.NAPEvent, yrLvl string) {
 
 	isrpi.SchoolID = schoolInfo.LocalId
 	isrpi.SchoolName = schoolInfo.SchoolName
@@ -80,7 +86,7 @@ func (isrpi *ISRPrintItem) initialiseISRItem(schoolInfo xml.SchoolInfo, event xm
 	isrpi.StudentLastName = student.FamilyName
 	isrpi.StudentLocalID = student.LocalId
 	isrpi.StudentPSI = student.PlatformId
-
+	isrpi.YearLevel = yrLvl
 }
 
 //
@@ -116,7 +122,7 @@ func (isrpi *ISRPrintItem) allocateDomainScoreAndMean(event *xml.NAPEvent,
 		summary = xml.NAPTestScoreSummary{}
 	}
 
-	resp := getResponseDomainScore(test.TestID, event.SPRefID)
+	resp, _ := getResponseDomainScore(test.TestID, event.SPRefID)
 
 	domain := strings.ToLower(test.TestContent.TestDomain)
 	switch {
@@ -155,7 +161,7 @@ func (isrpi *ISRPrintItemExpanded) allocateDomainScoreAndMeanAndParticipation(ev
 		summary = xml.NAPTestScoreSummary{}
 	}
 
-	resp := getResponseDomainScore(test.TestID, event.SPRefID)
+	resp, pathway := getResponseDomainScore(test.TestID, event.SPRefID)
 
 	domain := strings.ToLower(test.TestContent.TestDomain)
 	switch {
@@ -163,22 +169,27 @@ func (isrpi *ISRPrintItemExpanded) allocateDomainScoreAndMeanAndParticipation(ev
 		isrpi.G_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.G_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.G_Participation = event.ParticipationCode
+		isrpi.G_Pathway = pathway
 	case strings.Contains(domain, "num"):
 		isrpi.N_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.N_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.N_Participation = event.ParticipationCode
+		isrpi.N_Pathway = pathway
 	case strings.Contains(domain, "read"):
 		isrpi.R_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.R_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.R_Participation = event.ParticipationCode
+		isrpi.R_Pathway = pathway
 	case strings.Contains(domain, "writ"):
 		isrpi.W_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.W_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.W_Participation = event.ParticipationCode
+		isrpi.W_Pathway = pathway
 	case strings.Contains(domain, "spell"):
 		isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.S_Participation = event.ParticipationCode
+		isrpi.S_Pathway = pathway
 	default:
 		log.Println("Unknown test domain supplied (allocateDomainScore): ", domain)
 	}
@@ -188,7 +199,8 @@ func (isrpi *ISRPrintItemExpanded) allocateDomainScoreAndMeanAndParticipation(ev
 //
 // create the resolver functions for isr printing
 //
-func buildISRPrintResolvers() map[string]interface{} {
+/*
+func buildISRPrintResolversDISABLE() map[string]interface{} {
 
 	resolvers := map[string]interface{}{}
 
@@ -356,6 +368,7 @@ func buildISRPrintResolvers() map[string]interface{} {
 
 	return resolvers
 }
+*/
 
 //
 // returns set of score summary objects for the test/school combination
@@ -437,16 +450,16 @@ func getStudent(studentRefID string) xml.RegistrationRecord {
 }
 
 //
-// returns a domain score object for this student for this test
+// returns a domain score object and Pathway for this student for this test
 //
-func getResponseDomainScore(testID string, studentRefID string) xml.DomainScore {
+func getResponseDomainScore(testID string, studentRefID string) (xml.DomainScore, string) {
 
 	ds := xml.DomainScore{}
 
 	dsObjs, err := getObjects(getIdentifiers(testID + ":NAPStudentResponseSet:" + studentRefID))
 	if err != nil || len(dsObjs) == 0 {
 		// log.Println("Unable to find student domain score for id: ", testID, studentRefID)
-		return ds
+		return ds, ""
 	}
 
 	response, ok := dsObjs[0].(xml.NAPResponseSet)
@@ -454,7 +467,7 @@ func getResponseDomainScore(testID string, studentRefID string) xml.DomainScore 
 		log.Printf("Unable to assert response record for object: %#v", dsObjs[0])
 	}
 
-	return response.DomainScore
+	return response.DomainScore, response.PathTakenForDomain
 
 }
 

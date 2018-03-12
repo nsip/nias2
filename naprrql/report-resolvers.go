@@ -1192,6 +1192,183 @@ func buildReportResolvers() map[string]interface{} {
 		return results, err
 
 	}
+	// resolver for isr printing results, line per student.
+	//
+	resolvers["NaplanData/isrReportItems"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		isrPrintItems := make([]ISRPrintItem, 0)
+
+		// validate input params
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		/*
+			// get the test year level from the request params
+			yrLvl := params.Args["testYrLevel"].(string)
+			// log.Println("Yr Level: ", yrLvl)
+		*/
+
+		studentISRItems := make(map[string]ISRPrintItem) // index is string = student refid
+		for _, acaraid := range acaraids {
+			// get the school info for the acarid supplied
+			schoolInfo, err := getSchoolInfo(acaraid)
+			if err != nil {
+				return isrPrintItems, err
+			}
+			// log.Println("School: ", schoolInfo.SchoolName)
+
+			// get tests for yearLevel
+			for _, yrLvl := range []string{"3", "5", "7", "9"} {
+
+				tests, err := getTestsForYearLevel(yrLvl)
+				if err != nil {
+					return isrPrintItems, err
+				}
+				// convenience map to avoid revisiting db for tests
+				testLookup := make(map[string]xml.NAPTest) // key string = test refid
+				for _, test := range tests {
+					t := test
+					testLookup[t.TestID] = t
+				}
+
+				// get events for each test at this school
+				events := make([]xml.NAPEvent, 0)
+				events, err = getTestEvents(tests, schoolInfo.RefId)
+				if err != nil {
+					return isrPrintItems, err
+				}
+
+				// get score summaries for tests at this school
+				summaries := make([]xml.NAPTestScoreSummary, 0)
+				summaries, err = getScoreSummaries(tests, schoolInfo.RefId)
+				if err != nil {
+					return isrPrintItems, nil
+				}
+				// convenience map to avoid revisiting db for summaries
+				summaryLookup := make(map[string]xml.NAPTestScoreSummary)
+				for _, summary := range summaries {
+					s := summary
+					summaryLookup[s.NAPTestRefId] = s
+				}
+
+				// iterate events creating collated items for students
+				for _, event := range events {
+					_, present := studentISRItems[event.SPRefID]
+					if !present {
+						s := ISRPrintItem{}
+						s.initialiseISRItem(schoolInfo, event, yrLvl)
+						studentISRItems[event.SPRefID] = s
+					}
+					s := studentISRItems[event.SPRefID]
+					s.allocateDomainScoreAndMean(&event, testLookup, summaryLookup)
+					studentISRItems[event.SPRefID] = s
+				}
+			}
+		}
+
+		// once collated return the isr print items
+		for _, isrpi := range studentISRItems {
+			isrPrintItems = append(isrPrintItems, isrpi)
+		}
+
+		return isrPrintItems, nil
+
+	}
+	resolvers["NaplanData/isrReportItemsExpanded"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		isrPrintItems := make([]ISRPrintItemExpanded, 0)
+
+		// validate input params
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+		studentISRItems := make(map[string]ISRPrintItemExpanded) // index is string = student refid
+
+		/*
+			// get the test year level from the request params
+			yrLvl := params.Args["testYrLevel"].(string)
+		*/
+		for _, acaraid := range acaraids {
+			// get the school info for the acarid supplied
+			schoolInfo, err := getSchoolInfo(acaraid)
+			if err != nil {
+				return isrPrintItems, err
+			}
+			// log.Println("School: ", schoolInfo.SchoolName)
+
+			// get tests for yearLevel
+			for _, yrLvl := range []string{"3", "5", "7", "9"} {
+				tests, err := getTestsForYearLevel(yrLvl)
+				if err != nil {
+					return isrPrintItems, err
+				}
+				// convenience map to avoid revisiting db for tests
+				testLookup := make(map[string]xml.NAPTest) // key string = test refid
+				for _, test := range tests {
+					t := test
+					testLookup[t.TestID] = t
+				}
+
+				// get events for each test at this school
+				events := make([]xml.NAPEvent, 0)
+				events, err = getTestEvents(tests, schoolInfo.RefId)
+				if err != nil {
+					return isrPrintItems, err
+				}
+
+				// get score summaries for tests at this school
+				summaries := make([]xml.NAPTestScoreSummary, 0)
+				summaries, err = getScoreSummaries(tests, schoolInfo.RefId)
+				if err != nil {
+					return isrPrintItems, nil
+				}
+				// convenience map to avoid revisiting db for summaries
+				summaryLookup := make(map[string]xml.NAPTestScoreSummary)
+				for _, summary := range summaries {
+					s := summary
+					summaryLookup[s.NAPTestRefId] = s
+				}
+
+				// iterate events creating collated items for students
+				for _, event := range events {
+					_, present := studentISRItems[event.SPRefID]
+					if !present {
+						s := ISRPrintItemExpanded{}
+						s.initialiseISRItemExpanded(schoolInfo, event)
+						studentISRItems[event.SPRefID] = s
+					}
+					s := studentISRItems[event.SPRefID]
+					s.allocateDomainScoreAndMeanAndParticipation(&event, testLookup, summaryLookup)
+					studentISRItems[event.SPRefID] = s
+				}
+			}
+		}
+
+		// once collated return the isr print items
+		for _, isrpi := range studentISRItems {
+			isrPrintItems = append(isrPrintItems, isrpi)
+		}
+
+		return isrPrintItems, nil
+
+	}
 
 	return resolvers
 }

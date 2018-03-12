@@ -69,6 +69,12 @@ type NaplanData {
         guid_check_report: [GuidCheckDataSet]
         ## report on test items, testlets, tests extraneous to codeframe
         codeframe_check_report: [CodeframeCheckDataSet]
+        ## Request student summaries for the given school and year level of tests
+        #isrReportItems(schoolAcaraID: String!, testYrLevel: String!): [ISRPrintItem]
+        isrReportItems(acaraIDs: [String]): [ISRPrintItem]
+        ## Request student summaries for the given school and year level of tests, with full student details
+        #isrReportItemsExpanded(schoolAcaraID: String!, testYrLevel: String!): [ISRPrintItemExpanded]
+        isrReportItemsExpanded(acaraIDs: [String]): [ISRPrintItemExpanded]
 }
 
 ## List of problematic GUIDs in data set
@@ -1160,6 +1166,115 @@ type SchoolDetails {
 	## the ASL Id of the school
 	ACARAId: String
 }
+
+## Represents each student as a line of results for priniting
+type ISRPrintItem {
+        ## The student ID (typically localID)
+        StudentLocalID: String
+        ## Platform identifier for student
+        StudentPSI: String
+        ## Student given name
+        StudentFirstName: String
+        ## Student family name
+        StudentLastName: String
+	## Student year level
+	YearLevel: Int 
+        ## ID of school
+        SchoolID: String
+        ## School name
+        SchoolName: String
+        ## Reading domainscore, scaled
+        R_Score: Float
+        ## Reading mean
+        R_Mean: Float
+        ## Reading score comment
+        R_Comment: String
+        ## Writing domainscore, scaled
+        W_Score: Float
+        ## Writing mean
+        W_Mean: Float
+        ## Writing score comment
+        W_Comment: String
+        ## Spelling domainscore, scaled
+        S_Score: Float
+        ## Spelling mean
+        S_Mean: Float
+        ## Spelling score comment
+        S_Comment: String
+        ## Grammar domainscore, scaled
+        G_Score: Float
+        ## Grammar mean
+        G_Mean: Float
+        ## Grammar school comment
+        G_Comment: String
+        ## Numearacy domainscore, scaled
+        N_Score: Float
+        ## Numearacy mean
+        N_Mean: Float
+        ## Numeracy score comment
+        N_Comment: String
+}
+
+## Represents each student as a line of results for priniting
+type ISRPrintItemExpanded {
+        ## The student 
+        Student: RegistrationRecord
+        ## ID of school
+        SchoolID: String
+        ## School name
+        SchoolName: String
+        ## Reading domainscore, scaled
+        R_Score: Float
+        ## Reading mean
+        R_Mean: Float
+        ## Reading score comment
+        R_Comment: String
+        ## Writing domainscore, scaled
+        W_Score: Float
+        ## Writing mean
+        W_Mean: Float
+        ## Writing score comment
+        W_Comment: String
+        ## Spelling domainscore, scaled
+        S_Score: Float
+        ## Spelling mean
+        S_Mean: Float
+        ## Spelling score comment
+        S_Comment: String
+        ## Grammar domainscore, scaled
+        G_Score: Float
+        ## Grammar mean
+        G_Mean: Float
+        ## Grammar school comment
+        G_Comment: String
+        ## Numearacy domainscore, scaled
+        N_Score: Float
+        ## Numeracy mean
+        N_Mean: Float
+        ## Numeracy score comment
+        N_Comment: String
+        ## Reading participation
+        R_Participation: String
+        ## Writing participation
+        W_Participation: String
+        ## Numeracy participation
+        N_Participation: String
+        ## Spelling participation
+        S_Participation: String
+        ## Grammar & Punctuation participation
+        G_Participation: String
+        ## Reading pathway
+        R_Pathway: String
+        ## Writing pathway
+        W_Pathway: String
+        ## Numeracy pathway
+        N_Pathway: String
+        ## Spelling pathway
+        S_Pathway: String
+        ## Grammar & Punctuation pathway
+        G_Pathway: String
+}
+
 
 
 

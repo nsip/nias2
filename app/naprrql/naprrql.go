@@ -19,8 +19,9 @@ import (
 
 var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng data is overwritten.")
 var report = flag.Bool("report", false, "Creates .csv reports. Existing reports are overwritten")
-var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
-var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
+
+// var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
+// var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 
 func main() {
@@ -75,27 +76,27 @@ func main() {
 		closeDB()
 		os.Exit(1)
 	}
-
-	// create the isr printing reports
-	if *isrprint {
-		// launch web-server
-		startWebServer(true)
-		writeISRPrintingReports()
+	/*
+		// create the isr printing reports
+		if *isrprint {
+		 launch web-server
+			startWebServer(true)
+			writeISRPrintingReports()
 		// shut down
-		closeDB()
-		os.Exit(1)
-	}
+			closeDB()
+			os.Exit(1)
+		}
 
-	// create the item reports
-	if *itemprint {
-		// launch web-server
-		startWebServer(true)
-		writeItemPrintingReports()
-		// shut down
-		closeDB()
-		os.Exit(1)
-	}
-
+		// create the item reports
+		if *itemprint {
+			// launch web-server
+			startWebServer(true)
+			writeItemPrintingReports()
+			// shut down
+			closeDB()
+			os.Exit(1)
+		}
+	*/
 	// create the item reports
 	if *qa {
 		// launch web-server

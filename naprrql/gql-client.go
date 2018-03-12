@@ -12,7 +12,8 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-var DEF_GQL_URL = "http://localhost:1329/graphql"
+var DEF_INTERACTIVE_GQL_URL = "http://localhost:1329/graphql"
+var DEF_GQL_URL = "http://localhost:1329/report"
 var DEF_ISR_URL = "http://localhost:1329/isrprint"
 var DEF_ITEM_URL = "http://localhost:1329/itemprint"
 
