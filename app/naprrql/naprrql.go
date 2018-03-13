@@ -136,7 +136,7 @@ func ingestData() {
 func startWebServer(silent bool) {
 	go naprrql.RunQLServer()
 	if !silent {
-		fmt.Printf("\n\nBrowse to follwing locations:\n\n")
+		fmt.Printf("\n\nBrowse to following locations:\n\n")
 		fmt.Printf("\n\tFor qa reporting user interface:\n\n\t\thttp://localhost:1329/ui\n")
 		fmt.Printf("\n\tFor data query explorer:\n\n\t\thttp://localhost:1329/sifql\n")
 		fmt.Printf("\n\tFor data model viewer:\n\n\t\thttp://localhost:1329/datamodel\n\n ")

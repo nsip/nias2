@@ -116,7 +116,7 @@ func LoadASLLookupData() {
 		id := r["ACARA ID"]
 		id_state := id + r["State"]
 
-		//log.Println("ASLID:", id, "ASL_STATE:", id_state)
+		log.Println("ASLID:", id, "ASL_STATE:", id_state)
 
 		ibf_aslid.Add(id)
 		ibf_aslstateid.Add(id_state)
