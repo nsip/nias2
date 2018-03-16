@@ -19,7 +19,7 @@ do_build() {
         # GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$AUDITDIFFHARNESS
         cd $CWD
 	cd ./app
-        mkdir -p naprrql/in 
+    mkdir -p naprrql/in
 	rsync -a naprrql/gql_schemas naprrql/in naprrql/public naprrql/reporting_templates $OUTPUT/
 }
 
@@ -127,9 +127,25 @@ build_linux32() {
 # TODO ARM
 # GOOS=linux GOARCH=arm GOARM=7 go build -o $CWD/build/LinuxArm7/go-nias/aggregator
 
-build_mac64
-build_windows64
-build_windows32
-build_linux64
-build_linux32
-
+if [ "$1" = "L32" ]
+then
+    build_linux32
+elif [ "$1" = "L64"  ]
+then
+    build_linux64
+elif [ "$1" = "W32"  ]
+then
+    build_windows32
+elif [ "$1" = "W64"  ]
+then
+    build_windows64
+elif [ "$1" = "M64"  ]
+then
+    build_mac64
+else
+    build_mac64
+    build_windows64
+    build_windows32
+    build_linux64
+    build_linux32
+fi

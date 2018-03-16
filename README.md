@@ -1,8 +1,7 @@
 *All files in this repository are licensed under Apache 2.0. For a full description of the license [click this link](LICENSE).*
 
-
-# nias2
-NIAS: NSIP Integration As A Service.
+# NIAS2
+NSIP Integration As A Service.
 
 This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components. This version incorporates [NAPLAN](https://www.nap.edu.au) validation and post-processing functionality, as well as the generic functionality of NIAS.
 
@@ -21,7 +20,7 @@ If you  need a simple Java-based reader for SIF NAPLAN data, consider using http
 NIAS is a suite of open-source components designed to enable as many different users as possible to quickly and easily solve issues of system integration using the Australian [SIF Data Model](http://specification.sifassociation.org/Implementation/AU/1.4/html/) for school education.
 
 The product was developed by harnessing existing open source middleware components, including:
-* [NATS](http://nats.io) streaming queues 
+* [NATS](http://nats.io) streaming queues
 * [Echo](https://github.com/labstack/echo) web framework
 
 Over these components, two main modules have been built:
@@ -32,22 +31,20 @@ The software also uses these components as architecture to support Test Administ
 * __napval__ validates NAPLAN registration records, in either SIF/XML or CSV format.
 * __naprrql__ post-processes the NAPLAN results & reporting dataset, including generating local reports, and aligning Year 3 Writing results to the codeframe.
 
-The code is open source, and is released through the NSIP Github repository. 
-
 ## 1.1. Scope
 
-This product delivers the following high level functions: 
+This product delivers the following high level functions:
 
 1. Support for persistent and ordered queues of SIF messages, which can be reread multiple times.
 2. Support for asynchronous queues in both clients and servers.
 3. Support for format-agnostic messaging infrastructure.
-4. Support for data exchange through an event/subscribe model (in brokered environments)
-~~5. Support for message validation.~~
+4. Support for data exchange through an event/subscribe model (in brokered environments)  
+5. ~~Support for message validation.~~
 6. Support for extracting arbitrary relations between object types within SIF (bypassing need to configure service path queries, and simplifying the query API for objects).
-~~7. Support for extracting arbitrary relations between object types from different standards (allowing multiple data standards to coexist in an integration, referring to the same entities).~~
+7. ~~Support for extracting arbitrary relations between object types from different standards (allowing multiple data standards to coexist in an integration, referring to the same entities).~~
 8. Support for privacy filtering in middleware (which releases object providers from having to do privacy filtering internally).
-~~9. Support for simple and extensible interactive analytics.~~
-~~10. Support for the ODDESSA data dictionary as a service.~~
+9. ~~Support for simple and extensible interactive analytics.~~
+10. ~~Support for the ODDESSA data dictionary as a service.~~
 11. Support for data format conversions, including CSV to SIF, and SIF 2 to SIF 3.
 
 This product only acts as middleware. It does not provide integration with the back ends of products (although this can be provided by combining NIAS with the [SIF Framework](https://github.com/nsip/sif3-framework-java)). It is not intended to deliver business value to end consumers, or to compete with existing market offerings.
@@ -65,7 +62,8 @@ The product does not incorporate authentication or authorisation.
 
 * The key-value database in the product needs to be able to process a large number of open files; if you will be running NIAS on Mac/Linux with production-scale
 numbers of students in the results & reporting file, you will need  to increase your `ulimit` setting; we recommend 2048.
-  * For Mac, see https://blog.dekstroza.io/ulimit-shenanigans-on-osx-el-capitan/ 
+  * For Mac, see https://blog.dekstroza.io/ulimit-shenanigans-on-osx-el-capitan/
+  * For Linux, ```ulimit -n 2048```
 
 # 2. Installation
 
@@ -106,13 +104,13 @@ NIAS2 relies on the following infrastructure:
 * Contains files used in unit/integration testing of the code. Currently restricted to CSV files input into the validation module.
 
 `build.sh`, `build/`, `release.sh`
-* `build.sh` is the script to build all NIAS2 executables for the various supported platforms. 
-* `build_sms.sh` is the script to build the executables specific to the SSF and SMS. The builds for each platform are built in `build/{PLATFORM}/nias/`. 
-* `build_napval.sh` is the script to build NIAS2 executables speficic to NAPLAN registration for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/napval/`. 
-* `build_naprr.sh` is the script to build NIAS2 executables specific to NAPLAN results & reporting for the various supported platforms. The builds for each platform are built in `build/{PLATFORM}/naprr/`. 
-* The `release_naprr.sh` and `release_napval.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including the binary files specific to NAPLAN results & reporting and NAPLAN registration, respectively. 
-* The `release_napval.sh` script zips the builds at the top level of the `build` folder, and creates a new release of the NIAS2 code on github, including the binary files specific to both NAPLAN results & reporting and NAPLAN registration.
-* The supported platforms are: 
+* `build.sh` builds all NIAS2 executables for the various supported platforms
+* `build_sms.sh` builds the SSF and SMS application
+* `build_napval.sh` builds the NAPVAL application
+* `build_naprrql.sh` builds the NAPRRQL application  
+The builds for each platform are built in `build/{PLATFORM}/{APP}/`.
+
+#### The supported platforms are:
   * Mac OSX
   * Windows 32 bit
   * Windows 64 bit
@@ -134,14 +132,14 @@ Contains utilities for managing NIAS2
 Contains the code to run executables within NIAS as single pieces of software, along with necessary configuration files, and test executables. The configuration fields are copied into the binary distributions of NIAS.
   * `sms/` : the SIF Memory Store functionality of NIAS (ported from Ruby)
   * `napval/` : NAPLAN Registration records validation
-  * `naprr/` : NAPLAN Results and Reporting post-processing
-  * `napcomp/` : Comparison of students between NAPLAN Registration and NAPLAN Results and Reporting (included in `naprr` distribution)
-  
-`napval/`
-Code for NAPLAN Registration records validation
+  * `naprrql/` : NAPLAN Results and Reporting post-processing
+  * `napcomp/` : Comparison of students between NAPLAN Registration and NAPLAN Results and Reporting (included in `naprrql` distribution)
 
-`naprr/`
-Code for NAPLAN Results and Reporting post-processing
+`napval/`
+NAPLAN Registration records validation
+
+`naprrql/`
+NAPLAN Results and Reporting post-processing
 
 `sms/`
 SIF Memory Store functionality of NIAS
@@ -151,12 +149,10 @@ Golang structs corresponding to SIF XML objects relevant to executables. Current
 
 `lib/`
 Library code shared between all executables:
-* `config.go`: read configuration files (in [toml](github.com/BurntSushi/toml) format)
+* `config.go`: read configuration files (in [toml](https://github.com/BurntSushi/toml) format)
 * `encoding.go`: encode NIAS messages
 * `nats.go`: create NATS connections and process chains
 * `niasmessage.go`: message wrapper types
 * `server_connections.go`: standardised NATS server access module
 * `service.go`: service interface to handle message requests
 * `transactiontracker.go`: transaction status reporting structure
-    
-
