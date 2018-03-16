@@ -13,6 +13,7 @@ go get github.com/nats-io/nats-streaming-server
 do_build() {
 	echo "Building NAPVAL..."
 	mkdir -p $OUTPUT
+        rm -rf $OUTPUT/*.csv
 	cd ../../nats-io/nats-streaming-server
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
 	cd $CWD
