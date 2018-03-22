@@ -2,13 +2,24 @@
 package main
 
 import (
+	"fmt"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/napval"
+	"github.com/nsip/nias2/version"
 	"log"
 	"runtime"
 )
 
+var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
+
 func main() {
+
+	flag.Parse()
+
+	if *vers {
+		fmt.Printf("NIAS: Version %s\n", version.TagName)
+		os.Exit(1)
+	}
 
 	config := napval.LoadNAPLANConfig()
 	NAPLAN_NATS_CFG := lib.NATSConfig{Port: config.NATSPort}

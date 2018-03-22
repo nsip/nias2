@@ -15,6 +15,7 @@ import (
 	"syscall"
 
 	"github.com/nsip/nias2/naprrql"
+	"github.com/nsip/nias2/version"
 )
 
 var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng data is overwritten.")
@@ -23,6 +24,7 @@ var report = flag.Bool("report", false, "Creates .csv reports. Existing reports 
 // var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
 // var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
+var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
 
 func main() {
 
@@ -38,6 +40,11 @@ func main() {
 		closeDB()
 		os.Exit(1)
 	}()
+
+	if *vers {
+		fmt.Printf("NIAS: Version %s\n", version.TagName)
+		os.Exit(1)
+	}
 
 	// ingest results data, rebuild reports, and exit to save memory
 	if *ingest {

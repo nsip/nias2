@@ -6,15 +6,22 @@ package main
 // in both files.
 
 import (
+	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
 
 	"github.com/nsip/nias2/napcomp"
+	"github.com/nsip/nias2/version"
 )
 
+var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
+
 func main() {
+
+	flag.Parse()
 
 	// shutdown handler
 	c := make(chan os.Signal, 2)
@@ -24,6 +31,11 @@ func main() {
 		napcomp.CloseDB()
 		os.Exit(1)
 	}()
+
+	if *vers {
+		fmt.Printf("NIAS: Version %s\n", version.TagName)
+		os.Exit(1)
+	}
 
 	napcomp.IngestData()
 	napcomp.WriteReports()

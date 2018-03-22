@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -131,6 +132,7 @@ func uploadFile(release jsonRelease, name string, filename string) jsonUpload {
 //	1 = Project name
 //	2 = File name to upload
 //	3 = Local file path
+// If called with just the project name, we generate versioning code
 func main() {
 	// Load configuration
 	if _, err := toml.DecodeFile(os.Getenv("HOME")+"/.nsip.toml", &cfg); err != nil {
@@ -147,5 +149,9 @@ func main() {
 
 	log.Printf("Received release %d as %s", release.Id, release.TagName)
 
-	uploadFile(release, os.Args[2], os.Args[3])
+	if len(os.Args) == 2 {
+		fmt.Printf("package version\nvar(\nId = %d\nTagName = \"%s\"\n)\n", release.Id, release.TagName)
+	} else {
+		uploadFile(release, os.Args[2], os.Args[3])
+	}
 }
