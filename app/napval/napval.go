@@ -2,11 +2,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/napval"
 	"github.com/nsip/nias2/version"
 	"log"
+	"os"
 	"runtime"
 )
 

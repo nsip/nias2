@@ -1,6 +1,6 @@
 
 cd tools; go build release.go; cd ..
-./tools/release > version/version.go
+./tools/release nias2 > version/version.go
 sh build.sh
 ./tools/release nias2 nias-Mac.zip build/nias-Mac.zip
 ./tools/release nias2 nias-Win64.zip build/nias-Win64.zip
