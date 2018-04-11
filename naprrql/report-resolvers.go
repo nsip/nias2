@@ -846,21 +846,6 @@ func buildReportResolvers() map[string]interface{} {
 				schoolnames[acaraid] = si.SchoolName
 			}
 		}
-		/*
-			// get responses for student
-			responseids := make([]string, 0)
-			for _, studentid := range studentids {
-				key := "responseset_by_student:" + studentid
-				responseRefId := getIdentifiers(key)
-				responseids = append(responseids, responseRefId...)
-			}
-
-			// get responses
-			responses, err := getObjects(responseids)
-			if err != nil {
-				return []interface{}{}, err
-			}
-		*/
 		// convenience map to avoid revisiting db for tests
 		testLookup := make(map[string]xml.NAPTest) // key string = test refid
 		// get tests for yearLevel
@@ -905,7 +890,7 @@ func buildReportResolvers() map[string]interface{} {
 					}
 				}
 
-				responseRefId := getIdentifiers(testid + ":NAPStudentResponseSet::" + studentid)
+				responseRefId := getIdentifiers(testid + ":NAPStudentResponseSet:" + studentid)
 				responses, err := getObjects(responseRefId)
 				if err != nil {
 					return []interface{}{}, err
