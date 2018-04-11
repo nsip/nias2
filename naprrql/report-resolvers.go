@@ -814,7 +814,7 @@ func buildReportResolvers() map[string]interface{} {
 		return results, nil
 	}
 
-	// same as the above, just adds AnonymisedId
+	// same as the above, but adds AnonymisedId, and iterates all events, not just responses
 	resolvers["NaplanData/writing_item_for_marking_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
 
 		reqErr := checkRequiredParams(params)
@@ -846,21 +846,21 @@ func buildReportResolvers() map[string]interface{} {
 				schoolnames[acaraid] = si.SchoolName
 			}
 		}
+		/*
+			// get responses for student
+			responseids := make([]string, 0)
+			for _, studentid := range studentids {
+				key := "responseset_by_student:" + studentid
+				responseRefId := getIdentifiers(key)
+				responseids = append(responseids, responseRefId...)
+			}
 
-		// get responses for student
-		responseids := make([]string, 0)
-		for _, studentid := range studentids {
-			key := "responseset_by_student:" + studentid
-			responseRefId := getIdentifiers(key)
-			responseids = append(responseids, responseRefId...)
-		}
-
-		// get responses
-		responses, err := getObjects(responseids)
-		if err != nil {
-			return []interface{}{}, err
-		}
-
+			// get responses
+			responses, err := getObjects(responseids)
+			if err != nil {
+				return []interface{}{}, err
+			}
+		*/
 		// convenience map to avoid revisiting db for tests
 		testLookup := make(map[string]xml.NAPTest) // key string = test refid
 		// get tests for yearLevel
@@ -877,54 +877,76 @@ func buildReportResolvers() map[string]interface{} {
 
 		// construct RDS by including referenced test
 		results := make([]ItemResponseDataSet, 0)
-		for _, response := range responses {
-			resp, _ := response.(xml.NAPResponseSet)
 
-			students, err := getObjects([]string{resp.StudentID})
-			student, ok := students[0].(xml.RegistrationRecord)
-			if err != nil || !ok {
-				return []interface{}{}, err
-			}
-			student.Flatten()
-			// Only change
-			student.OtherIdList.OtherId = append(student.OtherIdList.OtherId, xml.XMLAttributeStruct{Type: "AnonymisedId", Value: nuid.New().Next()})
-
-			test := testLookup[resp.TestID]
-
+		for testid, test := range testLookup {
 			if test.TestContent.TestDomain != "Writing" {
 				continue
 			}
+			for _, studentid := range studentids {
+				var ok bool
 
-			eventsRefId := getIdentifiers("event_by_student_test:" + resp.StudentID + ":" + resp.TestID + ":")
-			events, err := getObjects(eventsRefId)
-			event, ok := events[0].(xml.NAPEvent)
-			if err != nil || !ok {
-				return []interface{}{}, err
-			}
+				students, err := getObjects([]string{studentid})
+				student, ok := students[0].(xml.RegistrationRecord)
+				if err != nil || !ok {
+					return []interface{}{}, err
+				}
+				student.Flatten()
+				student.OtherIdList.OtherId = append(student.OtherIdList.OtherId, xml.XMLAttributeStruct{Type: "AnonymisedId", Value: nuid.New().Next()})
 
-			for _, testlet := range resp.TestletList.Testlet {
-				for _, item_response := range testlet.ItemResponseList.ItemResponse {
-
-					resp1 := resp // pruned copy of response
-					resp1.TestletList.Testlet = make([]xml.NAPResponseSet_Testlet, 1)
-					resp1.TestletList.Testlet[0] = testlet
-					resp1.TestletList.Testlet[0].ItemResponseList.ItemResponse = make([]xml.NAPResponseSet_ItemResponse, 1)
-					resp1.TestletList.Testlet[0].ItemResponseList.ItemResponse[0] = item_response
-
-					items, err := getObjects([]string{item_response.ItemRefID})
-					item, ok := items[0].(xml.NAPTestItem)
+				eventsRefId := getIdentifiers("event_by_student_test:" + studentid + ":" + testid + ":")
+				events, err := getObjects(eventsRefId)
+				var event xml.NAPEvent
+				if len(events) == 0 {
+					continue
+				} else {
+					event, ok = events[0].(xml.NAPEvent)
 					if err != nil || !ok {
 						return []interface{}{}, err
 					}
+				}
 
-					testlets, err := getObjects([]string{testlet.NapTestletRefId})
-					tl := testlets[0].(xml.NAPTestlet)
-					if err != nil || !ok {
-						return []interface{}{}, err
+				responseRefId := getIdentifiers(testid + ":NAPStudentResponseSet::" + studentid)
+				responses, err := getObjects(responseRefId)
+				if err != nil {
+					return []interface{}{}, err
+				}
+				var resp xml.NAPResponseSet
+				if len(responses) == 0 {
+					ok = false
+				} else {
+					resp, ok = responses[0].(xml.NAPResponseSet)
+				}
+				if ok {
+					for _, testlet := range resp.TestletList.Testlet {
+						for _, item_response := range testlet.ItemResponseList.ItemResponse {
+
+							resp1 := resp // pruned copy of response
+							resp1.TestletList.Testlet = make([]xml.NAPResponseSet_Testlet, 1)
+							resp1.TestletList.Testlet[0] = testlet
+							resp1.TestletList.Testlet[0].ItemResponseList.ItemResponse = make([]xml.NAPResponseSet_ItemResponse, 1)
+							resp1.TestletList.Testlet[0].ItemResponseList.ItemResponse[0] = item_response
+
+							items, err := getObjects([]string{item_response.ItemRefID})
+							item, ok := items[0].(xml.NAPTestItem)
+							if err != nil || !ok {
+								return []interface{}{}, err
+							}
+
+							testlets, err := getObjects([]string{testlet.NapTestletRefId})
+							tl := testlets[0].(xml.NAPTestlet)
+							if err != nil || !ok {
+								return []interface{}{}, err
+							}
+							irds := ItemResponseDataSet{TestItem: item, Response: resp1,
+								Student: student, Test: test, Testlet: tl,
+								SchoolDetails:     SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+								ParticipationCode: event.ParticipationCode}
+							results = append(results, irds)
+						}
 					}
-
-					irds := ItemResponseDataSet{TestItem: item, Response: resp1,
-						Student: student, Test: test, Testlet: tl,
+				} else {
+					irds := ItemResponseDataSet{TestItem: xml.NAPTestItem{}, Response: xml.NAPResponseSet{},
+						Student: student, Test: test, Testlet: xml.NAPTestlet{},
 						SchoolDetails:     SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
 						ParticipationCode: event.ParticipationCode}
 					results = append(results, irds)
