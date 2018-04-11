@@ -23,6 +23,7 @@ var report = flag.Bool("report", false, "Creates .csv reports. Existing reports 
 
 // var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
 // var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
+var writingextract = flag.Bool("writingextract", false, "Creates .csv file extract of all writing items, for input into marking systems")
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
 
@@ -83,6 +84,17 @@ func main() {
 		closeDB()
 		os.Exit(1)
 	}
+
+	// create the writing item report
+	if *writingextract {
+		// launch web-server
+		startWebServer(true)
+		writeWritingExtractReports()
+		// shut down
+		closeDB()
+		os.Exit(1)
+	}
+
 	/*
 		// create the isr printing reports
 		if *isrprint {
@@ -179,6 +191,16 @@ func writeItemPrintingReports() {
 	log.Println("generating item printing reports...")
 	naprrql.GenerateItemPrintReports()
 	log.Println("item printing reports generated...")
+}
+
+//
+// create item printing reports
+//
+func writeWritingExtractReports() {
+	// clearReportsDirectory() // - check this
+	log.Println("generating Writing item extract reports...")
+	naprrql.GenerateWritingExtractReports()
+	log.Println("Writing item extract reports generated...")
 }
 
 // create QA reports

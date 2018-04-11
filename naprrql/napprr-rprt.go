@@ -92,6 +92,31 @@ func GenerateItemPrintReports() {
 	wg.Wait()
 }
 
+//
+// generates a specific 'report' which is the input
+// file for item printing processes
+//
+func GenerateWritingExtractReports() {
+
+	schools, err := getSchoolsList()
+	if err != nil {
+		log.Fatalln("Cannot connect to naprrql server: ", err)
+	}
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = runWritingExtractReports(schools)
+		if err != nil {
+			log.Println("Error creating isr printing reports: ", err)
+		}
+	}()
+
+	wg.Wait()
+}
+
 // generates a specific 'report' which is the input
 // file for item printing processes
 //
@@ -134,6 +159,14 @@ func runItemPrintReports(schools []string) error {
 
 	var pipelineError error
 	pipelineError = runItemPipeline(schools)
+	return pipelineError
+
+}
+
+func runWritingExtractReports(schools []string) error {
+
+	var pipelineError error
+	pipelineError = runWritingExtractPipeline(schools)
 	return pipelineError
 
 }

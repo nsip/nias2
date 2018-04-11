@@ -59,6 +59,8 @@ type NaplanData {
 	item_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
         ## reporting (ui) object for writing item responses per student
 	item_writing_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
+        ## reporting (ui) object for writing item responses per student, intended for export to marking systems, adds randomised ID to student (AnonymisedId in OtherIdList)
+	writing_item_for_marking_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
         ## report of all school summaries not linked to one of the acaraIDs
         orphan_school_summary_report(acaraIDs: [String]): [ScoreSummary]
         ## report of all events not linked to one of the acaraIDs

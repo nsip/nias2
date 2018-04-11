@@ -1,0 +1,85 @@
+query NAPItemResults($acaraIDs: [String]) {
+  writing_item_for_marking_report_by_school(acaraIDs: $acaraIDs) {
+    Test {
+      TestContent {
+        LocalId
+        TestName
+        TestLevel
+        TestDomain
+        TestYear
+        TestType
+      }
+    }
+    Testlet {
+      TestletContent {
+        LocalId
+        Node
+        LocationInStage
+        TestletName
+        LocalId
+      }
+    }
+    TestItem {
+      ItemID
+      TestItemContent {
+        NAPTestItemLocalId
+        ItemName
+        ItemType
+        Subdomain
+        WritingGenre
+        ItemSubstitutedForList {
+          SubstituteItem {
+            SubstituteItemRefId
+            LocalId
+          }
+        }
+        NAPWritingRubricList {
+          NAPWritingRubric {
+            RubricType
+          }
+        }
+      }
+    }
+    Student {
+      LocalId
+      BirthDate
+      Sex
+      YearLevel
+      ASLSchoolId
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      }
+    }
+    ParticipationCode
+    Response {
+      PathTakenForDomain
+      ParallelTest
+      PSI
+      TestletList {
+        Testlet {
+          NapTestletLocalId
+          TestletScore
+          ItemResponseList {
+            ItemResponse {
+              LocalID
+              Response
+              ResponseCorrectness
+              Score
+              LapsedTimeItem
+              SequenceNumber
+              SubscoreList {
+                Subscore {
+                  SubscoreType
+                  SubscoreValue
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
