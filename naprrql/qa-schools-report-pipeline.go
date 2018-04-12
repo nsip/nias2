@@ -50,7 +50,7 @@ type schoolQASummary struct {
 // Overall round-trip latency is less than querying for all data at once
 // and ensures we can't run out of memory
 //
-func runQASchoolSummaryPipeline(schools []string) error {
+func runQASchoolSummaryPipeline(schools []string, outFileDir string, mapFileName string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -145,14 +145,13 @@ func runQASchoolSummaryPipeline(schools []string) error {
 	// sink stage - write to csv file
 	//
 	// create working directory if not there
-	outFileDir := "./out/qa"
 	err = os.MkdirAll(outFileDir, os.ModePerm)
 	if err != nil {
 		return err
 	}
 	csvFileName := "qaSchools.csv"
 	outFileName := outFileDir + "/" + csvFileName
-	mapFileName := "./reporting_templates/qa/qaSchools_map.csv"
+	// mapFileName := "./reporting_templates/qa/qaSchools_map.csv"
 	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
 	if err != nil {
 		return err

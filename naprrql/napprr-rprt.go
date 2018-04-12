@@ -178,7 +178,7 @@ func runQAReports(schools []string) error {
 	pipelineError = runQAItemRespReportPipeline(schools)
 	pipelineError = runQAMiscReportPipeline(schools)
 	pipelineError = runQAOrphanPipeline(schools)
-	pipelineError = runQASchoolSummaryPipeline(schools)
+	pipelineError = runQASchoolSummaryPipeline(schools, "./out/qa", "./reporting_templates/qa/qaSchools_map.csv")
 	return pipelineError
 
 }

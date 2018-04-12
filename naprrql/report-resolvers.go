@@ -862,7 +862,6 @@ func buildReportResolvers() map[string]interface{} {
 
 		// construct RDS by including referenced test
 		results := make([]ItemResponseDataSet, 0)
-
 		for testid, test := range testLookup {
 			if test.TestContent.TestDomain != "Writing" {
 				continue
