@@ -899,6 +899,12 @@ func buildReportResolvers() map[string]interface{} {
 					ok = false
 				} else {
 					resp, ok = responses[0].(xml.NAPResponseSet)
+					if ok {
+						ok = (len(resp.TestletList.Testlet) != 0)
+						if ok {
+							ok = (len(resp.TestletList.Testlet[0].ItemResponseList.ItemResponse) != 0)
+						}
+					}
 				}
 				if ok {
 					for _, testlet := range resp.TestletList.Testlet {
