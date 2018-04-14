@@ -3,7 +3,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 
 	nwp "github.com/nsip/nias2/nap-writing-print"
@@ -11,8 +10,7 @@ import (
 
 func main() {
 
-	// check any cli params
-	flag.Parse()
+	log.Println("starting pdf writer...")
 
 	// clear directories
 	nwp.ClearReportsDirectory()
@@ -20,6 +18,7 @@ func main() {
 	// find file(s)
 	files := nwp.ParseResultsFileDirectory()
 
+	// send them through the processing pipeline
 	for _, fileName := range files {
 		err := nwp.RunPrintingPipeline(fileName)
 		if err != nil {
@@ -28,6 +27,7 @@ func main() {
 	}
 
 	// backup input file
+	nwp.BackupInputFiles()
 
-	// report files written?
+	log.Println("...all pdf files written.")
 }
