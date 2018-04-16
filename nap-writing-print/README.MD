@@ -1,4 +1,4 @@
-## nap-writing print
+## nap-writing-print
 
 nap-writing-print is a standalone tool that generates pdf files of NAPLAN writing responses.
 
