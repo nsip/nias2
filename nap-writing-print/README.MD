@@ -13,7 +13,7 @@ The full process to go from receiveing a NAPLAN results data file is:
 > ./naprrql --ingest
 1. wait for naprrql ingest to complete
 1. Run the writing extract report of naprrql by running the following command
-> ./naprrql --writimgextract
+> ./naprrql --writingextract
 1. wait for the report to complete.
 1. Go to the /out/writing_extract folder of naprrql
 1. copy the file called writing_extract.csv to the /in folder of the nap-writing-print directory.
@@ -36,6 +36,7 @@ contains all writing responses organised by the year level of the student who cr
 in each of the folders you will find the following sub-folder strucure
 
 /audit
+
 /script
 
 The files are named with a prefix of the student participation code, followed by the anonymous id given 
