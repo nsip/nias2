@@ -35,13 +35,13 @@ func createScriptWriter(ctx context.Context, in <-chan map[string]string) (<-cha
 			doc.SetColor("black").
 				SetFont("Helvetica-Bold", 24).
 				SetXY(3.5, 2.7).DrawText(rmap["Anonymised Id"])
-			//
-			// draw the column of text
-			var colText = strings.Replace(rmap["Item Response"], "\\n", " ", -1)
+
+			colText := splitParas(rmap["Item Response"])
 			doc.SetColor("black").
 				SetFont("Helvetica", 12).
 				// DrawUnitGrid().
 				DrawTextInBox(3.5, 4, 12, 28, "LT", colText)
+
 			//
 			// save the files
 			doc.SaveFile(outputFile1)
@@ -55,5 +55,15 @@ func createScriptWriter(ctx context.Context, in <-chan map[string]string) (<-cha
 		}
 	}()
 	return errc, nil
+
+}
+
+//
+// use the paragraph markers that have been left in the text
+// to insert spacing characters.
+//
+func splitParas(fullText string) string {
+
+	return strings.Replace(fullText, "<p>", "\n\n", -1)
 
 }
