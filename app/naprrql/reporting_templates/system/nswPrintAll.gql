@@ -63,6 +63,23 @@ query NAPDomainScores($acaraIDs: [String]) {
               ScaledScoreValue
               StudentDomainBand
           }
+        TestletList {
+          Testlet {
+            ItemResponseList {
+              ItemResponse {
+                ItemRefID
+                  Score
+                  SubscoreList {
+                    Subscore {
+                      SubscoreType
+                        SubscoreValue
+                    }
+                  }
+
+              }
+            }
+          }
+        }
       }
       Summary {
         DomainSchoolAverage
