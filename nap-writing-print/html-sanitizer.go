@@ -4,6 +4,8 @@ package nap_writing_print
 
 import (
 	"context"
+	"html"
+	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -25,8 +27,21 @@ func createHtmlSanitizer(ctx context.Context, in <-chan map[string]string) (
 			rmap := rMap
 
 			p := bluemonday.StrictPolicy()
-			html := p.Sanitize(rmap["Item Response"])
-			rmap["Item Response"] = html
+			// keep paragraph markers to preserve layout in pdf printing
+			p.AllowElements("p")
+			sanitizedHtml := p.Sanitize(rmap["Item Response"])
+			// now unescape the html for speech marks, apostrophe's etc. for printing
+			unescapedHtml := html.UnescapeString(sanitizedHtml)
+
+			// remove unnecessary characters
+			// remove non-breaking spaces and line feeds & backticks
+			noBrHtml := strings.Replace(unescapedHtml, "&nbsp;", " ", -1)
+			noLfHtml := strings.Replace(noBrHtml, "\\n", "", -1)
+
+			// remove end-of para markers, not needed for pdf print
+			noEndParaHtml := strings.Replace(noLfHtml, "</p>", "", -1)
+
+			rmap["Item Response"] = noEndParaHtml
 
 			select {
 			case out <- rmap:
