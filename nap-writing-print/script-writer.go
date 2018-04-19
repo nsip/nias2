@@ -29,18 +29,19 @@ func createScriptWriter(ctx context.Context, in <-chan map[string]string) (<-cha
 
 			var doc = pdf.NewPDF("A4") // create a new PDF using 'A4' page size
 			doc.SetUnits("cm")
+			// doc.AddPage()
 
 			//
 			// print header id
 			doc.SetColor("black").
 				SetFont("Helvetica-Bold", 24).
-				SetXY(3.5, 2.7).DrawText(rmap["Anonymised Id"])
+				SetXY(3.5, 2).DrawText(rmap["Anonymised Id"])
 
 			colText := splitParas(rmap["Item Response"])
 			doc.SetColor("black").
-				SetFont("Helvetica", 12).
+				SetFont("Helvetica", 10).
 				// DrawUnitGrid().
-				DrawTextInBox(3.5, 4, 12, 28, "LT", colText)
+				DrawTextInBox(1.5, 2.5, 17, 28, "LT", colText)
 
 			//
 			// save the files
@@ -64,6 +65,6 @@ func createScriptWriter(ctx context.Context, in <-chan map[string]string) (<-cha
 //
 func splitParas(fullText string) string {
 
-	return strings.Replace(fullText, "<p>", "\n\n", -1)
+	return strings.Replace(fullText, "<p>", "\n", -1)
 
 }

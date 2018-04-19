@@ -70,7 +70,8 @@ func fillEmptyFields(rmap map[string]string) {
 
 	key = "Jurisdiction Id"
 	if rmap[key] == "" {
-		rmap[key] = "Jurisdiction Id not provided"
+		// single string as may be used as part of output file path
+		rmap[key] = "Jurisdiction_ID_not_provided"
 	}
 
 	key = "Local school student ID"
@@ -114,7 +115,7 @@ func fillEmptyFields(rmap map[string]string) {
 
 	key = "Item Response"
 	if rmap[key] == "" {
-		rmap[key] = "No writing-response text recorded. Check Participation Code."
+		rmap[key] = "No writing-response text recorded."
 	}
 
 }

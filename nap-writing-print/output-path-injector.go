@@ -46,9 +46,13 @@ func createOutputPathInjector(ctx context.Context, in <-chan map[string]string) 
 //
 func addFileNames(rmap map[string]string) {
 
-	pdfFileName := fmt.Sprintf("%s_%s.pdf", rmap["Participation Code"], rmap["Anonymised Id"])
+	scriptFileName := fmt.Sprintf("%s_%s_%s_%s.html", rmap["Jurisdiction Id"],
+		rmap["Participation Code"], rmap["Anonymised Id"], "script")
+	auditFileName := fmt.Sprintf("%s_%s_%s_%s.html", rmap["Jurisdiction Id"],
+		rmap["Participation Code"], rmap["Anonymised Id"], "audit")
 
-	rmap["pdf_filename"] = pdfFileName
+	rmap["html_script_filename"] = scriptFileName
+	rmap["html_audit_filename"] = auditFileName
 
 }
 

@@ -70,18 +70,18 @@ func RunPrintingPipeline(csvFileName string) error {
 	errcList = append(errcList, errc)
 
 	//
-	// write script pdfs
+	// write script html files
 	//
-	errc, err = createScriptWriter(ctx, script_chan)
+	errc, err = createScriptWriterHtml(ctx, script_chan)
 	if err != nil {
 		return err
 	}
 	errcList = append(errcList, errc)
 
 	//
-	// write audit pdfs
+	// write audit html files
 	//
-	errc, err = createAuditWriter(ctx, audit_chan)
+	errc, err = createAuditWriterHtml(ctx, audit_chan)
 	if err != nil {
 		return err
 	}

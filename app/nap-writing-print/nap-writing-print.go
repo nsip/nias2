@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	log.Println("starting pdf writer...")
+	log.Println("starting html writer...")
 
 	// clear directories
 	nwp.ClearReportsDirectory()
@@ -29,5 +29,5 @@ func main() {
 	// backup input file
 	nwp.BackupInputFiles()
 
-	log.Println("...all pdf files written.")
+	log.Println("...all html files written.")
 }
