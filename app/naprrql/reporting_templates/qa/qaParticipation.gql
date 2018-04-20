@@ -2,6 +2,7 @@ query NAPParticipation($acaraIDs: [String]) {
   participation_report_by_school(acaraIDs: $acaraIDs)
   {
     Summary {
+      Domain
       ParticipationCode
     }
     EventInfos{

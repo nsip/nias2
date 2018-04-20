@@ -87,7 +87,7 @@ func runWritingExtractPipeline(schools []string) error {
 	defer cancelFunc()
 	var errcList []<-chan error
 
-	pipelineError := runQASchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv")
+	pipelineError := runQAWritingSchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv")
 	if pipelineError != nil {
 		return pipelineError
 	}
