@@ -816,9 +816,9 @@ func buildReportResolvers() map[string]interface{} {
 
 	// same as the above, but adds AnonymisedId, and iterates all events, not just responses
 	resolvers["NaplanData/writing_item_for_marking_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
-
 		reqErr := checkRequiredParams(params)
 		if reqErr != nil {
+			log.Println("writing_item_for_marking_report_by_school #1", reqErr)
 			return nil, reqErr
 		}
 		// get the acara ids from the request params
@@ -839,6 +839,7 @@ func buildReportResolvers() map[string]interface{} {
 			schoolrefid := getIdentifiers(acaraid + ":")
 			siObjects, err := getObjects(schoolrefid)
 			if err != nil {
+				log.Println("writing_item_for_marking_report_by_school #2", err)
 				return []interface{}{}, err
 			}
 			for _, sio := range siObjects {
@@ -849,19 +850,19 @@ func buildReportResolvers() map[string]interface{} {
 		// convenience map to avoid revisiting db for tests
 		testLookup := make(map[string]xml.NAPTest) // key string = test refid
 		// get tests for yearLevel
-		for _, yrLvl := range []string{"3", "5", "7", "9"} {
-			tests, err := getTestsForYearLevel(yrLvl)
-			if err != nil {
-				return nil, err
-			}
-			for _, test := range tests {
-				t := test
-				testLookup[t.TestID] = t
-			}
+		tests, err := getObjects(getIdentifiers("NAPTest:"))
+		if err != nil {
+			log.Println("writing_item_for_marking_report_by_school #3", err)
+			return nil, err
+		}
+		for _, test := range tests {
+			t := test.(xml.NAPTest)
+			testLookup[t.TestID] = t
 		}
 
 		// construct RDS by including referenced test
 		results := make([]ItemResponseDataSet, 0)
+		//log.Printf("School %+v: %d Writing tests for %d students\n", acaraids, len(testLookup), len(studentids))
 		for testid, test := range testLookup {
 			if test.TestContent.TestDomain != "Writing" {
 				continue
@@ -872,6 +873,7 @@ func buildReportResolvers() map[string]interface{} {
 				students, err := getObjects([]string{studentid})
 				student, ok := students[0].(xml.RegistrationRecord)
 				if err != nil || !ok {
+					log.Println("writing_item_for_marking_report_by_school #4", err)
 					return []interface{}{}, err
 				}
 				student.Flatten()
@@ -885,6 +887,7 @@ func buildReportResolvers() map[string]interface{} {
 				} else {
 					event, ok = events[0].(xml.NAPEvent)
 					if err != nil || !ok {
+						log.Println("writing_item_for_marking_report_by_school #5", err)
 						return []interface{}{}, err
 					}
 				}
@@ -892,6 +895,7 @@ func buildReportResolvers() map[string]interface{} {
 				responseRefId := getIdentifiers(testid + ":NAPStudentResponseSet:" + studentid)
 				responses, err := getObjects(responseRefId)
 				if err != nil {
+					log.Println("writing_item_for_marking_report_by_school #6", err)
 					return []interface{}{}, err
 				}
 				var resp xml.NAPResponseSet
@@ -919,12 +923,14 @@ func buildReportResolvers() map[string]interface{} {
 							items, err := getObjects([]string{item_response.ItemRefID})
 							item, ok := items[0].(xml.NAPTestItem)
 							if err != nil || !ok {
+								log.Println("writing_item_for_marking_report_by_school #7", err)
 								return []interface{}{}, err
 							}
 
 							testlets, err := getObjects([]string{testlet.NapTestletRefId})
 							tl := testlets[0].(xml.NAPTestlet)
 							if err != nil || !ok {
+								log.Println("writing_item_for_marking_report_by_school #8", err)
 								return []interface{}{}, err
 							}
 							irds := ItemResponseDataSet{TestItem: item, Response: resp1,
