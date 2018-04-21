@@ -1,5 +1,8 @@
 query NAPTestAttempts($acaraIDs: [String]) {
-  domain_scores_report_by_school(acaraIDs: $acaraIDs) {
+  domain_scores_event_report_by_school(acaraIDs: $acaraIDs) {
+    Event {
+       ParticipationCode
+    }
     Test {
       TestContent {
         TestLevel
