@@ -30,6 +30,9 @@ query CodeFrame {
         ItemDifficulty
         ItemType
         MarkingType
+        ContentDescriptionList {
+          ContentDescription
+        }
         ItemSubstitutedForList {
           SubstituteItem {
             SubstituteItemRefId
