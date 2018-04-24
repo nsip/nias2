@@ -1275,6 +1275,16 @@ type ISRPrintItemExpanded {
         S_Pathway: String
         ## Grammar & Punctuation pathway
         G_Pathway: String
+        ## Reading standard deviation
+        R_Stddev: String
+        ## Writing standard deviation
+        W_Stddev: String
+        ## Numeracy standard deviation
+        N_Stddev: String
+        ## Spelling standard deviation
+        S_Stddev: String
+        ## Grammar & Punctuation standard deviation
+        G_Stddev: String
 }
 
 
