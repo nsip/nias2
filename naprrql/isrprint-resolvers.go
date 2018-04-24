@@ -69,6 +69,11 @@ type ISRPrintItemExpanded struct {
 	W_Pathway       string
 	S_Pathway       string
 	N_Pathway       string
+	G_Stddev        float64
+	R_Stddev        float64
+	W_Stddev        float64
+	S_Stddev        float64
+	N_Stddev        float64
 }
 
 //
@@ -167,26 +172,31 @@ func (isrpi *ISRPrintItemExpanded) allocateDomainScoreAndMeanAndParticipation(ev
 	switch {
 	case strings.Contains(domain, "gramm"):
 		isrpi.G_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.G_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.G_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.G_Participation = event.ParticipationCode
 		isrpi.G_Pathway = pathway
 	case strings.Contains(domain, "num"):
 		isrpi.N_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.N_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.N_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.N_Participation = event.ParticipationCode
 		isrpi.N_Pathway = pathway
 	case strings.Contains(domain, "read"):
 		isrpi.R_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.R_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.R_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.R_Participation = event.ParticipationCode
 		isrpi.R_Pathway = pathway
 	case strings.Contains(domain, "writ"):
 		isrpi.W_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.W_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.W_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.W_Participation = event.ParticipationCode
 		isrpi.W_Pathway = pathway
 	case strings.Contains(domain, "spell"):
 		isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+		isrpi.S_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.S_Participation = event.ParticipationCode
 		isrpi.S_Pathway = pathway
