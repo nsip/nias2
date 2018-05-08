@@ -398,10 +398,23 @@ func buildReportResolvers() map[string]interface{} {
 			}
 		}
 
+		/*
+			itemObjs, err := getObjects(getIdentifiers("NAPTestItem:"))
+			if err != nil {
+				return []interface{}{}, err
+			}
+			for _, obj := range itemObjs {
+				i, _ := obj.(xml.NAPTestItem)
+				testitems[i.ItemID] = i
+			}
+			testitems := make(map[string]xml.NAPTestItem)
+		*/
+
 		studentObjs, err := getObjects(studentids)
 		if err != nil {
 			return []interface{}{}, err
 		}
+
 		// iterate students and assemble Event/Response Data Set
 		results := make([]EventResponseSummaryAllDomainsDataSet, 0)
 		for _, studentObj := range studentObjs {

@@ -68,15 +68,14 @@ query NAPDomainScores($acaraIDs: [String]) {
             ItemResponseList {
               ItemResponse {
                 ItemRefID
-                  ResponseCorrectness
-                  Score
-                  SubscoreList {
-                    Subscore {
-                      SubscoreType
-                        SubscoreValue
-                    }
+                ResponseCorrectness
+                Score
+                SubscoreList {
+                  Subscore {
+                    SubscoreType
+                      SubscoreValue
                   }
-
+                }
               }
             }
           }

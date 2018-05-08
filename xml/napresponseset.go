@@ -60,6 +60,7 @@ type NAPResponseSet_ItemResponse struct {
 	SequenceNumber      string       `xml:"SequenceNumber"`
 	ItemWeight          string       `xml:"ItemWeight,omitempty"`
 	SubscoreList        SubscoreList `xml:"SubscoreList,omitempty"`
+	Item                NAPTestItem  `xml:"-"`
 }
 
 type SubscoreList struct {
