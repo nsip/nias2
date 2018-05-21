@@ -6,6 +6,7 @@ query NAPDomainScores($acaraIDs: [String]) {
         GivenName
         Sex
         BirthDate
+        YearLevel
         CountryOfBirth
         StudentLOTE
         IndigenousStatus
