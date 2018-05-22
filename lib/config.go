@@ -37,3 +37,22 @@ func LoadDefaultConfig() NIASConfig {
 	}
 	return defaultConfig
 }
+
+type NaprrqlConfig struct {
+	WritingRubrics []string
+	Loaded         bool
+}
+
+var defaultNaprrqlConfig NaprrqlConfig = NaprrqlConfig{}
+
+func LoadDefaultNaprrqlConfig() NaprrqlConfig {
+	if !defaultNaprrqlConfig.Loaded {
+		ncfg := NaprrqlConfig{}
+		if _, err := toml.DecodeFile("naprrql.toml", &ncfg); err != nil {
+			log.Fatalln("Unable to read default config, aborting.", err)
+		}
+		defaultNaprrqlConfig = ncfg
+		defaultNaprrqlConfig.Loaded = true
+	}
+	return defaultNaprrqlConfig
+}

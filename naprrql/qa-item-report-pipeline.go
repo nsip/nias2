@@ -389,8 +389,11 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 func qaRubricSubscoreMatches(ctx context.Context, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
-	expectedRubricTypesStr := []string{"Spelling", "Audience", "Text Structure", "Paragraphs",
-		"Sentence structure", "Punctuation", "Ideas", "Persuasive Devices", "Vocabulary", "Cohesion"}
+	config := LoadNAPLANConfig()
+
+	// expectedRubricTypesStr := []string{"Spelling", "Audience", "Text Structure", "Paragraphs",
+	//		"Sentence structure", "Punctuation", "Ideas", "Persuasive Devices", "Vocabulary", "Cohesion"}
+	expectedRubricTypesStr = config.WritingRubrics
 	expectedRubricTypes := set.New()
 	for _, s := range expectedRubricTypesStr {
 		expectedRubricTypes.Add(s)
@@ -568,28 +571,7 @@ func qaWritingItemResponses(ctx context.Context, in <-chan gjson.Result) (<-chan
 			for _, s := range subscores {
 				rubric := s.Get("SubscoreType").String()
 				value := s.Get("SubscoreValue").String()
-				switch rubric {
-				case "Spelling":
-					m["Spelling"] = value
-				case "Audience":
-					m["Audience"] = value
-				case "Text Structure":
-					m["TextStructure"] = value
-				case "Paragraphs":
-					m["Paragraphs"] = value
-				case "Sentence structure":
-					m["SentenceStructure"] = value
-				case "Punctuation":
-					m["Punctuation"] = value
-				case "Ideas":
-					m["Ideas"] = value
-				case "Persuasive Devices":
-					m["PersuasiveDevices"] = value
-				case "Vocabulary":
-					m["Vocabulary"] = value
-				case "Cohesion":
-					m["Cohesion"] = value
-				}
+				m[rubric] = value
 				// if not matched, this will be picked up in  qaRubricSubscoreMatches
 			}
 			j, _ := json.Marshal(m)
