@@ -5,6 +5,8 @@ query NAPDomainScores($acaraIDs: [String]) {
     TestDomain
     TestItemLocalId
     Substitute
+    Codeframe
     Count
+    SubstitutedItems
   }
 }

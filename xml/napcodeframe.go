@@ -20,5 +20,6 @@ type NAPCodeFrame_Testlet struct {
 }
 
 type NAPCodeFrame_TestItem struct {
-	TestItemRefId string `xml:"TestItemRefId"`
+	TestItemRefId  string `xml:"TestItemRefId"`
+	SequenceNumber string `xml:"SequenceNumber"`
 }

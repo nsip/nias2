@@ -16,7 +16,7 @@ do_build() {
         cd ./app
         mkdir -p naprrql/in
         rm -rf $OUTPUT/in/*.xml $OUTPUT/in/*.zip $OUTPUT/kvs
-        rsync -a naprrql/gql_schemas naprrql/in naprrql/public naprrql/reporting_templates $OUTPUT/
+        rsync -a naprrql/naprrql.toml naprrql/gql_schemas naprrql/in naprrql/public naprrql/reporting_templates $OUTPUT/
       }
 
 

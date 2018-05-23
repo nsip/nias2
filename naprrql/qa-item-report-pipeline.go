@@ -4,6 +4,7 @@ package naprrql
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -107,6 +108,7 @@ func itemresults_query() string {
 func codeframeQuery() string {
 	return `query CodeFrame {
   codeframe_report {
+    SequenceNumber
     Test {
       TestContent {
 	LocalId
@@ -237,6 +239,8 @@ func runQAItemRespReportPipeline(schools []string) error {
 	errcList = append(errcList, errc)
 	codeframec1, errc, err := splitter(ctx, codeframec, 2)
 	errcList = append(errcList, errc)
+	noncodeframec1, errc, err := splitter(ctx, noncodeframec, 2)
+	errcList = append(errcList, errc)
 	for i, queryFileName := range reports {
 		// for now, I'm merely hardcoding the query names
 		// These are transforms on the CSV
@@ -254,11 +258,11 @@ func runQAItemRespReportPipeline(schools []string) error {
 			errcList = append(errcList, errc)
 		} else if queryFileName == "systemItemCounts.gql" {
 			// block on reading codeframe
-			jsonc2, errc, _ = qaItemCounts(ctx, codeframec1[0], noncodeframec, jsonc1[i])
+			jsonc2, errc, _ = qaItemCounts(ctx, codeframec1[0], noncodeframec1[0], jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemExpectedResponses.gql" {
 			// block on reading codeframe
-			jsonc2, errc, _ = qaItemExpectedResponses(ctx, codeframec1[1], jsonc1[i])
+			jsonc2, errc, _ = qaItemExpectedResponses(ctx, codeframec1[1], noncodeframec1[1], jsonc1[i])
 			errcList = append(errcList, errc)
 		} else if queryFileName == "itemPrinting.gql" {
 			jsonc2, errc, _ = qaItemResponses(ctx, jsonc1[i])
@@ -393,7 +397,7 @@ func qaRubricSubscoreMatches(ctx context.Context, in <-chan gjson.Result) (<-cha
 
 	// expectedRubricTypesStr := []string{"Spelling", "Audience", "Text Structure", "Paragraphs",
 	//		"Sentence structure", "Punctuation", "Ideas", "Persuasive Devices", "Vocabulary", "Cohesion"}
-	expectedRubricTypesStr = config.WritingRubrics
+	expectedRubricTypesStr := config.WritingRubrics
 	expectedRubricTypes := set.New()
 	for _, s := range expectedRubricTypesStr {
 		expectedRubricTypes.Add(s)
@@ -437,26 +441,36 @@ func qaRubricSubscoreMatches(ctx context.Context, in <-chan gjson.Result) (<-cha
 	return out, errc, nil
 }
 
-func qaItemCountsRowInit(counts map[string]map[string]map[string]map[string]map[string]int, testname string, testdomain string,
-	testlevel string, itemlocalid string, hasSubstituteItems bool) map[string]map[string]map[string]map[string]map[string]int {
+func qaItemCountsRowInit(counts map[string]map[string]map[string]map[string]map[string]int,
+	subs map[string]map[string]map[string]map[string]string,
+	testname string, testdomain string,
+	testlevel string, itemlocalid string, substituteItems []gjson.Result,
+	inCodeframe bool) (map[string]map[string]map[string]map[string]map[string]int, map[string]map[string]map[string]map[string]string) {
 	if _, ok := counts[testname]; !ok {
 		counts[testname] = make(map[string]map[string]map[string]map[string]int)
+		subs[testname] = make(map[string]map[string]map[string]string)
 	}
 	if _, ok := counts[testname][testdomain]; !ok {
 		counts[testname][testdomain] = make(map[string]map[string]map[string]int)
+		subs[testname][testdomain] = make(map[string]map[string]string)
 	}
 	if _, ok := counts[testname][testdomain][testlevel]; !ok {
 		counts[testname][testdomain][testlevel] = make(map[string]map[string]int)
+		subs[testname][testdomain][testlevel] = make(map[string]string)
 	}
 	if _, ok := counts[testname][testdomain][testlevel][itemlocalid]; !ok {
 		counts[testname][testdomain][testlevel][itemlocalid] = make(map[string]int)
 		counts[testname][testdomain][testlevel][itemlocalid]["substitute"] = 0
 		counts[testname][testdomain][testlevel][itemlocalid]["count"] = 0
 	}
-	if hasSubstituteItems {
+	if len(substituteItems) > 0 {
 		counts[testname][testdomain][testlevel][itemlocalid]["substitute"] = 1
+		subs[testname][testdomain][testlevel][itemlocalid] = fmt.Sprintf("%+v", substituteItems)
 	}
-	return counts
+	if inCodeframe {
+		counts[testname][testdomain][testlevel][itemlocalid]["codeframe"] = 1
+	}
+	return counts, subs
 }
 
 func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, noncodeframe <-chan gjson.Result, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
@@ -466,13 +480,14 @@ func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, noncodefra
 		defer close(out)
 		defer close(errc)
 		counts := make(map[string]map[string]map[string]map[string]map[string]int)
+		subs := make(map[string]map[string]map[string]map[string]string)
 		for record := range codeframe {
 			testname := record.Get("Test.TestContent.TestName").String()
 			testdomain := record.Get("Test.TestContent.TestDomain").String()
 			testlevel := record.Get("Test.TestContent.TestLevel").String()
 			itemlocalid := record.Get("Item.TestItemContent.NAPTestItemLocalId").String()
-			counts = qaItemCountsRowInit(counts, testname, testdomain, testlevel, itemlocalid,
-				len(record.Get("Item.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()) > 0)
+			counts, subs = qaItemCountsRowInit(counts, subs, testname, testdomain, testlevel, itemlocalid,
+				record.Get("Item.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array(), true)
 		}
 		for record := range noncodeframe {
 			objectType := record.Get("ObjectType").String()
@@ -484,9 +499,9 @@ func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, noncodefra
 			testdomain := "?"
 			testlevel := "?"
 			itemlocalid := record.Get("TestItem.TestItemContent.NAPTestItemLocalId").String()
-			// log.Printf("%+v\n", record)
-			counts = qaItemCountsRowInit(counts, testname, testdomain, testlevel, itemlocalid,
-				len(record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()) > 0)
+			//log.Printf("%+v\n", record)
+			counts, subs = qaItemCountsRowInit(counts, subs, testname, testdomain, testlevel, itemlocalid,
+				record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array(), false)
 		}
 		for record := range in {
 			testname := record.Get("Test.TestContent.TestName").String()
@@ -500,8 +515,8 @@ func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, noncodefra
 			if participationcode != "P" && participationcode != "S" {
 				continue
 			}
-			counts = qaItemCountsRowInit(counts, testname, testdomain, testlevel, itemlocalid,
-				len(record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()) > 0)
+			counts, subs = qaItemCountsRowInit(counts, subs, testname, testdomain, testlevel, itemlocalid,
+				record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array(), false)
 			counts[testname][testdomain][testlevel][itemlocalid]["count"] = counts[testname][testdomain][testlevel][itemlocalid]["count"] + 1
 		}
 
@@ -519,6 +534,12 @@ func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, noncodefra
 						} else {
 							result["Substitute"] = "false"
 						}
+						if v3["codeframe"] == 1 {
+							result["Codeframe"] = "true"
+						} else {
+							result["Codeframe"] = "false"
+						}
+						result["SubstitutedItems"] = subs[k][k1][k2][k3]
 						result["Count"] = strconv.Itoa(v3["count"])
 						j, _ := json.Marshal(result)
 						select {
@@ -614,31 +635,54 @@ func QaItemExpectedResponseTypeNew() QaItemExpectedResponseType {
 	return s
 }
 
-func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[string]map[string]*set.Set, map[string]*set.Set) {
+func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result, noncodeframe <-chan gjson.Result) (map[string]map[string]*set.Set, map[string]*set.Set, map[string]map[string]map[string]string) {
 	done := make(chan bool, 1)
 	// read codeframe
 	cf := make(map[string]map[string]*set.Set)
 	// track substitute items
 	sub := make(map[string]*set.Set)
+	// track locations of items in testlet
+	seq := make(map[string]map[string]map[string]string)
 	go func() {
 		for record := range codeframe {
 			testid := record.Get("Test.TestContent.LocalId").String()
 			testletid := record.Get("Testlet.TestletContent.LocalId").String()
 			substitutes := record.Get("Item.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()
 			itemid := record.Get("Item.TestItemContent.NAPTestItemLocalId").String()
+			seqno := record.Get("SequenceNumber").String()
 			//log.Printf("%s\t%+v\n", itemid, substitutes)
 			if _, ok := cf[testid]; !ok {
 				cf[testid] = make(map[string]*set.Set)
+				seq[testid] = make(map[string]map[string]string)
 			}
 			if _, ok := cf[testid][testletid]; !ok {
 				cf[testid][testletid] = set.New()
+				seq[testid][testletid] = make(map[string]string)
 			}
-			if len(substitutes) == 0 {
-				cf[testid][testletid].Add(itemid)
-			} else {
-				sub[itemid] = set.New()
+			// any item in the codeframe is registered as being for that sequence number, even if it substitutes for another item;
+			// the assumption is that it is a main item here, and a substitute elsewhere
+			cf[testid][testletid].Add(itemid)
+			seq[testid][testletid][seqno] = itemid
+			if len(substitutes) > 0 {
+				//log.Printf("%s\t%+v\n", itemid, substitutes)
+				if _, ok := sub[itemid]; !ok {
+					sub[itemid] = set.New()
+				}
 				for _, s := range substitutes {
-					//substitutes[0].Get("LocalId").String()
+					sub[itemid].Add(s.Get("LocalId").String())
+				}
+			}
+		}
+		//log.Println("NON-CODEFRAME SUBSTITUTES")
+		for record := range noncodeframe {
+			itemid := record.Get("TestItem.TestItemContent.NAPTestItemLocalId").String()
+			substitutes := record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()
+			if len(substitutes) > 0 {
+				if _, ok := sub[itemid]; !ok {
+					sub[itemid] = set.New()
+				}
+				for _, s := range substitutes {
+					//log.Printf("%s\t%+v\n", itemid, substitutes)
 					sub[itemid].Add(s.Get("LocalId").String())
 				}
 			}
@@ -647,15 +691,14 @@ func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result) (map[st
 	}()
 	<-done
 	//log.Printf("%+v\n", sub)
-	return cf, sub
+	return cf, sub, seq
 }
 
-//func qaItemExpectedResponses(ctx context.Context, cf map[string]map[string]*set.Set, sub map[string]string, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
-func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
+func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result, noncodeframe <-chan gjson.Result, in <-chan gjson.Result) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	go func() {
-		cf, sub := qaReadCodeframe(ctx, codeframec)
+		cf, sub, seq := qaReadCodeframe(ctx, codeframec, noncodeframe)
 		defer close(out)
 		defer close(errc)
 		// we are assuming the records come in for item results report in sorted order
@@ -666,6 +709,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 		locationinstage := 0
 		locationinstage_str := ""
 		testitems := set.New()
+		item2seq := make(map[string]string)
 		result := QaItemExpectedResponseTypeNew()
 		for record := range in {
 			psi := record.Get("Response.PSI").String()
@@ -675,6 +719,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			testname := record.Get("Test.TestContent.TestName").String()
 			itemid := record.Get("TestItem.TestItemContent.NAPTestItemLocalId").String()
 			correctness := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.ResponseCorrectness").String()
+			sequence := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SequenceNumber").String()
 			participationcode := record.Get("ParticipationCode").String()
 			// we're assuming LocationInStage is only 1, 2, 3
 			// locationinstage := record.Get("Testlet.TestletContent.LocationInStage").String()
@@ -684,7 +729,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			//}
 
 			if !testitems.IsEmpty() && (testletid != curr_testletid || testid != curr_testid || psi != curr_psi) {
-				result = checkExpectedItems(result, cf, sub, curr_testid, curr_testletid, curr_locationinstage, testitems)
+				result = checkExpectedItems(result, cf, sub, seq, curr_testid, curr_testletid, curr_locationinstage, testitems, item2seq)
 			}
 			if psi != curr_psi || testid != curr_testid {
 				if psi != curr_psi {
@@ -718,6 +763,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 				}
 
 				testitems.Clear()
+				item2seq = make(map[string]string)
 			}
 			switch correctness {
 			case "Correct":
@@ -730,6 +776,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 				result.FoundItems["NotInPath"][locationinstage_str]++
 			}
 			testitems.Add(itemid)
+			item2seq[itemid] = sequence
 			curr_testletid = testletid
 			curr_testid = testid
 			curr_psi = psi
@@ -737,7 +784,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			//log.Printf("%s\t%s\t%s\t%s\t%d\n", psi, testname, testletname, itemid, locationinstage)
 			// log.Printf("%+v\n", result)
 		}
-		result = checkExpectedItems(result, cf, sub, curr_testid, curr_testletid, curr_locationinstage, testitems)
+		result = checkExpectedItems(result, cf, sub, seq, curr_testid, curr_testletid, curr_locationinstage, testitems, item2seq)
 		j, _ := json.Marshal(result)
 		select {
 		case out <- gjson.ParseBytes(j):
@@ -748,7 +795,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 	return out, errc, nil
 }
 
-func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[string]*set.Set, sub map[string]*set.Set, curr_testid string, curr_testletid string, curr_locationinstage string, testitems *set.Set) QaItemExpectedResponseType {
+func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[string]*set.Set, sub map[string]*set.Set, seq map[string]map[string]map[string]string, curr_testid string, curr_testletid string, curr_locationinstage string, testitems *set.Set, item2seq map[string]string) QaItemExpectedResponseType {
 	if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
 
 		foundNotExp := set.New()
@@ -756,32 +803,36 @@ func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[str
 		//log.Printf("Expected: %+v\n", expected_testitems)
 		//log.Printf("Found   : %+v\n", testitems)
 		for _, t := range set.StringSlice(testitems) {
+			testitems_expansion.Add(t)
 			if s, ok := sub[t]; ok {
 				testitems_expansion.Merge(s)
-			} else {
-				testitems_expansion.Add(t)
 			}
 		}
 		//log.Printf("Expanded : %+v\n", testitems_expansion)
 		result.ExpectedItemsNotFound[curr_locationinstage] = set.Difference(expected_testitems, testitems_expansion).String()
 		for _, t := range set.StringSlice(testitems) {
 			if s, ok := sub[t]; ok {
+				//log.Printf("Checking substitutes %+v of item %s agaisnt %+v\n", s, t, expected_testitems)
 				found := false
+				if expected_testitems.Has(t) {
+					found = true // substitute items can also be main
+				}
 				for _, s1 := range s.List() {
 					if expected_testitems.Has(s1) {
 						found = true
 					}
 				}
 				if !found {
-					foundNotExp.Add(t)
+					//log.Printf("Not found; %+v; %s; %s\n", seq[curr_testid][curr_testletid], item2seq[t], seq[curr_testid][curr_testletid][item2seq[t]])
+					foundNotExp.Add(fmt.Sprintf("%s (Sequence No: %s, expected: %s)", t, item2seq[t], seq[curr_testid][curr_testletid][item2seq[t]]))
 				}
 			} else {
 				if !expected_testitems.Has(t) {
-					foundNotExp.Add(t)
+					foundNotExp.Add(fmt.Sprintf("%s (Sequence No: %s, expected: %s)", t, item2seq[t], seq[curr_testid][curr_testletid][item2seq[t]]))
 				}
 			}
 		}
-		//log.Printf("FoundNEx : %+v\n", foundNotExp)
+		// log.Printf("FoundNEx : %+v\n", foundNotExp)
 		result.FoundItemsNotExpected[curr_locationinstage] = foundNotExp.String()
 	} else {
 		result.ExpectedItemsNotFound[curr_locationinstage] = ""
