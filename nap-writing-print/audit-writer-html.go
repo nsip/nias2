@@ -37,7 +37,7 @@ var auditHeader = `
 
 var auditReport = `
         <p style="text-align: left;">Test Year: %s</p>
-        <p style="text-align: left;">Test Level: %s:</p>
+        <p style="text-align: left;">Test Level: %s</p>
         <p style="text-align: left;">TAA Student ID: %s</p>
         <p style="text-align: left;">PSI: %s</p>
         <p style="text-align: left;">Local School Student ID: %s</p>
