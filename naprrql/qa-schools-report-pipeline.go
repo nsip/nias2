@@ -24,18 +24,23 @@ import (
 //
 type schoolQASummary struct {
 	xml.SchoolInfo
-	TestAttempts         map[string]int // internal map structure where key is composite "YrLevel:Domain" eg. "3:Numeracy"
-	AttemptParticipation map[string]int // map of participation codes with summary totals for each
-	TotalAttempts        int
-	AttemptDisruptions   int
-	Yr3registered        int
-	Yr5registered        int
-	Yr7registered        int
-	Yr9registered        int
-	YrUnknowRegistered   int
-	TotalStudents        int
-	DerivedSector        string
-	DerivedSystem        string
+	TestAttempts            map[string]int // internal map structure where key is composite "YrLevel:Domain" eg. "3:Numeracy"
+	AttemptParticipation    map[string]int // map of participation codes with summary totals for each
+	TotalAttempts           int
+	AttemptDisruptions      int
+	Yr3registered           int
+	Yr5registered           int
+	Yr7registered           int
+	Yr9registered           int
+	YrUnknowRegistered      int
+	TestLvl3registered      int
+	TestLvl5registered      int
+	TestLvl7registered      int
+	TestLvl9registered      int
+	TestLvlUnknowRegistered int
+	TotalStudents           int
+	DerivedSector           string
+	DerivedSystem           string
 }
 
 //
@@ -337,6 +342,18 @@ func qaYrLevelQueryExecutor(ctx context.Context, query string, url string, in <-
 					school.Yr9registered++
 				default:
 					school.YrUnknowRegistered++
+				}
+				switch result.Get("TestLevel").String() {
+				case "3":
+					school.TestLvl3registered++
+				case "5":
+					school.TestLvl5registered++
+				case "7":
+					school.TestLvl7registered++
+				case "9":
+					school.TestLvl9registered++
+				default:
+					school.TestLvlUnknowRegistered++
 				}
 				school.TotalStudents++
 			}

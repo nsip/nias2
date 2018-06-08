@@ -6,15 +6,15 @@ type NAPTest struct {
 }
 
 type TestContent struct {
-	LocalId           string            `xml:"NAPTestLocalId,omitempty"`
-	TestName          string            `xml:"TestName,omitempty"`
+	LocalId           string            `xml:"NAPTestLocalId"`
+	TestName          string            `xml:"TestName"`
 	TestLevel         string            `xml:"TestLevel>Code"`
 	TestDomain        string            `xml:"Domain"`
 	TestYear          string            `xml:"TestYear"`
-	StagesCount       string            `xml:"StagesCount,omitempty"`
-	TestType          string            `xml:"TestType,omitempty"`
-	DomainBands       DomainBands       `xml:"DomainBands,omitempty"`
-	DomainProficiency DomainProficiency `xml:"DomainProficiency,omitempty"`
+	StagesCount       string            `xml:"StagesCount"`
+	TestType          string            `xml:"TestType"`
+	DomainBands       DomainBands       `xml:"DomainBands"`
+	DomainProficiency DomainProficiency `xml:"DomainProficiency"`
 }
 
 type DomainBands struct {

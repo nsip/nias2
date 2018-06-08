@@ -319,6 +319,18 @@ func qaWritingYrLevelQueryExecutor(ctx context.Context, query string, url string
 					school.YrUnknowRegistered++
 					school.TotalStudents++
 				}
+				switch result.Get("TestLevel").String() {
+				case "3":
+					school.TestLvl3registered++
+				case "5":
+					school.TestLvl5registered++
+				case "7":
+					school.TestLvl7registered++
+				case "9":
+					school.TestLvl9registered++
+				default:
+					school.TestLvlUnknowRegistered++
+				}
 			}
 
 			// Send the data to the output channel but return early

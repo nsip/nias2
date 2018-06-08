@@ -7,10 +7,10 @@ type NAPResponseSet struct {
 	EquatingSampleFlag    string      `xml:"EquatingSampleFlag,omitempty"`
 	PathTakenForDomain    string      `xml:"PathTakenForDomain,omitempty"`
 	ParallelTest          string      `xml:"ParallelTest,omitempty"`
-	StudentID             string      `xml:"StudentPersonalRefId"`
+	StudentID             string      `xml:"StudentPersonalRefId,omitempty"`
 	PSI                   string      `xml:"PlatformStudentIdentifier"`
-	TestID                string      `xml:"NAPTestRefId"`
-	TestLocalID           string      `xml:"NAPTestLocalId,omitempty"`
+	TestID                string      `xml:"NAPTestRefId,omitempty"`
+	TestLocalID           string      `xml:"NAPTestLocalId"`
 	DomainScore           DomainScore `xml:"DomainScore,omitempty"`
 	TestletList           TestletList `xml:"TestletList"`
 }
@@ -20,23 +20,23 @@ type TestletList struct {
 }
 
 type DomainScore struct {
-	RawScore                      string                   `xml:"RawScore,omitempty"`
-	ScaledScoreValue              string                   `xml:"ScaledScoreValue,omitempty"`
-	ScaledScoreLogitValue         string                   `xml:"ScaledScoreLogitValue,omitempty"`
-	ScaledScoreStandardError      string                   `xml:"ScaledScoreStandardError,omitempty"`
-	ScaledScoreLogitStandardError string                   `xml:"ScaledScoreLogitStandardError,omitempty"`
-	StudentDomainBand             string                   `xml:"StudentDomainBand,omitempty"`
+	RawScore                      string                   `xml:"RawScore"`
+	ScaledScoreValue              string                   `xml:"ScaledScoreValue"`
+	ScaledScoreLogitValue         string                   `xml:"ScaledScoreLogitValue"`
+	ScaledScoreStandardError      string                   `xml:"ScaledScoreStandardError"`
+	ScaledScoreLogitStandardError string                   `xml:"ScaledScoreLogitStandardError"`
+	StudentDomainBand             string                   `xml:"StudentDomainBand"`
 	StudentProficiency            string                   `xml:"StudentProficiency,omitempty"`
-	PlausibleScaledValueList      PlausibleScaledValueList `xml:"PlausibleScaledValueList,omitempty"`
+	PlausibleScaledValueList      PlausibleScaledValueList `xml:"PlausibleScaledValueList"`
 }
 
 type PlausibleScaledValueList struct {
-	PlausibleScaledValue []string `xml:"PlausibleScaledValue,omitempty"`
+	PlausibleScaledValue []string `xml:"PlausibleScaledValue"`
 }
 
 type NAPResponseSet_Testlet struct {
-	NapTestletRefId   string           `xml:"NAPTestletRefId"`
-	NapTestletLocalId string           `xml:"NAPTestletLocalId,omitempty"`
+	NapTestletRefId   string           `xml:"NAPTestletRefId,omitempty"`
+	NapTestletLocalId string           `xml:"NAPTestletLocalId"`
 	TestletScore      string           `xml:"TestletSubScore,omitempty"`
 	ItemResponseList  ItemResponseList `xml:"ItemResponseList"`
 }
@@ -51,14 +51,14 @@ type NAPResponseSet_Subscore struct {
 }
 
 type NAPResponseSet_ItemResponse struct {
-	ItemRefID           string       `xml:"NAPTestItemRefId"`
-	LocalID             string       `xml:"NAPTestItemLocalId,omitempty"`
+	ItemRefID           string       `xml:"NAPTestItemRefId,omitempty"`
+	LocalID             string       `xml:"NAPTestItemLocalId"`
 	Response            string       `xml:"Response,omitempty"`
-	ResponseCorrectness string       `xml:"ResponseCorrectness,omitempty"`
+	ResponseCorrectness string       `xml:"ResponseCorrectness"`
 	Score               string       `xml:"Score,omitempty"`
 	LapsedTimeItem      string       `xml:"LapsedTimeItem,omitempty"`
 	SequenceNumber      string       `xml:"SequenceNumber"`
-	ItemWeight          string       `xml:"ItemWeight,omitempty"`
+	ItemWeight          string       `xml:"ItemWeight"`
 	SubscoreList        SubscoreList `xml:"SubscoreList,omitempty"`
 	Item                NAPTestItem  `xml:"-"`
 }

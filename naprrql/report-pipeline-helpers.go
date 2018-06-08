@@ -21,6 +21,15 @@ import (
 // utiltiy methods to support reporting pipelines
 //
 
+func emptyCsvRow(row []string) bool {
+	for _, r := range row {
+		if len(r) > 0 {
+			return false
+		}
+	}
+	return true
+}
+
 //
 // generic print pipeline terminator that writes to a csv file
 // mapFile is the path/name of a *_map.csv file which contains the
@@ -46,7 +55,6 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 		defer file.Close()
 
 		for record := range in {
-
 			// if no row template established derive one from the data
 			if len(rowFormat) == 0 {
 				rowFormat, dataKeys = deriveRowFormat(record)
@@ -70,15 +78,16 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 				}
 				headerWritten = true
 			} else {
-				i++
-				err := w.Write(resultRow)
-				if err != nil {
-					// Handle an error that occurs during the goroutine.
-					errc <- err
-					log.Printf("%+v\n", err)
-					return
+				if !emptyCsvRow(resultRow) {
+					i++
+					err := w.Write(resultRow)
+					if err != nil {
+						// Handle an error that occurs during the goroutine.
+						errc <- err
+						log.Printf("%+v\n", err)
+						return
+					}
 				}
-
 			}
 			w.Flush()
 		}
@@ -286,7 +295,7 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 		defer file.Close()
 
 		for record := range in {
-
+			log.Println(string(record))
 			i++
 			var to TypedObject
 			var out []byte

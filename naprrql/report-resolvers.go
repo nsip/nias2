@@ -1522,5 +1522,84 @@ func buildReportResolvers() map[string]interface{} {
 
 	}
 
+	resolvers["NaplanData/test_year_level_discrepancy_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			studentids = append(studentids, studentRefIds...)
+		}
+
+		siObjects, err := getObjects(studentids)
+		studentPersonals := make([]xml.RegistrationRecord, 0)
+		for _, sio := range siObjects {
+			si, _ := sio.(xml.RegistrationRecord)
+			if si.TestLevel != si.YearLevel {
+				studentPersonals = append(studentPersonals, si)
+			}
+		}
+		return studentPersonals, err
+	}
+
+	resolvers["NaplanData/student_event_acara_id_discrepancy_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		results := make([]EventResponseDataSet, 0)
+
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			studentids = append(studentids, studentRefIds...)
+		}
+
+		siObjects, err := getObjects(studentids)
+		studentPersonals := make([]xml.RegistrationRecord, 0)
+		for _, sio := range siObjects {
+			student, _ := sio.(xml.RegistrationRecord)
+			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
+			if len(studentEventIds) < 1 {
+				continue
+			}
+			eventObjs, err := getObjects(studentEventIds)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			for _, eventObj := range eventObjs {
+				event := eventObj.(xml.NAPEvent)
+				if student.ASLSchoolId != event.SchoolID {
+					results = append(results, EventResponseDataSet{Event: event, Student: student})
+				}
+			}
+		}
+		return results, err
+	}
+
 	return resolvers
 }

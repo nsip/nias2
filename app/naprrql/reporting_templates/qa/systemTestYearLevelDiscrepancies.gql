@@ -1,0 +1,16 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  test_year_level_discrepancy_by_school(acaraIDs: $acaraIDs) {
+      FamilyName
+      GivenName
+      TestLevel
+      YearLevel
+      BirthDate
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      }
+  }
+}
+

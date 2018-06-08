@@ -7,19 +7,19 @@ import (
 type NAPEvent struct {
 	XMLName                xml.Name           `xml:"NAPEventStudentLink"`
 	EventID                string             `xml:"RefId,attr"`
-	SPRefID                string             `xml:"StudentPersonalRefId"`
-	PSI                    string             `xml:"PlatformStudentIdentifier,omitempty"`
-	SchoolRefID            string             `xml:"SchoolInfoRefId,omitempty"`
+	SPRefID                string             `xml:"StudentPersonalRefId,omitempty"`
+	PSI                    string             `xml:"PlatformStudentIdentifier"`
+	SchoolRefID            string             `xml:"SchoolInfoRefId"`
 	SchoolID               string             `xml:"SchoolACARAId,omitempty"`
-	TestID                 string             `xml:"NAPTestRefId"`
-	NAPTestLocalID         string             `xml:"NAPTestLocalId,omitempty"`
-	SchoolSector           string             `xml:"SchoolSector,omitempty"`
+	TestID                 string             `xml:"NAPTestRefId,omitempty"`
+	NAPTestLocalID         string             `xml:"NAPTestLocalId"`
+	SchoolSector           string             `xml:"SchoolSector"`
 	System                 string             `xml:"System,omitempty"`
 	SchoolGeolocation      string             `xml:"SchoolGeolocation,omitempty"`
 	ReportingSchoolName    string             `xml:"ReportingSchoolName,omitempty"`
 	JurisdictionID         string             `xml:"JurisdictionID,omitempty"`
 	ParticipationCode      string             `xml:"ParticipationCode"`
-	ParticipationText      string             `xml:"ParticipationText,omitempty"`
+	ParticipationText      string             `xml:"ParticipationText"`
 	Device                 string             `xml:"Device,omitempty"`
 	Date                   string             `xml:"Date,omitempty"`
 	StartTime              string             `xml:"StartTime,omitempty"`
@@ -41,7 +41,7 @@ type TestDisruption struct {
 }
 
 type Adjustment struct {
-	PNPCodelist PNPCodelist `xml:"PNPCodeList,omitempty"`
+	PNPCodelist PNPCodelist `xml:"PNPCodeList"`
 	BookletType string      `xml:"BookletType,omitempty"`
 }
 

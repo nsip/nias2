@@ -14,7 +14,7 @@ func init() {
 }
 
 type XMLAttributeStruct struct {
-	Type  string `xml:"Type,attr"`
+	Type  string `xml:"Type,attr,omitempty"`
 	Value string `xml:",chardata"`
 }
 
@@ -31,7 +31,7 @@ type RegistrationRecord struct {
 	XMLName xml.Name `xml:"StudentPersonal"`
 	// Important fields
 	RefId                     string      `json:",omitempty" xml:"RefId,attr"`
-	LocalId                   string      `json:",omitempty" xml:"LocalId,omitempty"`
+	LocalId                   string      `json:",omitempty" xml:"LocalId"`
 	StateProvinceId           string      `json:",omitempty" xml:"StateProvinceId,omitempty"`
 	OtherIdList               OtherIdList `xml:OtherIdList,omitempty`
 	FamilyName                string      `json:",omitempty" xml:"PersonInfo>Name>FamilyName,omitempty"`
@@ -69,7 +69,6 @@ type RegistrationRecord struct {
 	MainSchoolFlag            string      `json:",omitempty" xml:"MostRecent>MembershipType,omitempty"`
 	FFPOS                     string      `json:",omitempty" xml:"MostRecent>FFPOS,omitempty"`
 	ReportingSchoolId         string      `json:",omitempty" xml:"MostRecent>ReportingSchoolId,omitempty"`
-	OtherSchoolId             string      `json:",omitempty" xml:"MostRecent>OtherEnrollmentSchoolACARAId,omitempty"`
 	EducationSupport          string      `json:",omitempty" xml:"EducationSupport,omitempty"`
 	HomeSchooledStudent       string      `json:",omitempty" xml:"HomeSchooledStudent,omitempty"`
 	Sensitive                 string      `json:",omitempty" xml:"Sensitive,omitempty"`
@@ -80,16 +79,21 @@ type RegistrationRecord struct {
 	OtherId                   string      `json:",omitempty" xml:"-"`
 	PlatformId                string      `json:",omitempty" xml:"-"`
 	PreviousDiocesanId        string      `json:",omitempty" xml:"-"`
-	//PreviousJurisdictionId    string `json:",omitempty"`
-	PreviousLocalId         string `json:",omitempty" xml:"-"`
-	PreviousNationalId      string `json:",omitempty" xml:"-"`
-	PreviousOtherId         string `json:",omitempty" xml:"-"`
-	PreviousPlatformId      string `json:",omitempty" xml:"-"`
-	PreviousSectorId        string `json:",omitempty" xml:"-"`
-	PreviousStateProvinceId string `json:",omitempty" xml:"-"`
-	PreviousTAAId           string `json:",omitempty" xml:"-"`
-	SectorId                string `json:",omitempty" xml:"-"`
-	TAAId                   string `json:",omitempty" xml:"-"`
+	PreviousLocalId           string      `json:",omitempty" xml:"-"`
+	PreviousNationalId        string      `json:",omitempty" xml:"-"`
+	PreviousOtherId           string      `json:",omitempty" xml:"-"`
+	PreviousPlatformId        string      `json:",omitempty" xml:"-"`
+	PreviousSectorId          string      `json:",omitempty" xml:"-"`
+	PreviousStateProvinceId   string      `json:",omitempty" xml:"-"`
+	PreviousTAAId             string      `json:",omitempty" xml:"-"`
+	SectorId                  string      `json:",omitempty" xml:"-"`
+	TAAId                     string      `json:",omitempty" xml:"-"`
+	OtherIdLocality           string      `json:",omitempty" xml:"-"`
+	DOBRange                  string      `json:",omitempty" xml:"-"`
+	PersonalDetailsChanged    string      `json:",omitempty" xml:"-"`
+	PossibleDuplicate         string      `json:",omitempty" xml:"-"`
+	PsiOtherIdMismatch        string      `json:",omitempty" xml:"-"`
+	OtherSchoolId             string      `json:",omitempty" xml:"-"`
 }
 
 // Flatten out Other IDs from XML into JSON/CSV flat structure
@@ -136,6 +140,24 @@ func (r *RegistrationRecord) Flatten() RegistrationRecord {
 		}
 		if id.Type == "TAAStudentId" {
 			r.TAAId = id.Value
+		}
+		if id.Type == "Locality" {
+			r.OtherIdLocality = id.Value
+		}
+		if id.Type == "DOBRange" {
+			r.DOBRange = id.Value
+		}
+		if id.Type == "PersonalDetailsChanged" {
+			r.PersonalDetailsChanged = id.Value
+		}
+		if id.Type == "PossibleDuplicate" {
+			r.PossibleDuplicate = id.Value
+		}
+		if id.Type == "PsiOtherIdMismatch" {
+			r.PsiOtherIdMismatch = id.Value
+		}
+		if id.Type == "OtherSchoolId" {
+			r.OtherSchoolId = id.Value
 		}
 	}
 	return *r
@@ -186,6 +208,25 @@ func (r *RegistrationRecord) Unflatten() RegistrationRecord {
 	if r.TAAId != "" {
 		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"TAAStudentId", r.TAAId})
 	}
+	if r.OtherIdLocality != "" {
+		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"Locality", r.OtherIdLocality})
+	}
+	if r.PersonalDetailsChanged != "" {
+		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"PersonalDetailsChanged", r.PersonalDetailsChanged})
+	}
+	if r.DOBRange != "" {
+		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"DOBRange", r.DOBRange})
+	}
+	if r.PossibleDuplicate != "" {
+		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"PossibleDuplicate", r.PossibleDuplicate})
+	}
+	if r.PsiOtherIdMismatch != "" {
+		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"PsiOtherIdMismatch", r.PsiOtherIdMismatch})
+	}
+	if r.OtherSchoolId != "" {
+		r.OtherIdList.OtherId = append(r.OtherIdList.OtherId, XMLAttributeStruct{"OtherSchoolId", r.OtherSchoolId})
+	}
+
 	return *r
 }
 
@@ -385,7 +426,13 @@ func (r RegistrationRecord) GetHeaders() []string {
 		"TAAId",
 		"TestLevel",
 		"VisaCode",
-		"YearLevel"}
+		"YearLevel",
+		"OtherIdLocality",
+		"DOBRange",
+		"PersonalDetailsChanged",
+		"PossibleDuplicate",
+		"PsiOtherIdMismatch",
+	}
 }
 
 // convenience method for writing to csv
@@ -416,7 +463,7 @@ func (r RegistrationRecord) GetSlice() []string {
 		r.NationalId,
 		r.OfflineDelivery,
 		r.GetOtherId("OtherStudentId"),
-		r.OtherSchoolId,
+		r.GetOtherId("OtherSchoolId"),
 		r.Parent1LOTE,
 		r.Parent1NonSchoolEducation,
 		r.Parent1Occupation,
@@ -447,7 +494,13 @@ func (r RegistrationRecord) GetSlice() []string {
 		r.TAAId,
 		r.TestLevel,
 		r.VisaCode,
-		r.YearLevel}
+		r.YearLevel,
+		r.GetOtherId("Locality"),
+		r.GetOtherId("DOBRange"),
+		r.GetOtherId("PersonalDetailsChanged"),
+		r.GetOtherId("PossibleDuplicate"),
+		r.GetOtherId("PsiOtherIdMismatch"),
+	}
 }
 
 // information extracted out of SIF for graph

@@ -77,6 +77,10 @@ type NaplanData {
         ## Request student summaries for the given school and year level of tests, with full student details
         #isrReportItemsExpanded(schoolAcaraID: String!, testYrLevel: String!): [ISRPrintItemExpanded]
         isrReportItemsExpanded(acaraIDs: [String]): [ISRPrintItemExpanded]
+        ## report on discrepancies between test level and year level
+        test_year_level_discrepancy_by_school(acaraIDs: [String]): [RegistrationRecord]
+        ## report on students sitting a test at a school other than where they are enrolled
+        student_event_acara_id_discrepancy_by_school(acaraIDs: [String]): [EventResponseDataSet]
 }
 
 ## List of problematic GUIDs in data set

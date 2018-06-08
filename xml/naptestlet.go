@@ -2,18 +2,18 @@ package xml
 
 type NAPTestlet struct {
 	TestletID      string         `xml:"RefId,attr"`
-	NAPTestRefId   string         `xml:"NAPTestRefId"`
+	NAPTestRefId   string         `xml:"NAPTestRefId,omitempty"`
+	NAPTestLocalId string         `xml:"NAPTestLocalId"`
 	TestletContent TestletContent `xml:"TestletContent"`
 	TestItemList   TestItemList   `xml:"TestItemList"`
 }
 
 type TestletContent struct {
-	LocalId             string `xml:"NAPTestletLocalId,omitempty"`
-	NAPTestLocalId      string `xml:"NAPTestLocalId,omitempty"`
-	TestletName         string `xml:"TestletName,omitempty"`
+	LocalId             string `xml:"NAPTestletLocalId"`
+	TestletName         string `xml:"TestletName"`
 	Node                string `xml:"Node,omitempty"`
 	LocationInStage     string `xml:"LocationInStage,omitempty"`
-	TestletMaximumScore string `xml:"TestletMaximumScore,omitempty"`
+	TestletMaximumScore string `xml:"TestletMaximumScore"`
 }
 
 type TestItemList struct {
@@ -34,7 +34,7 @@ func (t NAPTestlet) GetHeaders() []string {
 
 func (t NAPTestlet) GetSlice() []string {
 	return []string{
-		t.TestletID, t.NAPTestRefId, t.TestletContent.LocalId, t.TestletContent.NAPTestLocalId,
+		t.TestletID, t.NAPTestRefId, t.NAPTestLocalId, t.TestletContent.LocalId,
 		t.TestletContent.TestletName, t.TestletContent.Node, t.TestletContent.LocationInStage,
 		t.TestletContent.TestletMaximumScore}
 }

@@ -2,9 +2,9 @@ package xml
 
 type NAPTestScoreSummary struct {
 	SummaryID                     string `xml:"RefId,attr"`
-	SchoolInfoRefId               string `xml:"SchoolInfoRefId"`
+	SchoolInfoRefId               string `xml:"SchoolInfoRefId,omitempty"`
 	SchoolACARAId                 string `xml:"SchoolACARAId"`
-	NAPTestRefId                  string `xml:"NAPTestRefId"`
+	NAPTestRefId                  string `xml:"NAPTestRefId,omitempty"`
 	NAPTestLocalId                string `xml:"NAPTestLocalId"`
 	DomainNationalAverage         string `xml:"DomainNationalAverage,omitempty"`
 	DomainSchoolAverage           string `xml:"DomainSchoolAverage,omitempty"`

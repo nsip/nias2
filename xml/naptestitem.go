@@ -7,22 +7,22 @@ type NAPTestItem struct {
 
 type TestItemContent struct {
 	NAPTestItemLocalId        string                 `xml:"NAPTestItemLocalId"`
-	ItemName                  string                 `xml:"ItemName,omitempty"`
-	ItemType                  string                 `xml:"ItemType,omitempty"`
-	Subdomain                 string                 `xml:"Subdomain,omitempty"`
+	ItemName                  string                 `xml:"ItemName"`
+	ItemType                  string                 `xml:"ItemType"`
+	Subdomain                 string                 `xml:"Subdomain"`
 	WritingGenre              string                 `xml:"WritingGenre,omitempty"`
-	ItemDescriptor            string                 `xml:"ItemDescriptor,omitempty"`
-	ReleasedStatus            string                 `xml:"ReleasedStatus,omitempty"`
-	MarkingType               string                 `xml:"MarkingType,omitempty"`
+	ItemDescriptor            string                 `xml:"ItemDescriptor"`
+	ReleasedStatus            string                 `xml:"ReleasedStatus"`
+	MarkingType               string                 `xml:"MarkingType"`
 	MultipleChoiceOptionCount string                 `xml:"MultipleChoiceOptionCount,omitempty"`
 	CorrectAnswer             string                 `xml:"CorrectAnswer,omitempty"`
-	MaximumScore              string                 `xml:"MaximumScore,omitempty"`
-	ItemDifficulty            string                 `xml:"ItemDifficulty,omitempty"`
-	ItemDifficultyLogit5      string                 `xml:"ItemDifficultyLogit5,omitempty"`
-	ItemDifficultyLogit62     string                 `xml:"ItemDifficultyLogit62,omitempty"`
-	ItemDifficultyLogit5SE    string                 `xml:"ItemDifficultyLogit5SE,omitempty"`
-	ItemDifficultyLogit62SE   string                 `xml:"ItemDifficultyLogit62SE,omitempty"`
-	ItemProficiencyBand       string                 `xml:"ItemProficiencyBand,omitempty"`
+	MaximumScore              string                 `xml:"MaximumScore"`
+	ItemDifficulty            string                 `xml:"ItemDifficulty"`
+	ItemDifficultyLogit5      string                 `xml:"ItemDifficultyLogit5"`
+	ItemDifficultyLogit62     string                 `xml:"ItemDifficultyLogit62"`
+	ItemDifficultyLogit5SE    string                 `xml:"ItemDifficultyLogit5SE"`
+	ItemDifficultyLogit62SE   string                 `xml:"ItemDifficultyLogit62SE"`
+	ItemProficiencyBand       string                 `xml:"ItemProficiencyBand"`
 	ItemProficiencyLevel      string                 `xml:"ItemProficiencyLevel,omitempty"`
 	ExemplarURL               string                 `xml:"ExemplarURL,omitempty"`
 	ItemSubstitutedForList    ItemSubstitutedForList `xml:"ItemSubstitutedForList,omitempty"`
@@ -36,7 +36,7 @@ type ItemSubstitutedForList struct {
 }
 
 type SubstituteItem struct {
-	SubstituteItemRefId string      `xml:"SubstituteItemRefId,omitempty"`
+	SubstituteItemRefId string      `xml:"SubstituteItemRefId"`
 	LocalId             string      `xml:"SubstituteItemLocalId,omitempty"`
 	PNPCodeList         PNPCodeList `xml:"PNPCodeList,omitempty"`
 }
@@ -55,9 +55,9 @@ type StimulusList struct {
 
 type Stimulus struct {
 	LocalId        string `xml:"StimulusLocalId"`
-	TextGenre      string `xml:"TextGenre"`
-	TextType       string `xml:"TextType"`
-	WordCount      string `xml:"WordCount"`
+	TextGenre      string `xml:"TextGenre,omitempty"`
+	TextType       string `xml:"TextType,omitempty"`
+	WordCount      string `xml:"WordCount,omitempty"`
 	TextDescriptor string `xml:"TextDescriptor"`
 	Content        string `xml:"Content"`
 }
@@ -67,9 +67,9 @@ type NAPWritingRubricList struct {
 }
 
 type NAPWritingRubric struct {
-	RubricType string    `xml:"RubricType,omitempty"`
-	Descriptor string    `xml:"Descriptor,omitempty"`
+	RubricType string    `xml:"RubricType"`
 	ScoreList  ScoreList `xml:"ScoreList,omitempty"`
+	Descriptor string    `xml:"Descriptor,omitempty"`
 }
 
 type ScoreList struct {
@@ -77,8 +77,8 @@ type ScoreList struct {
 }
 
 type Score struct {
-	MaxScoreValue        string               `xml:"MaxScoreValue,omitempty"`
-	ScoreDescriptionList ScoreDescriptionList `xml:"ScoreDescriptionList,omitempty"`
+	MaxScoreValue        string               `xml:"MaxScoreValue"`
+	ScoreDescriptionList ScoreDescriptionList `xml:"ScoreDescriptionList"`
 }
 
 type ScoreDescriptionList struct {
@@ -86,8 +86,8 @@ type ScoreDescriptionList struct {
 }
 
 type ScoreDescription struct {
-	ScoreValue string `xml:"ScoreValue,omitempty"`
-	Descriptor string `xml:"Descriptor,omitempty"`
+	ScoreValue string `xml:"ScoreValue"`
+	Descriptor string `xml:"Descriptor"`
 }
 
 func (t NAPTestItem) GetHeaders() []string {

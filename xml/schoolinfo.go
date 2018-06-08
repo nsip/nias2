@@ -1,39 +1,60 @@
 package xml
 
 type SchoolInfo struct {
-	RefId                    string            `xml:"RefId,attr"`
-	LocalId                  string            `xml:"LocalId"`
-	StateProvinceId          string            `xml:"StateProvinceId"`
-	ACARAId                  string            `xml:"ACARAId"`
-	SchoolName               string            `xml:"SchoolName"`
-	LEAInfoRefId             string            `xml:"LEAInfoRefId"`
-	OtherLEA                 string            `xml:"OtherLEA"`
-	SchoolDistrict           string            `xml:"SchoolDistrict"`
-	SchoolType               string            `xml:"SchoolType"`
-	StudentCount             string            // non xml field added for reporting
-	SchoolFocusList          SchoolFocusList   `xml:"SchoolFocusList"`
-	SchoolURL                string            `xml:"SchoolURL"`
-	PrincipalInfo            PrincipalInfo     `xml:"PrincipalInfo"`
-	SchoolContactList        SchoolContactList `xml:"SchoolContactList"`
-	PhoneNumberList          PhoneNumberList   `xml:"PhoneNumberList"`
-	SessionType              string            `xml:"SessionType"`
-	YearLevels               YearLevelList     `xml:"YearLevels"`
-	ARIA                     string            `xml:"ARIA"`
-	OperationalStatus        string            `xml:"OperationalStatus"`
-	FederalElectorate        string            `xml:"FederalElectorate"`
-	Campus                   Campus            `xml:"Campus"`
-	SchoolSector             string            `xml:"SchoolSector"`
-	IndependentSchool        string            `xml:"IndependentSchool"`
-	NonGovSystemicStatus     string            `xml:"NonGovSystemicStatus"`
-	System                   string            `xml:"System"`
-	ReligiousAffiliation     string            `xml:"ReligiousAffiliation"`
-	SchoolGeographicLocation string            `xml:"SchoolGeographicLocation"`
-	LocalGovernmentArea      string            `xml:"LocalGovernmentArea"`
-	JurisdictionLowerHouse   string            `xml:"JurisdictionLowerHouse"`
-	SLA                      string            `xml:"SLA"`
-	SchoolCoEdStatus         string            `xml:"SchoolCoEdStatus"`
-	SchoolGroupList          SchoolGroupList   `xml:"SchoolGroupList"`
-	AddressList              AddressList       `xml:"AddressList"`
+	RefId                    string                  `xml:"RefId,attr"`
+	LocalId                  string                  `xml:"LocalId,omitempty"`
+	StateProvinceId          string                  `xml:"StateProvinceId,omitempty"`
+	ACARAId                  string                  `xml:"ACARAId,omitempty"`
+	SchoolName               string                  `xml:"SchoolName"`
+	LEAInfoRefId             string                  `xml:"LEAInfoRefId,omitempty"`
+	OtherLEA                 string                  `xml:"OtherLEA,omitempty"`
+	SchoolDistrict           string                  `xml:"SchoolDistrict,omitempty"`
+	SchoolType               string                  `xml:"SchoolType,omitempty"`
+	StudentCount             string                  // non xml field added for reporting
+	SchoolFocusList          SchoolFocusList         `xml:"SchoolFocusList,omitempty"`
+	SchoolURL                string                  `xml:"SchoolURL,omitempty"`
+	PrincipalInfo            PrincipalInfo           `xml:"PrincipalInfo,omitempty"`
+	SchoolContactList        SchoolContactList       `xml:"SchoolContactList,omitempty"`
+	AddressList              AddressList             `xml:"AddressList,omitempty"`
+	PhoneNumberList          PhoneNumberList         `xml:"PhoneNumberList,omitempty"`
+	SessionType              string                  `xml:"SessionType,omitempty"`
+	YearLevels               YearLevelList           `xml:"YearLevels,omitempty"`
+	ARIA                     string                  `xml:"ARIA,omitempty"`
+	OperationalStatus        string                  `xml:"OperationalStatus,omitempty"`
+	FederalElectorate        string                  `xml:"FederalElectorate,omitempty"`
+	Campus                   Campus                  `xml:"Campus,omitempty"`
+	SchoolSector             string                  `xml:"SchoolSector"`
+	IndependentSchool        string                  `xml:"IndependentSchool,omitempty"`
+	NonGovSystemicStatus     string                  `xml:"NonGovSystemicStatus,omitempty"`
+	System                   string                  `xml:"System,omitempty"`
+	ReligiousAffiliation     string                  `xml:"ReligiousAffiliation,omitempty"`
+	SchoolGeographicLocation string                  `xml:"SchoolGeographicLocation,omitempty"`
+	LocalGovernmentArea      string                  `xml:"LocalGovernmentArea,omitempty"`
+	JurisdictionLowerHouse   string                  `xml:"JurisdictionLowerHouse,omitempty"`
+	SLA                      string                  `xml:"SLA,omitempty"`
+	SchoolCoEdStatus         string                  `xml:"SchoolCoEdStatus,omitempty"`
+	BoardingSchoolStatus     string                  `xml:"BoardingSchoolStatus,omitempty"`
+	YearLevelEnrollmentList  YearLevelEnrollmentList `xml:"YearLevelEnrollmentList,omitempty"`
+	TotalEnrollments         TotalEnrollments        `xml:"TotalEnrollments,omitempty"`
+	Entity_Open              string                  `xml:"Entity_Open,omitempty"`
+	Entity_Close             string                  `xml:"Entity_Close,omitempty"`
+	SchoolGroupList          SchoolGroupList         `xml:"SchoolGroupList,omitempty"`
+	SchoolTimeZone           string                  `xml:"SchoolTimeZone,omitempty"`
+}
+
+type YearLevelEnrollmentList struct {
+	YearLevelEnrollment []YearLevelEnrollment `xml:"YearLevelEnrollment"`
+}
+
+type YearLevelEnrollment struct {
+	Year       string `xml:"YearLevel>Code"`
+	Enrollment string `xml:"Enrollment"`
+}
+
+type TotalEnrollments struct {
+	Girls         string `xml:"Girls,omitempty"`
+	Boys          string `xml:"Boys,omitempty"`
+	TotalStudents string `xml:"TotalStudents,omitempty"`
 }
 
 type AddressList struct {
