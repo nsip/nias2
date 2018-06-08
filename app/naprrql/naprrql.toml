@@ -1,0 +1,5 @@
+WritingRubrics = ["Spelling", "Audience", "Text structure", "Paragraphing", "Sentence structure", "Punctuation", "Ideas", "Persuasive devices", "Vocabulary", "Cohesion"]
+XMLFilter = [
+"NAPTest.TestContent.DomainBands.Band1Upper",
+"NAPTestlet.TestItemList.TestItem.0.TestItemLocalId"
+]
