@@ -4,6 +4,9 @@ package naprrql
 import (
 	"context"
 	"encoding/csv"
+	"encoding/json"
+	"encoding/xml"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 )
 
 //
@@ -260,4 +264,74 @@ func splitter(ctx context.Context, in <-chan gjson.Result, size int) (
 	*/
 	return jsonc1, errc, nil
 
+}
+
+// Specific to the XML report: takes in JSON output, marshals to XML, prints out. Does not insert
+// container elements (e.g. no StudentPersonals container), does not segregate objects by class
+// into different files. Applies filtering from nappqrl.toml (which is expressed in JSON dot notation)
+func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-chan error, error) {
+	config := LoadNAPLANConfig()
+	// filter format: SJSON dot notation
+	filter := config.XMLFilter
+
+	file, err := os.Create(xmlFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	errc := make(chan error, 1)
+	go func() {
+		i := 0
+		defer close(errc)
+		defer file.Close()
+
+		for record := range in {
+
+			i++
+			var to TypedObject
+			var out []byte
+			for _, rule := range filter {
+				record1, err := sjson.DeleteBytes(record, rule)
+				if err == nil {
+					record = record1
+					// ignore errors, such as the filter not applying to this object
+				}
+			}
+			json.Unmarshal(record, &to)
+			if to.NAPTestScoreSummary != nil {
+				out, err = xml.MarshalIndent(to.NAPTestScoreSummary, "", "  ")
+			} else if to.SchoolInfo != nil {
+				out, err = xml.MarshalIndent(to.SchoolInfo, "", "  ")
+			} else if to.StudentPersonal != nil {
+				out, err = xml.MarshalIndent(to.StudentPersonal, "", "  ")
+			} else if to.NAPEventStudentLink != nil {
+				out, err = xml.MarshalIndent(to.NAPEventStudentLink, "", "  ")
+			} else if to.NAPTest != nil {
+				out, err = xml.MarshalIndent(to.NAPTest, "", "  ")
+			} else if to.NAPTestlet != nil {
+				out, err = xml.MarshalIndent(to.NAPTestlet, "", "  ")
+			} else if to.NAPTestItem != nil {
+				out, err = xml.MarshalIndent(to.NAPTestItem, "", "  ")
+			} else if to.NAPStudentResponseSet != nil {
+				out, err = xml.MarshalIndent(to.NAPStudentResponseSet, "", "  ")
+			} else if to.NAPCodeFrame != nil {
+				out, err = xml.MarshalIndent(to.NAPCodeFrame, "", "  ")
+			} else {
+				err = fmt.Errorf("%+v: no type selected for record", to)
+			}
+			if err != nil {
+				// Handle an error that occurs during the goroutine.
+				errc <- err
+				log.Printf("%+v\n", err)
+				return
+			}
+			_, err = file.Write(out)
+			if err != nil {
+				errc <- err
+				log.Printf("%+v\n", err)
+				return
+			}
+		}
+	}()
+	return errc, nil
 }

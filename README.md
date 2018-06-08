@@ -9,7 +9,7 @@ If you are using NIAS for the purposes of NAPLAN validation or postprocessing, y
 * [NAPVAL Readme](https://github.com/nsip/nias2/blob/master/napval/README.md) (NAPLAN registration data validation)
 * [NAPVAL User guide](https://github.com/nsip/nias2/blob/master/app/napval/nias8help.pdf)
 * [NAPRRQL Readme](https://github.com/nsip/nias2/blob/master/naprrql/README.md) (NAPLAN reporting data UI, GraphQL endpoint and CSV exporter)
-* [NAPRRQL User guide](https://github.com/nsip/nias2/blob/master/app/naprrql/NIAS_NAPLAN_UserGuide_v05.pdf)
+* [NAPRRQL User guide](https://github.com/nsip/nias2/blob/master/app/naprrql/NIAS_NAPLAN_UserGuide_v06.pdf)
 * [NAPRRQL CSV and Reporting Output Outline](https://github.com/nsip/nias2/blob/master/app/naprrql/NAPRRQLToolsetCsvAndReportingOutput_v05.pdf)
 * [NAPCOMP Readme](https://github.com/nsip/nias2/blob/master/napcomp/README.md) (Audit of registration data against reporting data)
 

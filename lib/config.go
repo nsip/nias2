@@ -40,6 +40,7 @@ func LoadDefaultConfig() NIASConfig {
 
 type NaprrqlConfig struct {
 	WritingRubrics []string
+	XMLFilter      []string
 	Loaded         bool
 }
 

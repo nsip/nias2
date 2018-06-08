@@ -110,7 +110,32 @@ func GenerateWritingExtractReports() {
 		defer wg.Done()
 		err = runWritingExtractReports(schools)
 		if err != nil {
-			log.Println("Error creating isr printing reports: ", err)
+			log.Println("Error creating writing extract reports: ", err)
+		}
+	}()
+
+	wg.Wait()
+}
+
+//
+// generates a specific 'report' which is a reexport of the XML input,
+// potentially with redactions
+//
+func GenerateXMLReports() {
+
+	schools, err := getSchoolsList()
+	if err != nil {
+		log.Fatalln("Cannot connect to naprrql server: ", err)
+	}
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = runXMLReports(schools)
+		if err != nil {
+			log.Println("Error creating xml reports: ", err)
 		}
 	}()
 
@@ -156,7 +181,6 @@ func runISRPrintReports(schools []string) error {
 }
 
 func runItemPrintReports(schools []string) error {
-
 	var pipelineError error
 	pipelineError = runItemPipeline(schools)
 	return pipelineError
@@ -164,9 +188,15 @@ func runItemPrintReports(schools []string) error {
 }
 
 func runWritingExtractReports(schools []string) error {
-
 	var pipelineError error
 	pipelineError = runWritingExtractPipeline(schools)
+	return pipelineError
+
+}
+
+func runXMLReports(schools []string) error {
+	var pipelineError error
+	pipelineError = runXMLPipeline(schools)
 	return pipelineError
 
 }

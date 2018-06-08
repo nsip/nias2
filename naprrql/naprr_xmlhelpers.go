@@ -23,11 +23,24 @@ func init() {
 	gob.Register(ResultsByStudent{})
 	gob.Register(GuidCheckDataSet{})
 	gob.Register(CodeframeCheckDataSet{})
+	gob.Register(TypedObject{})
 }
 
 // convenience types for aggregating response information sets
 // used in reporting and support types for sorting results.
 //
+
+type TypedObject struct {
+	NAPEventStudentLink   *xml.NAPEvent
+	NAPTest               *xml.NAPTest
+	NAPTestlet            *xml.NAPTestlet
+	NAPTestItem           *xml.NAPTestItem
+	StudentPersonal       *xml.RegistrationRecord
+	NAPStudentResponseSet *xml.NAPResponseSet
+	NAPTestScoreSummary   *xml.NAPTestScoreSummary
+	SchoolInfo            *xml.SchoolInfo
+	NAPCodeFrame          *xml.NAPCodeFrame
+}
 
 // Codeframe validity check
 

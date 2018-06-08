@@ -1,6 +1,11 @@
 package xml
 
+import (
+	"encoding/xml"
+)
+
 type NAPEvent struct {
+	XMLName                xml.Name           `xml:"NAPEventStudentLink"`
 	EventID                string             `xml:"RefId,attr"`
 	SPRefID                string             `xml:"StudentPersonalRefId"`
 	PSI                    string             `xml:"PlatformStudentIdentifier,omitempty"`

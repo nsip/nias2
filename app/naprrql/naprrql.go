@@ -26,6 +26,7 @@ var report = flag.Bool("report", false, "Creates .csv reports. Existing reports 
 var writingextract = flag.Bool("writingextract", false, "Creates .csv file extract of all writing items, for input into marking systems")
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
+var xml = flag.Bool("xml", false, "Reexports redacted xml of RRD dataset")
 
 func main() {
 
@@ -90,6 +91,16 @@ func main() {
 		// launch web-server
 		startWebServer(true)
 		writeWritingExtractReports()
+		// shut down
+		closeDB()
+		os.Exit(1)
+	}
+
+	// create the writing item report
+	if *xml {
+		// launch web-server
+		startWebServer(true)
+		writeXMLReports()
 		// shut down
 		closeDB()
 		os.Exit(1)
@@ -194,13 +205,21 @@ func writeItemPrintingReports() {
 }
 
 //
-// create item printing reports
+// create writing extract printing reports
 //
 func writeWritingExtractReports() {
-	// clearReportsDirectory() // - check this
 	log.Println("generating Writing item extract reports...")
 	naprrql.GenerateWritingExtractReports()
 	log.Println("Writing item extract reports generated...")
+}
+
+//
+// create XML printing reports
+//
+func writeXMLReports() {
+	log.Println("generating XML reports...")
+	naprrql.GenerateXMLReports()
+	log.Println("Writing XML generated...")
 }
 
 // create QA reports
