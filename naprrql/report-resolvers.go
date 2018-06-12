@@ -1580,7 +1580,6 @@ func buildReportResolvers() map[string]interface{} {
 		}
 
 		siObjects, err := getObjects(studentids)
-		studentPersonals := make([]xml.RegistrationRecord, 0)
 		for _, sio := range siObjects {
 			student, _ := sio.(xml.RegistrationRecord)
 			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
