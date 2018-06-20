@@ -11,6 +11,7 @@ build_mac64() {
     sh build_naprrql.sh M64
     sh build_napcomp.sh M64
     sh build_nap-writing-print.sh M64
+    sh build_nap-writing-sanitiser.sh M64
 
     echo "Creating zip archive..."
     cd $CWD/build
@@ -31,6 +32,7 @@ build_windows64() {
     sh build_naprrql.sh W64
     sh build_napcomp.sh W64
     sh build_nap-writing-print.sh W64
+    sh build_nap-writing-sanitiser.sh W64
 
     echo "Creating zip archive..."
     cd $CWD/build
@@ -51,6 +53,7 @@ build_windows32() {
     sh build_naprrql.sh W32
     sh build_napcomp.sh W32
     sh build_nap-writing-print.sh W32
+    sh build_nap-writing-sanitiser.sh W32
 
     echo "Creating zip archive..."
     cd $CWD/build
@@ -71,6 +74,7 @@ build_linux64() {
     sh build_naprrql.sh L64
     sh build_napcomp.sh L64
     sh build_nap-writing-print.sh L64
+    sh build_nap-writing-sanitiser.sh L64
 
     echo "Creating zip archive..."
     cd $CWD/build
@@ -91,6 +95,7 @@ build_linux32() {
     sh build_naprrql.sh L32
     sh build_napcomp.sh L32
     sh build_nap-writing-print.sh L32
+    sh build_nap-writing-sanitiser.sh L32
 
     echo "Creating zip archive..."
     cd $CWD/build
@@ -111,6 +116,7 @@ build_all() {
     sh build_naprrql.sh
     sh build_napcomp.sh
     sh build_nap-writing-print.sh
+    sh build_nap-writing-sanitiser.sh
 
     echo "Creating zip archives..."
     cd $CWD/build
