@@ -33,6 +33,10 @@ func createHtmlSanitizer(ctx context.Context, in <-chan map[string]string) (
 
 			fragmentHtml := rmap["Item Response"]
 			sanitised := unescape(p.Sanitize(fragmentHtml))
+			if (!strings.Contains(sanitised, "<") || !strings.Contains(sanitised, ">")) && sanitised != "No writing-response text recorded." {
+				sanitised = "<p>" + sanitised + "</p>"
+				sanitised = strings.Replace(sanitised, "\n\n", "</p>\n\n<p>", -1)
+			}
 			rmap["Item Response"] = sanitised
 
 			select {
