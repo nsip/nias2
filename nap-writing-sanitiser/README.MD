@@ -25,6 +25,25 @@ The nap-writing-sanitiser tool will then generate two files:
 * out/writing_extract_sanitised.csv: a file with the same structure as writing_extract.csv, but with the HTML content sanitised
 * out/sanitise_report.csv: a before-and-after list of all sanitised responses
 
-The output file maintains the paragraphing of the original input from the user, bold text, underlined text, italic text, and ordered and unordered lists as available in the online naplan editor component. The file strips any markup involving CSS classes. If any responses lack any HTML markup, the tool inserts a `<p>` wrapper around the response, and in any instances of double carriage return.
+The following HTML markup in responses is preserved during sanitisation:
+
+* The elements "strong", "em", "span", "p", "ol", "ul", "li", "br", "u", "font", "h1", "h2", "h3", "h4", "h5", "h6"
+* The attribute "size" on the element "font", with a numeric value.
+* The following values of the attribute "style" on any element, singly or in combination:
+  * text-decoration:underline;
+  * text-decoration-line:underline;
+  * font-size:16px;
+  * font-size:18px;
+  * font-size:large;
+  * text-align:left;
+  * text-align:center;
+  * text-align:start;
+  * background-color:rgba(255, 255, 255, 0);
+
+All other attributes are stripped, including CSS classes, and other values of the "style" attribute. All other elements are stripped; this includes the bulk of elements in the Writing prompt.
+
+If any responses lack any HTML markup, the tool inserts a `<p>` wrapper around the response, and in any instances of double carriage return.
+
+To make sense of the sanitise_report.csv report, we suggest a visual diff tool, that highlights the changes to markup introduced by the sanitiser. https://text-compare.com is one example of such a tool.
 
 // Current performance on a i5 macbook creates 200,000 html files (4 files for each of 50k students) in around 1 minute.
