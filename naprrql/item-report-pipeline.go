@@ -192,7 +192,6 @@ func itemQueryExecutor(ctx context.Context, query string, url string, in <-chan 
 				errc <- err
 				return
 			}
-			// log.Printf("%+v\n", json)
 			for _, result := range json.Array() {
 				// Send the data to the output channel but return early
 				// if the context has been cancelled.
