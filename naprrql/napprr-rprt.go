@@ -85,7 +85,7 @@ func GenerateItemPrintReports() {
 		defer wg.Done()
 		err = runItemPrintReports(schools)
 		if err != nil {
-			log.Println("Error creating isr printing reports: ", err)
+			log.Println("Error creating item printing reports: ", err)
 		}
 	}()
 

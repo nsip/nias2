@@ -60,11 +60,11 @@ func TestSexInvalid(t *testing.T) {
 }
 
 func TestYearLevelPrep(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1students1YearLevelPrep.csv", "BirthDate/TestLevel", "Year level P does not match Test level")
+	test_harness(t, "../../unit_test_files/1students1YearLevelPrep.csv", "BirthDate/TestLevel", "Year Level P does not match Test level")
 }
 
 func TestYearLevelF(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1students2YearLevelF.csv", "BirthDate/TestLevel", "Student Year Level (yr F) does not match year level derived from BirthDate")
+	test_harness(t, "../../unit_test_files/1students2YearLevelF.csv", "BirthDate/TestLevel", "Year Level F does not match Test level")
 }
 
 func TestYearLevelP(t *testing.T) {
@@ -112,7 +112,7 @@ func TestCommaAddressField(t *testing.T) {
 }
 
 func TestDupGivenLastNameDOBDiffACARAId(t *testing.T) {
-	test_harness(t, "../../unit_test_files/2studentsDupGivenLastNameDOBDiffACARAId.csv", "", "")
+	test_harness(t, "../../unit_test_files/2studentsDupGivenLastNameDOBDiffACARAId.csv", "Multiple (see description)", "Potential duplicate")
 }
 
 func TestExceedCharLengthsSurname(t *testing.T) {
@@ -284,19 +284,19 @@ func TestSameStudentIdTwoDifferentSchoolId(t *testing.T) {
 }
 
 func TestUngradedValuesUGJunSec(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGJunSec.csv", "BirthDate/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGJunSec.csv", "BirthDate/YearLevel", "Student Year Level (yr UGJunSec) does not match year level derived from BirthDate")
 }
 
 func TestUngradedValuesUGSnrSec(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGSnrSec.csv", "BirthDate/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGSnrSec.csv", "BirthDate/YearLevel", "Student Year Level (yr UGSnrSec) does not match year level derived from BirthDate")
 }
 
 func TestUngradedValuesUGPri(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGPri.csv", "BirthDate/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGPri.csv", "BirthDate/YearLevel", "Student Year Level (yr UGPri) does not match year level derived from BirthDate")
 }
 
 func TestUngradedValuesUGSec(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGSec.csv", "BirthDate/YearLevel", "Year level supplied is UG, will result in SRM warning flag for test level")
+	test_harness(t, "../../unit_test_files/1studentsUngradedValuesUGSec.csv", "BirthDate/YearLevel", "Student Year Level (yr UGSec) does not match year level derived from BirthDate")
 }
 
 func TestUnusualCountryCodes(t *testing.T) {
@@ -316,7 +316,7 @@ func TestWrongChecksumPreviousPlatformId(t *testing.T) {
 }
 
 func TestYearLevelTestLevelMismatch(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
+	test_harness(t, "../../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match Test level ")
 }
 
 func TestExtraneousNotPermittedField(t *testing.T) {
@@ -345,6 +345,22 @@ func TestDuplicateStudentOneSchool(t *testing.T) {
 	for i := 0; i < 20; i++ {
 		test_harness(t, "../../unit_test_files/2studentsDuplicateStudentOneSchool.csv", "LocalID/ASL ID", "otential duplicate of record")
 	}
+}
+
+func TestSuspectCharactersFamilyName(t *testing.T) {
+	test_harness(t, "../../unit_test_files/1studentsSuspectCharacterFamilyName.csv", "FamilyName", "Family Name contains suspect character")
+}
+
+func TestSuspectCharactersGivenName(t *testing.T) {
+	test_harness(t, "../../unit_test_files/1studentsSuspectCharacterGivenName.csv", "GivenName", "Given Name contains suspect character")
+}
+
+func TestSuspectCharactersMiddleName(t *testing.T) {
+	test_harness(t, "../../unit_test_files/1studentsSuspectCharacterMiddleName.csv", "MiddleName", "Middle Name contains suspect character")
+}
+
+func TestSuspectCharactersPreferredName(t *testing.T) {
+	test_harness(t, "../../unit_test_files/1studentsSuspectCharacterPreferredName.csv", "PreferredName", "Preferred Name contains suspect character")
 }
 
 func errcheck(t *testing.T, err error) {

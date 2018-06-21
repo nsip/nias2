@@ -94,6 +94,11 @@ func createDefaultServiceRegister(nats_cfg lib.NATSConfig) *ServiceRegister {
 		log.Fatal("Unable to create numeric validation service ", err)
 	}
 
+	nam, err := NewNameValidService()
+	if err != nil {
+		log.Fatal("Unable to create name validation service ", err)
+	}
+
 	sr.AddService("schema", schema1)
 	sr.AddService("schema2", schema11)
 	sr.AddService("local", schema2)
@@ -102,6 +107,7 @@ func createDefaultServiceRegister(nats_cfg lib.NATSConfig) *ServiceRegister {
 	sr.AddService("asl", asl1)
 	sr.AddService("psi", psi1)
 	sr.AddService("numericvalid", num)
+	sr.AddService("namevalid", nam)
 
 	log.Println("services created & installed in register")
 

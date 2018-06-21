@@ -185,7 +185,7 @@ func runQAItemRespReportPipeline(schools []string) error {
 		"systemParticipationCodeItemImpacts.gql",
 		"systemItemCounts.gql",
 		"itemExpectedResponses.gql",
-		"itemPrinting.gql",
+		// "itemPrinting.gql", // too time-consuming, banish to its own --itemprint branch
 		"itemWritingPrinting.gql",
 		"systemRubricSubscoreMatches.gql",
 	}

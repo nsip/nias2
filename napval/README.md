@@ -77,6 +77,7 @@ Configuration files:
   * `dobservice.go` : Date of Birth validator
   * `psiservice.go`: Checksum validator for Platform Student Identifiers
   * `numericvalidservice.go`: Validator of numeric values in NAPLAN registration
+  * `nameservice.go`: Validator of names in NAPLAN registration
   * `idservice.go` : Check each message in a transmission for uniqueness within the transmission. Check involves two keys: (LocalId, ASLSchoolId), and (LocalId, ASLSchoolId, FamilyName, GivenName, BirthDate).
   * `schemaservice.go` : Validate a message against either the core JSON schema or the local JSON schema. The service replaces some JSON Schema error messages with custom messages.
 * Support code

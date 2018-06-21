@@ -8,6 +8,7 @@ package naprrql
 import (
 	"errors"
 	"log"
+	"regexp"
 
 	"github.com/nats-io/nuid"
 	"github.com/nsip/nias2/xml"
@@ -1598,6 +1599,43 @@ func buildReportResolvers() map[string]interface{} {
 			}
 		}
 		return results, err
+	}
+
+	resolvers["NaplanData/extraneous_characters_student_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		results := make([]xml.RegistrationRecord, 0)
+
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			studentids = append(studentids, studentRefIds...)
+		}
+
+		re := regexp.MustCompile("[^a-zA-Z'-]")
+
+		siObjects, err := getObjects(studentids)
+		for _, sio := range siObjects {
+			student, _ := sio.(xml.RegistrationRecord)
+			if len(re.FindString(student.FamilyName)) > 0 || len(re.FindString(student.GivenName)) > 0 ||
+				len(re.FindString(student.MiddleName)) > 0 || len(re.FindString(student.PreferredName)) > 0 {
+				results = append(results, student)
+			}
+		}
+		return results, err
+
 	}
 
 	return resolvers

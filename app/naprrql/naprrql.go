@@ -22,7 +22,7 @@ var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng 
 var report = flag.Bool("report", false, "Creates .csv reports. Existing reports are overwritten")
 
 // var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
-// var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
+var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
 var writingextract = flag.Bool("writingextract", false, "Creates .csv file extract of all writing items, for input into marking systems")
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
@@ -116,18 +116,19 @@ func main() {
 			closeDB()
 			os.Exit(1)
 		}
-
-		// create the item reports
-		if *itemprint {
-			// launch web-server
-			startWebServer(true)
-			writeItemPrintingReports()
-			// shut down
-			closeDB()
-			os.Exit(1)
-		}
 	*/
+
 	// create the item reports
+	if *itemprint {
+		// launch web-server
+		startWebServer(true)
+		writeItemPrintingReports()
+		// shut down
+		closeDB()
+		os.Exit(1)
+	}
+
+	// create the QA reports
 	if *qa {
 		// launch web-server
 		startWebServer(true)
