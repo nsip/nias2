@@ -17,7 +17,7 @@ do_build() {
 	rsync -a napcomp/in $OUTPUT/
 	mkdir -p $OUTPUT/in
 	mkdir -p $OUTPUT/in/results
-	# rsync -a naprrql/in/*.xml.zip  $OUTPUT/in/results
+	rsync -a naprrql/in/*.xml.zip  $OUTPUT/in/results
 }
 
 do_zip() {
