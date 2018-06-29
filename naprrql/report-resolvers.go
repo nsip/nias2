@@ -9,6 +9,7 @@ import (
 	"errors"
 	"log"
 	"regexp"
+	"strings"
 
 	"github.com/nats-io/nuid"
 	"github.com/nsip/nias2/xml"
@@ -61,6 +62,28 @@ func checkGuid(issues []GuidCheckDataSet, objectguid string, objecttype string, 
 			PointsTo:      "nil"})
 	}
 	return issues
+}
+
+// The results set coming out of the NAP includes empty testlets with no items in them. These testlets need to be removed from the result set,
+// which is assuming three or four contentful testlets for the purposes of reporting (particularly domain_scores_summary_event_report_by_school,
+// which genereates the nswPrintAll report, which iterates through testlets 0...3 for each domain.
+func TrimEmptyTestlets(r xml.NAPResponseSet) xml.NAPResponseSet {
+	delete_testlets := make(map[int]bool)
+	for i, testlet := range r.TestletList.Testlet {
+		if len(testlet.ItemResponseList.ItemResponse) == 0 {
+			delete_testlets[i] = true
+		}
+	}
+	if len(delete_testlets) > 0 {
+		newtestlets := make([]xml.NAPResponseSet_Testlet, 0)
+		for i, testlet := range r.TestletList.Testlet {
+			if _, ok := delete_testlets[i]; !ok {
+				newtestlets = append(newtestlets, testlet)
+			}
+		}
+		r.TestletList.Testlet = newtestlets
+	}
+	return r
 }
 
 func buildReportResolvers() map[string]interface{} {
@@ -448,6 +471,7 @@ func buildReportResolvers() map[string]interface{} {
 					if err != nil {
 						return []interface{}{}, err
 					}
+					// response = TrimEmptyTestlets(responseObjs[0].(xml.NAPResponseSet))
 					response = responseObjs[0].(xml.NAPResponseSet)
 				}
 				perdomain := EventResponseSummaryPerDomain{Domain: test.TestContent.TestDomain,
@@ -679,6 +703,15 @@ func buildReportResolvers() map[string]interface{} {
 				return []interface{}{}, err
 			}
 
+			for idx, testlet := range resp.TestletList.Testlet {
+				// if there are no item responses included under a testlet, generate an entry with a dummy item response,
+				// so that the discrepancy can be picked up downstream by QA reports
+				if len(testlet.ItemResponseList.ItemResponse) == 0 {
+					log.Printf("Empty response testlet\n")
+					resp.TestletList.Testlet[idx].ItemResponseList.ItemResponse = append(testlet.ItemResponseList.ItemResponse,
+						xml.NAPResponseSet_ItemResponse{LocalID: "empty_response_testlet"})
+				}
+			}
 			for _, testlet := range resp.TestletList.Testlet {
 				for _, item_response := range testlet.ItemResponseList.ItemResponse {
 
@@ -688,14 +721,21 @@ func buildReportResolvers() map[string]interface{} {
 					resp1.TestletList.Testlet[0].ItemResponseList.ItemResponse = make([]xml.NAPResponseSet_ItemResponse, 1)
 					resp1.TestletList.Testlet[0].ItemResponseList.ItemResponse[0] = item_response
 
-					items, err := getObjects([]string{item_response.ItemRefID})
-					item, ok := items[0].(xml.NAPTestItem)
-					if err != nil || !ok {
-						return []interface{}{}, err
+					var item xml.NAPTestItem
+					var ok bool
+					if item_response.LocalID == "empty_response_testlet" {
+						item = xml.NAPTestItem{}
+						item.TestItemContent = xml.TestItemContent{NAPTestItemLocalId: "empty_response_testlet"}
+					} else {
+						items, err := getObjects([]string{item_response.ItemRefID})
+						item, ok = items[0].(xml.NAPTestItem)
+						if err != nil || !ok {
+							return []interface{}{}, err
+						}
 					}
 
 					testlets, err := getObjects([]string{testlet.NapTestletRefId})
-					tl := testlets[0].(xml.NAPTestlet)
+					tl, ok := testlets[0].(xml.NAPTestlet)
 					if err != nil || !ok {
 						return []interface{}{}, err
 					}
@@ -1636,6 +1676,129 @@ func buildReportResolvers() map[string]interface{} {
 			}
 		}
 		return results, err
+
+	}
+
+	// This report hard codes the number of expected testlets for each domain and year level
+	resolvers["NaplanData/missing_testlets_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get school names
+		schoolnames := make(map[string]string)
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			studentids = append(studentids, studentRefIds...)
+
+			schoolrefid := getIdentifiers(acaraid + ":")
+			siObjects, err := getObjects(schoolrefid)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			for _, sio := range siObjects {
+				si, _ := sio.(xml.SchoolInfo)
+				schoolnames[acaraid] = si.SchoolName
+			}
+		}
+
+		studentObjs, err := getObjects(studentids)
+		if err != nil {
+			return []interface{}{}, err
+		}
+
+		// convenience map to avoid revisiting db for tests
+		testLookup := make(map[string]xml.NAPTest) // key string = test refid
+		// get tests for yearLevel
+		for _, yrLvl := range []string{"3", "5", "7", "9"} {
+			tests, err := getTestsForYearLevel(yrLvl)
+			if err != nil {
+				return nil, err
+			}
+			for _, test := range tests {
+				t := test
+				testLookup[t.TestID] = t
+			}
+		}
+
+		// iterate students and assemble Event/Response Data Set
+		results := make([]EventResponseDataSet, 0)
+		for _, studentObj := range studentObjs {
+			student, _ := studentObj.(xml.RegistrationRecord)
+			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
+			if len(studentEventIds) < 1 {
+				// log.Println("no events found for student: ", student.RefId)
+				continue
+			}
+			eventObjs, err := getObjects(studentEventIds)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			for _, eventObj := range eventObjs {
+				event := eventObj.(xml.NAPEvent)
+				if event.ParticipationCode != "P" {
+					continue
+				}
+				test := testLookup[event.TestID]
+				responseIds := getIdentifiers(test.TestID + ":NAPStudentResponseSet:" + student.RefId)
+				response := xml.NAPResponseSet{}
+				if len(responseIds) > 0 {
+					responseObjs, err := getObjects(responseIds)
+					if err != nil {
+						return []interface{}{}, err
+					}
+
+					testlevel := test.TestContent.TestLevel
+					var expectednodes int
+					switch test.TestContent.TestDomain {
+					case "Writing":
+						expectednodes = 1
+					case "Numeracy":
+						if testlevel == "7" || testlevel == "9" {
+							expectednodes = 4
+						} else {
+							expectednodes = 3
+						}
+					case "Reading":
+						expectednodes = 3
+					case "Grammar and Punctuation":
+						expectednodes = 1
+					case "Spelling":
+						expectednodes = 3
+					default:
+						expectednodes = -1
+					}
+					for _, responseObj := range responseObjs {
+
+						response = responseObj.(xml.NAPResponseSet)
+						testletnodes := strings.Split(response.PathTakenForDomain, ":")
+						if len(testletnodes) == expectednodes {
+							continue
+						}
+						erds := EventResponseDataSet{Student: student,
+							Event:         event,
+							Test:          test,
+							Response:      response,
+							SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+						}
+						results = append(results, erds)
+					}
+				}
+			}
+		}
+		return results, nil
 
 	}
 

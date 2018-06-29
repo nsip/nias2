@@ -264,10 +264,6 @@ func runQAItemRespReportPipeline(schools []string) error {
 			// block on reading codeframe
 			jsonc2, errc, _ = qaItemExpectedResponses(ctx, codeframec1[1], noncodeframec1[1], jsonc1[i])
 			errcList = append(errcList, errc)
-		} else if queryFileName == "itemPrinting.gql" {
-			jsonc2, errc, _ = qaItemResponses(ctx, jsonc1[i])
-			output_prefix = outFileDir
-			errcList = append(errcList, errc)
 		} else if queryFileName == "itemWritingPrinting.gql" {
 			// TODO This query relies on subscores, and may need to go to a different pipeline
 			jsonc2, errc, _ = qaWritingItemResponses(ctx, jsonc1[i])

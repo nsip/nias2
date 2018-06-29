@@ -83,6 +83,8 @@ type NaplanData {
         student_event_acara_id_discrepancy_by_school(acaraIDs: [String]): [EventResponseDataSet]
         ## report on students with unexpected characters in their name
         extraneous_characters_student_report(acaraIDs: [String]): [RegistrationRecord]
+	## report on students with less testlets in their response than expected
+	missing_testlets_by_school(acaraIDs: [String]): [EventResponseDataSet]
 }
 
 ## List of problematic GUIDs in data set
