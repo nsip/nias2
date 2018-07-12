@@ -58,21 +58,22 @@ type TotalEnrollments struct {
 }
 
 type AddressList struct {
-	Address []string `xml:"Address"`
+	//Address []string `xml:"Address,omitempty"` // avoid shortcut for XML roundtripping!
+	Address Address `xml:"Address,omitempty"`
 }
 
 type SchoolGroupList struct {
-	SchoolGroup []string `xml:"SchoolGroup"`
+	SchoolGroup []string `xml:"SchoolGroup,omitempty"`
 }
 
 type Campus struct {
-	SchoolCampusId string `xml:"SchoolCampusId"`
-	CampusType     string `xml:"CampusType"`
-	AdminStatus    string `xml:"AdminStatus"`
+	SchoolCampusId string `xml:"SchoolCampusId,omitempty"`
+	CampusType     string `xml:"CampusType,omitempty"`
+	AdminStatus    string `xml:"AdminStatus,omitempty"`
 }
 
 type YearLevelList struct {
-	YearLevel []YearLevel `xml:"YearLevel"`
+	YearLevel []YearLevel `xml:"YearLevel,omitempty"`
 }
 
 type YearLevel struct {
@@ -84,22 +85,22 @@ type PhoneNumberList struct {
 }
 
 type PhoneNumber struct {
-	Type   string `xml:"Type,attr"`
-	Number string `xml:"Number"`
+	Type   string `xml:"Type,attr,omitempty"`
+	Number string `xml:"Number,omitempty"`
 }
 
 type SchoolFocusList struct {
-	SchoolFocus []string `xml:"SchoolFocus"`
+	SchoolFocus []string `xml:"SchoolFocus,omitempty"`
 }
 
 type NameType struct {
 	Type       string `xml:"Type,attr"`
-	Title      string `xml:"Title"`
-	FamilyName string `xml:"FamilyName"`
-	GivenName  string `xml:"GivenName"`
-	MiddleName string `xml:"MiddleName"`
-	Suffix     string `xml:"Suffix"`
-	FullName   string `xml:"FullName"`
+	Title      string `xml:"Title,omitempty"`
+	FamilyName string `xml:"FamilyName,omitempty"`
+	GivenName  string `xml:"GivenName,omitempty"`
+	MiddleName string `xml:"MiddleName,omitempty"`
+	Suffix     string `xml:"Suffix,omitempty"`
+	FullName   string `xml:"FullName,omitempty"`
 }
 
 type EmailList struct {
@@ -107,57 +108,58 @@ type EmailList struct {
 }
 
 type Email struct {
-	Type    string `xml:"Type,attr"`
-	Address string `xml:"Email"`
+	Type    string `xml:"Type,attr,omitempty"`
+	Address string `xml:"Email,omitempty"`
 }
 
 type FullPhoneNumberList struct {
-	PhoneNumber []FullPhoneNumber `xml:"PhoneNumber"`
+	PhoneNumber []FullPhoneNumber `xml:"PhoneNumber,omitempty"`
 }
 
 type FullPhoneNumber struct {
-	Type         string `xml:"Type,attr"`
-	Number       string `xml:"Number"`
-	Extension    string `xml:"Extension"`
-	ListedStatus string `xml:"ListedStatus"`
+	Type         string `xml:"Type,attr,omitempty"`
+	Number       string `xml:"Number,omitempty"`
+	Extension    string `xml:"Extension,omitempty"`
+	ListedStatus string `xml:"ListedStatus,omitempty"`
 }
 
 type PrincipalInfo struct {
-	ContactName  NameType `xml:"ContactName"`
-	ContactTitle string   `xml:"ContactTitle"`
+	ContactName  NameType `xml:"ContactName,omitempty"`
+	ContactTitle string   `xml:"ContactTitle,omitempty"`
 }
 
 type SchoolContactList struct {
-	SchoolContact []SchoolContact `xml:"SchoolContact"`
+	SchoolContact []SchoolContact `xml:"SchoolContact,omitempty"`
 }
 
 type SchoolContact struct {
-	PublishInDirectory string      `xml:"PublishInDirectory"`
-	ContactInfo        ContactInfo `xml:"ContactInfo"`
+	PublishInDirectory string      `xml:"PublishInDirectory,omitempty"`
+	ContactInfo        ContactInfo `xml:"ContactInfo,omitempty"`
 }
 
 type ContactInfo struct {
-	Name            NameType            `xml:"Name"`
-	PositionTitle   string              `xml:"PositionTitle"`
-	Role            string              `xml:"Role"`
-	Address         Address             `xml:"Address"`
-	EmailList       EmailList           `xml:"EmailList"`
-	PhoneNumberList FullPhoneNumberList `xml:"PhoneNumberList"`
+	Name            NameType            `xml:"Name,omitempty"`
+	PositionTitle   string              `xml:"PositionTitle,omitempty"`
+	Role            string              `xml:"Role,omitempty"`
+	Address         Address             `xml:"Address,omitempty"`
+	EmailList       EmailList           `xml:"EmailList,omitempty"`
+	PhoneNumberList FullPhoneNumberList `xml:"PhoneNumberList,omitempty"`
 }
 
 type Address struct {
-	Type          string       `xml:"Type,attr"`
-	Role          string       `xml:"Role,attr"`
-	Street        Street       `xml:"Street"`
-	City          string       `xml:"City"`
-	StateProvince string       `xml:"StateProvince"`
-	Country       string       `xml:"Country"`
-	PostalCode    string       `xml:"PostalCode"`
-	GridLocation  GridLocation `xml:"GridLocation"`
+	Type          string       `xml:"Type,attr,omitempty"`
+	Role          string       `xml:"Role,attr,omitempty"`
+	Street        Street       `xml:"Street,omitempty"`
+	City          string       `xml:"City,omitempty"`
+	StateProvince string       `xml:"StateProvince,omitempty"`
+	Country       string       `xml:"Country,omitempty"`
+	PostalCode    string       `xml:"PostalCode,omitempty"`
+	GridLocation  GridLocation `xml:"GridLocation,omitempty"`
 }
 
 type Street struct {
 	Line1 string `xml:"Line1"`
+	Line2 string `xml:"Line2"`
 }
 
 type GridLocation struct {

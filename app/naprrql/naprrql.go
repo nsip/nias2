@@ -28,6 +28,8 @@ var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN re
 var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
 var xml = flag.Bool("xml", false, "Reexports redacted xml of RRD dataset")
 
+//var pnpadd = flag.String("pnpadd", "", "Adds PNP codes from CSV file into RRD dataset")
+
 func main() {
 
 	// runtime.GOMAXPROCS(16) // optional performance improvement for larger systems.
@@ -105,6 +107,19 @@ func main() {
 		closeDB()
 		os.Exit(1)
 	}
+
+	// add PNP codes into ingested RRD
+	/*
+		if len(*pnpadd) > 0 {
+			// launch web-server
+			startWebServer(true)
+			addEventCSV(*pnpadd)
+			writeXMLReports()
+			// shut down
+			closeDB()
+			os.Exit(1)
+		}
+	*/
 
 	/*
 		// create the isr printing reports
@@ -221,6 +236,15 @@ func writeXMLReports() {
 	log.Println("generating XML reports...")
 	naprrql.GenerateXMLReports()
 	log.Println("Writing XML generated...")
+}
+
+//
+// create XML printing reports
+//
+func addEventCSV(filename string) {
+	log.Println("Adding PNP values to dataset...")
+	naprrql.AddEventCSV(filename)
+	log.Println("Added PNP values to dataset...")
 }
 
 // create QA reports

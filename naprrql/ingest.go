@@ -181,6 +181,10 @@ func IngestResultsFile(resultsFilePath string) {
 				key = []byte(e.TestID + ":NAPEventStudentLink:" + e.SchoolRefID + ":" + e.EventID)
 				batch.Put(key, []byte(e.EventID))
 
+				// {test}:NAPEventStudentLink-type:{school}:{id} = {id}
+				key = []byte("event_by_PSI_ACARAID_LocalTestID:" + e.PSI + ":" + e.SchoolID + ":" + e.NAPTestLocalID)
+				batch.Put(key, []byte(e.EventID))
+
 				totalEvents++
 
 			case "NAPStudentResponseSet":
@@ -279,8 +283,10 @@ func IngestResultsFile(resultsFilePath string) {
 				totalSchools++
 
 			case "StudentPersonal":
+				var sp_orig xml.SIFRegistrationRecord
+				decoder.DecodeElement(&sp_orig, &se)
 				var sp xml.RegistrationRecord
-				decoder.DecodeElement(&sp, &se)
+				sp = sp_orig.From_SIF()
 				gsp, err := ge.Encode(sp)
 				if err != nil {
 					log.Println("Unable to gob-encode studentpersonal: ", err)

@@ -287,6 +287,7 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 	if err != nil {
 		return nil, err
 	}
+	_, _ = file.Write([]byte("<sif xmlns=\"http://www.sifassociation.org/datamodel/au/3.4\">\n"))
 
 	errc := make(chan error, 1)
 	go func() {
@@ -295,7 +296,7 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 		defer file.Close()
 
 		for record := range in {
-			log.Println(string(record))
+			//log.Println(string(record))
 			i++
 			var to TypedObject
 			var out []byte
@@ -312,7 +313,8 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 			} else if to.SchoolInfo != nil {
 				out, err = xml.MarshalIndent(to.SchoolInfo, "", "  ")
 			} else if to.StudentPersonal != nil {
-				out, err = xml.MarshalIndent(to.StudentPersonal, "", "  ")
+				// to_SIF() to get the attributes back in to the flattened structure
+				out, err = xml.MarshalIndent(to.StudentPersonal.To_SIF(), "", "  ")
 			} else if to.NAPEventStudentLink != nil {
 				out, err = xml.MarshalIndent(to.NAPEventStudentLink, "", "  ")
 			} else if to.NAPTest != nil {
@@ -341,6 +343,7 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 				return
 			}
 		}
+		_, _ = file.Write([]byte("</sif>\n"))
 	}()
 	return errc, nil
 }

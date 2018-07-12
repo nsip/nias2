@@ -30,70 +30,229 @@ type RegistrationRecord struct {
 	// XML Configuration
 	XMLName xml.Name `xml:"StudentPersonal"`
 	// Important fields
-	RefId                     string      `json:",omitempty" xml:"RefId,attr"`
-	LocalId                   string      `json:",omitempty" xml:"LocalId"`
-	StateProvinceId           string      `json:",omitempty" xml:"StateProvinceId,omitempty"`
-	OtherIdList               OtherIdList `xml:OtherIdList,omitempty`
-	FamilyName                string      `json:",omitempty" xml:"PersonInfo>Name>FamilyName,omitempty"`
-	GivenName                 string      `json:",omitempty" xml:"PersonInfo>Name>GivenName,omitempty"`
-	MiddleName                string      `json:",omitempty" xml:"PersonInfo>Name>MiddleName,omitempty"`
-	PreferredName             string      `json:",omitempty" xml:"PersonInfo>Name>PreferredGivenName,omitempty"`
-	IndigenousStatus          string      `json:",omitempty" xml:"PersonInfo>Demographics>IndigenousStatus,omitempty"`
-	Sex                       string      `json:",omitempty" xml:"PersonInfo>Demographics>Sex,omitempty"`
-	BirthDate                 string      `json:",omitempty" xml:"PersonInfo>Demographics>BirthDate,omitempty"`
-	CountryOfBirth            string      `json:",omitempty" xml:"PersonInfo>Demographics>CountryOfBirth,omitempty"`
-	StudentLOTE               string      `json:",omitempty" xml:"PersonInfo>Demographics>LanguageList>Language>Code,omitempty"`
-	VisaCode                  string      `json:",omitempty" xml:"PersonInfo>Demographics>VisaSubClass,omitempty"`
-	LBOTE                     string      `json:",omitempty" xml:"PersonInfo>Demographics>LBOTE,omitempty"`
-	AddressLine1              string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line1,omitempty"`
-	AddressLine2              string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line2,omitempty"`
-	Locality                  string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>City,omitempty"`
-	StateTerritory            string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>StateProvince,omitempty"`
-	Postcode                  string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>PostalCode,omitempty"`
-	SchoolLocalId             string      `json:",omitempty" xml:"MostRecent>SchoolLocalId,omitempty"`
-	YearLevel                 string      `json:",omitempty" xml:"MostRecent>YearLevel>Code,omitempty"`
-	FTE                       string      `json:",omitempty" xml:"MostRecent>FTE,omitempty"`
-	Parent1LOTE               string      `json:",omitempty" xml:"MostRecent>Parent1Language,omitempty"`
-	Parent2LOTE               string      `json:",omitempty" xml:"MostRecent>Parent2Language,omitempty"`
-	Parent1Occupation         string      `json:",omitempty" xml:"MostRecent>Parent1EmploymentType,omitempty"`
-	Parent2Occupation         string      `json:",omitempty" xml:"MostRecent>Parent2EmploymentType,omitempty"`
-	Parent1SchoolEducation    string      `json:",omitempty" xml:"MostRecent>Parent1SchoolEducationLevel,omitempty"`
-	Parent2SchoolEducation    string      `json:",omitempty" xml:"MostRecent>Parent2SchoolEducationLevel,omitempty"`
-	Parent1NonSchoolEducation string      `json:",omitempty" xml:"MostRecent>Parent1NonSchoolEducation,omitempty"`
-	Parent2NonSchoolEducation string      `json:",omitempty" xml:"MostRecent>Parent2NonSchoolEducation,omitempty"`
-	LocalCampusId             string      `json:",omitempty" xml:"MostRecent>LocalCampusId,omitempty"`
-	ASLSchoolId               string      `json:",omitempty" xml:"MostRecent>SchoolACARAId,omitempty"`
-	TestLevel                 string      `json:",omitempty" xml:"MostRecent>TestLevel>Code,omitempty"`
-	Homegroup                 string      `json:",omitempty" xml:"MostRecent>Homegroup,omitempty"`
-	ClassGroup                string      `json:",omitempty" xml:"MostRecent>ClassCode,omitempty"`
-	MainSchoolFlag            string      `json:",omitempty" xml:"MostRecent>MembershipType,omitempty"`
-	FFPOS                     string      `json:",omitempty" xml:"MostRecent>FFPOS,omitempty"`
-	ReportingSchoolId         string      `json:",omitempty" xml:"MostRecent>ReportingSchoolId,omitempty"`
-	EducationSupport          string      `json:",omitempty" xml:"EducationSupport,omitempty"`
-	HomeSchooledStudent       string      `json:",omitempty" xml:"HomeSchooledStudent,omitempty"`
-	Sensitive                 string      `json:",omitempty" xml:"Sensitive,omitempty"`
-	OfflineDelivery           string      `json:",omitempty" xml:"OfflineDelivery,omitempty"`
-	DiocesanId                string      `json:",omitempty" xml:"-"`
-	JurisdictionId            string      `json:",omitempty" xml:"-"`
-	NationalId                string      `json:",omitempty" xml:"-"`
-	OtherId                   string      `json:",omitempty" xml:"-"`
-	PlatformId                string      `json:",omitempty" xml:"-"`
-	PreviousDiocesanId        string      `json:",omitempty" xml:"-"`
-	PreviousLocalId           string      `json:",omitempty" xml:"-"`
-	PreviousNationalId        string      `json:",omitempty" xml:"-"`
-	PreviousOtherId           string      `json:",omitempty" xml:"-"`
-	PreviousPlatformId        string      `json:",omitempty" xml:"-"`
-	PreviousSectorId          string      `json:",omitempty" xml:"-"`
-	PreviousStateProvinceId   string      `json:",omitempty" xml:"-"`
-	PreviousTAAId             string      `json:",omitempty" xml:"-"`
-	SectorId                  string      `json:",omitempty" xml:"-"`
-	TAAId                     string      `json:",omitempty" xml:"-"`
-	OtherIdLocality           string      `json:",omitempty" xml:"-"`
-	DOBRange                  string      `json:",omitempty" xml:"-"`
-	PersonalDetailsChanged    string      `json:",omitempty" xml:"-"`
-	PossibleDuplicate         string      `json:",omitempty" xml:"-"`
-	PsiOtherIdMismatch        string      `json:",omitempty" xml:"-"`
-	OtherSchoolId             string      `json:",omitempty" xml:"-"`
+	RefId                        string      `json:",omitempty" xml:"RefId,attr"`
+	LocalId                      string      `json:",omitempty" xml:"LocalId"`
+	StateProvinceId              string      `json:",omitempty" xml:"StateProvinceId,omitempty"`
+	OtherIdList                  OtherIdList `xml:OtherIdList,omitempty`
+	NameType                     string      `json:",omitempty" xml:"-"`
+	FamilyName                   string      `json:",omitempty" xml:"PersonInfo>Name>FamilyName,omitempty"`
+	GivenName                    string      `json:",omitempty" xml:"PersonInfo>Name>GivenName,omitempty"`
+	MiddleName                   string      `json:",omitempty" xml:"PersonInfo>Name>MiddleName,omitempty"`
+	PreferredName                string      `json:",omitempty" xml:"PersonInfo>Name>PreferredGivenName,omitempty"`
+	IndigenousStatus             string      `json:",omitempty" xml:"PersonInfo>Demographics>IndigenousStatus,omitempty"`
+	Sex                          string      `json:",omitempty" xml:"PersonInfo>Demographics>Sex,omitempty"`
+	BirthDate                    string      `json:",omitempty" xml:"PersonInfo>Demographics>BirthDate,omitempty"`
+	CountryOfBirth               string      `json:",omitempty" xml:"PersonInfo>Demographics>CountryOfBirth,omitempty"`
+	StudentLOTE                  string      `json:",omitempty" xml:"PersonInfo>Demographics>LanguageList>Language>Code,omitempty"`
+	VisaCode                     string      `json:",omitempty" xml:"PersonInfo>Demographics>VisaSubClass,omitempty"`
+	LBOTE                        string      `json:",omitempty" xml:"PersonInfo>Demographics>LBOTE,omitempty"`
+	AddressRole                  string      `json:",omitempty" xml:"-"`
+	AddressType                  string      `json:",omitempty" xml:"-"`
+	AddressLine1                 string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line1,omitempty"`
+	AddressLine2                 string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>Street>Line2,omitempty"`
+	Locality                     string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>City,omitempty"`
+	StateTerritory               string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>StateProvince,omitempty"`
+	Postcode                     string      `json:",omitempty" xml:"PersonInfo>AddressList>Address>PostalCode,omitempty"`
+	SchoolLocalId                string      `json:",omitempty" xml:"MostRecent>SchoolLocalId,omitempty"`
+	YearLevel                    string      `json:",omitempty" xml:"MostRecent>YearLevel>Code,omitempty"`
+	FTE                          string      `json:",omitempty" xml:"MostRecent>FTE,omitempty"`
+	Parent1LOTE                  string      `json:",omitempty" xml:"MostRecent>Parent1Language,omitempty"`
+	Parent2LOTE                  string      `json:",omitempty" xml:"MostRecent>Parent2Language,omitempty"`
+	Parent1Occupation            string      `json:",omitempty" xml:"MostRecent>Parent1EmploymentType,omitempty"`
+	Parent2Occupation            string      `json:",omitempty" xml:"MostRecent>Parent2EmploymentType,omitempty"`
+	Parent1SchoolEducation       string      `json:",omitempty" xml:"MostRecent>Parent1SchoolEducationLevel,omitempty"`
+	Parent2SchoolEducation       string      `json:",omitempty" xml:"MostRecent>Parent2SchoolEducationLevel,omitempty"`
+	Parent1NonSchoolEducation    string      `json:",omitempty" xml:"MostRecent>Parent1NonSchoolEducation,omitempty"`
+	Parent2NonSchoolEducation    string      `json:",omitempty" xml:"MostRecent>Parent2NonSchoolEducation,omitempty"`
+	LocalCampusId                string      `json:",omitempty" xml:"MostRecent>LocalCampusId,omitempty"`
+	ASLSchoolId                  string      `json:",omitempty" xml:"MostRecent>SchoolACARAId,omitempty"`
+	TestLevel                    string      `json:",omitempty" xml:"MostRecent>TestLevel>Code,omitempty"`
+	Homegroup                    string      `json:",omitempty" xml:"MostRecent>Homegroup,omitempty"`
+	ClassGroup                   string      `json:",omitempty" xml:"MostRecent>ClassCode,omitempty"`
+	MainSchoolFlag               string      `json:",omitempty" xml:"MostRecent>MembershipType,omitempty"`
+	FFPOS                        string      `json:",omitempty" xml:"MostRecent>FFPOS,omitempty"`
+	ReportingSchoolId            string      `json:",omitempty" xml:"MostRecent>ReportingSchoolId,omitempty"`
+	OtherEnrollmentSchoolACARAId string      `json:",omitempty" xml:"MostRecent>OtherEnrollmentSchoolACARAId,omitempty"`
+	EducationSupport             string      `json:",omitempty" xml:"EducationSupport,omitempty"`
+	HomeSchooledStudent          string      `json:",omitempty" xml:"HomeSchooledStudent,omitempty"`
+	Sensitive                    string      `json:",omitempty" xml:"Sensitive,omitempty"`
+	OfflineDelivery              string      `json:",omitempty" xml:"OfflineDelivery,omitempty"`
+	DiocesanId                   string      `json:",omitempty" xml:"-"`
+	JurisdictionId               string      `json:",omitempty" xml:"-"`
+	NationalId                   string      `json:",omitempty" xml:"-"`
+	OtherId                      string      `json:",omitempty" xml:"-"`
+	PlatformId                   string      `json:",omitempty" xml:"-"`
+	PreviousDiocesanId           string      `json:",omitempty" xml:"-"`
+	PreviousLocalId              string      `json:",omitempty" xml:"-"`
+	PreviousNationalId           string      `json:",omitempty" xml:"-"`
+	PreviousOtherId              string      `json:",omitempty" xml:"-"`
+	PreviousPlatformId           string      `json:",omitempty" xml:"-"`
+	PreviousSectorId             string      `json:",omitempty" xml:"-"`
+	PreviousStateProvinceId      string      `json:",omitempty" xml:"-"`
+	PreviousTAAId                string      `json:",omitempty" xml:"-"`
+	SectorId                     string      `json:",omitempty" xml:"-"`
+	TAAId                        string      `json:",omitempty" xml:"-"`
+	OtherIdLocality              string      `json:",omitempty" xml:"-"`
+	DOBRange                     string      `json:",omitempty" xml:"-"`
+	PersonalDetailsChanged       string      `json:",omitempty" xml:"-"`
+	PossibleDuplicate            string      `json:",omitempty" xml:"-"`
+	PsiOtherIdMismatch           string      `json:",omitempty" xml:"-"`
+	OtherSchoolId                string      `json:",omitempty" xml:"-"`
+}
+
+// More complete SIF/XML representation
+type SIFRegistrationRecord struct {
+	XMLName                      xml.Name    `xml:"StudentPersonal"`
+	RefId                        string      `json:",omitempty" xml:"RefId,attr"`
+	LocalId                      string      `json:",omitempty" xml:"LocalId"`
+	StateProvinceId              string      `json:",omitempty" xml:"StateProvinceId,omitempty"`
+	OtherIdList                  OtherIdList `xml:OtherIdList,omitempty`
+	Name                         SIFName     `json:",omitempty" xml:"PersonInfo>Name,omitempty"`
+	IndigenousStatus             string      `json:",omitempty" xml:"PersonInfo>Demographics>IndigenousStatus,omitempty"`
+	Sex                          string      `json:",omitempty" xml:"PersonInfo>Demographics>Sex,omitempty"`
+	BirthDate                    string      `json:",omitempty" xml:"PersonInfo>Demographics>BirthDate,omitempty"`
+	CountryOfBirth               string      `json:",omitempty" xml:"PersonInfo>Demographics>CountryOfBirth,omitempty"`
+	StudentLOTE                  string      `json:",omitempty" xml:"PersonInfo>Demographics>LanguageList>Language>Code,omitempty"`
+	VisaCode                     string      `json:",omitempty" xml:"PersonInfo>Demographics>VisaSubClass,omitempty"`
+	LBOTE                        string      `json:",omitempty" xml:"PersonInfo>Demographics>LBOTE,omitempty"`
+	Address                      Address     `json:",omitempty" xml:"PersonInfo>AddressList>Address"`
+	SchoolLocalId                string      `json:",omitempty" xml:"MostRecent>SchoolLocalId,omitempty"`
+	YearLevel                    string      `json:",omitempty" xml:"MostRecent>YearLevel>Code,omitempty"`
+	FTE                          string      `json:",omitempty" xml:"MostRecent>FTE,omitempty"`
+	Parent1LOTE                  string      `json:",omitempty" xml:"MostRecent>Parent1Language,omitempty"`
+	Parent2LOTE                  string      `json:",omitempty" xml:"MostRecent>Parent2Language,omitempty"`
+	Parent1Occupation            string      `json:",omitempty" xml:"MostRecent>Parent1EmploymentType,omitempty"`
+	Parent2Occupation            string      `json:",omitempty" xml:"MostRecent>Parent2EmploymentType,omitempty"`
+	Parent1SchoolEducation       string      `json:",omitempty" xml:"MostRecent>Parent1SchoolEducationLevel,omitempty"`
+	Parent2SchoolEducation       string      `json:",omitempty" xml:"MostRecent>Parent2SchoolEducationLevel,omitempty"`
+	Parent1NonSchoolEducation    string      `json:",omitempty" xml:"MostRecent>Parent1NonSchoolEducation,omitempty"`
+	Parent2NonSchoolEducation    string      `json:",omitempty" xml:"MostRecent>Parent2NonSchoolEducation,omitempty"`
+	LocalCampusId                string      `json:",omitempty" xml:"MostRecent>LocalCampusId,omitempty"`
+	ASLSchoolId                  string      `json:",omitempty" xml:"MostRecent>SchoolACARAId,omitempty"`
+	TestLevel                    string      `json:",omitempty" xml:"MostRecent>TestLevel>Code,omitempty"`
+	Homegroup                    string      `json:",omitempty" xml:"MostRecent>Homegroup,omitempty"`
+	ClassGroup                   string      `json:",omitempty" xml:"MostRecent>ClassCode,omitempty"`
+	MainSchoolFlag               string      `json:",omitempty" xml:"MostRecent>MembershipType,omitempty"`
+	FFPOS                        string      `json:",omitempty" xml:"MostRecent>FFPOS,omitempty"`
+	ReportingSchoolId            string      `json:",omitempty" xml:"MostRecent>ReportingSchoolId,omitempty"`
+	OtherEnrollmentSchoolACARAId string      `json:",omitempty" xml:"MostRecent>OtherEnrollmentSchoolACARAId,omitempty"`
+	EducationSupport             string      `json:",omitempty" xml:"EducationSupport,omitempty"`
+	HomeSchooledStudent          string      `json:",omitempty" xml:"HomeSchooledStudent,omitempty"`
+	Sensitive                    string      `json:",omitempty" xml:"Sensitive,omitempty"`
+	OfflineDelivery              string      `json:",omitempty" xml:"OfflineDelivery,omitempty"`
+}
+
+func (r *SIFRegistrationRecord) From_SIF() RegistrationRecord {
+	ret := RegistrationRecord{
+		RefId:                        r.RefId,
+		LocalId:                      r.LocalId,
+		StateProvinceId:              r.StateProvinceId,
+		OtherIdList:                  r.OtherIdList,
+		IndigenousStatus:             r.IndigenousStatus,
+		Sex:                          r.Sex,
+		BirthDate:                    r.BirthDate,
+		CountryOfBirth:               r.CountryOfBirth,
+		StudentLOTE:                  r.StudentLOTE,
+		VisaCode:                     r.VisaCode,
+		LBOTE:                        r.LBOTE,
+		SchoolLocalId:                r.SchoolLocalId,
+		YearLevel:                    r.YearLevel,
+		FTE:                          r.FTE,
+		Parent1LOTE:                  r.Parent1LOTE,
+		Parent2LOTE:                  r.Parent2LOTE,
+		Parent1Occupation:            r.Parent1Occupation,
+		Parent2Occupation:            r.Parent2Occupation,
+		Parent1SchoolEducation:       r.Parent1SchoolEducation,
+		Parent2SchoolEducation:       r.Parent2SchoolEducation,
+		Parent1NonSchoolEducation:    r.Parent1NonSchoolEducation,
+		Parent2NonSchoolEducation:    r.Parent2NonSchoolEducation,
+		LocalCampusId:                r.LocalCampusId,
+		ASLSchoolId:                  r.ASLSchoolId,
+		TestLevel:                    r.TestLevel,
+		Homegroup:                    r.Homegroup,
+		ClassGroup:                   r.ClassGroup,
+		MainSchoolFlag:               r.MainSchoolFlag,
+		FFPOS:                        r.FFPOS,
+		ReportingSchoolId:            r.ReportingSchoolId,
+		OtherEnrollmentSchoolACARAId: r.OtherEnrollmentSchoolACARAId,
+		EducationSupport:             r.EducationSupport,
+		HomeSchooledStudent:          r.HomeSchooledStudent,
+		Sensitive:                    r.Sensitive,
+		OfflineDelivery:              r.OfflineDelivery,
+		NameType:                     r.Name.NameType,
+		FamilyName:                   r.Name.FamilyName,
+		GivenName:                    r.Name.GivenName,
+		MiddleName:                   r.Name.MiddleName,
+		PreferredName:                r.Name.PreferredName,
+		AddressRole:                  r.Address.Role,
+		AddressType:                  r.Address.Type,
+		AddressLine1:                 r.Address.Street.Line1,
+		AddressLine2:                 r.Address.Street.Line2,
+		Locality:                     r.Address.City,
+		StateTerritory:               r.Address.StateProvince,
+		Postcode:                     r.Address.PostalCode,
+	}
+	return ret
+
+}
+
+func (r *RegistrationRecord) To_SIF() SIFRegistrationRecord {
+	ret := SIFRegistrationRecord{
+		RefId:                        r.RefId,
+		LocalId:                      r.LocalId,
+		StateProvinceId:              r.StateProvinceId,
+		OtherIdList:                  r.OtherIdList,
+		IndigenousStatus:             r.IndigenousStatus,
+		Sex:                          r.Sex,
+		BirthDate:                    r.BirthDate,
+		CountryOfBirth:               r.CountryOfBirth,
+		StudentLOTE:                  r.StudentLOTE,
+		VisaCode:                     r.VisaCode,
+		LBOTE:                        r.LBOTE,
+		SchoolLocalId:                r.SchoolLocalId,
+		YearLevel:                    r.YearLevel,
+		FTE:                          r.FTE,
+		Parent1LOTE:                  r.Parent1LOTE,
+		Parent2LOTE:                  r.Parent2LOTE,
+		Parent1Occupation:            r.Parent1Occupation,
+		Parent2Occupation:            r.Parent2Occupation,
+		Parent1SchoolEducation:       r.Parent1SchoolEducation,
+		Parent2SchoolEducation:       r.Parent2SchoolEducation,
+		Parent1NonSchoolEducation:    r.Parent1NonSchoolEducation,
+		Parent2NonSchoolEducation:    r.Parent2NonSchoolEducation,
+		LocalCampusId:                r.LocalCampusId,
+		ASLSchoolId:                  r.ASLSchoolId,
+		TestLevel:                    r.TestLevel,
+		Homegroup:                    r.Homegroup,
+		ClassGroup:                   r.ClassGroup,
+		MainSchoolFlag:               r.MainSchoolFlag,
+		FFPOS:                        r.FFPOS,
+		ReportingSchoolId:            r.ReportingSchoolId,
+		OtherEnrollmentSchoolACARAId: r.OtherEnrollmentSchoolACARAId,
+		EducationSupport:             r.EducationSupport,
+		HomeSchooledStudent:          r.HomeSchooledStudent,
+		Sensitive:                    r.Sensitive,
+		OfflineDelivery:              r.OfflineDelivery,
+	}
+	ret.Name = SIFName{NameType: r.NameType, FamilyName: r.FamilyName,
+		GivenName: r.GivenName, MiddleName: r.MiddleName, PreferredName: r.PreferredName}
+	ret.Address = Address{
+		Role:          r.AddressRole,
+		Type:          r.AddressType,
+		Street:        Street{Line1: r.AddressLine1, Line2: r.AddressLine2},
+		City:          r.Locality,
+		StateProvince: r.StateTerritory,
+		PostalCode:    r.Postcode,
+	}
+	return ret
+}
+
+type SIFName struct {
+	NameType      string `json:",omitempty" xml:"Type,attr"`
+	FamilyName    string `json:",omitempty" xml:"FamilyName,omitempty"`
+	GivenName     string `json:",omitempty" xml:"GivenName,omitempty"`
+	MiddleName    string `json:",omitempty" xml:"MiddleName,omitempty"`
+	PreferredName string `json:",omitempty" xml:"PreferredGivenName,omitempty"`
 }
 
 // Flatten out Other IDs from XML into JSON/CSV flat structure

@@ -1,6 +1,11 @@
 package xml
 
+import (
+	"encoding/xml"
+)
+
 type NAPResponseSet struct {
+	XMLName               xml.Name    `xml:"NAPStudentResponseSet"`
 	ResponseID            string      `xml:"RefId,attr"`
 	ReportExclusionFlag   string      `xml:"ReportExclusionFlag,omitempty"`
 	CalibrationSampleFlag string      `xml:"CalibrationSampleFlag,omitempty"`

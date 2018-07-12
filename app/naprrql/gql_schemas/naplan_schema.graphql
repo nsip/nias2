@@ -85,6 +85,8 @@ type NaplanData {
         extraneous_characters_student_report(acaraIDs: [String]): [RegistrationRecord]
 	## report on students with less testlets in their response than expected
 	missing_testlets_by_school(acaraIDs: [String]): [EventResponseDataSet]
+	## report on events containing PNP codes
+	pnp_events_report(acaraIDs: [String]): [NAPEvent]
 }
 
 ## List of problematic GUIDs in data set

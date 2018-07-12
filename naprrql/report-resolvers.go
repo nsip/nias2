@@ -1802,5 +1802,55 @@ func buildReportResolvers() map[string]interface{} {
 
 	}
 
+	resolvers["NaplanData/pnp_events_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		reqErr := checkRequiredParams(params)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			studentids = append(studentids, studentRefIds...)
+		}
+
+		studentObjs, err := getObjects(studentids)
+		if err != nil {
+			return []interface{}{}, err
+		}
+		// iterate students and assemble Event/Response Data Set
+		results := make([]xml.NAPEvent, 0)
+		for _, studentObj := range studentObjs {
+			student, _ := studentObj.(xml.RegistrationRecord)
+			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
+			if len(studentEventIds) < 1 {
+				// log.Println("no events found for student: ", student.RefId)
+				continue
+			}
+			eventObjs, err := getObjects(studentEventIds)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			for _, eventObj := range eventObjs {
+				event := eventObj.(xml.NAPEvent)
+				if len(event.Adjustment.PNPCodelist.PNPCode) > 0 {
+					results = append(results, event)
+				}
+			}
+		}
+		return results, nil
+
+	}
+
 	return resolvers
 }

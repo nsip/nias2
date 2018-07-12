@@ -26,6 +26,8 @@ import (
 // and ensures we can't run out of memory
 //
 
+var codeframe [][]byte = nil
+
 func runXMLPipeline(schools []string) error {
 
 	// setup pipeline cancellation
@@ -48,7 +50,46 @@ func runXMLPipeline(schools []string) error {
 
 	// sink stage
 	// create working directory if not there
-	outFileDir := "./out"
+	outFileDir := "./out/xml"
+	err = os.MkdirAll(outFileDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	xmlFileName := "sif.xml"
+	outFileName := outFileDir + "/" + xmlFileName
+	errc, err = xmlFileSink(ctx, outFileName, jsonc)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+
+	log.Println("XML file writing... " + outFileName)
+	return WaitForPipeline(errcList...)
+}
+
+func runXMLPipelinePerSchool(school string) error {
+
+	// setup pipeline cancellation
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+	var errcList []<-chan error
+
+	// input stage
+	varsc, errc, err := xmlParametersSource(ctx, school)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+
+	jsonc, errc, err := xmlQueryExecutor(ctx, varsc)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+
+	// sink stage
+	// create working directory if not there
+	outFileDir := "./out/xml/" + school + "/"
 	err = os.MkdirAll(outFileDir, os.ModePerm)
 	if err != nil {
 		return err
@@ -150,6 +191,9 @@ func xmlQueryExecutor(ctx context.Context, in <-chan systemQueryParams) (<-chan 
 }
 
 func xmlCodeframeQuery(params map[string]interface{}) ([][]byte, error) {
+	if codeframe != nil {
+		return codeframe, nil
+	}
 	ret := make([][]byte, 0)
 
 	ids := getIdentifiers("NAPCodeFrame:")
@@ -207,7 +251,7 @@ func xmlCodeframeQuery(params map[string]interface{}) ([][]byte, error) {
 		}
 		ret = append(ret, b)
 	}
-
+	codeframe = ret
 	return ret, err
 
 }

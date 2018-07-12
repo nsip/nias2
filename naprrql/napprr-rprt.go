@@ -196,7 +196,11 @@ func runWritingExtractReports(schools []string) error {
 
 func runXMLReports(schools []string) error {
 	var pipelineError error
+	// run for entire system
 	pipelineError = runXMLPipeline(schools)
+	for _, school := range schools {
+		pipelineError = runXMLPipelinePerSchool(school)
+	}
 	return pipelineError
 
 }

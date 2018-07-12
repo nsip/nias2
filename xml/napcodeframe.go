@@ -4,6 +4,7 @@ package xml
 type NAPCodeFrame struct {
 	RefId        string                   `xml:"RefId,attr"`
 	NAPTestRefId string                   `xml:"NAPTestRefId"`
+	TestContent  TestContent              `xml:"TestContent"` // added for XML roundtrip
 	TestletList  NAPCodeFrame_TestletList `xml:"TestletList"`
 }
 
@@ -16,10 +17,12 @@ type NAPCodeFrame_TestletList struct {
 
 type NAPCodeFrame_Testlet struct {
 	NAPTestletRefId string                    `xml:"NAPTestletRefId"`
+	TestletContent  TestletContent            `xml:"TestletContent"` // added for XML roundtrip
 	TestItemList    NAPCodeFrame_TestItemList `xml:"TestItemList"`
 }
 
 type NAPCodeFrame_TestItem struct {
-	TestItemRefId  string `xml:"TestItemRefId"`
-	SequenceNumber string `xml:"SequenceNumber"`
+	TestItemRefId   string          `xml:"TestItemRefId"`
+	SequenceNumber  string          `xml:"SequenceNumber"`
+	TestItemContent TestItemContent `xml:"TestItemContent"` // added for XML roundtrip
 }

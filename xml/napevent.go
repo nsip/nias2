@@ -41,7 +41,7 @@ type TestDisruption struct {
 }
 
 type Adjustment struct {
-	PNPCodelist PNPCodelist `xml:"PNPCodeList"`
+	PNPCodelist PNPCodelist `xml:"PNPCodeList,omitempty"`
 	BookletType string      `xml:"BookletType,omitempty"`
 }
 
