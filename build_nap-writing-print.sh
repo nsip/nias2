@@ -15,7 +15,7 @@ do_build() {
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
 	mkdir -p $OUTPUT/in
-	rsync -a nap-writing-print/in $OUTPUT/
+	rsync -a nap-writing-print/in nap-writing-print/*.pdf $OUTPUT/
 	# mkdir -p $OUTPUT/in/results
 	# rsync -a naprrql/in/master_nap.xml.zip  $OUTPUT/in/results
 }
