@@ -12,6 +12,9 @@ ValidationRoute = ["schema", "schema2", "dob", "id","asl", "psi", "numericvalid"
 # Data match fields for matching across schools
 StudentMatch = ["FamilyName", "GivenName", "BirthDate"]
 
+# Legal characters for names. NOTE: this is the input to a regular expression; if hyphens are permitted, leave - as the final character
+LegalNameChars = "A-Za-z '-"
+
 # Webserver port
 WebServerPort = "1325"
 
