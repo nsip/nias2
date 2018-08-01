@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
+	"github.com/tidwall/sjson"
 	"github.com/xeipuuv/gojsonschema"
 	"io/ioutil"
 	//"log"
@@ -73,6 +74,9 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 		return responses, err
 	}
 
+	// remove extraneous elements
+	data, _ = sjson.DeleteBytes(data, "XMLName")
+	data, _ = sjson.DeleteBytes(data, "OtherIdList")
 	// validate with schema
 	payloadLoader := gojsonschema.NewStringLoader(string(data))
 	result, err := ss.schema.Validate(payloadLoader)

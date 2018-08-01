@@ -47,6 +47,10 @@ func TestRepeatPSIwithinSchool(t *testing.T) {
 	test_harness(t, "../../unit_test_files/5StudentsDuplicatePlatformID.csv", "PSI/ASL ID", "Platform Student ID (Student) and ASL ID (School) are potential duplicate")
 }
 
+func TestAddress(t *testing.T) {
+	test_harness(t, "../../unit_test_files/1studentsAddress.csv", "AddressLine1", "Additional property AddressLine1 is not allowed")
+}
+
 func TestKurdistan(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsKurdistan.csv", "", "")
 }
@@ -119,9 +123,11 @@ func TestExceedCharLengthsSurname(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsExceedCharLengthsSurname.csv", "FamilyName", "String length must be less than or equal to 40")
 }
 
+/*
 func TestExceedCharLengthsAddress(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsExceedCharLengthsAddress.csv", "AddressLine1", "String length must be less than or equal to 40")
 }
+*/
 
 func TestExceedCharLengthsGivenName(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsExceedCharLengthsGivenName.csv", "GivenName", "String length must be less than or equal to 40")
@@ -319,12 +325,14 @@ func TestYearLevelTestLevelMismatch(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match Test level ")
 }
 
+/*
 func TestExtraneousNotPermittedField(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsExtraneousNotPermittedField.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
 }
+*/
 
 func TestExtraneousPermittedField(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsExtraneousPermittedField.csv", "", "")
+	test_harness(t, "../../unit_test_files/1studentsExtraneousPermittedField.csv", "PossibleDuplicate", "Additional property PossibleDuplicate is not allowed")
 }
 
 func TestMaximumFTE(t *testing.T) {
