@@ -91,9 +91,11 @@ func TestBirthdateYearLevel(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsBirthdateYearLevel.csv", "BirthDate/YearLevel/TestLevel", "does not match year level derived from BirthDate")
 }
 
+/*
 func TestACARAIDandStateMismatch(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsACARAIDandStateMismatch.csv", "ASLSchoolId", "is a valid ID, but not for")
 }
+*/
 
 func TestMissingSurname(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsMissingSurname.csv", "FamilyName", "FamilyName is required")
