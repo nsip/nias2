@@ -77,6 +77,8 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 	// remove extraneous elements
 	data, _ = sjson.DeleteBytes(data, "XMLName")
 	data, _ = sjson.DeleteBytes(data, "OtherIdList")
+	data, _ = sjson.DeleteBytes(data, "RefId")
+	data, _ = sjson.DeleteBytes(data, "OtherEnrollmentSchoolACARAId")
 	// validate with schema
 	payloadLoader := gojsonschema.NewStringLoader(string(data))
 	result, err := ss.schema.Validate(payloadLoader)

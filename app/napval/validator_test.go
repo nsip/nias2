@@ -51,6 +51,10 @@ func TestAddress(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsAddress.csv", "AddressLine1", "Additional property AddressLine1 is not allowed")
 }
 
+func TestState(t *testing.T) {
+	test_harness(t, "../../unit_test_files/1studentsState.csv", "StateTerritory", "Additional property StateTerritory is not allowed")
+}
+
 func TestKurdistan(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsKurdistan.csv", "", "")
 }
