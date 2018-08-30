@@ -52,7 +52,7 @@ query ISRPrinting($acaraIDs: [String]) {
     R_Comment
     R_Participation
     R_Pathway
-    R_Stddec
+    R_Stddev
     W_Score
     W_Mean
     W_Comment

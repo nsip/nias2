@@ -331,11 +331,9 @@ func TestYearLevelTestLevelMismatch(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsYearLevelTestLevelMismatch.csv", "BirthDate/TestLevel", "does not match Test level ")
 }
 
-/*
 func TestExtraneousNotPermittedField(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1studentsExtraneousNotPermittedField.csv", "BirthDate/TestLevel", "does not match year level derived from BirthDate")
+	test_harness(t, "../../unit_test_files/1studentsExtraneousNotPermittedField.csv", "Pokemon", "Additional property Pokemon is not allowed")
 }
-*/
 
 func TestExtraneousPermittedField(t *testing.T) {
 	test_harness(t, "../../unit_test_files/1studentsExtraneousPermittedField.csv", "PossibleDuplicate", "Additional property PossibleDuplicate is not allowed")
