@@ -417,7 +417,7 @@ func buildReportResolvers() map[string]interface{} {
 					if _, ok := schoolsummaries[acaraid]; !ok {
 						schoolsummaries[acaraid] = make(map[string]xml.NAPTestScoreSummary)
 					}
-					schoolsummaries[acaraid][si.RefId] = ss
+					schoolsummaries[acaraid][ss.NAPTestRefId] = ss
 				}
 			}
 		}
