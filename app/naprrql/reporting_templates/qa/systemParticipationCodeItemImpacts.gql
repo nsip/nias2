@@ -32,6 +32,8 @@ query NAPItemResults($acaraIDs: [String]) {
       }
     }
     Student {
+      FamilyName
+      GivenName
       BirthDate
       Sex
       IndigenousStatus

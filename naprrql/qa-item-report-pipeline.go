@@ -62,6 +62,8 @@ func itemresults_query() string {
       }
     }
     Student {
+      FamilyName
+      GivenName
       BirthDate
       Sex
       YearLevel
