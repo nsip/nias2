@@ -66498,7 +66498,7 @@
   </OtherIdList>
   <PersonInfo>
     <Name Type="LGL">
-      <FamilyName>Woodruff</FamilyName>
+      <FamilyName>Wood:ruff</FamilyName>
       <GivenName>Genevie</GivenName>
       <MiddleName>M</MiddleName>
     </Name>
@@ -66512,6 +66512,7 @@
           <Code>9601</Code>
         </Language>
       </LanguageList>
+      <LBOTE>N</LBOTE>
     </Demographics>
     <AddressList>
       <Address Type="0123" Role="012A">
