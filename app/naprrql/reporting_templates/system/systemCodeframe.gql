@@ -18,6 +18,7 @@ query CodeFrame {
       }
     }
     Item {
+      ItemID
       TestItemContent {
         NAPTestItemLocalId
         Subdomain
