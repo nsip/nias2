@@ -28,9 +28,10 @@ query NAPDomainScores($acaraIDs: [String]) {
         }
     }
     School {
-      LocalId
+        LocalId
         ACARAId
         SchoolName
+        SchoolSector
         Campus {
           SchoolCampusId
         }
@@ -44,8 +45,7 @@ query NAPDomainScores($acaraIDs: [String]) {
           }
         }
       Event {
-        NAPJurisdiction
-          SchoolSector
+          NAPJurisdiction
           SchoolGeolocation
           EventID
           ParticipationCode

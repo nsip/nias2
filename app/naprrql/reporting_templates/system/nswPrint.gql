@@ -27,8 +27,9 @@ query NAPDomainScores($acaraIDs: [String]) {
         }
     }
     School {
-      LocalId
+        LocalId
         ACARAId
+        SchoolSector
         SchoolName
         Campus {
           SchoolCampusId

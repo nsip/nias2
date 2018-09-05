@@ -457,7 +457,9 @@ func buildReportResolvers() map[string]interface{} {
 			for _, eventObj := range eventObjs {
 				event := eventObj.(xml.NAPEvent)
 				// report assumes that the school is the same across all domains; it may not be
-				schoolid = event.SchoolID
+				if _, ok := schools[event.SchoolID]; ok {
+					schoolid = event.SchoolID
+				}
 				pnpcodelistmap := pnpcodelistmap(event)
 				testObj, err := getObjects([]string{event.TestID})
 				if err != nil {

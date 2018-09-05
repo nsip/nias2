@@ -17,7 +17,7 @@ type NAPEvent struct {
 	System                 string             `xml:"System,omitempty"`
 	SchoolGeolocation      string             `xml:"SchoolGeolocation,omitempty"`
 	ReportingSchoolName    string             `xml:"ReportingSchoolName,omitempty"`
-	JurisdictionID         string             `xml:"JurisdictionID,omitempty"`
+	NAPJurisdiction        string             `xml:"NAPJurisdiction,omitempty"`
 	ParticipationCode      string             `xml:"ParticipationCode"`
 	ParticipationText      string             `xml:"ParticipationText"`
 	Device                 string             `xml:"Device,omitempty"`
@@ -52,7 +52,7 @@ type PNPCodelist struct {
 func (t NAPEvent) GetHeaders() []string {
 	return []string{
 		"EventID", "SPRefID", "PSI", "SchoolRefID", "SchoolID", "TestID", "NAPTestLocalID", "SchoolSector",
-		"System", "SchoolGeolocation", "ReportingSchoolName", "JurisdictionID", "ParticipationCode",
+		"System", "SchoolGeolocation", "ReportingSchoolName", "NAPJurisdiction", "ParticipationCode",
 		"ParticipationText", "Device", "Date", "StartTime", "LapsedTimeTest", "ExemptionReason",
 		"PersonalDetailsChanged", "PossibleDuplicate", "DOBRange", "BookletType"}
 }
@@ -60,7 +60,7 @@ func (t NAPEvent) GetHeaders() []string {
 func (t NAPEvent) GetSlice() []string {
 	return []string{
 		t.EventID, t.SPRefID, t.PSI, t.SchoolRefID, t.SchoolID, t.TestID, t.NAPTestLocalID, t.SchoolSector,
-		t.System, t.SchoolGeolocation, t.ReportingSchoolName, t.JurisdictionID, t.ParticipationCode,
+		t.System, t.SchoolGeolocation, t.ReportingSchoolName, t.NAPJurisdiction, t.ParticipationCode,
 		t.ParticipationText, t.Device, t.Date, t.StartTime, t.LapsedTimeTest, t.ExemptionReason,
 		t.PersonalDetailsChanged, t.PossibleDuplicate, t.DOBRange, t.Adjustment.BookletType}
 }

@@ -166,7 +166,7 @@ type NAPEvent {
 	## School reporting data should be returned to
 	ReportingSchoolName: String
 	## Jurisdictional Event ID
-	JurisdictionID: String
+	NAPJurisdiction: String
 	## Present, Absent, Withdrawn etc.
 	ParticipationCode: String
 	## Text explanation of participation code
