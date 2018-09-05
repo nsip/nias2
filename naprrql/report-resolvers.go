@@ -577,6 +577,7 @@ func buildReportResolvers() map[string]interface{} {
 		codeframeIds := getIdentifiers("NAPCodeFrame:")
 		codeFrameObjs, err := getObjects(codeframeIds)
 		if err != nil {
+			log.Printf("No match for Codeframe %#v\n", codeframeIds)
 			return []interface{}{}, err
 		}
 		for _, codeframeObj := range codeFrameObjs {
@@ -588,18 +589,21 @@ func buildReportResolvers() map[string]interface{} {
 		for _, codeframe := range codeframes {
 			testObj, err := getObjects([]string{codeframe.NAPTestRefId})
 			if err != nil {
+				log.Printf("No match for Test %s\n", codeframe.NAPTestRefId)
 				return []interface{}{}, err
 			}
 			test, _ := testObj[0].(xml.NAPTest)
 			for _, cf_testlet := range codeframe.TestletList.Testlet {
 				tlObj, err := getObjects([]string{cf_testlet.NAPTestletRefId})
 				if err != nil {
+					log.Printf("No match for Testlet %s\n", cf_testlet.NAPTestletRefId)
 					return []interface{}{}, err
 				}
 				tl, _ := tlObj[0].(xml.NAPTestlet)
 				for _, cf_item := range cf_testlet.TestItemList.TestItem {
 					tiObj, err := getObjects([]string{cf_item.TestItemRefId})
 					if err != nil {
+						log.Printf("No match for Test Item %s\n", cf_item.TestItemRefId)
 						return []interface{}{}, err
 					}
 					ti, _ := tiObj[0].(xml.NAPTestItem)
