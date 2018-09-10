@@ -74,6 +74,11 @@ type ISRPrintItemExpanded struct {
 	W_Stddev        float64
 	S_Stddev        float64
 	N_Stddev        float64
+	G_DomainBand    string
+	R_DomainBand    string
+	W_DomainBand    string
+	S_DomainBand    string
+	N_DomainBand    string
 }
 
 //
@@ -176,209 +181,40 @@ func (isrpi *ISRPrintItemExpanded) allocateDomainScoreAndMeanAndParticipation(ev
 		isrpi.G_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.G_Participation = event.ParticipationCode
 		isrpi.G_Pathway = pathway
+		isrpi.G_DomainBand = resp.StudentDomainBand
 	case strings.Contains(domain, "num"):
 		isrpi.N_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.N_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.N_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.N_Participation = event.ParticipationCode
 		isrpi.N_Pathway = pathway
+		isrpi.N_DomainBand = resp.StudentDomainBand
 	case strings.Contains(domain, "read"):
 		isrpi.R_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.R_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.R_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.R_Participation = event.ParticipationCode
 		isrpi.R_Pathway = pathway
+		isrpi.R_DomainBand = resp.StudentDomainBand
 	case strings.Contains(domain, "writ"):
 		isrpi.W_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.W_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.W_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.W_Participation = event.ParticipationCode
 		isrpi.W_Pathway = pathway
+		isrpi.W_DomainBand = resp.StudentDomainBand
 	case strings.Contains(domain, "spell"):
 		isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
 		isrpi.S_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
 		isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
 		isrpi.S_Participation = event.ParticipationCode
 		isrpi.S_Pathway = pathway
+		isrpi.S_DomainBand = resp.StudentDomainBand
 	default:
 		log.Println("Unknown test domain supplied (allocateDomainScore): ", domain)
 	}
 
 }
-
-//
-// create the resolver functions for isr printing
-//
-/*
-func buildISRPrintResolversDISABLE() map[string]interface{} {
-
-	resolvers := map[string]interface{}{}
-
-	//
-	// resolver for isr printing results, line per student.
-	//
-	resolvers["ISRPrint/reportItems"] = func(params *graphql.ResolveParams) (interface{}, error) {
-
-		// ISRPrintItems := make([]ISRPrintItem, 0)
-		isrPrintItems := make([]ISRPrintItem, 0)
-
-		// validate input params
-		reqErr := checkISRReportParams(params)
-		if reqErr != nil {
-			return nil, reqErr
-		}
-
-		// get the acara id from the request params
-		acaraid := params.Args["schoolAcaraID"].(string)
-		// log.Println("ACARA ID: ", acaraid)
-
-		// get the test year level from the request params
-		yrLvl := params.Args["testYrLevel"].(string)
-		// log.Println("Yr Level: ", yrLvl)
-
-		// get the school info for the acarid supplied
-		schoolInfo, err := getSchoolInfo(acaraid)
-		if err != nil {
-			return isrPrintItems, err
-		}
-		// log.Println("School: ", schoolInfo.SchoolName)
-
-		// get tests for yearLevel
-		tests, err := getTestsForYearLevel(yrLvl)
-		if err != nil {
-			return isrPrintItems, err
-		}
-		// convenience map to avoid revisiting db for tests
-		testLookup := make(map[string]xml.NAPTest) // key string = test refid
-		for _, test := range tests {
-			t := test
-			testLookup[t.TestID] = t
-		}
-
-		// get events for each test at this school
-		events := make([]xml.NAPEvent, 0)
-		events, err = getTestEvents(tests, schoolInfo.RefId)
-		if err != nil {
-			return isrPrintItems, err
-		}
-
-		// get score summaries for tests at this school
-		summaries := make([]xml.NAPTestScoreSummary, 0)
-		summaries, err = getScoreSummaries(tests, schoolInfo.RefId)
-		if err != nil {
-			return isrPrintItems, nil
-		}
-		// convenience map to avoid revisiting db for summaries
-		summaryLookup := make(map[string]xml.NAPTestScoreSummary)
-		for _, summary := range summaries {
-			s := summary
-			summaryLookup[s.NAPTestRefId] = s
-		}
-
-		// iterate events creating collated items for students
-		studentISRItems := make(map[string]ISRPrintItem) // index is string = student refid
-		for _, event := range events {
-			_, present := studentISRItems[event.SPRefID]
-			if !present {
-				s := ISRPrintItem{}
-				s.initialiseISRItem(schoolInfo, event)
-				studentISRItems[event.SPRefID] = s
-			}
-			s := studentISRItems[event.SPRefID]
-			s.allocateDomainScoreAndMean(&event, testLookup, summaryLookup)
-			studentISRItems[event.SPRefID] = s
-		}
-
-		// once collated return the isr print items
-		for _, isrpi := range studentISRItems {
-			isrPrintItems = append(isrPrintItems, isrpi)
-		}
-
-		return isrPrintItems, nil
-
-	}
-
-	resolvers["ISRPrint/reportItemsExpanded"] = func(params *graphql.ResolveParams) (interface{}, error) {
-
-		isrPrintItems := make([]ISRPrintItemExpanded, 0)
-
-		// validate input params
-		reqErr := checkISRReportParams(params)
-		if reqErr != nil {
-			return nil, reqErr
-		}
-
-		// get the acara id from the request params
-		acaraid := params.Args["schoolAcaraID"].(string)
-
-		// get the test year level from the request params
-		yrLvl := params.Args["testYrLevel"].(string)
-
-		// get the school info for the acarid supplied
-		schoolInfo, err := getSchoolInfo(acaraid)
-		if err != nil {
-			return isrPrintItems, err
-		}
-		// log.Println("School: ", schoolInfo.SchoolName)
-
-		// get tests for yearLevel
-		tests, err := getTestsForYearLevel(yrLvl)
-		if err != nil {
-			return isrPrintItems, err
-		}
-		// convenience map to avoid revisiting db for tests
-		testLookup := make(map[string]xml.NAPTest) // key string = test refid
-		for _, test := range tests {
-			t := test
-			testLookup[t.TestID] = t
-		}
-
-		// get events for each test at this school
-		events := make([]xml.NAPEvent, 0)
-		events, err = getTestEvents(tests, schoolInfo.RefId)
-		if err != nil {
-			return isrPrintItems, err
-		}
-
-		// get score summaries for tests at this school
-		summaries := make([]xml.NAPTestScoreSummary, 0)
-		summaries, err = getScoreSummaries(tests, schoolInfo.RefId)
-		if err != nil {
-			return isrPrintItems, nil
-		}
-		// convenience map to avoid revisiting db for summaries
-		summaryLookup := make(map[string]xml.NAPTestScoreSummary)
-		for _, summary := range summaries {
-			s := summary
-			summaryLookup[s.NAPTestRefId] = s
-		}
-
-		// iterate events creating collated items for students
-		studentISRItems := make(map[string]ISRPrintItemExpanded) // index is string = student refid
-		for _, event := range events {
-			_, present := studentISRItems[event.SPRefID]
-			if !present {
-				s := ISRPrintItemExpanded{}
-				s.initialiseISRItemExpanded(schoolInfo, event)
-				studentISRItems[event.SPRefID] = s
-			}
-			s := studentISRItems[event.SPRefID]
-			s.allocateDomainScoreAndMeanAndParticipation(&event, testLookup, summaryLookup)
-			studentISRItems[event.SPRefID] = s
-		}
-
-		// once collated return the isr print items
-		for _, isrpi := range studentISRItems {
-			isrPrintItems = append(isrPrintItems, isrpi)
-		}
-
-		return isrPrintItems, nil
-
-	}
-
-	return resolvers
-}
-*/
 
 //
 // returns set of score summary objects for the test/school combination

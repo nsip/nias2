@@ -53,29 +53,34 @@ query ISRPrinting($acaraIDs: [String]) {
     R_Participation
     R_Pathway
     R_Stddev
+    R_DomainBand
     W_Score
     W_Mean
     W_Comment
     W_Participation
     W_Pathway
     W_Stddev
+    W_DomainBand
     S_Score
     S_Mean
     S_Comment
     S_Participation
     S_Pathway
     S_Stddev
+    S_DomainBand
     G_Score
     G_Mean
     G_Comment
     G_Participation
     G_Pathway
     G_Stddev
+    G_DomainBand
     N_Score
     N_Mean
     N_Comment
     N_Participation
     N_Pathway
     N_Stddev
+    N_DomainBand
   }
 }

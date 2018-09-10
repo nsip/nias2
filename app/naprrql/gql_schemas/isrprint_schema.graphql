@@ -101,6 +101,16 @@ type ISRPrintItemExpanded {
         S_Participation: String
         ## Grammar & Punctuation participation
         G_Participation: String
+        ## Reading domain band
+        R_DomainBand: String
+        ## Writing domain band
+        W_DomainBand: String
+        ## Numeracy domain band
+        N_DomainBand: String
+        ## Spelling domain band
+        S_DomainBand: String
+        ## Grammar & Punctuation domain band
+        G_DomainBand: String
 }
 
 ## Student Personal information

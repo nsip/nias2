@@ -1295,6 +1295,16 @@ type ISRPrintItemExpanded {
         S_Stddev: String
         ## Grammar & Punctuation standard deviation
         G_Stddev: String
+        ## Reading domain band
+        R_DomainBand: String
+        ## Writing domain band
+        W_DomainBand: String
+        ## Numeracy domain band
+        N_DomainBand: String
+        ## Spelling domain band
+        S_DomainBand: String
+        ## Grammar & Punctuation domain band
+        G_DomainBand: String
 }
 
 
