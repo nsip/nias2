@@ -1,4 +1,4 @@
-Student ID,Strand,Year,Year_Level,Raw_Score,Scale_Score,Band,Participation_Code
+Student ID,Strand,Test Level,Year,Raw Score,Scaled Score,Band,Participation Code
 64844,Grammar and Punctuation,7,2017,9.00,610.00,8,P
 64844,Writing,7,2017,1.00,625.00,9,P
 64844,Numeracy,7,2017,35.00,584.38,7,P
