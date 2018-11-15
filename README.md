@@ -158,4 +158,3 @@ Library code shared between all executables:
 * `server_connections.go`: standardised NATS server access module
 * `service.go`: service interface to handle message requests
 * `transactiontracker.go`: transaction status reporting structure
-# nias2ag
