@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -38,6 +39,12 @@ func emptyCsvRow(row []string) bool {
 // If no map is found or is unreadable the data format will be derived
 // from the first record the processor recieves.
 //
+// Will also deal with mapFile specifying Fixed Format width: in that case,
+// the first line of the mapFile is "FixedFormat", the second is the
+// absolute character widths of each colum (if zero padding if prefixed with 0),
+// and the third is the name of the json data fields to put in those columns.
+// Blanks are printed  if the data field is named as Blank.
+//
 func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in <-chan gjson.Result) (<-chan error, error) {
 
 	file, err := os.Create(csvFileName)
@@ -45,8 +52,11 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 		return nil, err
 	}
 	w := csv.NewWriter(file)
-	rowFormat, dataKeys := readRowFormat(mapFileName)
+	rowFormat, dataKeys, dataWidths := readRowFormat(mapFileName)
 	headerWritten := false
+	if len(dataWidths) > 0 {
+		return fixedFormatFileSink(ctx, csvFileName, mapFileName, in)
+	}
 
 	errc := make(chan error, 1)
 	go func() {
@@ -95,37 +105,130 @@ func csvFileSink(ctx context.Context, csvFileName string, mapFileName string, in
 	return errc, nil
 }
 
+func fixedFormatFileSink(ctx context.Context, csvFileName string, mapFileName string, in <-chan gjson.Result) (<-chan error, error) {
+	file, err := os.Create(csvFileName)
+	if err != nil {
+		return nil, err
+	}
+	_, dataKeys, dataWidths := readRowFormat(mapFileName)
+	errc := make(chan error, 1)
+	if err != nil {
+		errc <- err
+		log.Printf("%+v\n", err)
+		return errc, err
+
+	}
+	go func() {
+		i := 0
+		defer close(errc)
+		defer file.Close()
+		for record := range in {
+			resultRow := make([]string, 0)
+			for _, key := range dataKeys {
+				if key == "Blank" {
+					resultRow = append(resultRow, "")
+				} else {
+					value := record.Get(key).String()
+					if strings.HasSuffix(key, ".BirthDate") {
+						//value = strings.Replace(value, "-", "", -1)
+					}
+					resultRow = append(resultRow, strings.Replace(value, "\n", "\\n", -1))
+				}
+			}
+			if !emptyCsvRow(resultRow) {
+				log.Printf("FIXED: %#v", resultRow)
+				out := fixedFormat(resultRow, dataWidths)
+				log.Printf("%s", out)
+				log.Printf("%s", strings.Join(out, ""))
+				i++
+				_, err := file.WriteString(strings.Join(out, "") + "\n")
+				if err != nil {
+					// Handle an error that occurs during the goroutine.
+					errc <- err
+					log.Printf("%+v\n", err)
+					return
+				}
+			}
+			file.Sync()
+		}
+	}()
+	return errc, nil
+}
+
+// convert slice of strings into slice of strings with fixed width given in format.
+// if width prefixed with 0, zero pad output
+func fixedFormat(data []string, format []string) []string {
+	ret := make([]string, 0)
+	for i, value := range data {
+		zeropad := strings.HasPrefix(format[i], "0")
+		length, err := strconv.Atoi(format[i])
+		if err != nil || length < 1 {
+			continue
+		}
+		if length > len(value) {
+			replchar := " "
+			if zeropad {
+				replchar = "0"
+			}
+			value = strings.Repeat(replchar, length-len(value)) + value
+		} else if length < len(value) {
+			log.Println("Truncating: " + value)
+			value = string(value[:length]) + ""
+			log.Println("Truncated: " + value)
+		}
+		ret = append(ret, value)
+	}
+	return ret
+}
+
 //
 // if a formatting file provided to fix layout of
 // columns in csv, then attempt to read now
 // errors are not propagated, so pipeline will function with
-// a derived layout rather than quitting
+// a derived layout rather than quitting.
+
+// If first line is "FixedFormat", then return fixed format specification.
 //
-func readRowFormat(fileName string) (displayNames []string, dataKeys []string) {
+func readRowFormat(fileName string) (displayNames []string, dataKeys []string, dataWidths []string) {
 
 	displayNames = make([]string, 0)
 	dataKeys = make([]string, 0)
+	dataWidths = make([]string, 0)
 
 	file, err := os.Open(fileName)
 	defer file.Close()
 	if err != nil {
 		log.Printf("No format map: %s: found: layout will be auto-derived from data.", fileName)
-		return displayNames, dataKeys
+		return displayNames, dataKeys, dataWidths
 	}
 
 	r := csv.NewReader(file)
+	r.FieldsPerRecord = -1 // don't immediately check number of columns
 	formatLines, err := r.ReadAll()
 	if err != nil {
-		log.Println("Error reading format map: ", err)
-		return displayNames, dataKeys
+		if perr, ok := err.(*csv.ParseError); !ok || perr.Err != csv.ErrFieldCount {
+			log.Println("Error reading format map: ", err)
+			return displayNames, dataKeys, dataWidths
+		}
 	}
 
 	if len(formatLines) == 2 {
+		if len(formatLines[0]) != len(formatLines[1]) {
+			log.Println("Error reading format map: unequal count of fields in header and definitions line")
+			return displayNames, dataKeys, dataWidths
+		}
 		displayNames = formatLines[0]
 		dataKeys = formatLines[1]
+	} else if len(formatLines) == 3 && formatLines[0][0] == "FixedFormat" {
+		if len(formatLines[1]) != len(formatLines[2]) {
+			log.Println("Error reading format map: unequal count of fields in widths and definitions line")
+			return displayNames, dataKeys, dataWidths
+		}
+		dataWidths = formatLines[1]
+		dataKeys = formatLines[2]
 	}
 
-	return displayNames, dataKeys
+	return displayNames, dataKeys, dataWidths
 
 }
 

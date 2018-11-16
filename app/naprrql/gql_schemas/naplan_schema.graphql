@@ -47,6 +47,14 @@ type NaplanData {
 	domain_scores_report_by_school(acaraIDs: [String]): [ResponseDataSet]
 	## reporting (ui) object for domain scores and participation
 	domain_scores_event_report_by_school(acaraIDs: [String]): [EventResponseDataSet]
+        ## reporting (ui) object for domain scores and participation, restricted to Yr 3 Writing
+	domain_scores_event_report_by_school_writing_yr3(acaraIDs: [String]): [EventResponseDataSet]
+        ## reporting (ui) object for domain scores and participation, restricted to Yr 5 Writing
+	domain_scores_event_report_by_school_writing_yr5(acaraIDs: [String]): [EventResponseDataSet]
+        ## reporting (ui) object for domain scores and participation, restricted to Yr 7 Writing
+	domain_scores_event_report_by_school_writing_yr7(acaraIDs: [String]): [EventResponseDataSet]
+        ## reporting (ui) object for domain scores and participation, restricted to Yr 9 Writing
+	domain_scores_event_report_by_school_writing_yr9(acaraIDs: [String]): [EventResponseDataSet]
 	## reporting (ui) object for domain scores and participation with score summary info
 	domain_scores_summary_event_report_by_school(acaraIDs: [String]): [EventResponseSummaryAllDomainsDataSet]
 	## reporting (ui) object for score summaries

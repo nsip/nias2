@@ -1,5 +1,5 @@
 package version
 var(
-Id = 12000953
-TagName = "v1.0.3"
+Id = 13495550
+TagName = "v1.0.4"
 )
