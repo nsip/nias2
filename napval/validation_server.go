@@ -180,6 +180,10 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 
 	}
 
+	if total == 0 {
+		return ir, errors.New("No valid records found in XML")
+	}
+
 	// create tx record to return to client
 	ir.Records = total
 	ir.TxID = txid
