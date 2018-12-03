@@ -8,6 +8,12 @@ query NAPItemResults($acaraIDs: [String]) {
       }
     }
     Student {
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      }
       BirthDate
       IndigenousStatus
       Sex
@@ -24,7 +30,7 @@ query NAPItemResults($acaraIDs: [String]) {
       SchoolSector
       SchoolGeolocation
       NAPJurisdiction
-      ParticipationEvent
+      ParticipationCode
     }
     SchoolDetails {
       ACARAId

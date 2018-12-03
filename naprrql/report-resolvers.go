@@ -380,8 +380,9 @@ func buildReportResolvers() map[string]interface{} {
 		return results, nil
 	}
 
+	// Because there are no Writing Yr 3 enrolments in the platform at all, we are cheating by providing the Numeracy enrolments instead
 	resolvers["NaplanData/domain_scores_event_report_by_school_writing_yr3"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		return domain_scores_event_report_by_school(params, "3", "Writing")
+		return domain_scores_event_report_by_school(params, "3", "Numeracy")
 	}
 	resolvers["NaplanData/domain_scores_event_report_by_school_writing_yr5"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		return domain_scores_event_report_by_school(params, "5", "Writing")

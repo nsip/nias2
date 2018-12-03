@@ -130,16 +130,16 @@ func fixedFormatFileSink(ctx context.Context, csvFileName string, mapFileName st
 				} else {
 					value := record.Get(key).String()
 					if strings.HasSuffix(key, ".BirthDate") {
-						//value = strings.Replace(value, "-", "", -1)
+						value = strings.Replace(value, "-", "", -1)
 					}
 					resultRow = append(resultRow, strings.Replace(value, "\n", "\\n", -1))
 				}
 			}
 			if !emptyCsvRow(resultRow) {
-				log.Printf("FIXED: %#v", resultRow)
+				//log.Printf("FIXED: %#v", resultRow)
 				out := fixedFormat(resultRow, dataWidths)
-				log.Printf("%s", out)
-				log.Printf("%s", strings.Join(out, ""))
+				//log.Printf("%s", out)
+				//log.Printf("%s", strings.Join(out, ""))
 				i++
 				_, err := file.WriteString(strings.Join(out, "") + "\n")
 				if err != nil {
@@ -172,9 +172,9 @@ func fixedFormat(data []string, format []string) []string {
 			}
 			value = strings.Repeat(replchar, length-len(value)) + value
 		} else if length < len(value) {
-			log.Println("Truncating: " + value)
+			//log.Println("Truncating: " + value)
 			value = string(value[:length]) + ""
-			log.Println("Truncated: " + value)
+			//log.Println("Truncated: " + value)
 		}
 		ret = append(ret, value)
 	}

@@ -7,6 +7,7 @@ import (
 	gcsv "encoding/csv"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"html/template"
 	"io"
 	"log"
