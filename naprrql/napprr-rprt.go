@@ -96,7 +96,7 @@ func GenerateItemPrintReports() {
 // generates a specific 'report' which is the input
 // file for item printing processes
 //
-func GenerateWritingExtractReports() {
+func GenerateWritingExtractReports(wordcount bool) {
 
 	schools, err := getSchoolsList()
 	if err != nil {
@@ -108,7 +108,7 @@ func GenerateWritingExtractReports() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = runWritingExtractReports(schools)
+		err = runWritingExtractReports(schools, wordcount)
 		if err != nil {
 			log.Println("Error creating writing extract reports: ", err)
 		}
@@ -187,9 +187,9 @@ func runItemPrintReports(schools []string) error {
 
 }
 
-func runWritingExtractReports(schools []string) error {
+func runWritingExtractReports(schools []string, wordcount bool) error {
 	var pipelineError error
-	pipelineError = runWritingExtractPipeline(schools)
+	pipelineError = runWritingExtractPipeline(schools, wordcount)
 	return pipelineError
 
 }

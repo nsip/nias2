@@ -24,6 +24,7 @@ var report = flag.Bool("report", false, "Creates .csv reports. Existing reports 
 // var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
 var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
 var writingextract = flag.Bool("writingextract", false, "Creates .csv file extract of all writing items, for input into marking systems")
+var wordcount = flag.Bool("wordcount", false, "Include wordcount in writingextract report")
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
 var xml = flag.Bool("xml", false, "Reexports redacted xml of RRD dataset")
@@ -92,7 +93,7 @@ func main() {
 	if *writingextract {
 		// launch web-server
 		startWebServer(true)
-		writeWritingExtractReports()
+		writeWritingExtractReports(*wordcount)
 		// shut down
 		closeDB()
 		os.Exit(1)
@@ -221,9 +222,9 @@ func writeItemPrintingReports() {
 //
 // create writing extract printing reports
 //
-func writeWritingExtractReports() {
+func writeWritingExtractReports(wordcount bool) {
 	log.Println("generating Writing item extract reports...")
-	naprrql.GenerateWritingExtractReports()
+	naprrql.GenerateWritingExtractReports(wordcount)
 	log.Println("Writing item extract reports generated...")
 }
 

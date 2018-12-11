@@ -3,17 +3,19 @@
 nap-writing-print is a standalone tool that generates pdf files of NAPLAN writing responses.
 
 It is designed to work with the .csv file that is output by the naprrql data analysis tool when naprrql is run with the 
---writingextract flag.
+--writingextract flag. If the word count is to be included as a column, it should be run with both the --writingextract
+and the --wordcount flag.
 
 The full process to go from receiveing a NAPLAN results data file is:
 
 1. Place the results data file in the /in directory of naprrql
 1. Navigate in a command/terminal shell to the naprrql directory
 1. Ingest the data file into naprrql by running the following command
-> ./naprrql --ingest
+`> ./naprrql --ingest`
 1. wait for naprrql ingest to complete
 1. Run the writing extract report of naprrql by running the following command
-> ./naprrql --writingextract
+`> ./naprrql --writingextract`
+  1. Alternatively, `./naprrql --writingextract --wordcount`
 1. wait for the report to complete.
 1. Go to the /out/writing_extract folder of naprrql
 1. copy the file called writing_extract.csv to the /in folder of the nap-writing-print directory.
@@ -56,7 +58,7 @@ the meta-data associated with the student's script; such as PSI, Local identifie
 
 This means scripts can be distributed independently, but manually reconciled if needed.
 
-As the html outout is constructed entirely from the contents of the input file, for safety at the end of a run a timestamped 
+As the html output is constructed entirely from the contents of the input file, for safety at the end of a run a timestamped 
 folder is created in the /backup directory of the nap-writing-print folder so that the same html files can be 
 generated at any time in the future even if the working .csv file has been over-written.
 

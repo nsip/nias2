@@ -15,6 +15,8 @@ func init() {
 	gob.Register(SchoolDetails{})
 	gob.Register(ScoreSummaryDataSet{})
 	gob.Register(ResponseDataSet{})
+	gob.Register(ItemResponseDataSet{})
+	gob.Register(ItemResponseDataSetWordCount{})
 	gob.Register(EventResponseDataSet{})
 	gob.Register(EventResponseSummaryDataSet{})
 	gob.Register(EventResponseSummaryAllDomainsDataSet{})
@@ -124,6 +126,36 @@ func (resps ItemResponseComparator) Swap(i, j int) {
 
 // sort interface implementation for responsedatasets
 func (resps ItemResponseComparator) Less(i, j int) bool {
+	return resps[i].TestItem.TestItemContent.ItemName < resps[j].TestItem.TestItemContent.ItemName
+}
+
+// aggregating type used for reporting item responses against items with word count
+type ItemResponseDataSetWordCount struct {
+	WordCount         string
+	Test              xml.NAPTest
+	Testlet           xml.NAPTestlet
+	TestItem          xml.NAPTestItem
+	Student           xml.RegistrationRecord
+	Response          xml.NAPResponseSet
+	ParticipationCode string
+	SchoolDetails     SchoolDetails
+}
+
+// struct for sorting support
+type ItemResponseWordCountComparator []ItemResponseDataSetWordCount
+
+// sort interface implementation for itemresponsedatasets
+func (resps ItemResponseWordCountComparator) Len() int {
+	return len(resps)
+}
+
+// sort interface implementation for responsedatasets
+func (resps ItemResponseWordCountComparator) Swap(i, j int) {
+	resps[i], resps[j] = resps[j], resps[i]
+}
+
+// sort interface implementation for responsedatasets
+func (resps ItemResponseWordCountComparator) Less(i, j int) bool {
 	return resps[i].TestItem.TestItemContent.ItemName < resps[j].TestItem.TestItemContent.ItemName
 }
 

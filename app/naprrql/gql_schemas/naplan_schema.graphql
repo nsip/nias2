@@ -68,7 +68,7 @@ type NaplanData {
         ## reporting (ui) object for writing item responses per student
 	item_writing_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
         ## reporting (ui) object for writing item responses per student, intended for export to marking systems, adds randomised ID to student (AnonymisedId in OtherIdList)
-	writing_item_for_marking_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
+	writing_item_for_marking_report_by_school(acaraIDs: [String]): [ItemResponseDataSetWordCount]
         ## report of all school summaries not linked to one of the acaraIDs
         orphan_school_summary_report(acaraIDs: [String]): [ScoreSummary]
         ## report of all events not linked to one of the acaraIDs
@@ -349,6 +349,26 @@ type ItemResponseDataSet {
 	Response: NAPResponseSet
         ## the related test
 	Test: NAPTest
+        ## Participation Code for the response
+        ParticipationCode: String
+        ## The school involved
+        SchoolDetails: SchoolDetails
+}
+
+## Item Response reporting object with word counts
+type ItemResponseDataSetWordCount {
+        ## Word count for writing
+        WordCount: String
+        ## The student whose participation is being reported
+        Student: RegistrationRecord
+        ## the related testlet
+        Testlet: NAPTestlet
+        ## the related test item
+        TestItem: NAPTestItem
+        ## the response to the item (removing all other item responses from the object)
+        Response: NAPResponseSet
+        ## the related test
+        Test: NAPTest
         ## Participation Code for the response
         ParticipationCode: String
         ## The school involved

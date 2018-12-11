@@ -80,7 +80,7 @@ func runItemPipeline(schools []string) error {
 }
 
 // Slight variant of the foregoing
-func runWritingExtractPipeline(schools []string) error {
+func runWritingExtractPipeline(schools []string, wordcount bool) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -122,6 +122,10 @@ func runWritingExtractPipeline(schools []string) error {
 	outFileName := outFileDir + "/" + csvFileName
 	// we're assuming a single output report
 	mapFileName := "./reporting_templates/writing_extract/itemWritingPrinting_map.csv"
+	if wordcount {
+		mapFileName = "./reporting_templates/writing_extract/itemWritingPrintingWordCount_map.csv"
+	}
+
 	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
 	if err != nil {
 		return err

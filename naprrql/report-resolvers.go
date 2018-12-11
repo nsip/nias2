@@ -9,8 +9,12 @@ import (
 	"errors"
 	"log"
 	"regexp"
+	"strconv"
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
+	"github.com/clipperhouse/jargon"
+	"github.com/clipperhouse/jargon/contractions"
 	"github.com/nats-io/nuid"
 	"github.com/nsip/nias2/xml"
 	"github.com/playlyfe/go-graphql"
@@ -39,9 +43,39 @@ func checkRequiredParams(params *graphql.ResolveParams) error {
 		}
 
 	}
-
 	return nil
+}
 
+var lem = jargon.NewLemmatizer(contractions.Dictionary, 3)
+var tokenRe = regexp.MustCompile("[a-zA-Z0-9]")
+var hyphens = regexp.MustCompile("-+")
+
+func countwords(html string) int {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+	if err != nil {
+		return 0
+	}
+	doc.Find("script").Each(func(i int, el *goquery.Selection) {
+		el.Remove()
+	})
+	// Jargon lemmatiser tokenises text, and resolves contractions
+	// We will resolve hyphenated compounds ourselves
+	tokens := jargon.Tokenize(strings.NewReader(doc.Text()))
+	lemmas := lem.Lemmatize(tokens)
+	wc := 0
+	for {
+		lemma := lemmas.Next()
+		if lemma == nil {
+			break
+		}
+		wordpart := hyphens.Split(lemma.String(), -1)
+		for _, w := range wordpart {
+			if len(tokenRe.FindString(w)) > 0 {
+				wc = wc + 1
+			}
+		}
+	}
+	return wc
 }
 
 func checkGuid(issues []GuidCheckDataSet, objectguid string, objecttype string, guid string, expected_type string, idmap map[string]string) []GuidCheckDataSet {
@@ -598,7 +632,7 @@ func buildReportResolvers() map[string]interface{} {
 				perdomain_slice = append(perdomain_slice, perdomain)
 			}
 			erds := EventResponseSummaryAllDomainsDataSet{Student: student,
-				School: schools[schoolid],
+				School:                        schools[schoolid],
 				EventResponseSummaryPerDomain: perdomain_slice,
 			}
 			results = append(results, erds)
@@ -988,6 +1022,7 @@ func buildReportResolvers() map[string]interface{} {
 
 	// same as the above, but adds AnonymisedId, and iterates all events, not just responses
 	resolvers["NaplanData/writing_item_for_marking_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		wordcount := 0
 		reqErr := checkRequiredParams(params)
 		if reqErr != nil {
 			log.Println("writing_item_for_marking_report_by_school #1", reqErr)
@@ -1033,7 +1068,7 @@ func buildReportResolvers() map[string]interface{} {
 		}
 
 		// construct RDS by including referenced test
-		results := make([]ItemResponseDataSet, 0)
+		results := make([]ItemResponseDataSetWordCount, 0)
 		//log.Printf("School %+v: %d Writing tests for %d students\n", acaraids, len(testLookup), len(studentids))
 		for testid, test := range testLookup {
 			if test.TestContent.TestDomain != "Writing" {
@@ -1085,6 +1120,7 @@ func buildReportResolvers() map[string]interface{} {
 				if ok {
 					for _, testlet := range resp.TestletList.Testlet {
 						for _, item_response := range testlet.ItemResponseList.ItemResponse {
+							wordcount = countwords(item_response.Response)
 
 							resp1 := resp // pruned copy of response
 							resp1.TestletList.Testlet = make([]xml.NAPResponseSet_Testlet, 1)
@@ -1105,18 +1141,20 @@ func buildReportResolvers() map[string]interface{} {
 								log.Println("writing_item_for_marking_report_by_school #8", err)
 								return []interface{}{}, err
 							}
-							irds := ItemResponseDataSet{TestItem: item, Response: resp1,
+							irds := ItemResponseDataSetWordCount{TestItem: item, Response: resp1,
 								Student: student, Test: test, Testlet: tl,
 								SchoolDetails:     SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
-								ParticipationCode: event.ParticipationCode}
+								ParticipationCode: event.ParticipationCode,
+								WordCount:         strconv.Itoa(wordcount)}
 							results = append(results, irds)
 						}
 					}
 				} else {
-					irds := ItemResponseDataSet{TestItem: xml.NAPTestItem{}, Response: xml.NAPResponseSet{},
+					irds := ItemResponseDataSetWordCount{TestItem: xml.NAPTestItem{}, Response: xml.NAPResponseSet{},
 						Student: student, Test: test, Testlet: xml.NAPTestlet{},
 						SchoolDetails:     SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
-						ParticipationCode: event.ParticipationCode}
+						ParticipationCode: event.ParticipationCode,
+						WordCount:         "0"}
 					results = append(results, irds)
 				}
 			}

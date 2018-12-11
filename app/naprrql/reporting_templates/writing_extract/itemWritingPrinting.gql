@@ -1,5 +1,6 @@
 query NAPItemResults($acaraIDs: [String]) {
   writing_item_for_marking_report_by_school(acaraIDs: $acaraIDs) {
+    WordCount
     Test {
       TestContent {
         LocalId
