@@ -16,7 +16,7 @@ import (
 // ACARA IDs that reports iterate over)
 //
 
-func runQAOrphanPipeline(schools []string) error {
+func RunQAOrphanPipeline(schools []string) error {
 	var pipelineError error
 	systemTemplates := getTemplates("./reporting_templates/qa/")
 	orphan_queries := make(map[string]string)

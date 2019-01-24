@@ -9,8 +9,9 @@ import (
 	"strconv"
 
 	"encoding/json"
+
 	"github.com/tidwall/gjson"
-	"gopkg.in/fatih/set.v0"
+	set "gopkg.in/fatih/set.v0"
 )
 
 //
@@ -64,7 +65,7 @@ func erds_query() string {
 }`
 }
 
-func runQAErdsReportPipeline(schools []string) error {
+func RunQAErdsReportPipeline(schools []string) error {
 
 	reports_path := "./reporting_templates/qa/"
 

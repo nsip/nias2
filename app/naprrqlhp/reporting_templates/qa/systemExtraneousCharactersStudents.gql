@@ -1,0 +1,18 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  extraneous_characters_student_report(acaraIDs: $acaraIDs) {
+      FamilyName
+      GivenName
+      MiddleName
+      PreferredName
+      TestLevel
+      YearLevel
+      BirthDate
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      }
+  }
+}
+

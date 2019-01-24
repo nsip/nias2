@@ -182,14 +182,14 @@ func runISRPrintReports(schools []string) error {
 
 func runItemPrintReports(schools []string) error {
 	var pipelineError error
-	pipelineError = runItemPipeline(schools)
+	pipelineError = RunItemPipeline(schools)
 	return pipelineError
 
 }
 
 func runWritingExtractReports(schools []string, wordcount bool) error {
 	var pipelineError error
-	pipelineError = runWritingExtractPipeline(schools, wordcount)
+	pipelineError = RunWritingExtractPipeline(schools, wordcount)
 	return pipelineError
 
 }
@@ -197,9 +197,9 @@ func runWritingExtractReports(schools []string, wordcount bool) error {
 func runXMLReports(schools []string) error {
 	var pipelineError error
 	// run for entire system
-	pipelineError = runXMLPipeline(schools)
+	pipelineError = RunXMLPipeline(schools)
 	for _, school := range schools {
-		pipelineError = runXMLPipelinePerSchool(school)
+		pipelineError = RunXMLPipelinePerSchool(school)
 	}
 	return pipelineError
 
@@ -208,11 +208,11 @@ func runXMLReports(schools []string) error {
 func runQAReports(schools []string) error {
 
 	var pipelineError error
-	pipelineError = runQAErdsReportPipeline(schools)
-	pipelineError = runQAItemRespReportPipeline(schools)
-	pipelineError = runQAMiscReportPipeline(schools)
-	pipelineError = runQAOrphanPipeline(schools)
-	pipelineError = runQASchoolSummaryPipeline(schools, "./out/qa", "./reporting_templates/qa/qaSchools_map.csv")
+	pipelineError = RunQAErdsReportPipeline(schools)
+	pipelineError = RunQAItemRespReportPipeline(schools)
+	pipelineError = RunQAMiscReportPipeline(schools)
+	pipelineError = RunQAOrphanPipeline(schools)
+	pipelineError = RunQASchoolSummaryPipeline(schools, "./out/qa", "./reporting_templates/qa/qaSchools_map.csv")
 	return pipelineError
 
 }
@@ -226,9 +226,17 @@ func runSystemReports(schools []string) error {
 
 	systemTemplates := getTemplates("./reporting_templates/system/")
 
+	var wg sync.WaitGroup
+
 	for filename, query := range systemTemplates {
-		pipelineError = runSystemReportPipeline(filename, query, schools)
+		wg.Add(1)
+		go func(fn, q string, sch []string) {
+			defer wg.Done()
+			pipelineError = RunSystemReportPipeline(fn, q, sch)
+		}(filename, query, schools)
 	}
+
+	wg.Wait()
 
 	return pipelineError
 
@@ -243,11 +251,19 @@ func runSchoolReports(schools []string) error {
 
 	schoolTemplates := getTemplates("./reporting_templates/school/")
 
+	var wg sync.WaitGroup
+
 	for _, school := range schools {
 		for filename, query := range schoolTemplates {
-			pipelineError = runSchoolReportPipeline(filename, query, school)
+			wg.Add(1)
+			go func(fn, q, sch string) {
+				defer wg.Done()
+				pipelineError = RunSchoolReportPipeline(fn, q, sch)
+			}(filename, query, school)
 		}
 	}
+
+	wg.Wait()
 
 	return pipelineError
 

@@ -33,7 +33,7 @@ type itemQueryParams struct {
 //
 
 // TODO may need to reintroduce year level here to break payload size down further
-func runItemPipeline(schools []string) error {
+func RunItemPipeline(schools []string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -80,17 +80,17 @@ func runItemPipeline(schools []string) error {
 }
 
 // Slight variant of the foregoing
-func runWritingExtractPipeline(schools []string, wordcount bool) error {
+func RunWritingExtractPipeline(schools []string, wordcount bool) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 	var errcList []<-chan error
 
-	pipelineError := runQAWritingSchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv")
-	if pipelineError != nil {
-		return pipelineError
-	}
+	// pipelineError := runQAWritingSchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv")
+	// if pipelineError != nil {
+	// 	return pipelineError
+	// }
 
 	// input stage
 	varsc, errc, err := itemParametersSource(ctx, schools...)

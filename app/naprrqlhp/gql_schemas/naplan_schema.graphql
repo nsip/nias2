@@ -1,0 +1,1343 @@
+
+## All NAPLAN Test results data for a given school
+type NaplanData {
+	## NAPLAN tests within this results set
+	tests: [NAPTest]
+	## Number of NAPLAN tests within this results set
+	tests_count: Int
+	## Testlets used within this NAPLAN Test 
+	testlets: [NAPTestlet]
+	## Number of testlets used in this NAPLAN test
+	testlets_count: Int
+	## Test Items used in this NAPLAN test
+	testitems: [NAPTestItem]
+	## Number of test items in this results set
+	testitems_count: Int
+	## CodeFrame structure of this NAPLAN Test
+	codeframes: [NAPCodeFrame]
+	## number of codeframes in this results set
+	codeframes_count: Int
+	## Students at this school
+	students: [RegistrationRecord]
+	## number of student records in this results set
+	students_count: Int
+	## Test events students participated in
+	events: [NAPEvent]
+	## number of student-test events in this results set
+	events_count: Int
+	## The student responses from this school
+	responses: [NAPResponseSet]
+	## The number of student responses in this results set
+	responses_count: Int
+	## summary of scores for school
+	score_summaries: [ScoreSummary]
+	## number of score summary objects in this results set
+	score_summaries_count: Int
+	## School info of schools in this result set
+	schools: [SchoolInfo]
+	## Number of schools in this results set
+	schools_count: Int
+	## School basic details (name, acara asl id)
+	school_details: [SchoolDetails]
+	## Get school info data for schools identified by ASL id
+	school_infos_by_acaraid(acaraIDs: [String]): [SchoolInfo]
+	## filtered list of students by school (asl acara id)
+	students_by_school(acaraIDs: [String]): [RegistrationRecord]
+	## reporting (ui) object for domain scores
+	domain_scores_report_by_school(acaraIDs: [String]): [ResponseDataSet]
+	## reporting (ui) object for domain scores and participation
+	domain_scores_event_report_by_school(acaraIDs: [String]): [EventResponseDataSet]
+        ## reporting (ui) object for domain scores and participation, restricted to Yr 3 Writing
+	domain_scores_event_report_by_school_writing_yr3(acaraIDs: [String]): [EventResponseDataSet]
+        ## reporting (ui) object for domain scores and participation, restricted to Yr 5 Writing
+	domain_scores_event_report_by_school_writing_yr5(acaraIDs: [String]): [EventResponseDataSet]
+        ## reporting (ui) object for domain scores and participation, restricted to Yr 7 Writing
+	domain_scores_event_report_by_school_writing_yr7(acaraIDs: [String]): [EventResponseDataSet]
+        ## reporting (ui) object for domain scores and participation, restricted to Yr 9 Writing
+	domain_scores_event_report_by_school_writing_yr9(acaraIDs: [String]): [EventResponseDataSet]
+	## reporting (ui) object for domain scores and participation with score summary info
+	domain_scores_summary_event_report_by_school(acaraIDs: [String]): [EventResponseSummaryAllDomainsDataSet]
+	## reporting (ui) object for score summaries
+	score_summary_report_by_school(acaraIDs: [String]): [ScoreSummaryDataSet]
+	## reporting (ui) object for participation data
+	participation_report_by_school(acaraIDs: [String]): [ParticipationDataSet]
+	## reporting (ui) object for codeframes
+	codeframe_report: [CodeFrameDataSet]
+        ## reporting (ui) object for item responses per student
+	item_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
+        ## reporting (ui) object for writing item responses per student
+	item_writing_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
+        ## reporting (ui) object for writing item responses per student, intended for export to marking systems, adds randomised ID to student (AnonymisedId in OtherIdList)
+	writing_item_for_marking_report_by_school(acaraIDs: [String]): [ItemResponseDataSetWordCount]
+        ## report of all school summaries not linked to one of the acaraIDs
+        orphan_school_summary_report(acaraIDs: [String]): [ScoreSummary]
+        ## report of all events not linked to one of the acaraIDs
+        orphan_event_report(acaraIDs: [String]): [NAPEvent]
+        ## report of all students not linked to one of the acaraIDs
+        orphan_student_report(acaraIDs: [String]): [RegistrationRecord]
+        ## report on GUID integrity within data set
+        guid_check_report: [GuidCheckDataSet]
+        ## report on test items, testlets, tests extraneous to codeframe
+        codeframe_check_report: [CodeframeCheckDataSet]
+        ## Request student summaries for the given school and year level of tests
+        #isrReportItems(schoolAcaraID: String!, testYrLevel: String!): [ISRPrintItem]
+        isrReportItems(acaraIDs: [String]): [ISRPrintItem]
+        ## Request student summaries for the given school and year level of tests, with full student details
+        #isrReportItemsExpanded(schoolAcaraID: String!, testYrLevel: String!): [ISRPrintItemExpanded]
+        isrReportItemsExpanded(acaraIDs: [String]): [ISRPrintItemExpanded]
+        ## report on discrepancies between test level and year level
+        test_year_level_discrepancy_by_school(acaraIDs: [String]): [RegistrationRecord]
+        ## report on students sitting a test at a school other than where they are enrolled
+        student_event_acara_id_discrepancy_by_school(acaraIDs: [String]): [EventResponseDataSet]
+        ## report on students with unexpected characters in their name
+        extraneous_characters_student_report(acaraIDs: [String]): [RegistrationRecord]
+	## report on students with less testlets in their response than expected
+	missing_testlets_by_school(acaraIDs: [String]): [EventResponseDataSet]
+	## report on events containing PNP codes
+	pnp_events_report(acaraIDs: [String]): [NAPEvent]
+}
+
+## List of problematic GUIDs in data set
+type GuidCheckDataSet {
+        # GUID of Object that faulty GUID is found in
+        ObjectName: String
+        # Type of Object that faulty GUID is found in
+        ObjectType: String
+        # GUID whose reference is problematic
+        Guid: String
+        # Expected type referent of GUID
+        ShouldPointTo: String
+        # Found type referent of GUID 
+        # (nil if GUID not present in dataset)
+        # (duplicate if GUID is RefID of multiple objects)
+        PointsTo: String
+}
+
+## List of tests, test items, testlets not in Codeframe 
+type CodeframeCheckDataSet {
+        # GUID of extraneous item
+        ObjectID: String
+        # LocalID of extraneous item
+        LocalID: String
+        # Type of Object that faulty GUID is found in
+        ObjectType: String
+        ## the related testlet if any
+        Testlet: NAPTestlet
+        ## the related test item if any
+        TestItem: NAPTestItem
+        ## the related test if any
+        Test: NAPTest
+}
+
+## Reason why sitting test was interrupted
+type TestDisruption {
+	## the disruption event description
+	Event: String
+}
+
+## Adjustments for the student in this event
+type Adjustment {
+	## List of PNP codes applied to this student
+	PNPCodelist: PNPCodelist
+	## Booklet type requirement for this student
+	BookletType: String
+}
+
+## list container for pnp codes associated with this event
+type PNPCodelist {
+	## the pnp codes associated with this event
+	PNPCode: [String]
+}
+
+## A NAP Testing event
+type NAPEvent {
+	## RefID of the Event
+	EventID: String
+	## RefID of student who particpated in event
+	SPRefID: String
+	## Platform ID of the student
+	PSI: String
+	## RefID for the SchoolInfo
+	SchoolRefID: String
+	## ACARA ASL id for the school
+	SchoolID: String
+	## RefID for the Test
+	TestID: String
+	## Local Name or ID for the Test
+	NAPTestLocalID: String
+	## Sector indicator for School
+	SchoolSector: String
+	## School System (gov, non-gov etc.)
+	System: String
+	## Regional, Metro etc.
+	SchoolGeolocation: String
+	## School reporting data should be returned to
+	ReportingSchoolName: String
+	## Jurisdictional Event ID
+	NAPJurisdiction: String
+	## Present, Absent, Withdrawn etc.
+	ParticipationCode: String
+	## Text explanation of participation code
+	ParticipationText: String
+	## Device test was taken on
+	Device: String
+	## Date of test event
+	Date: String
+	## Timecode for start of test
+	StartTime: String
+	## Timecode for user test duration
+	LapsedTimeTest: String
+	## Text description of reason why student exempted
+	ExemptionReason: String
+	## Flags whether personal detials were updated within AD platform
+	PersonalDetailsChanged: String
+	## Flags if this may be a duplicate of another user
+	PossibleDuplicate: String
+	## Date of Birth range
+	DOBRange: String
+	## List of test disruptions for this event/student
+	TestDisruptionList: TestDisruptionList
+	## List of adjustments for this event/student
+	Adjustment: Adjustment
+}
+
+## list container for test disruptions
+type TestDisruptionList {
+	## test disruptions
+	TestDisruption: [TestDisruption]
+}
+
+
+## Codeframe reporting object
+type CodeFrameDataSet {
+	## The test within the codeframe
+	Test: NAPTest
+	## Testlet associated with the test
+	Testlet: NAPTestlet
+	## The item associated with the testlet
+	Item: NAPTestItem
+        ## The sequence number of the item in the testlet
+        SequenceNumber: Int
+}
+
+
+## Participation reporting object
+type ParticipationDataSet {
+	## The student whose participation is being reported
+	Student: RegistrationRecord
+	## The school they belong to
+	School: SchoolInfo
+	## The events they participated in
+	EventInfos: [EventInfo]
+	## A summary of their participation by domain
+	Summary: [ParticipationSummary]
+}
+
+## Event information reporting object
+type EventInfo {
+	## The event participated in
+	Event: NAPEvent
+	## The test related to the event
+	Test: NAPTest
+}
+
+## Overview summary object of the student participation
+type ParticipationSummary {
+	## The test domain
+	Domain: String
+	## The participation code for the student
+	ParticipationCode: String
+}
+
+## Domain scores and events reporting object
+type EventResponseDataSet {
+	## The event participated in
+	Event: NAPEvent
+	## The student whose participation is being reported
+	Student: RegistrationRecord
+	## the related test
+	Test: NAPTest
+	## the response from which the domain score will be derived
+	Response: NAPResponseSet
+        ## The school involved
+        SchoolDetails: SchoolDetails
+}
+
+## Domain scores and events reporting object with score summaries
+type EventResponseSummaryDataSet {
+        ## The event participated in
+        Event: NAPEvent
+        ## The student whose participation is being reported
+        Student: RegistrationRecord
+        ## the related test
+        Test: NAPTest
+        ## the response from which the domain score will be derived
+        Response: NAPResponseSet
+	## the score summary
+	Summary: ScoreSummary
+        ## The school involved
+        School: SchoolInfo
+        ## Expansion of PNP Code list
+        PNPCodeListMap: PNPCodeListMap
+}
+
+## Domain scores and events reporting object with score summaries, one row for all domains
+type EventResponseSummaryAllDomainsDataSet {
+        ## The student whose participation is being reported
+        Student: RegistrationRecord
+        ## The school involved
+        School: SchoolInfo
+        ## EventResponseSummaryAllDomains
+        EventResponseSummaryPerDomain: [EventResponseSummaryPerDomain]
+}
+
+type EventResponseSummaryPerDomain {
+        Domain: String
+        ## The event participated in
+        Event: NAPEvent
+        ## the related test
+        Test: NAPTest
+        ## the response from which the domain score will be derived
+        Response: NAPResponseSet
+        ## the score summary
+        Summary: ScoreSummary
+        ## Expansion of PNP Code list
+        PNPCodeListMap: PNPCodeListMap
+}
+
+
+## Expansion of PNPCodeList into a map of values to boolean
+type PNPCodeListMap {
+        Domain: String
+        AAM: String
+        AIA: String
+        AIM: String
+        AIV: String
+        ALL: String
+        AST: String
+        AVM: String
+        BRA: String
+        COL: String
+        ETA: String
+        ETB: String
+        ETC: String
+        OSS: String
+        RBK: String
+        SCR: String
+        SUP: String
+}
+
+## Domain scores reporting object
+type ResponseDataSet {
+	## The student whose participation is being reported
+	Student: RegistrationRecord
+	## the related test
+	Test: NAPTest
+	## the response from which the domain score will be derived
+	Response: NAPResponseSet
+}
+
+## Item Response reporting object
+type ItemResponseDataSet {
+	## The student whose participation is being reported
+	Student: RegistrationRecord
+	## the related testlet
+	Testlet: NAPTestlet
+	## the related test item
+	TestItem: NAPTestItem
+	## the response to the item (removing all other item responses from the object)
+	Response: NAPResponseSet
+        ## the related test
+	Test: NAPTest
+        ## Participation Code for the response
+        ParticipationCode: String
+        ## The school involved
+        SchoolDetails: SchoolDetails
+}
+
+## Item Response reporting object with word counts
+type ItemResponseDataSetWordCount {
+        ## Word count for writing
+        WordCount: String
+        ## The student whose participation is being reported
+        Student: RegistrationRecord
+        ## the related testlet
+        Testlet: NAPTestlet
+        ## the related test item
+        TestItem: NAPTestItem
+        ## the response to the item (removing all other item responses from the object)
+        Response: NAPResponseSet
+        ## the related test
+        Test: NAPTest
+        ## Participation Code for the response
+        ParticipationCode: String
+        ## The school involved
+        SchoolDetails: SchoolDetails
+}
+
+## score summary reporting object
+type ScoreSummaryDataSet {
+	## the score summary
+	Summ: ScoreSummary
+	## the related test
+	Test: NAPTest
+}
+
+## CodeFrame that sets structure of this test
+type NAPCodeFrame {
+	## RefID of this codeframe
+	RefId: String
+	## RefID of the NAPLAN Test this codeframe applies to
+	NAPTestRefId: String
+	## Testlets used within this codeframe
+	TestletList: NAPCodeFrame_TestletList
+}
+
+## Testlets used within this codeframe
+type NAPCodeFrame_TestletList {
+	## Testlet reference structure
+	Testlet: [NAPCodeFrame_Testlet]
+}
+
+## Teslet reference strucure for this codeframe
+type NAPCodeFrame_Testlet {
+	## RefID of this testlet
+	NAPTestletRefId: String
+	## Items referenced in this teslet
+	TestItemList: NAPCodeFrame_TestItemList
+}
+
+## Items referenced in this testlet
+type NAPCodeFrame_TestItemList {
+	## Item references
+	TestItem: [NAPCodeFrame_TestItem]
+}
+
+## reference to the test item
+type NAPCodeFrame_TestItem {
+	## Item RefID
+	TestItemRefId: String
+}
+
+
+## A NAPLAN Tetlet; container for test items
+type NAPTestlet {
+	## RefID of testlet
+	TestletID: String
+	## RefID of the NAPLAN Test that uses this Testlet
+	NAPTestRefId: String
+	## Details of the Testlet
+	TestletContent: TestletContent
+	## The items used by the testlet
+	TestItemList: TestItemList
+}
+
+## Details about the nature of the testlet
+type TestletContent {
+	## Local name/id for this testlet
+	LocalId: String
+	## Local name/id for the NAPLAN test that uses the testlet
+	NAPTestLocalId: String
+	## The official name of the testlet
+	TestletName: String
+	## The branching node locaiton of testlet in the test
+	Node: String
+	## The stage this testlet is assigned to in the Test
+	LocationInStage: String
+	## The maximum score that could be achieved within this testlet
+	TestletMaximumScore: String
+}
+
+## The items contained in this testlet
+type TestItemList {
+	## Detail of each item
+	TestItem: [NAPTestlet_TestItem]
+}
+
+## Brief summary information about the test item
+type NAPTestlet_TestItem {
+	## RefID of the test item
+	TestItemRefId: String
+	## Local id/name for the test item
+	TestItemLocalId: String
+	## Location in testing sequence of this item
+	SequenceNumber: String
+}
+
+
+
+## Details of the NAPLAN test itself
+type NAPTest {
+	## RefID for the Test
+	TestID: String      
+	## Test Details
+	TestContent: TestContent 
+}
+
+## The information about the test
+type TestContent {
+	## Local identifier/name for this test
+	LocalId: String
+	## Name of the Test
+	TestName: String
+	## Year level test applies to
+	TestLevel: String
+	## Doamin of this test
+	TestDomain: String
+	## Year test occurs in eg. 2017
+	TestYear: String
+	## Number of stages within this test
+	StagesCount: String
+	## Test type, main test, claibration, sample etc.
+	TestType: String
+	## Domain score bands for this test
+	DomainBands: DomainBands
+	## Domain proficiency bands for this test
+	DomainProficiency: DomainProficiency
+}
+
+## Upper & Lower scores for each band within this test
+type DomainBands {
+	Band1Lower: String
+	Band1Upper: String
+	Band2Lower: String
+	Band2Upper: String
+	Band3Lower: String
+	Band3Upper: String
+	Band4Lower: String
+	Band4Upper: String
+	Band5Lower: String
+	Band5Upper: String
+	Band6Lower: String
+	Band6Upper: String
+	Band7Lower: String
+	Band7Upper: String
+	Band8Lower: String
+	Band8Upper: String
+	Band9Lower: String
+	Band9Upper: String
+	Band10Lower: String
+	Band10Upper: String
+}
+
+## Upper and lower bounds for proficiency bands
+type DomainProficiency {
+	Level1Lower: String
+	Level1Upper: String
+	Level2Lower: String
+	Level2Upper: String
+	Level3Lower: String
+	Level3Upper: String
+	Level4Lower: String
+	Level4Upper: String
+}
+
+
+## Student Responses to Test Questions
+type NAPResponseSet {
+	## RefID for this Response
+	ResponseID: String
+	## These responses not to be included in published reports if true
+	ReportExclusionFlag: String
+	## Responses are part of ACARA Calibration sample
+	CalibrationSampleFlag: String 
+	## Responses are part of Equating sample
+	EquatingSampleFlag: String 
+	## Text description of student testlet path taken
+	PathTakenForDomain: String 
+	## List of specific nodes in testlet path taken
+	ParallelTest: String 
+	## RefID for Student
+	StudentID: String 
+	## Platform ID for Student
+	PSI: String 
+	## RefID for the Test these responses came from
+	TestID: String 
+	## Local (jurisdiction) name for the test
+	TestLocalID: String 
+	## Detailed scoring breakdown for the test domain of this responses
+	DomainScore: DomainScore
+	# Testlets answered by this student
+	TestletList: TestletList
+}
+
+## list of testlets used by this response
+type TestletList {
+	## testlet details list
+	Testlet: [NAPResponseSet_Testlet]
+}
+
+
+## Testlet taken by this student
+type NAPResponseSet_Testlet {
+	## Guid for the source testlet in codeframe
+	NapTestletRefId: String 
+	## local name for testlet
+	NapTestletLocalId: String
+	## score for this testlet 
+	TestletScore: String
+	## Responses to each of the items the testlet contains
+	ItemResponseList: ItemResponseList
+}
+
+## list container for item responses
+type ItemResponseList {
+	## item responses by this student
+	ItemResponse: [NAPResponseSet_ItemResponse]
+}
+
+
+
+## Item-level responses within a testlet
+type NAPResponseSet_ItemResponse {
+	## the refid of the item in the code-frame
+	ItemRefID: String 
+	## The referenced Test Item
+	Item: NAPTestItem
+	## the local id for the item
+	LocalID: String 
+	## the student's response
+	Response: String 
+	## Correct or Incorrect
+	ResponseCorrectness: String 
+	## Item score
+	Score: String
+	## student duration on item 
+	LapsedTimeItem: String 
+	## ordering no. for item
+	SequenceNumber: String 
+	## weighting / importance
+	ItemWeight: String 
+	## sub-scores eg. for subcomponents of writing
+	SubscoreList: SubscoreList
+}
+
+## list container for item subscores
+type SubscoreList {
+	## the subscores
+	Subscore: [NAPResponseSet_Subscore]
+}
+
+
+## Test Item Container
+type NAPTestItem {
+	## The RefID of the Test Item
+	ItemID: String
+	## The details about the test item
+	TestItemContent: TestItemContent
+}
+
+## Test Item Details
+type TestItemContent {
+	## Local system id for this item
+	NAPTestItemLocalId: String 
+	## The name of the item
+	ItemName: String 
+	## the Type of the item
+	ItemType: String 
+	## Subdomain item applies to
+	Subdomain: String 
+	## Writing Genre
+	WritingGenre: String 
+	## The item Descriptor
+	ItemDescriptor: String
+	## Was this item released 
+	ReleasedStatus: String 
+	## What sort of marking for this item; machine/human
+	MarkingType: String 
+	## No. of mc options available
+	MultipleChoiceOptionCount: String 
+	## The correct answer for this item
+	CorrectAnswer: String 
+	## Max score available for this item
+	MaximumScore: String 
+	## Difficulty
+	ItemDifficulty: String 
+	## DiffLogit 5
+	ItemDifficultyLogit5: String 
+	## DiffLogit 62
+	ItemDifficultyLogit62: String 
+	## DiffLogit 5SE
+	ItemDifficultyLogit5SE: String 
+	## DiffLogit 62SE
+	ItemDifficultyLogit62SE: String 
+	## Proficiency Band for item
+	ItemProficiencyBand: String 
+	## Proficiency Level for item
+	ItemProficiencyLevel: String 
+	## URL for exemplar, remote system 
+	ExemplarURL: String 
+	## Items this Item may be a substitute for
+	ItemSubstitutedForList: ItemSubstitutedForList
+	## Descriptors for Item content
+	ContentDescriptionList: ContentDescriptionList
+	## List of writing stimulus types
+	StimulusList: StimulusList
+	## Details of writing rubrics used in this item
+	NAPWritingRubricList: NAPWritingRubricList
+}
+
+## List of items this item can substitute for
+type ItemSubstitutedForList {
+	## Link to item that can be substituted
+	SubstituteItem: [SubstituteItem]
+}
+
+## Details of substitute item
+type SubstituteItem {
+	## RefID of substitutable item
+	SubstituteItemRefId: String
+	## local name/id for substitutable item
+	LocalId: String
+	## PNP Codes assigned to this item
+	PNPCodeList: PNPCodeList
+}
+
+## PNP Codes associated with this item
+type PNPCodeList {
+	## List of codes
+	PNPCode: [String]
+}
+
+## Content descriptors for this item
+type ContentDescriptionList {
+	## Descriptors
+	ContentDescription: [String]
+}
+
+## Text Stimuli associated with this item
+type StimulusList {
+	## Stimuli
+	Stimulus: [Stimulus]
+}
+
+## Text Stimulus
+type Stimulus {
+	## local name/id for this stimulus
+	LocalId: String 
+	## text Genre
+	TextGenre: String
+	## text type
+	TextType: String
+	## wordcount
+	WordCount: String
+	## text descriptor
+	TextDescriptor: String
+	## text content
+	Content: String
+}
+
+## Writing rubrics associated with this item
+type NAPWritingRubricList {
+	## Rubric details
+	NAPWritingRubric: [NAPWritingRubric]
+}
+
+## Wrting rubric details
+type NAPWritingRubric {
+	## rubric type
+	RubricType: String
+	## descriptor
+	Descriptor: String
+	## score list
+	ScoreList: ScoreList
+}
+
+## score list for this rubric
+type ScoreList {
+	## score structure 
+	Score: [Score]
+}
+
+## Score details
+type Score {
+	## maximum score available 
+	MaxScoreValue: String
+	## sub-score descriptions
+	ScoreDescriptionList: ScoreDescriptionList
+}
+
+## descriptions of subscore components
+type ScoreDescriptionList {
+	## subscore descriptions
+	ScoreDescription: [ScoreDescription] 
+}
+
+## score description details
+type ScoreDescription {
+	## score value
+	ScoreValue: String
+	## score descriptor
+	Descriptor: String
+}
+
+## Detailed subscores for domains such as writing
+type NAPResponseSet_Subscore {
+	## name of subscore
+	SubscoreType: String
+	## score for this sub-component
+	SubscoreValue: String
+}
+
+## Detailed scoring breakdown for the test domain of this responses
+type DomainScore {
+	## Raw score, unsclaed		
+	RawScore: String 
+	## Scaled score
+	ScaledScoreValue: String 
+	## Scaled score logit
+	ScaledScoreLogitValue: String 
+	## Std. Err for Scaled Score
+	ScaledScoreStandardError: String 
+	## Sclaed Score Logit
+	ScaledScoreLogitStandardError: String 
+	## Band allocated to student based on score
+	StudentDomainBand: String 
+	## Proficiency of student
+	StudentProficiency: String
+	## Plausible values list for this domain 
+	PlausibleScaledValueList: PlausibleScaledValueList
+}
+
+# list container type for plausible scled values
+type PlausibleScaledValueList {
+	# plausible scaled value
+	PlausibleScaledValue: [String]
+}
+
+## Student Personal information
+type RegistrationRecord {
+	## SIF GuID for this record
+	RefId: String 
+	## Local ID of student
+	LocalId: String 
+	## State/Province ID of student
+	StateProvinceId: String 
+	## Key-Value list of all ids associated with student, including past/present variants
+	OtherIdList: OtherIdList
+	## Family Name, surname of student
+	FamilyName: String 
+	## Given Name of Student
+	GivenName: String 
+	## Middle Name of Student
+	MiddleName: String 
+	## Name student preferes to be known by
+	PreferredName: String 
+	## Ind. Status indicator
+	IndigenousStatus: String
+	## Male/Female/Other 
+	Sex: String 
+	## Date of Birth
+	BirthDate: String
+	## Country of Birth 
+	CountryOfBirth: String 
+	## Student Language Other than English
+	StudentLOTE: String 
+	## Student's current visa code
+	VisaCode: String 
+	## Langauage Background Other than English
+	LBOTE: String 
+	## Address
+	AddressLine1: String 
+	## Address
+	AddressLine2: String 
+	## Region etc.
+	Locality: String 
+	## State or Territory
+	StateTerritory: String
+	## Student's postcode 
+	Postcode: String 
+	## Local identifier (non-ASL) for student's school
+	SchoolLocalId: String 
+	## Student year level
+	YearLevel: String 
+	## Time fraction for attendance
+	FTE: String 
+	## Parent 1 Language other Than English
+	Parent1LOTE: String 
+	## Parent 2 Language other Than English
+	Parent2LOTE: String 
+	## Parent 1 occupation category
+	Parent1Occupation: String 
+	## Parent 2 occupation category
+	Parent2Occupation: String 
+	## Parent 1 Educational background classifier
+	Parent1SchoolEducation: String 
+	## Parent 2 Educational background classifier
+	Parent2SchoolEducation: String 
+	## Parent 1 post/non-school Educational background classifier
+	Parent1NonSchoolEducation: String 
+	## Parent 2 post/non-school Educational background classifier
+	Parent2NonSchoolEducation: String 
+	## Local id (non-ASL) of school campus
+	LocalCampusId: String 
+	## ACARA ASL Id of School
+	ASLSchoolId: String 
+	## Test level (3,5,7,9) for this student
+	TestLevel: String 
+	## Student homegroup name
+	Homegroup: String 
+	## Student class-group name
+	ClassGroup: String 
+	## Flag indicates this is student's main school
+	MainSchoolFlag: String 
+	## FFPOS
+	FFPOS: String 
+	## ACARA ASL Id of school reports should be returned to
+	ReportingSchoolId: String 
+	## ACARA ASL Id of other school student is associated with
+	OtherSchoolId: String 
+	## Does student require educational support
+	EducationSupport: String 
+	## Is student home-schooled
+	HomeSchooledStudent: String
+	## Flag indicates sensitive handling reqiuired of student information  
+	Sensitive: String 
+	## Student took test using offline delivery
+	OfflineDelivery: String 
+	# Catholic sector id, ingest only in results reporting use otherid list
+	# DiocesanId: String 
+	# Jurisdiction id, ingest only in results reporting use otherid list
+	# JurisdictionId: String 
+	# National id, ingest only in results reporting use otherid list
+	# NationalId: String 
+	# Other id, ingest only in results reporting use otherid list
+	# OtherId: String 
+	# PlatformId: String 
+	# Catholic sector id, ingest only in results reporting use otherid list
+	# PreviousDiocesanId: String 
+	# Jurisdiction id, ingest only in results reporting use otherid list
+	# PreviousLocalId: String 
+	# National id, ingest only in results reporting use otherid list
+	# PreviousNationalId: String 
+	# Other id, ingest only in results reporting use otherid list
+	# PreviousOtherId: String 
+	# PSI, ingest only in results reporting use otherid list
+	# PreviousPlatformId: String 
+	# Sector id, ingest only in results reporting use otherid list
+	# PreviousSectorId: String 
+	# State id, ingest only in results reporting use otherid list
+	# PreviousStateProvinceId: String 
+	# TAA id, ingest only in results reporting use otherid list
+	# PreviousTAAId: String 
+	# Sector id, ingest only in results reporting use otherid list
+	# SectorId: String 
+	# TAA id, ingest only in results reporting use otherid list
+	# TAAId: String 
+}
+
+## list container for other student ids
+type OtherIdList {
+	## list of other ids
+	OtherId: [XMLAttributeStruct]
+}
+
+## key-value pairs for other ids
+type XMLAttributeStruct {
+	## other id name
+	Type: String
+	## other id value
+	Value: String
+}
+
+type ScoreSummary {
+	## The Refid of this score summary
+	SummaryID: String 
+	## The RefID of the school this summary refers to
+	SchoolInfoRefId: String
+	## The ACARA ASL Id of the school
+	SchoolACARAId: String
+	## The NAPLAN Test this summary is for
+	NAPTestRefId: String
+	## Local name/id for this NAPLAN test
+	NAPTestLocalId: String
+	## The natioanl average school score for this test domain
+	DomainNationalAverage: String
+	## The averaged school score for this test domain
+	DomainSchoolAverage: String
+	## The jurusdictions average school score for this test domain
+	DomainJurisdictionAverage: String
+	## Top national 60th percentile average school score for this test domain
+	DomainTopNational60Percent: String
+	## Bottom national 60th percentile average school score for this test domain
+	DomainBottomNational60Percent: String
+}
+
+## Administrative information about a School
+type SchoolInfo {
+	## refid of this school
+	RefId: String
+	## local name/id for school
+	LocalId: String
+	## jurisdiction id for school
+	StateProvinceId: String
+	## ASL id for school
+	ACARAId: String
+	## name of the school
+	SchoolName: String
+	## Education Authority refid 
+	LEAInfoRefId: String
+	## Association with any other organisation or LEA
+	OtherLEA: String
+	## school district 
+	SchoolDistrict: String
+	## school type
+	SchoolType: String
+	## no. students enroled
+	StudentCount: String #non xml field added for reporting
+	## special area of attention for school
+	SchoolFocusList: SchoolFocusList
+	## school website
+	SchoolURL: String
+	## contact details for principal 
+	PrincipalInfo: PrincipalInfo
+	## contact details for the school
+	SchoolContactList: SchoolContactList
+	## phone numbers that can be used to contact school
+	PhoneNumberList: PhoneNumberList
+	## session type
+	SessionType: String
+	## year levels taught at this school
+	YearLevels: YearLevelList
+	## ARIA status code
+	ARIA: String
+	## operaitonal staus; eg. closed, open, merging etc.
+	OperationalStatus: String
+	## federal electorate school is in
+	FederalElectorate: String
+	## campus school is part of
+	Campus: Campus
+	## gov't or non-gov, catholic etc.
+	SchoolSector: String
+	## independent school flag
+	IndependentSchool: String
+	## systemic or not, eg non-systemic catholic
+	NonGovSystemicStatus: String
+	## which system belongs to, if any
+	System: String
+	## nature of religious affiliation
+	ReligiousAffiliation: String
+	## where it is; metro, country, remote etc.
+	SchoolGeographicLocation: String
+	## LGA school is in
+	LocalGovernmentArea: String
+	## MP jurisdiction for this school
+	JurisdictionLowerHouse: String
+	## SLA
+	SLA: String
+	## school is co-ed or single-sex
+	SchoolCoEdStatus: String
+	## belongs to school network
+	SchoolGroupList: SchoolGroupList
+}
+
+## list of school groups school can belong to
+type SchoolGroupList {
+	## names of school group
+	SchoolGroup: [String]
+}
+
+## Campus school belongs to
+type Campus {
+	## id of campus 
+	SchoolCampusId: String 
+	## campus type
+	CampusType: String
+	## administrativ status of campus
+	AdminStatus: String
+}
+
+## list container for year levels taught by school
+type YearLevelList {
+	YearLevel: [YearLevel] 
+}
+
+## year levels taught by the school 
+type YearLevel  {
+	Code: String
+}
+
+## list container for phone number contacts
+type PhoneNumberList {
+	## phone numbers
+	PhoneNumber: [PhoneNumber]
+}
+
+## phone number details
+type PhoneNumber {
+	## type of number
+	Type: String
+	## the phone number
+	Number: String
+}
+
+## container list for school focus areas
+type SchoolFocusList {
+	## school focus type
+	SchoolFocus: [String]
+}
+
+## Name Abstraction for use in multiple objects
+type NameType {
+	## Name Type
+	Type: String
+	## Salutation
+	Title: String
+	## Family name
+	FamilyName: String
+	## First name
+	GivenName: String
+	## middle name
+	MiddleName: String
+	## Suffix
+	Suffix: String
+	## long form name
+	FullName: String
+}
+
+## list container for email
+type EmailList {
+	## email addresses
+	Email: Email
+}
+
+## email list members
+type Email {
+	## email type
+	Type: String
+	## email address
+	Address: String
+}
+
+## list container for complete phone numbers
+type FullPhoneNumberList {
+	## list items
+	PhoneNumber: [FullPhoneNumber]
+}
+
+## Complete phone number details
+type FullPhoneNumber {
+	## phone number type
+	Type: String
+	## the phone number
+	Number: String
+	## extension number
+	Extension: String
+	## whether number is ex-directory
+	ListedStatus: String
+}
+
+# Information about the school Principal
+type PrincipalInfo {
+	## name of principal contact
+	ContactName: NameType
+	## title of contact
+	ContactTitle: String
+}
+
+## list container for school contact details
+type SchoolContactList {
+	## school contact list items
+	SchoolContact: [SchoolContact]
+}
+
+## container for contact information
+type SchoolContact {
+	## whether this infomation can be published externally
+	PublishInDirectory: String
+	## contact information object
+	ContactInfo: ContactInfo
+}
+
+## contact information details
+type ContactInfo {
+	## contact name
+	Name: NameType
+	## job title
+	PositionTitle: String
+	## role
+	Role: String
+	## link to address structure
+	Address: Address
+	## list of contact email addresses
+	EmailList: EmailList
+	## list of contact phone numbers
+	PhoneNumberList: FullPhoneNumberList
+}
+
+## address information
+type Address {
+	## adress type
+	Type: String
+	## address role
+	Role: String
+	## street details
+	Street: Street
+	## city
+	City: String 
+	## state, territory 
+	StateProvince: String
+	## country
+	Country: String
+	## postcaode
+	PostalCode: String
+	## link to grid location
+	GridLocation: GridLocation
+}
+
+## street details
+type Street {
+	## line1 is special it seems
+	Line1: String
+}
+
+## long-lat grid coordinates of school
+type GridLocation {
+	## latitude coordinate
+	Latitude: String
+	## longitude coordinate
+	Longitude: String
+}
+
+## SchoolDetails is shorthand lookup object for name & acaraid of a school
+type SchoolDetails {
+	## the name of the school
+	SchoolName: String
+	## the ASL Id of the school
+	ACARAId: String
+}
+
+## Represents each student as a line of results for priniting
+type ISRPrintItem {
+        ## The student ID (typically localID)
+        StudentLocalID: String
+        ## Platform identifier for student
+        StudentPSI: String
+        ## Student given name
+        StudentFirstName: String
+        ## Student family name
+        StudentLastName: String
+	## Student year level
+	YearLevel: Int 
+        ## ID of school
+        SchoolID: String
+        ## School name
+        SchoolName: String
+        ## Reading domainscore, scaled
+        R_Score: Float
+        ## Reading mean
+        R_Mean: Float
+        ## Reading score comment
+        R_Comment: String
+        ## Writing domainscore, scaled
+        W_Score: Float
+        ## Writing mean
+        W_Mean: Float
+        ## Writing score comment
+        W_Comment: String
+        ## Spelling domainscore, scaled
+        S_Score: Float
+        ## Spelling mean
+        S_Mean: Float
+        ## Spelling score comment
+        S_Comment: String
+        ## Grammar domainscore, scaled
+        G_Score: Float
+        ## Grammar mean
+        G_Mean: Float
+        ## Grammar school comment
+        G_Comment: String
+        ## Numearacy domainscore, scaled
+        N_Score: Float
+        ## Numearacy mean
+        N_Mean: Float
+        ## Numeracy score comment
+        N_Comment: String
+}
+
+## Represents each student as a line of results for priniting
+type ISRPrintItemExpanded {
+        ## The student 
+        Student: RegistrationRecord
+        ## ID of school
+        SchoolID: String
+        ## School name
+        SchoolName: String
+        ## Reading domainscore, scaled
+        R_Score: Float
+        ## Reading mean
+        R_Mean: Float
+        ## Reading score comment
+        R_Comment: String
+        ## Writing domainscore, scaled
+        W_Score: Float
+        ## Writing mean
+        W_Mean: Float
+        ## Writing score comment
+        W_Comment: String
+        ## Spelling domainscore, scaled
+        S_Score: Float
+        ## Spelling mean
+        S_Mean: Float
+        ## Spelling score comment
+        S_Comment: String
+        ## Grammar domainscore, scaled
+        G_Score: Float
+        ## Grammar mean
+        G_Mean: Float
+        ## Grammar school comment
+        G_Comment: String
+        ## Numearacy domainscore, scaled
+        N_Score: Float
+        ## Numeracy mean
+        N_Mean: Float
+        ## Numeracy score comment
+        N_Comment: String
+        ## Reading participation
+        R_Participation: String
+        ## Writing participation
+        W_Participation: String
+        ## Numeracy participation
+        N_Participation: String
+        ## Spelling participation
+        S_Participation: String
+        ## Grammar & Punctuation participation
+        G_Participation: String
+        ## Reading pathway
+        R_Pathway: String
+        ## Writing pathway
+        W_Pathway: String
+        ## Numeracy pathway
+        N_Pathway: String
+        ## Spelling pathway
+        S_Pathway: String
+        ## Grammar & Punctuation pathway
+        G_Pathway: String
+        ## Reading standard deviation
+        R_Stddev: String
+        ## Writing standard deviation
+        W_Stddev: String
+        ## Numeracy standard deviation
+        N_Stddev: String
+        ## Spelling standard deviation
+        S_Stddev: String
+        ## Grammar & Punctuation standard deviation
+        G_Stddev: String
+        ## Reading domain band
+        R_DomainBand: String
+        ## Writing domain band
+        W_DomainBand: String
+        ## Numeracy domain band
+        N_DomainBand: String
+        ## Spelling domain band
+        S_DomainBand: String
+        ## Grammar & Punctuation domain band
+        G_DomainBand: String
+}
+
+
+
+
+
+
+	

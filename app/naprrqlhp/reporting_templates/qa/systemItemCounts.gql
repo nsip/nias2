@@ -1,0 +1,12 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  item_counts(acaraIDs: $acaraIDs) {
+    TestName
+    TestLevel
+    TestDomain
+    TestItemLocalId
+    Substitute
+    Codeframe
+    Count
+    SubstitutedItems
+  }
+}

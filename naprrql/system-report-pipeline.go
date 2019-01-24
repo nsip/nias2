@@ -35,7 +35,7 @@ type systemQueryParams struct {
 // Overall round-trip latency is less than querying for all data at once
 // and ensures we can't run out of memory
 //
-func runSystemReportPipeline(queryFileName string, query string, schools []string) error {
+func RunSystemReportPipeline(queryFileName string, query string, schools []string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())

@@ -17,7 +17,7 @@ import (
 	"github.com/clipperhouse/jargon/contractions"
 	"github.com/nats-io/nuid"
 	"github.com/nsip/nias2/xml"
-	"github.com/playlyfe/go-graphql"
+	graphql "github.com/playlyfe/go-graphql"
 )
 
 //
@@ -1798,7 +1798,7 @@ func buildReportResolvers() map[string]interface{} {
 	}
 
 	resolvers["NaplanData/extraneous_characters_student_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		log.Println("Launching")
+		// log.Println("Launching")
 		reqErr := checkRequiredParams(params)
 		if reqErr != nil {
 			return nil, reqErr

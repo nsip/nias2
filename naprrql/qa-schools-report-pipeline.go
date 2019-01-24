@@ -55,7 +55,7 @@ type schoolQASummary struct {
 // Overall round-trip latency is less than querying for all data at once
 // and ensures we can't run out of memory
 //
-func runQASchoolSummaryPipeline(schools []string, outFileDir string, mapFileName string) error {
+func RunQASchoolSummaryPipeline(schools []string, outFileDir string, mapFileName string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
