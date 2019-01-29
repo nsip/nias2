@@ -133,7 +133,6 @@ func runQAWritingSchoolSummaryPipeline(schools []string, outFileDir string, mapF
 	}
 	csvFileName := "qaSchools.csv"
 	outFileName := outFileDir + "/" + csvFileName
-	// mapFileName := "./reporting_templates/qa/qaSchools_map.csv"
 	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
 	if err != nil {
 		return err
