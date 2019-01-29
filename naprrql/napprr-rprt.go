@@ -94,9 +94,10 @@ func GenerateItemPrintReports() {
 
 //
 // generates a specific 'report' which is the input
-// file for item printing processes
+// file for writing extract printing processes;
+// input for nap-writing-extract tool.
 //
-func GenerateWritingExtractReports(wordcount bool) {
+func GenerateWritingExtractReports() {
 
 	schools, err := getSchoolsList()
 	if err != nil {
@@ -108,9 +109,18 @@ func GenerateWritingExtractReports(wordcount bool) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = runWritingExtractReports(schools, wordcount)
+		err = runQAWritingSchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv")
 		if err != nil {
-			log.Println("Error creating writing extract reports: ", err)
+			log.Println("Error creating writing extract qa summary report: ", err)
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = runWritingExtractReports(schools)
+		if err != nil {
+			log.Println("Error creating writing extract report: ", err)
 		}
 	}()
 
@@ -187,9 +197,9 @@ func runItemPrintReports(schools []string) error {
 
 }
 
-func runWritingExtractReports(schools []string, wordcount bool) error {
+func runWritingExtractReports(schools []string) error {
 	var pipelineError error
-	pipelineError = runWritingExtractPipeline(schools, wordcount)
+	pipelineError = runWritingExtractPipeline(schools)
 	return pipelineError
 
 }

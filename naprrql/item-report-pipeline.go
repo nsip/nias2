@@ -80,17 +80,21 @@ func runItemPipeline(schools []string) error {
 }
 
 // Slight variant of the foregoing
-func runWritingExtractPipeline(schools []string, wordcount bool) error {
+func runWritingExtractPipeline(schools []string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 	var errcList []<-chan error
 
-	pipelineError := runQAWritingSchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv")
-	if pipelineError != nil {
-		return pipelineError
-	}
+	//
+	// this pipeline call moved up a level to GenerateWritingExtractReports() so that
+	// both reports are created in parallel.
+	//
+	// pipelineError := runQAWritingSchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv")
+	// if pipelineError != nil {
+	// 	return pipelineError
+	// }
 
 	// input stage
 	varsc, errc, err := itemParametersSource(ctx, schools...)
@@ -120,11 +124,16 @@ func runWritingExtractPipeline(schools []string, wordcount bool) error {
 	}
 	csvFileName := "writing_extract.csv"
 	outFileName := outFileDir + "/" + csvFileName
+
+	//
+	// switch below deprecated as wordcount always included
+	//
+	// mapFileName := "./reporting_templates/writing_extract/itemWritingPrinting_map.csv"
+	// if wordcount {
+
 	// we're assuming a single output report
-	mapFileName := "./reporting_templates/writing_extract/itemWritingPrinting_map.csv"
-	if wordcount {
-		mapFileName = "./reporting_templates/writing_extract/itemWritingPrintingWordCount_map.csv"
-	}
+	mapFileName := "./reporting_templates/writing_extract/itemWritingPrintingWordCount_map.csv"
+	// }
 
 	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
 	if err != nil {
