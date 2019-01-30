@@ -46,7 +46,8 @@ func createRecordValidator(ctx context.Context, in <-chan map[string]string) (
 func fillMissingFields(rmap map[string]string) {
 
 	expectedHeaders := []string{"Test level", "Jurisdiction Id", "Local school student ID",
-		"TAA student ID", "Participation Code", "Anonymised Id", "Test Year", "ACARA ID", "PSI"}
+		"TAA student ID", "Participation Code", "Anonymised Id", "Test Year", "ACARA ID",
+		"PSI", "Test Id", "Word Count"}
 
 	for _, key := range expectedHeaders {
 		_, ok := rmap[key]
@@ -115,7 +116,18 @@ func fillEmptyFields(rmap map[string]string) {
 
 	key = "Item Response"
 	if rmap[key] == "" {
-		rmap[key] = "No writing-response text recorded."
+		// html para markers ensure consistent rendering of non-text
+		rmap[key] = "<p>No writing-response text recorded</p>"
+	}
+
+	key = "Test Id"
+	if rmap[key] == "" {
+		rmap[key] = "not provided"
+	}
+
+	key = "Word Count"
+	if rmap[key] == "" {
+		rmap[key] = "0"
 	}
 
 }
