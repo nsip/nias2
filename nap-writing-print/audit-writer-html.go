@@ -18,9 +18,18 @@ var auditHeader = `
     <style>
     p,
     li,
+    tr,
     h2 {
         font-family: Verdana, Arial, sans-serif;
     }
+
+	table {
+  		border-spacing: 10px;
+	}
+	
+	th, td {
+	  padding: 2px;
+	}	
 
     .audit-body {
         width: 650px;
@@ -35,6 +44,7 @@ var auditHeader = `
 <body>
     <div class="audit-body">`
 
+// original inline text style
 var auditReport = `
         <p style="text-align: left;">Test Year: %s</p>
         <p style="text-align: left;">Test Level: %s</p>
@@ -45,7 +55,27 @@ var auditReport = `
         <p style="text-align: left;">Anonymised ID: %s</p>        
         <p style="text-align: left;">Participation Code: %s</p>
         <p style="text-align: left;">School ACARA ID: %s</p>
-		<p style="text-align: left;">Script File Name: %s</p>        	
+        <p style="text-align: left;">Test ID: %s</p>
+        <p style="text-align: left;">Estimated Word Count: %s words</p>
+		<p style="text-align: left;">Script File Name: %s</p>
+`
+
+// revised table style for better readability
+var auditReportTable = `
+		<table>
+			<tr><td>Test Year</td><td>%s</td></tr>
+			<tr><td>Test Level</td><td>%s</td></tr>
+			<tr><td>TAA Student ID</td><td>%s</td></tr>
+			<tr><td>PSI</td><td>%s</td></tr>
+			<tr><td>Local School Student ID</td><td>%s</td></tr>
+			<tr><td>Jurisdiction ID</td><td>%s</td></tr>
+			<tr><td>Anonymised ID</td><td>%s</td></tr>
+			<tr><td>Participation Code</td><td>%s</td></tr>
+			<tr><td>School ACARA ID</td><td>%s</td></tr>
+			<tr><td>Test ID</td><td>%s</td></tr>
+			<tr><td>Estimated Word Count</td><td>%s</td></tr>
+			<tr><td>Script File Name</td><td>%s</td></tr>
+		</table>
 `
 
 var auditFooter = `
@@ -72,9 +102,19 @@ func createAuditWriterHtml(ctx context.Context, in <-chan map[string]string) (<-
 			schoolFileName := fmt.Sprintf("%s%s", rmap["school_level_audit_path"], rmap["html_audit_filename"])
 
 			// build the audit report
-			auditBody := fmt.Sprintf(auditReport, rmap["Test Year"], rmap["Test level"],
-				rmap["TAA student ID"], rmap["PSI"], rmap["Local school student ID"],
-				rmap["Jurisdiction Id"], rmap["Anonymised Id"], rmap["Participation Code"], rmap["ACARA ID"],
+			// (replace auditReportTable with auditReport to revert to 2018 style)
+			auditBody := fmt.Sprintf(auditReportTable,
+				rmap["Test Year"],
+				rmap["Test level"],
+				rmap["TAA student ID"],
+				rmap["PSI"],
+				rmap["Local school student ID"],
+				rmap["Jurisdiction Id"],
+				rmap["Anonymised Id"],
+				rmap["Participation Code"],
+				rmap["ACARA ID"],
+				rmap["Test Id"],
+				rmap["Word Count"],
 				rmap["html_script_filename"])
 
 			f, err := os.Create(schoolFileName)
@@ -83,7 +123,7 @@ func createAuditWriterHtml(ctx context.Context, in <-chan map[string]string) (<-
 				continue
 			}
 
-			anonID := strings.TrimSuffix(rmap["html_script_filename"], ".html")
+			anonID := strings.TrimSuffix(rmap["html_audit_filename"], ".html")
 			fileNameBanner := fmt.Sprintf("<h2 style=\"text-align: center;\">%s</h2>", anonID)
 			topFileName := fileNameBanner
 

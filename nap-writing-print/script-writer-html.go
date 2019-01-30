@@ -65,9 +65,10 @@ func createScriptWriterHtml(ctx context.Context, in <-chan map[string]string) (<
 			scriptFileName := strings.TrimSuffix(rmap["html_script_filename"], ".html")
 			scriptFileNameBanner := fmt.Sprintf("<h2 style=\"text-align: center;\">%s</h2>", scriptFileName)
 			topFileName := scriptFileNameBanner
+			metaData := fmt.Sprintf("<p style=\"text-align: center;\">Test ID: %s | Estimated Word Count: %s words</p>", rmap["Test Id"], rmap["Word Count"])
 			bottomfileName := scriptFileNameBanner
 
-			doc := []string{scriptHeader, topFileName, rmap["Item Response"], bottomfileName, scriptFooter}
+			doc := []string{scriptHeader, topFileName, metaData, rmap["Item Response"], bottomfileName, scriptFooter}
 			for _, element := range doc {
 				_, err := f.WriteString(element)
 				if err != nil {
