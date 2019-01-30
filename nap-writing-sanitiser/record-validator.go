@@ -116,7 +116,8 @@ func fillEmptyFields(rmap map[string]string) {
 
 	key = "Item Response"
 	if rmap[key] == "" {
-		rmap[key] = "No writing-response text recorded."
+		// html tags added for better final rendering
+		rmap[key] = "<p>No writing-response text recorded.</p>"
 	}
 
 }
