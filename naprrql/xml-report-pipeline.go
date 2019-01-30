@@ -89,7 +89,7 @@ func runXMLPipelinePerSchool(school string) error {
 
 	// sink stage
 	// create working directory if not there
-	outFileDir := "./out/xml/" + school + "/"
+	outFileDir := "./out/xml/" + school //+ "/"
 	err = os.MkdirAll(outFileDir, os.ModePerm)
 	if err != nil {
 		return err
