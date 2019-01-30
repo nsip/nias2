@@ -54,7 +54,7 @@ func RunPrintingPipeline(csvFileName string) error {
 	//
 	// write sanitise report CSV file
 	//
-	errc, err = createScriptWriterCSV(ctx, "sanitise_report.csv", sanitize_report_out)
+	errc, err = createScriptWriterCSV(ctx, "sanitiser_report.csv", sanitize_report_out)
 	if err != nil {
 		return err
 	}
