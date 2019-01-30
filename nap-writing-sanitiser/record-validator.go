@@ -46,7 +46,8 @@ func createRecordValidator(ctx context.Context, in <-chan map[string]string) (
 func fillMissingFields(rmap map[string]string) {
 
 	expectedHeaders := []string{"Test level", "Jurisdiction Id", "Local school student ID",
-		"TAA student ID", "Participation Code", "Anonymised Id", "Test Year", "ACARA ID", "PSI"}
+		"TAA student ID", "Participation Code", "Anonymised Id", "Test Year", "ACARA ID",
+		"PSI", "Test Id", "Word Count"}
 
 	for _, key := range expectedHeaders {
 		_, ok := rmap[key]
