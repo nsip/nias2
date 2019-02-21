@@ -59,7 +59,7 @@ type TotalEnrollments struct {
 
 type AddressList struct {
 	//Address []string `xml:"Address,omitempty"` // avoid shortcut for XML roundtripping!
-	Address Address `xml:"Address,omitempty"`
+	Address []Address `xml:"Address,omitempty"`
 }
 
 type SchoolGroupList struct {
