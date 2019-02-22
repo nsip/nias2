@@ -1,0 +1,61 @@
+query NAPItemResults($acaraIDs: [String]) {
+  domain_scores_event_report_by_school_acara_yr7(acaraIDs: $acaraIDs) {
+    Student {
+      OtherIdList {
+        OtherId {
+          Type
+            Value
+        }
+      }
+      BirthDate
+        IndigenousStatus
+        Sex
+        LBOTE
+        YearLevel
+        Parent1Occupation
+        Parent2Occupation
+        Parent1SchoolEducation
+        Parent2SchoolEducation
+        Parent1NonSchoolEducation
+        Parent2NonSchoolEducation
+    }
+    School {
+      ACARAId
+        SchoolName
+    }
+    EventResponseSummaryPerDomain {
+      Domain
+        Test {
+          TestContent {
+            TestLevel
+              TestDomain
+          }
+        }
+      Event {
+        SchoolSector
+          NAPJurisdiction
+          SchoolGeolocation
+          ParticipationCode
+      }
+      Response {
+        TestletList {
+          Testlet {
+            ItemResponseList {
+              ItemResponse {
+                ItemRefID
+                  ResponseCorrectness
+                  Score
+                  SubscoreList {
+                    Subscore {
+                      SubscoreType
+                        SubscoreValue
+                    }
+                  }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

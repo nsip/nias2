@@ -1,0 +1,39 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  homeschooled_student_tests_report(acaraIDs: $acaraIDs) {
+    Test {
+      TestContent {
+        TestName
+        TestDomain
+      }
+    }
+    School {
+      SchoolName
+      ACARAId
+      SchoolSector
+      Address {
+        City
+      }
+    }
+    Student {
+      FamilyName
+      GivenName
+      MiddleName
+      LocalId
+      PreferredName
+      YearLevel
+      Sex
+      BirthDate
+      ReportingSchoolId
+      OtherIdList {
+          OtherId {
+            Type
+              Value
+          }
+        }
+    }
+    Event {
+      ParticipationCode
+      ReportingSchoolName
+    }
+  }
+}
