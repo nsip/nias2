@@ -208,7 +208,7 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 	log.Println("NAPLAN: Initialising uuid generator")
 	// config := uuid.StateSaverConfig{SaveReport: true, SaveSchedule: 30 * time.Minute}
 	// uuid.SetupFileSystemStateSaver(config)
-	uuid.Init()
+	// XXX uuid.Init()
 	log.Println("NAPLAN: UUID generator initialised.")
 
 	tt = lib.NewTransactionTracker(naplanconfig.TxReportInterval, nats_cfg)
@@ -358,7 +358,8 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 
 			}
 
-		}).ServeHTTP(c.Response(), c.Request())
+		// }).ServeHTTP(c.Response(), c.Request())
+		}).ServeHTTP(c.Request(), c.Response())
 
 		return nil
 
