@@ -1,0 +1,21 @@
+query CodeFrame {
+  codeframe_report {
+    Test {
+      TestContent {
+        TestDomain
+      }
+    }
+    Testlet {
+      TestletContent {
+        LocalId
+      }
+    }
+    Item {
+      ItemID
+      TestItemContent {
+        ItemDescriptor
+      }
+    }
+  }
+}
+

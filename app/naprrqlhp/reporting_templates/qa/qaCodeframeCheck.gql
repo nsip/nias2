@@ -1,0 +1,18 @@
+query CodeFrame {
+  codeframe_check_report {
+    ObjectID
+    LocalID
+    ObjectType
+    TestItem {
+      TestItemContent {
+        ItemSubstitutedForList {
+          SubstituteItem {
+            SubstituteItemRefId
+            LocalId
+          }
+        }
+      }
+    }
+  }
+}
+

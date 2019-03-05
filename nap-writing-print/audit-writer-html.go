@@ -26,10 +26,10 @@ var auditHeader = `
 	table {
   		border-spacing: 10px;
 	}
-	
+
 	th, td {
 	  padding: 2px;
-	}	
+	}
 
     .audit-body {
         width: 650px;
@@ -52,7 +52,7 @@ var auditReport = `
         <p style="text-align: left;">PSI: %s</p>
         <p style="text-align: left;">Local School Student ID: %s</p>
         <p style="text-align: left;">Jurisdiction ID: %s</p>
-        <p style="text-align: left;">Anonymised ID: %s</p>        
+        <p style="text-align: left;">Anonymised ID: %s</p>
         <p style="text-align: left;">Participation Code: %s</p>
         <p style="text-align: left;">School ACARA ID: %s</p>
         <p style="text-align: left;">Test ID: %s</p>
@@ -123,6 +123,7 @@ func createAuditWriterHtml(ctx context.Context, in <-chan map[string]string) (<-
 				continue
 			}
 
+			// anonID := strings.TrimSuffix(rmap["html_script_filename"], ".html")
 			anonID := strings.TrimSuffix(rmap["html_audit_filename"], ".html")
 			fileNameBanner := fmt.Sprintf("<h2 style=\"text-align: center;\">%s</h2>", anonID)
 			topFileName := fileNameBanner

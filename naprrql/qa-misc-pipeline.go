@@ -14,7 +14,7 @@ import (
 // printing pipeline for miscellaneous QA reports
 //
 
-func runQAMiscReportPipeline(schools []string) error {
+func RunQAMiscReportPipeline(schools []string) error {
 	var pipelineError error
 	systemTemplates := getTemplates("./reporting_templates/qa/")
 	querymap := make(map[string][]string)

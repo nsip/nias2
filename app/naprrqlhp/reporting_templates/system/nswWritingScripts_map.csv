@@ -1,0 +1,2 @@
+ACARAID,SchoolName,StudentFamilyName,StudentGivenName,StudentDOB,Year,Mark,Script
+SchoolDetails.ACARAId,SchoolDetails.SchoolName,Student.FamilyName,Student.GivenName,Student.BirthDate,Test.TestContent.TestLevel,Response.DomainScore.ScaledScoreValue,Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Response

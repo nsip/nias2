@@ -1,0 +1,18 @@
+WritingRubrics = ["Spelling", "Audience", "Text structure", "Paragraphing", "Sentence structure", "Punctuation", "Ideas", "Persuasive devices", "Vocabulary", "Cohesion"]
+XMLFilter = [
+"StudentPersonal.EducationSupport",
+"StudentPersonal.FFPOS",
+"StudentPersonal.VisaCode",
+"StudentPersonal.Sensitive",
+"StudentPersonal.AddressLine1",
+"StudentPersonal.AddressLine2",
+"StudentPersonal.Locality",
+"StudentPersonal.Postcode",
+"StudentPersonal.OtherIdList.OtherId.#[Type==PersonalDetailsChanged]",
+"NAPEventStudentLink.ExemptionReason",
+"NAPEventStudentLink.Adjustment",
+"NAPEventStudentLink.TestDisruptionList",
+"NAPEventStudentLink.Device",
+"SchoolInfo.ReligiousAffiliation"
+]
+

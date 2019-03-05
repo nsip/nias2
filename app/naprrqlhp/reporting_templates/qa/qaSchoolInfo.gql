@@ -1,0 +1,19 @@
+query schoolInfo($acaraIDs: [String]) {
+  school_infos_by_acaraid(acaraIDs: $acaraIDs) {
+    LocalId
+    StateProvinceId
+    ACARAId
+    SchoolName
+    LEAInfoRefId
+    SchoolDistrict
+    SchoolType
+    StudentCount
+    SchoolSector
+    IndependentSchool
+    NonGovSystemicStatus
+    System
+    ReligiousAffiliation
+    SchoolGeographicLocation
+    LocalGovernmentArea
+  }
+}

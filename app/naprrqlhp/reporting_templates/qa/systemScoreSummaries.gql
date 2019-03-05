@@ -1,0 +1,14 @@
+query NAPScoreSummaries($acaraIDs: [String]) {
+  score_summary_report_by_school(acaraIDs: $acaraIDs){
+    Summ {
+      SchoolACARAId
+    }
+    Test {
+      TestContent{
+        TestLevel
+        TestDomain
+      }
+    }
+  }
+}
+

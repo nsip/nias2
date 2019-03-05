@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/syndtr/goleveldb/leveldb"
-	"github.com/syndtr/goleveldb/leveldb/filter"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
@@ -58,10 +57,11 @@ func openDB() {
 	workingDir := "kvs"
 
 	o := &opt.Options{
-		Filter: filter.NewBloomFilter(10),
+		// Filter:             filter.NewBloomFilter(10),
 		// BlockCacheCapacity: 128 * 1024 * 1024,
 		// NoSync: true,
 		// OpenFilesCacheCapacity: 1024,
+		// ReadOnly:            true,
 		CompactionTableSize: (4 * opt.MiB),
 	}
 	var dbErr error

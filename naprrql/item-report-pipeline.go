@@ -33,7 +33,7 @@ type itemQueryParams struct {
 //
 
 // TODO may need to reintroduce year level here to break payload size down further
-func runItemPipeline(schools []string) error {
+func RunItemPipeline(schools []string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
