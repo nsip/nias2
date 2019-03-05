@@ -358,8 +358,7 @@ func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 
 			}
 
-		// }).ServeHTTP(c.Response(), c.Request())
-		}).ServeHTTP(c.Request(), c.Response())
+		}).ServeHTTP(c.Response(), c.Request())
 
 		return nil
 
