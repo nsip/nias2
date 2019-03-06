@@ -12,7 +12,7 @@ ValidationRoute = ["schema", "schema2", "dob", "id","asl", "psi", "numericvalid"
 # Data match fields for matching across schools
 StudentMatch = ["FamilyName", "GivenName", "BirthDate"]
 
-# Legal characters for names. NOTE: this is the input to a regular expression; if hyphens are permitted, leave - as the final character
+# Legal characters for names. NOTE: this is the input to a regular expression; if hyphens are permitted, leave - as the final character. Any instances of backslashes must be doubled, since backslashes are a special character in regular expressions: \\
 LegalNameChars = "A-Za-z '-"
 
 # Webserver port

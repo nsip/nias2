@@ -76,7 +76,7 @@ func TestYearLevelF(t *testing.T) {
 }
 
 func TestYearLevelP(t *testing.T) {
-	test_harness(t, "../../unit_test_files/1students1YearLevelP.csv", "BirthDate/YearLevel", "")
+	test_harness(t, "../../unit_test_files/1students1YearLevelP.csv", "BirthDate/TestLevel", "")
 }
 
 func TestFutureBirthdate(t *testing.T) {
@@ -423,7 +423,7 @@ func test_harness(t *testing.T, filename string, errfield string, errdescription
 			t.Fatalf("Expected error field %s, got no error", errfield)
 		} else {
 			if dat["errField"] != errfield {
-				t.Fatalf("Expected error field %s, got field %s", errfield, dat["errField"])
+				t.Fatalf("Expected error field %s, got field %s: %s", errfield, dat["errField"], dat["description"])
 			}
 			if !strings.Contains(dat["description"], errdescription) {
 				t.Fatalf("Expected error description %s, got description %s", errdescription, dat["description"])
