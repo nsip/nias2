@@ -24,3 +24,13 @@ Updates required:
 
 * Unix needs a manual go get
   go get golang.org/x/sys/unix
+
+
+
+ulimit
+  Change reference to this url  https://wilsonmar.github.io/maximum-limits/
+  Covers all versions of mac
+
+Max files
+  We are concurrently opening all these files, they don't need to stay open.
+  Open, read into memory, close - so we should not be hitting this limit.
