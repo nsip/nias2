@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/beevik/etree"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 )
@@ -439,7 +440,29 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 				log.Printf("%+v\n", err)
 				return
 			}
-			_, err = file.Write(out)
+
+			doc := etree.NewDocument()
+			err = doc.ReadFromBytes(out)
+			if err != nil {
+				errc <- err
+				log.Printf("%+v\n", err)
+				return
+			}
+			for _, path := range filter {
+				elems := doc.Root().FindElements(path)
+				for _, elem := range elems {
+					elem.Parent().RemoveChildAt(elem.Index())
+				}
+			}
+			doc.Indent(2)
+			out1, err := doc.WriteToBytes()
+			if err != nil {
+				errc <- err
+				log.Printf("%+v\n", err)
+				return
+			}
+
+			_, err = file.Write(out1)
 			if err != nil {
 				errc <- err
 				log.Printf("%+v\n", err)
