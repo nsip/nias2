@@ -21,7 +21,7 @@ do_build() {
 	go get 
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
-	rsync -a napval/nias8help.pdf napval/napval.toml napval/napval_nss.cfg napval/public napval/schemas napval/schoolslist napval/templates $OUTPUT/
+	rsync -a napval/napval.toml napval/napval_nss.cfg napval/public napval/schemas napval/schoolslist napval/templates $OUTPUT/
 	rsync -a napval/students.csv $OUTPUT/
 }
 

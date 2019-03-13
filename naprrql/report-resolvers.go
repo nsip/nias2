@@ -275,6 +275,9 @@ func domain_scores_summary_event_report_by_school(params *graphql.ResolveParams,
 	results := make([]EventResponseSummaryAllDomainsDataSet, 0)
 	for _, studentObj := range studentObjs {
 		student, _ := studentObj.(xml.RegistrationRecord)
+		if len(yrLvl) > 0 && student.TestLevel != yrLvl {
+			continue
+		}
 		studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
 		if len(studentEventIds) < 1 {
 			// log.Println("no events found for student: ", student.RefId)
@@ -298,9 +301,6 @@ func domain_scores_summary_event_report_by_school(params *graphql.ResolveParams,
 				return []interface{}{}, err
 			}
 			test := testObj[0].(xml.NAPTest)
-			if len(yrLvl) > 0 && test.TestContent.TestLevel != yrLvl {
-				continue
-			}
 			if len(domain) > 0 && test.TestContent.TestDomain != domain {
 				continue
 			}
