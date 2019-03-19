@@ -199,7 +199,7 @@ func runItemPrintReports(schools []string) error {
 
 func runWritingExtractReports(schools []string) error {
 	var pipelineError error
-	pipelineError = runWritingExtractPipeline(schools)
+	pipelineError = RunWritingExtractPipeline(schools)
 	return pipelineError
 
 }
