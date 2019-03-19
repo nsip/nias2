@@ -80,7 +80,7 @@ func RunItemPipeline(schools []string) error {
 }
 
 // Slight variant of the foregoing
-func runWritingExtractPipeline(schools []string) error {
+func RunWritingExtractPipeline(schools []string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
