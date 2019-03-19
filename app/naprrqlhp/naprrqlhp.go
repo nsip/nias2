@@ -84,7 +84,7 @@ func runReports() {
 
 	// writing extract reports
 	group.Add(func() {
-		naprrql.RunWritingExtractPipeline(schools, true)
+		naprrql.RunWritingExtractPipeline(schools)
 	})
 
 	// xml pipeline
