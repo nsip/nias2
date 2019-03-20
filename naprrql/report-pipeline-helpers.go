@@ -16,7 +16,6 @@ import (
 
 	"github.com/beevik/etree"
 	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 )
 
 //
@@ -381,10 +380,9 @@ func splitter(ctx context.Context, in <-chan gjson.Result, size int) (
 
 // Specific to the XML report: takes in JSON output, marshals to XML, prints out. Does not insert
 // container elements (e.g. no StudentPersonals container), does not segregate objects by class
-// into different files. Applies filtering from nappqrl.toml (which is expressed in JSON dot notation)
+// into different files. Applies filtering from nappqrl.toml (which is expressed in XPath notation)
 func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-chan error, error) {
 	config := LoadNAPLANConfig()
-	// filter format: SJSON dot notation
 	filter := config.XMLFilter
 
 	file, err := os.Create(xmlFileName)
@@ -404,13 +402,6 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 			i++
 			var to TypedObject
 			var out []byte
-			for _, rule := range filter {
-				record1, err := sjson.DeleteBytes(record, rule)
-				if err == nil {
-					record = record1
-					// ignore errors, such as the filter not applying to this object
-				}
-			}
 			json.Unmarshal(record, &to)
 			if to.NAPTestScoreSummary != nil {
 				out, err = xml.MarshalIndent(to.NAPTestScoreSummary, "", "  ")
@@ -451,7 +442,11 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 			for _, path := range filter {
 				elems := doc.Root().FindElements(path)
 				for _, elem := range elems {
-					elem.Parent().RemoveChildAt(elem.Index())
+					// elem.Parent().RemoveChildAt(elem.Index())
+					for i := range elem.Child {
+						elem.RemoveChildAt(i)
+					}
+					elem.CreateAttr("xsi:nil", "true")
 				}
 			}
 			doc.Indent(2)
