@@ -2,6 +2,7 @@
 package naprrql
 
 import (
+	"bytes"
 	"context"
 	"encoding/csv"
 	"encoding/json"
@@ -14,7 +15,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/beevik/etree"
+	//"github.com/beevik/etree"
+	"github.com/jbowtie/gokogiri"
+	gxml "github.com/jbowtie/gokogiri/xml"
+	gxpath "github.com/jbowtie/gokogiri/xpath"
 	"github.com/tidwall/gjson"
 )
 
@@ -431,31 +435,52 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 				log.Printf("%+v\n", err)
 				return
 			}
-
-			doc := etree.NewDocument()
-			err = doc.ReadFromBytes(out)
+			/*
+				doc := etree.NewDocument()
+				err = doc.ReadFromBytes(out)
+				if err != nil {
+					errc <- err
+					log.Printf("%+v\n", err)
+					return
+				}
+				for _, path := range filter {
+					elems := doc.Root().FindElements(path)
+					for _, elem := range elems {
+						// elem.Parent().RemoveChildAt(elem.Index())
+						for i := range elem.Child {
+							elem.RemoveChildAt(i)
+						}
+						elem.CreateAttr("xsi:nil", "true")
+					}
+				}
+				doc.Indent(2)
+				out1, err := doc.WriteToBytes()
+				if err != nil {
+					errc <- err
+					log.Printf("%+v\n", err)
+					return
+				}
+			*/
+			doc, err := gokogiri.ParseXml(out)
+			//doc.Root().DeclareNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")
 			if err != nil {
 				errc <- err
 				log.Printf("%+v\n", err)
 				return
 			}
 			for _, path := range filter {
-				elems := doc.Root().FindElements(path)
-				for _, elem := range elems {
-					// elem.Parent().RemoveChildAt(elem.Index())
-					for i := range elem.Child {
-						elem.RemoveChildAt(i)
-					}
-					elem.CreateAttr("xsi:nil", "true")
+				//https://stackoverflow.com/questions/27474239/how-do-i-parse-xml-with-a-namespace-using-gokogiri-libxml2
+				xp := doc.DocXPathCtx()
+				xp.RegisterNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")
+				x := gxpath.Compile(path)
+				idNode, _ := doc.Search(x)
+				for _, elem := range idNode {
+					elem.ResetChildren()
+					elem.SetAttr("xsi:nil", "true")
 				}
 			}
-			doc.Indent(2)
-			out1, err := doc.WriteToBytes()
-			if err != nil {
-				errc <- err
-				log.Printf("%+v\n", err)
-				return
-			}
+			out1, _ := doc.SerializeWithFormat(gxml.XML_SAVE_NO_DECL|gxml.XML_SAVE_AS_XML, nil, nil)
+			out1 = bytes.Trim(out1, "\x00")
 
 			_, err = file.Write(out1)
 			if err != nil {
