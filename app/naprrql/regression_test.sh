@@ -5,6 +5,8 @@ go run naprrql.go -ingest
 go run naprrql.go -report
 go run naprrql.go -qa
 go run naprrql.go -writingextract
+mv -f out/writing_extract out/writing_extract1
+go run naprrql.go -writingextract -psiexceptions qaPsi.csv
 go run naprrql.go -xml
 rm "in/sif.minimal.xml.zip"
 for file in $( find ./out -name "*.csv" 2> /dev/null); do

@@ -80,7 +80,7 @@ func runItemPipeline(schools []string) error {
 }
 
 // Slight variant of the foregoing
-func runWritingExtractPipeline(schools []string) error {
+func runWritingExtractPipeline(schools []string, psi_exceptions []string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -115,6 +115,15 @@ func runWritingExtractPipeline(schools []string) error {
 	}
 	errcList = append(errcList, errc)
 
+	jsonc0, errc, err := filterPSI(ctx, jsonc, psi_exceptions)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+
+	jsonc1, errc, err := splitter(ctx, jsonc0, 2)
+	errcList = append(errcList, errc)
+
 	// sink stage
 	// create working directory if not there
 	outFileDir := "./out/writing_extract"
@@ -131,11 +140,18 @@ func runWritingExtractPipeline(schools []string) error {
 	// mapFileName := "./reporting_templates/writing_extract/itemWritingPrinting_map.csv"
 	// if wordcount {
 
-	// we're assuming a single output report
 	mapFileName := "./reporting_templates/writing_extract/itemWritingPrintingWordCount_map.csv"
 	// }
 
-	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc)
+	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc1[0])
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+
+	outFileName = outFileDir + "/" + "qaPsi.csv"
+	mapFileName = "./reporting_templates/writing_extract/qaPsi_map.csv"
+	errc, err = csvFileSink(ctx, outFileName, mapFileName, jsonc1[1])
 	if err != nil {
 		return err
 	}
@@ -214,6 +230,31 @@ func itemQueryExecutor(ctx context.Context, query string, url string, in <-chan 
 					return
 				}
 
+			}
+		}
+	}()
+	return out, errc, nil
+}
+
+func filterPSI(ctx context.Context, in <-chan gjson.Result, psi_exceptions []string) (<-chan gjson.Result, <-chan error, error) {
+	out := make(chan gjson.Result)
+	errc := make(chan error, 1)
+	exclude := make(map[string]bool)
+	for _, p := range psi_exceptions {
+		exclude[p] = true
+	}
+	go func() {
+		defer close(out)
+		defer close(errc)
+		for record := range in {
+			psi := record.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
+			if exclude[psi] {
+				continue
+			}
+			select {
+			case out <- record:
+			case <-ctx.Done():
+				return
 			}
 		}
 	}()
