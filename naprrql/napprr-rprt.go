@@ -138,6 +138,9 @@ func GenerateWritingExtractReports(psi_exceptions_file string) {
 	var err error
 	if len(psi_exceptions_file) > 0 {
 		psi_exceptions, err = readLines(psi_exceptions_file)
+		if err != nil {
+			log.Fatalln("File "+psi_exceptions_file+" not found: ", err)
+		}
 	}
 
 	schools, err := getSchoolsList()
