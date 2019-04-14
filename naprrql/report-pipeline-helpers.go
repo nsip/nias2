@@ -2,6 +2,7 @@
 package naprrql
 
 import (
+	//"bytes"
 	"context"
 	"encoding/csv"
 	"encoding/json"
@@ -14,8 +15,12 @@ import (
 	"strings"
 	"sync"
 
+	//"github.com/beevik/etree"
+	//"github.com/jbowtie/gokogiri"
+	//gxml "github.com/jbowtie/gokogiri/xml"
+	//gxpath "github.com/jbowtie/gokogiri/xpath"
+	"github.com/subchen/go-xmldom"
 	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 )
 
 //
@@ -380,10 +385,9 @@ func splitter(ctx context.Context, in <-chan gjson.Result, size int) (
 
 // Specific to the XML report: takes in JSON output, marshals to XML, prints out. Does not insert
 // container elements (e.g. no StudentPersonals container), does not segregate objects by class
-// into different files. Applies filtering from nappqrl.toml (which is expressed in JSON dot notation)
+// into different files. Applies filtering from nappqrl.toml (which is expressed in XPath notation)
 func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-chan error, error) {
 	config := LoadNAPLANConfig()
-	// filter format: SJSON dot notation
 	filter := config.XMLFilter
 
 	file, err := os.Create(xmlFileName)
@@ -403,13 +407,6 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 			i++
 			var to TypedObject
 			var out []byte
-			for _, rule := range filter {
-				record1, err := sjson.DeleteBytes(record, rule)
-				if err == nil {
-					record = record1
-					// ignore errors, such as the filter not applying to this object
-				}
-			}
 			json.Unmarshal(record, &to)
 			if to.NAPTestScoreSummary != nil {
 				out, err = xml.MarshalIndent(to.NAPTestScoreSummary, "", "  ")
@@ -439,7 +436,73 @@ func xmlFileSink(ctx context.Context, xmlFileName string, in <-chan []byte) (<-c
 				log.Printf("%+v\n", err)
 				return
 			}
-			_, err = file.Write(out)
+			/*
+				doc := etree.NewDocument()
+				err = doc.ReadFromBytes(out)
+				if err != nil {
+					errc <- err
+					log.Printf("%+v\n", err)
+					return
+				}
+				for _, path := range filter {
+					elems := doc.Root().FindElements(path)
+					for _, elem := range elems {
+						// elem.Parent().RemoveChildAt(elem.Index())
+						for i := range elem.Child {
+							elem.RemoveChildAt(i)
+						}
+						elem.CreateAttr("xsi:nil", "true")
+					}
+				}
+				doc.Indent(2)
+				out1, err := doc.WriteToBytes()
+				if err != nil {
+					errc <- err
+					log.Printf("%+v\n", err)
+					return
+				}
+			*/
+			/*
+				doc, err := gokogiri.ParseXml(out)
+				//doc.Root().DeclareNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")
+				if err != nil {
+					errc <- err
+					log.Printf("%+v\n", err)
+					return
+				}
+				for _, path := range filter {
+					//https://stackoverflow.com/questions/27474239/how-do-i-parse-xml-with-a-namespace-using-gokogiri-libxml2
+					xp := doc.DocXPathCtx()
+					xp.RegisterNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")
+					x := gxpath.Compile(path)
+					idNode, _ := doc.Search(x)
+					for _, elem := range idNode {
+						elem.ResetChildren()
+						elem.SetAttr("xsi:nil", "true")
+					}
+				}
+				out1, _ := doc.SerializeWithFormat(gxml.XML_SAVE_NO_DECL|gxml.XML_SAVE_AS_XML, nil, nil)
+				out1 = bytes.Trim(out1, "\x00")
+			*/
+			doc := xmldom.Must(xmldom.ParseXML("<sif>" + string(out) + "</sif>"))
+			for _, path := range filter {
+				nodelist := doc.Root.Query(path)
+				for _, c := range nodelist {
+					c.SetAttributeValue("xsi:nil", "true")
+					c.Text = ""
+				}
+			}
+			out0 := doc.Root.FirstChild().XMLPretty()
+			out0 = strings.Replace(out0, "&#xA;", "\n", -1)
+			out0 = strings.Replace(out0, "&#xD;", "\r", -1)
+			out0 = strings.Replace(out0, "&#x9;", "\t", -1)
+			out0 = strings.Replace(out0, "&#9;", "\t", -1)
+			out0 = strings.Replace(out0, "&#34;", "\"", -1)
+			out0 = strings.Replace(out0, "&#x27;", "'", -1)
+			out0 = strings.Replace(out0, "&#39;", "'", -1)
+			out1 := []byte(out0)
+
+			_, err = file.Write(out1)
 			if err != nil {
 				errc <- err
 				log.Printf("%+v\n", err)

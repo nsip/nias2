@@ -60,7 +60,7 @@ func add_name_error(responses []lib.NiasMessage, desc string, field string, req 
 		Field:        field,
 		OriginalLine: req.SeqNo,
 		Vtype:        "name",
-		Severity:     "error",
+		Severity:     "warning",
 	}
 	r := lib.NiasMessage{}
 	r.TxID = req.TxID

@@ -10,7 +10,6 @@ import (
 
 	nx "github.com/nsip/nias2/xml"
 	"github.com/pkg/errors"
-	//"github.com/tidwall/sjson"
 )
 
 //
@@ -50,7 +49,7 @@ func RunXMLPipeline(schools []string) error {
 
 	// sink stage
 	// create working directory if not there
-	outFileDir := "./out/xml"
+	outFileDir := "./out/redacted_xml"
 	err = os.MkdirAll(outFileDir, os.ModePerm)
 	if err != nil {
 		return err
@@ -89,7 +88,7 @@ func RunXMLPipelinePerSchool(school string) error {
 
 	// sink stage
 	// create working directory if not there
-	outFileDir := "./out/xml/" + school //+ "/"
+	outFileDir := "./out/redacted_xml/" + school //+ "/"
 	err = os.MkdirAll(outFileDir, os.ModePerm)
 	if err != nil {
 		return err

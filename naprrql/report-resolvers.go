@@ -275,6 +275,9 @@ func domain_scores_summary_event_report_by_school(params *graphql.ResolveParams,
 	results := make([]EventResponseSummaryAllDomainsDataSet, 0)
 	for _, studentObj := range studentObjs {
 		student, _ := studentObj.(xml.RegistrationRecord)
+		if len(yrLvl) > 0 && student.TestLevel != yrLvl {
+			continue
+		}
 		studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
 		if len(studentEventIds) < 1 {
 			// log.Println("no events found for student: ", student.RefId)
@@ -298,9 +301,6 @@ func domain_scores_summary_event_report_by_school(params *graphql.ResolveParams,
 				return []interface{}{}, err
 			}
 			test := testObj[0].(xml.NAPTest)
-			if len(yrLvl) > 0 && test.TestContent.TestLevel != yrLvl {
-				continue
-			}
 			if len(domain) > 0 && test.TestContent.TestDomain != domain {
 				continue
 			}
@@ -608,210 +608,11 @@ func buildReportResolvers() map[string]interface{} {
 		e, err := domain_scores_summary_event_report_by_school(params, "9", "")
 		return acaraCodeItemResponses(e.([]EventResponseSummaryAllDomainsDataSet)), err
 	}
-
 	resolvers["NaplanData/domain_scores_event_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		return domain_scores_event_report_by_school(params, "", "")
-		/*
-				  reqErr := checkRequiredParams(params)
-				  if reqErr != nil {
-				    return nil, reqErr
-				  }
-
-				  // get the acara ids from the request params
-				  acaraids := make([]string, 0)
-				  for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
-				    acaraid, _ := a_id.(string)
-				    acaraids = append(acaraids, acaraid)
-				  }
-
-				  // get school names
-				  schoolnames := make(map[string]string)
-				  // get students for the schools
-				  studentids := make([]string, 0)
-				  for _, acaraid := range acaraids {
-				    key := "student_by_acaraid:" + acaraid
-				    studentRefIds := getIdentifiers(key)
-				    studentids = append(studentids, studentRefIds...)
-
-				    schoolrefid := getIdentifiers(acaraid + ":")
-				    siObjects, err := getObjects(schoolrefid)
-				    if err != nil {
-				      return []interface{}{}, err
-				    }
-				    for _, sio := range siObjects {
-				      si, _ := sio.(xml.SchoolInfo)
-				      schoolnames[acaraid] = si.SchoolName
-				    }
-				  }
-
-				  studentObjs, err := getObjects(studentids)
-				  if err != nil {
-				    return []interface{}{}, err
-				  }
-				  // iterate students and assemble Event/Response Data Set
-				  results := make([]EventResponseDataSet, 0)
-				  for _, studentObj := range studentObjs {
-				    student, _ := studentObj.(xml.RegistrationRecord)
-				    studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
-				    if len(studentEventIds) < 1 {
-				      // log.Println("no events found for student: ", student.RefId)
-				      continue
-				    }
-				    eventObjs, err := getObjects(studentEventIds)
-				    if err != nil {
-				      return []interface{}{}, err
-				    }
-				    for _, eventObj := range eventObjs {
-				      event := eventObj.(xml.NAPEvent)
-
-				      testObj, err := getObjects([]string{event.TestID})
-				      if err != nil {
-					return []interface{}{}, err
-				      }
-				      test := testObj[0].(xml.NAPTest)
-
-				      responseIds := getIdentifiers(test.TestID + ":NAPStudentResponseSet:" + student.RefId)
-				      response := xml.NAPResponseSet{}
-				      if len(responseIds) > 0 {
-					responseObjs, err := getObjects(responseIds)
-					if err != nil {
-					  return []interface{}{}, err
-					}
-					for _, responseObj := range responseObjs {
-					  response = responseObj.(xml.NAPResponseSet)
-					  erds := EventResponseDataSet{Student: student,
-					  Event:         event,
-					  Test:          test,
-					  Response:      response,
-					  SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
-					}
-					results = append(results, erds)
-				      }
-				    } else {
-
-				      erds := EventResponseDataSet{Student: student,
-				      Event:         event,
-				      Test:          test,
-				      Response:      response,
-				      SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
-				    }
-				    results = append(results, erds)
-				  }
-				}
-			      }
-			      return results, nil
-		*/
 	}
 	resolvers["NaplanData/domain_scores_summary_event_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		return domain_scores_summary_event_report_by_school(params, "", "")
-
-		/*
-			reqErr := checkRequiredParams(params)
-			if reqErr != nil {
-				return nil, reqErr
-			}
-
-			// get the acara ids from the request params
-			acaraids := make([]string, 0)
-			for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
-				acaraid, _ := a_id.(string)
-				acaraids = append(acaraids, acaraid)
-			}
-
-			// get school infos and school summaries
-			schools := make(map[string]xml.SchoolInfo)                             // key string = acara id
-			schoolsummaries := make(map[string]map[string]xml.NAPTestScoreSummary) // key string = acara id + test refid
-
-			// get students for the schools
-			studentids := make([]string, 0)
-			for _, acaraid := range acaraids {
-				key := "student_by_acaraid:" + acaraid
-				studentRefIds := getIdentifiers(key)
-				studentids = append(studentids, studentRefIds...)
-
-				schoolrefid := getIdentifiers(acaraid + ":")
-				siObjects, err := getObjects(schoolrefid)
-				if err != nil {
-					return []interface{}{}, err
-				}
-				for _, sio := range siObjects {
-					si, _ := sio.(xml.SchoolInfo)
-					schools[acaraid] = si
-					summaryrefid := getIdentifiers(si.RefId + ":NAPTestScoreSummary:")
-					ssObjects, err := getObjects(summaryrefid)
-					if err != nil {
-						return []interface{}{}, err
-					}
-					for _, sso := range ssObjects {
-						ss := sso.(xml.NAPTestScoreSummary)
-						if _, ok := schoolsummaries[acaraid]; !ok {
-							schoolsummaries[acaraid] = make(map[string]xml.NAPTestScoreSummary)
-						}
-						schoolsummaries[acaraid][ss.NAPTestRefId] = ss
-					}
-				}
-			}
-
-			studentObjs, err := getObjects(studentids)
-			if err != nil {
-				return []interface{}{}, err
-			}
-
-			// iterate students and assemble Event/Response Data Set
-			results := make([]EventResponseSummaryAllDomainsDataSet, 0)
-			for _, studentObj := range studentObjs {
-				student, _ := studentObj.(xml.RegistrationRecord)
-				studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink:")
-				if len(studentEventIds) < 1 {
-					// log.Println("no events found for student: ", student.RefId)
-					continue
-				}
-				eventObjs, err := getObjects(studentEventIds)
-				if err != nil {
-					return []interface{}{}, err
-				}
-				perdomain_slice := make([]EventResponseSummaryPerDomain, 0)
-				schoolid := ""
-				for _, eventObj := range eventObjs {
-					event := eventObj.(xml.NAPEvent)
-					// report assumes that the school is the same across all domains; it may not be
-					if _, ok := schools[event.SchoolID]; ok {
-						schoolid = event.SchoolID
-					}
-					pnpcodelistmap := pnpcodelistmap(event)
-					testObj, err := getObjects([]string{event.TestID})
-					if err != nil {
-						return []interface{}{}, err
-					}
-					test := testObj[0].(xml.NAPTest)
-					responseIds := getIdentifiers(test.TestID + ":NAPStudentResponseSet:" + student.RefId)
-					response := xml.NAPResponseSet{}
-					if len(responseIds) > 0 {
-						responseObjs, err := getObjects(responseIds)
-						if err != nil {
-							return []interface{}{}, err
-						}
-						// response = TrimEmptyTestlets(responseObjs[0].(xml.NAPResponseSet))
-						response = responseObjs[0].(xml.NAPResponseSet)
-					}
-					perdomain := EventResponseSummaryPerDomain{Domain: test.TestContent.TestDomain,
-						Event:          event,
-						Test:           test,
-						PNPCodeListMap: pnpcodelistmap,
-						Summary:        schoolsummaries[event.SchoolID][test.TestID],
-						Response:       response,
-					}
-					perdomain_slice = append(perdomain_slice, perdomain)
-				}
-				erds := EventResponseSummaryAllDomainsDataSet{Student: student,
-					School:                        schools[schoolid],
-					EventResponseSummaryPerDomain: perdomain_slice,
-				}
-				results = append(results, erds)
-
-			}
-			return results, nil
-		*/
 	}
 
 	resolvers["NaplanData/participation_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
@@ -2077,6 +1878,7 @@ func buildReportResolvers() map[string]interface{} {
 			for _, eventObj := range eventObjs {
 				event := eventObj.(xml.NAPEvent)
 				if event.ParticipationCode != "P" {
+					// ignore "F", those testlets are not adaptive, so they won't have the same testlet count
 					continue
 				}
 				test := testLookup[event.TestID]

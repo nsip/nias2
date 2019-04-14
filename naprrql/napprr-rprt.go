@@ -1,8 +1,12 @@
 package naprrql
 
 import (
+	"bufio"
+	"bytes"
+	"io"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -92,12 +96,52 @@ func GenerateItemPrintReports() {
 	wg.Wait()
 }
 
+// https://stackoverflow.com/questions/5884154/read-text-file-into-string-array-and-write
+// Read a whole file into the memory and store it as array of lines
+func readLines(path string) (lines []string, err error) {
+	var (
+		file   *os.File
+		part   []byte
+		prefix bool
+	)
+	if file, err = os.Open(path); err != nil {
+		return
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	buffer := bytes.NewBuffer(make([]byte, 0))
+	for {
+		if part, prefix, err = reader.ReadLine(); err != nil {
+			break
+		}
+		buffer.Write(part)
+		if !prefix {
+			lines = append(lines, buffer.String())
+			buffer.Reset()
+		}
+	}
+	if err == io.EOF {
+		err = nil
+	}
+	return
+}
+
 //
 // generates a specific 'report' which is the input
 // file for writing extract printing processes;
 // input for nap-writing-extract tool.
 //
-func GenerateWritingExtractReports() {
+func GenerateWritingExtractReports(psi_exceptions_file string) {
+
+	var psi_exceptions []string
+	var err error
+	if len(psi_exceptions_file) > 0 {
+		psi_exceptions, err = readLines(psi_exceptions_file)
+		if err != nil {
+			log.Fatalln("File "+psi_exceptions_file+" not found: ", err)
+		}
+	}
 
 	schools, err := getSchoolsList()
 	if err != nil {
@@ -118,7 +162,7 @@ func GenerateWritingExtractReports() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = runWritingExtractReports(schools)
+		err = runWritingExtractReports(schools, psi_exceptions)
 		if err != nil {
 			log.Println("Error creating writing extract report: ", err)
 		}
@@ -197,9 +241,9 @@ func runItemPrintReports(schools []string) error {
 
 }
 
-func runWritingExtractReports(schools []string) error {
+func runWritingExtractReports(schools []string, psi_exceptions []string) error {
 	var pipelineError error
-	pipelineError = RunWritingExtractPipeline(schools)
+	pipelineError = runWritingExtractPipeline(schools, psi_exceptions)
 	return pipelineError
 
 }

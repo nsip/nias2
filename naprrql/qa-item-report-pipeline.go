@@ -343,16 +343,16 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 			j = nil
 			if (len(lapsedtimeitem) > 0 ||
 				len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Response").String()) > 0) &&
-				participationcode != "P" && participationcode != "S" {
+				participationcode != "P" && participationcode != "S" && participationcode != "F" {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Response captured without student writing test"
 				j, _ = json.Marshal(m)
 			} else if (len(testletscore) > 0 ||
 				len(itemscore) > 0 ||
 				len(subscores) > 0) &&
-				participationcode != "P" && participationcode != "R" {
+				participationcode != "P" && participationcode != "R" && participationcode != "F" {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Scored test with status other than P or R"
+				m["Error"] = "Scored test with status other than F, P or R"
 				j, _ = json.Marshal(m)
 			} else if ((len(testletscore) > 0 && testletscore_num != 0) ||
 				(len(itemscore) > 0 && itemscore_num != 0) || len(subscores) > 0) &&
@@ -364,17 +364,18 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 				(participationcode == "R" || participationcode == "P") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Missing testlet score with status of P or R"
+				// ignore "F", those are non-adaptive
 				j, _ = json.Marshal(m)
 			} else if (len(itemscore) == 0) &&
-				(participationcode == "R" || participationcode == "P") {
+				(participationcode == "R" || participationcode == "P" || participationcode == "F") {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Unscored test with status of P or R"
+				m["Error"] = "Unscored test with status of F, P or R"
 				j, _ = json.Marshal(m)
 			} else if len(subscores) == 0 &&
 				record.Get("Test.TestContent.TestDomain").String() == "Writing" &&
-				participationcode == "P" {
+				(participationcode == "P" || participationcode == "F") {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Unscored writing test with status of P"
+				m["Error"] = "Unscored writing test with status of P or F"
 				j, _ = json.Marshal(m)
 			}
 			if j != nil {
@@ -511,7 +512,7 @@ func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, noncodefra
 			if record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.ResponseCorrectness").String() == "Not In Path" {
 				continue
 			}
-			if participationcode != "P" && participationcode != "S" {
+			if participationcode != "P" && participationcode != "S" && participationcode != "F" {
 				continue
 			}
 			counts, subs = qaItemCountsRowInit(counts, subs, testname, testdomain, testlevel, itemlocalid,

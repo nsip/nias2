@@ -23,7 +23,9 @@ var report = flag.Bool("report", false, "Creates .csv reports. Existing reports 
 
 // var isrprint = flag.Bool("isrprint", false, "Creates .csv files for use in isr printing")
 var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item results for each student against items")
+
 var writingextract = flag.Bool("writingextract", false, "Creates .csv file extract of all writing items, for input into marking systems")
+var psiexceptions = flag.String("psiexceptions", "-", "File containing list of PSIs to ignore in generating writing extract")
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
 var xml = flag.Bool("xml", false, "Reexports redacted xml of RRD dataset")
@@ -98,7 +100,11 @@ func main() {
 	if *writingextract {
 		// launch web-server
 		startWebServer(true)
-		writeWritingExtractReports()
+		filename := ""
+		if *psiexceptions != "-" {
+			filename = *psiexceptions
+		}
+		writeWritingExtractReports(filename)
 		// shut down
 		closeDB()
 		os.Exit(1)
@@ -227,9 +233,9 @@ func writeItemPrintingReports() {
 //
 // create writing extract printing reports
 //
-func writeWritingExtractReports() {
+func writeWritingExtractReports(psi_exceptions string) {
 	log.Println("generating Writing item extract reports...")
-	naprrql.GenerateWritingExtractReports()
+	naprrql.GenerateWritingExtractReports(psi_exceptions)
 	log.Println("Writing item extract reports generated...")
 }
 
