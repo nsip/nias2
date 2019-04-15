@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/filter"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
@@ -57,12 +58,23 @@ func openDB() {
 	workingDir := "kvs"
 
 	o := &opt.Options{
-		// Filter:             filter.NewBloomFilter(10),
-		// BlockCacheCapacity: 128 * 1024 * 1024,
-		// NoSync: true,
-		// OpenFilesCacheCapacity: 1024,
-		// ReadOnly:            true,
-		CompactionTableSize: (4 * opt.MiB),
+
+		// Original
+		// // Filter:             filter.NewBloomFilter(10),
+		// // BlockCacheCapacity: 128 * 1024 * 1024,
+		// // NoSync: true,
+		// // OpenFilesCacheCapacity: 1024,
+		// // ReadOnly:            true,
+		// CompactionTableSize: (4 * opt.MiB),
+
+		// Experiment from Matt 2019-04-12
+		Filter:                        filter.NewBloomFilter(10),
+		BlockCacheCapacity:            2 * opt.GiB,
+		CompactionTotalSizeMultiplier: 20,
+		OpenFilesCacheCapacity:        1024,
+		ReadOnly:                      true,
+		CompactionTableSize:           (4 * opt.MiB),   //default 2
+		CompactionTotalSize:           (128 * opt.MiB), //default 10 mb
 	}
 	var dbErr error
 	db, dbErr = leveldb.OpenFile(workingDir, o)
