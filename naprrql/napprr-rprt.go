@@ -243,7 +243,7 @@ func runItemPrintReports(schools []string) error {
 
 func runWritingExtractReports(schools []string, psi_exceptions []string) error {
 	var pipelineError error
-	pipelineError = runWritingExtractPipeline(schools, psi_exceptions)
+	pipelineError = RunWritingExtractPipeline(schools, psi_exceptions)
 	return pipelineError
 
 }
