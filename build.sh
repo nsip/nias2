@@ -47,25 +47,26 @@ build_windows64() {
     echo "Build Completed."
 }
 build_windows32() {
-    echo "Building Windows32 components..."
+    echo "Windows 32 bit no longer supported"
+
     # sh build_sms.sh
-    sh build_napval.sh W32
-    sh build_naprrql.sh W32
-    sh build_napcomp.sh W32
-    sh build_nap-writing-print.sh W32
-    sh build_nap-writing-sanitiser.sh W32
+    #sh build_napval.sh W32
+    #sh build_naprrql.sh W32
+    #sh build_napcomp.sh W32
+    #sh build_nap-writing-print.sh W32
+    #sh build_nap-writing-sanitiser.sh W32
 
-    echo "Creating zip archive..."
-    cd $CWD/build
-    cd Win32
-    zip -qr ../nias-Win32.zip .
-    echo "Zip archive created"
-    cd ..
+    #echo "Creating zip archive..."
+    #cd $CWD/build
+    #cd Win32
+    #zip -qr ../nias-Win32.zip .
+    #echo "Zip archive created"
+    #cd ..
 
-    echo "Removing temporary build files"
-    rm -r Win32
+    #echo "Removing temporary build files"
+    #rm -r Win32
 
-    echo "Build Completed."
+    #echo "Build Completed."
 }
 build_linux64() {
     echo "Building Linux64 components..."
