@@ -41,6 +41,19 @@ func main() {
 //
 func runReports() {
 
+	var psi_exceptions []string
+	/*
+	TODO - improve this, name overlap too of psiexceptions for filename, psi_exceptions for array of strings
+	// var psiexceptions = flag.String("psiexceptions", "-", "File containing list of PSIs to ignore in generating writing extract")
+	var err error
+	if len(psi_exceptions_file) > 0 {
+		psi_exceptions, err = readLines(psi_exceptions_file)
+		if err != nil {
+			log.Fatalln("File "+psi_exceptions_file+" not found: ", err)
+		}
+	}
+	*/
+
 	schools, err := getSchoolsList()
 	if err != nil {
 		log.Fatalln("Cannot connect to naprrql server: ", err)
@@ -84,8 +97,7 @@ func runReports() {
 
 	// writing extract reports
 	group.Add(func() {
-		var pipelineError error
-		naprrql.Run	WritingExtractPipeline(schools, pipelineError)
+		naprrql.RunWritingExtractPipeline(schools, psi_exceptions);
 	})
 
 	// xml pipeline
@@ -140,6 +152,7 @@ func getSchoolsList() ([]string, error) {
 	return schoolsList, nil
 
 }
+
 
 //
 // ensure clean shutdown of data store
