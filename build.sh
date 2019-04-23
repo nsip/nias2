@@ -46,28 +46,6 @@ build_windows64() {
 
     echo "Build Completed."
 }
-build_windows32() {
-    echo "Windows 32 bit no longer supported"
-
-    # sh build_sms.sh
-    #sh build_napval.sh W32
-    #sh build_naprrql.sh W32
-    #sh build_napcomp.sh W32
-    #sh build_nap-writing-print.sh W32
-    #sh build_nap-writing-sanitiser.sh W32
-
-    #echo "Creating zip archive..."
-    #cd $CWD/build
-    #cd Win32
-    #zip -qr ../nias-Win32.zip .
-    #echo "Zip archive created"
-    #cd ..
-
-    #echo "Removing temporary build files"
-    #rm -r Win32
-
-    #echo "Build Completed."
-}
 build_linux64() {
     echo "Building Linux64 components..."
     # sh build_sms.sh
@@ -89,27 +67,6 @@ build_linux64() {
 
     echo "Build Completed."
 }
-build_linux32() {
-    echo "Building Linux32 components..."
-    # sh build_sms.sh
-    sh build_napval.sh L32
-    sh build_naprrql.sh L32
-    sh build_napcomp.sh L32
-    sh build_nap-writing-print.sh L32
-    sh build_nap-writing-sanitiser.sh L32
-
-    echo "Creating zip archive..."
-    cd $CWD/build
-    cd Linux32
-    zip -qr ../nias-Linux32.zip .
-    echo "Zip archive created"
-    cd ..
-
-    echo "Removing temporary build files"
-    rm -r Linux32
-
-    echo "Build Completed."
-}
 build_all() {
     echo "Building all components..."
     # sh build_sms.sh
@@ -126,16 +83,8 @@ build_all() {
     zip -qr ../nias-Mac.zip .
     cd ..
 
-    cd Win32
-    zip -qr ../nias-Win32.zip .
-    cd ..
-
     cd Win64
     zip -qr ../nias-Win64.zip .
-    cd ..
-
-    cd Linux32
-    zip -qr ../nias-Linux32.zip .
     cd ..
 
     cd Linux64
@@ -145,20 +94,14 @@ build_all() {
     echo "Zip archives created"
 
     echo "Removing temporary build files"
-    rm -r Mac Win32 Win64 Linux32 Linux64
+    rm -r Mac Win64 Linux64
 
     echo "Build Completed."
 }
 
-if [ "$1" = "L32" ]
-then
-    build_linux32
-elif [ "$1" = "L64"  ]
+if [ "$1" = "L64"  ]
 then
     build_linux64
-elif [ "$1" = "W32"  ]
-then
-    build_windows32
 elif [ "$1" = "W64"  ]
 then
     build_windows64
