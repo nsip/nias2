@@ -18,6 +18,11 @@ import (
 // simple test of worker pool to run all pipelines
 func main() {
 
+	// gc optimisation - Read the article to understand! Could make it 8GB
+  // based on: https://blog.twitch.tv/go-memory-ballast-how-i-learnt-to-stop-worrying-and-love-the-heap-26c2462549a2
+	ballast := make([]byte, 4<<30)
+	ballast[0] = byte('A')
+
 	// shutdown handler
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
