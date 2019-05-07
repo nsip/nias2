@@ -12,34 +12,26 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
-// Read Only optimised
+// DB - First one to call gets readonly vs readWrite version
 var db *leveldb.DB
 var dbOpen bool = false
-
-// Read Write for ingest only
-var dbReadWrite *leveldb.DB
-var dbOpenReadWrite bool = false
+var dbReadOnly bool = true
 
 var ge = GobEncoder{}
+
+// Call before first get to use ReadWrite DB (e.g. Ingest)
+func SetDBReadWrite() {
+	dbReadOnly = false;
+}
 
 // if allow_empty is false, abort if database is empty: enforces
 // requirement to run ingest first
 func GetDB() *leveldb.DB {
 	if !dbOpen {
-		log.Println("DB not initialised. Opening...")
+		log.Println("DB not initialised. Opening ReadOnly =", dbReadOnly, "...");
 		openDB()
 	}
 	return db
-}
-
-// if allow_empty is false, abort if database is empty: enforces
-// requirement to run ingest first
-func GetDBReadWrite() *leveldb.DB {
-	if !dbOpenReadWrite {
-		log.Println("DB not initialised. Opening ReadWrite...")
-		openDBReadWrite()
-	}
-	return dbReadWrite
 }
 
 //
@@ -60,6 +52,7 @@ func DatabaseIsEmpty() bool {
 //
 func CompactDatastore() {
 	err := GetDB().CompactRange(util.Range{Limit: nil, Start: nil})
+
 	if err != nil {
 		log.Println("Error compacting datastore: ", err)
 	}
@@ -87,7 +80,7 @@ func openDB() {
 		BlockCacheCapacity:            2 * opt.GiB,
 		CompactionTotalSizeMultiplier: 20,
 		OpenFilesCacheCapacity:        1024,
-		ReadOnly:                      true,
+		ReadOnly:                      dbReadOnly,
 		CompactionTableSize:           (4 * opt.MiB),   //default 2
 		CompactionTotalSize:           (128 * opt.MiB), //default 10 mb
 	}
@@ -98,41 +91,6 @@ func openDB() {
 	}
 
 	dbOpen = true
-}
-
-//
-// open the kv store, this must be called before any access is attempted (ReadWrite)
-//
-func openDBReadWrite() {
-
-	workingDir := "kvs"
-
-	o := &opt.Options{
-
-		// Original
-		// // Filter:             filter.NewBloomFilter(10),
-		// // BlockCacheCapacity: 128 * 1024 * 1024,
-		// // NoSync: true,
-		// // OpenFilesCacheCapacity: 1024,
-		// // ReadOnly:            true,
-		// CompactionTableSize: (4 * opt.MiB),
-
-		// Experiment from Matt 2019-04-12
-		Filter:                        filter.NewBloomFilter(10),
-		BlockCacheCapacity:            2 * opt.GiB,
-		CompactionTotalSizeMultiplier: 20,
-		OpenFilesCacheCapacity:        1024,
-		ReadOnly:                      false,
-		CompactionTableSize:           (4 * opt.MiB),   //default 2
-		CompactionTotalSize:           (128 * opt.MiB), //default 10 mb
-	}
-	var dbErr error
-	dbReadWrite, dbErr = leveldb.OpenFile(workingDir, o)
-	if dbErr != nil {
-		log.Fatalln("DB Create error: ", dbErr)
-	}
-
-	dbOpenReadWrite = true
 }
 
 //

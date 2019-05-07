@@ -66,8 +66,8 @@ func main() {
 			// writeReports()
 		} else {
 			log.Println(`
-				-- 
-				Data is unfit for reporting, 
+				--
+				Data is unfit for reporting,
 				please correct before running further naprr services
 				--
 				`)
