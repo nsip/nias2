@@ -1092,12 +1092,16 @@ func buildReportResolvers() map[string]interface{} {
 				if len(responses) == 0 {
 					ok = false
 				} else {
+					/* ok iff there is an actual response recorded -- even if it is just &nbsp; */
 					resp, ok = responses[0].(xml.NAPResponseSet)
 					if ok {
 						ok = (len(resp.TestletList.Testlet) != 0)
 						if ok {
 							ok = (len(resp.TestletList.Testlet[0].ItemResponseList.ItemResponse) != 0)
 						}
+					}
+					if ok {
+						ok = (len(resp.TestletList.Testlet[0].ItemResponseList.ItemResponse[0].Response) != 0)
 					}
 				}
 				if ok {
@@ -1133,7 +1137,7 @@ func buildReportResolvers() map[string]interface{} {
 						}
 					}
 				} else {
-					if event.ParticipationCode == "P" {
+					if event.ParticipationCode == "P" && len(event.StartTime) == 0 {
 						// no response recorded; consider this to be an open event, and ignore it
 					} else {
 						irds := ItemResponseDataSetWordCount{TestItem: xml.NAPTestItem{}, Response: xml.NAPResponseSet{},
