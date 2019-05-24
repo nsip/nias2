@@ -1,2 +1,0 @@
-Participation Code,ACARA ID,School Name,Test Level,Test Domain,Family Name,Given Name,Birth Date,PSI,EventID
-Event.ParticipationCode,SchoolDetails.ACARAId,SchoolDetails.SchoolName,Test.TestContent.TestLevel,Test.TestContent.TestDomain,Student.FamilyName,Student.GivenName,Student.BirthDate,Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value,Event.EventID

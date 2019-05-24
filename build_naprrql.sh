@@ -5,20 +5,30 @@ set -e
 CWD=`pwd`
 
 
-do_build() {
-	echo "Building NAPRRQL..."
-	mkdir -p $OUTPUT
-	cd $CWD
-	cd ./app/naprrql
-	go get
-	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
+    do_build() {
+        # comment out line below to exclude naprrqlhp from build
+        include_hp
+        echo "Building NAPRRQL..."
+        mkdir -p $OUTPUT
+    	cd $CWD
+    	cd ./app/naprrql
+    	go get
+    	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
         cd $CWD
         cd ./app
         mkdir -p naprrql/in
         rm -rf $OUTPUT/in/*.xml $OUTPUT/in/*.zip $OUTPUT/kvs
         rsync -a naprrql/naprrql.toml naprrql/gql_schemas naprrql/in naprrql/public naprrql/reporting_templates naprrql/*.pdf $OUTPUT/
-      }
+    }
 
+
+    include_hp() {
+        echo "Including NAPRRQLHP..."
+        cd $CWD
+        cd ./app/naprrqlhp
+        go get
+        GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HPHARNESS
+    }
 
 
 
@@ -39,6 +49,7 @@ do_build() {
         # GNATS=nats-streaming-server
         HARNESS=naprrql
         AUDITDIFFHARNESS=napcomp
+        HPHARNESS=naprrqlhp
         ZIP=naprrql-Mac.zip
         do_build
         #do_upx
@@ -57,6 +68,7 @@ do_build() {
         OUTPUT=$CWD/build/Win64/naprrql
         # GNATS=nats-streaming-server.exe
         HARNESS=naprrql.exe
+        HPHARNESS=naprrqlhp.exe
         AUDITDIFFHARNESS=napcomp.exe
         ZIP=naprrql-Win64.zip
         do_build
@@ -75,6 +87,7 @@ do_build() {
         OUTPUT=$CWD/build/Linux64/naprrql
         # GNATS=nats-streaming-server
         HARNESS=naprrql
+        HPHARNESS=naprrqlhp
         AUDITDIFFHARNESS=napcomp
         ZIP=naprrql-Linux64.zip
         do_build

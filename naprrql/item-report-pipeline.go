@@ -81,11 +81,7 @@ func RunItemPipeline(schools []string) error {
 }
 
 // Slight variant of the foregoing
-// <<<<<<< monday-02-WithParams
-// func RunWritingExtractPipeline(schools []string, psi_exceptions []string) error {
-// =======
 func RunWritingExtractPipeline(schools []string, psi_exceptions []string, blacklist bool, psi2prompt map[string]string) error {
-// >>>>>>> master
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())

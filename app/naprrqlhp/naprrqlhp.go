@@ -19,7 +19,7 @@ import (
 func main() {
 
 	// gc optimisation - Read the article to understand! Could make it 8GB
-  // based on: https://blog.twitch.tv/go-memory-ballast-how-i-learnt-to-stop-worrying-and-love-the-heap-26c2462549a2
+	// based on: https://blog.twitch.tv/go-memory-ballast-how-i-learnt-to-stop-worrying-and-love-the-heap-26c2462549a2
 	ballast := make([]byte, 4<<30)
 	ballast[0] = byte('A')
 
@@ -46,17 +46,26 @@ func main() {
 //
 func runReports() {
 
+	// - added as part of creating ttest build for NESA 24-05-19
+	// needs refactoring
+	//
+	// TODO - All these variables to support white/blacklist writin extract
+	// currently just empty placeholders
+	// need to read from commandline as per non-hp
+	// but better would be to have shared config.
 	var psi_exceptions []string
+	var blacklist bool
+	var psi2prompt map[string]string
 	/*
-	TODO - improve this, name overlap too of psiexceptions for filename, psi_exceptions for array of strings
-	// var psiexceptions = flag.String("psiexceptions", "-", "File containing list of PSIs to ignore in generating writing extract")
-	var err error
-	if len(psi_exceptions_file) > 0 {
-		psi_exceptions, err = readLines(psi_exceptions_file)
-		if err != nil {
-			log.Fatalln("File "+psi_exceptions_file+" not found: ", err)
+		TODO - improve this, name overlap too of psiexceptions for filename, psi_exceptions for array of strings
+		// var psiexceptions = flag.String("psiexceptions", "-", "File containing list of PSIs to ignore in generating writing extract")
+		var err error
+		if len(psi_exceptions_file) > 0 {
+			psi_exceptions, err = readLines(psi_exceptions_file)
+			if err != nil {
+				log.Fatalln("File "+psi_exceptions_file+" not found: ", err)
+			}
 		}
-	}
 	*/
 
 	schools, err := getSchoolsList()
@@ -102,7 +111,7 @@ func runReports() {
 
 	// writing extract reports
 	group.Add(func() {
-		naprrql.RunWritingExtractPipeline(schools, psi_exceptions);
+		naprrql.RunWritingExtractPipeline(schools, psi_exceptions, blacklist, psi2prompt)
 	})
 
 	// xml pipeline
@@ -157,7 +166,6 @@ func getSchoolsList() ([]string, error) {
 	return schoolsList, nil
 
 }
-
 
 //
 // ensure clean shutdown of data store

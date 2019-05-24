@@ -1,3 +1,0 @@
-FixedFormat
-3,4,09,15,1,1,8,1,1,1,1,1,1,1,1,1,1,10,1,1,1,1,1,1,1,1,1,1,54,60
-Event.NAPJurisdiction,Test.TestContent.TestLevel,SchoolDetails.ACARAId,Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value,Event.SchoolGeolocation,Event.SchoolSector,Student.BirthDate,Student.Sex,Student.IndigenousStatus,Student.LBOTE,Student.Parent1SchoolEducation,Student.Parent1NonSchoolEducation,Student.Parent1Occupation,Student.Parent2SchoolEducation,Student.Parent2NonSchoolEducation,Student.Parent2Occupation,Event.ParticipationCode,Blank,Blank,Blank,Blank,Blank,Blank,Blank,Blank,Blank,Blank,Blank,Blank,SchoolDetails.SchoolName
