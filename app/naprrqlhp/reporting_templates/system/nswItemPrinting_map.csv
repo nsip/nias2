@@ -1,0 +1,2 @@
+Item GUID,Item Local ID,Platform Student ID,Test Domain,Item Score,Item Descriptor,Item Difficulty
+TestItem.ItemID,TestItem.TestItemContent.NAPTestItemLocalId,Response.PSI,Test.TestContent.TestDomain,Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Score,TestItem.TestItemContent.ItemDescriptor,TestItem.TestItemContent.ItemDifficulty

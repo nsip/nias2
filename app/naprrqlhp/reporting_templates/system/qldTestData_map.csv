@@ -1,0 +1,2 @@
+Year,Year_Level,Item_ID,Strand,LocationInStage,SequenceNumber,Item_Type,Item,Answer,StimulusList,Description,Substrand
+Test.TestContent.TestYear,Test.TestContent.TestLevel,Item.TestItemContent.NAPTestItemLocalId,Test.TestContent.TestDomain,Testlet.TestletContent.LocationInStage,SequenceNumber,Item.TestItemContent.ItemType,Item.TestItemContent.ItemName,Item.TestItemContent.CorrectAnswer,Item.TestItemContent.StimulusList,Item.TestItemContent.ItemDescriptor,Item.TestItemContent.Subdomain

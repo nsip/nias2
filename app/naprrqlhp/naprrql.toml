@@ -1,0 +1,24 @@
+WritingRubrics = ["Spelling", "Audience", "Text structure", "Paragraphing", "Sentence structure", "Punctuation", "Ideas", "Persuasive devices", "Vocabulary", "Cohesion"]
+XMLFilter = [
+"/NAPStudentResponseSet[PathTakenForDomain != '']/TestletList/Testlet/ItemResponseList/ItemResponse/Response",
+"/NAPCodeFrame/TestletList/Testlet/TestItemList/TestItem/TestItemContent/CorrectAnswer",
+"/NAPTestItem/TestItemContent/CorrectAnswer"
+
+
+
+#"/StudentPersonal/EducationSupport",
+#"/StudentPersonal/MostRecent/FFPOS",
+#"/StudentPersonal/PersonInfo/Demographics/VisaSubClass",
+#"/StudentPersonal/Sensitive",
+#"/StudentPersonal/PersonInfo/AddressList/Address/Street/Line1",
+#"/StudentPersonal/PersonInfo/AddressList/Address/Street/Line2",
+#"/StudentPersonal/PersonInfo/AddressList/Address/City",
+#"/StudentPersonal/PersonInfo/AddressList/Address/PostalCode",
+#"/NAPEventStudentLink/PersonalDetailsChanged",
+#"/NAPEventStudentLink/ExemptionReason",
+#"/NAPEventStudentLink/Adjustment",
+#"/NAPEventStudentLink/TestDisruptionList",
+#"/NAPEventStudentLink/Device",
+#"/SchoolInfo/ReligiousAffiliation"
+]
+

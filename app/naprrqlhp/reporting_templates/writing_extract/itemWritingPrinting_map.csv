@@ -1,0 +1,2 @@
+Test Year,Test level,Jurisdiction Id,ACARA ID,PSI,Local school student ID,TAA student ID,Participation Code,Item Response,Anonymised Id,Test Id
+Test.TestContent.TestYear,Test.TestContent.TestLevel,Student.OtherIdList.OtherId.#[Type==JurisdictionId].Value,Student.ASLSchoolId,Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value,Student.LocalId,Student.OtherIdList.OtherId.#[Type==TAAStudentId].Value,ParticipationCode,Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Response,Student.OtherIdList.OtherId.#[Type==AnonymisedId].Value,Test.TestContent.LocalId

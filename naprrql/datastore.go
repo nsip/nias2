@@ -12,16 +12,23 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
+// DB - First one to call gets readonly vs readWrite version
 var db *leveldb.DB
 var dbOpen bool = false
+var dbReadOnly bool = true
 
 var ge = GobEncoder{}
+
+// Call before first get to use ReadWrite DB (e.g. Ingest)
+func SetDBReadWrite() {
+	dbReadOnly = false;
+}
 
 // if allow_empty is false, abort if database is empty: enforces
 // requirement to run ingest first
 func GetDB() *leveldb.DB {
 	if !dbOpen {
-		log.Println("DB not initialised. Opening...")
+		log.Println("DB not initialised. Opening ReadOnly =", dbReadOnly, "...");
 		openDB()
 	}
 	return db
@@ -45,6 +52,7 @@ func DatabaseIsEmpty() bool {
 //
 func CompactDatastore() {
 	err := GetDB().CompactRange(util.Range{Limit: nil, Start: nil})
+
 	if err != nil {
 		log.Println("Error compacting datastore: ", err)
 	}
@@ -58,11 +66,23 @@ func openDB() {
 	workingDir := "kvs"
 
 	o := &opt.Options{
-		Filter: filter.NewBloomFilter(10),
-		// BlockCacheCapacity: 128 * 1024 * 1024,
-		// NoSync: true,
-		// OpenFilesCacheCapacity: 1024,
-		CompactionTableSize: (4 * opt.MiB),
+
+		// Original
+		// // Filter:             filter.NewBloomFilter(10),
+		// // BlockCacheCapacity: 128 * 1024 * 1024,
+		// // NoSync: true,
+		// // OpenFilesCacheCapacity: 1024,
+		// // ReadOnly:            true,
+		// CompactionTableSize: (4 * opt.MiB),
+
+		// Experiment from Matt 2019-04-12
+		Filter:                        filter.NewBloomFilter(10),
+		BlockCacheCapacity:            2 * opt.GiB,
+		CompactionTotalSizeMultiplier: 20,
+		OpenFilesCacheCapacity:        1024,
+		ReadOnly:                      dbReadOnly,
+		CompactionTableSize:           (4 * opt.MiB),   //default 2
+		CompactionTotalSize:           (128 * opt.MiB), //default 10 mb
 	}
 	var dbErr error
 	db, dbErr = leveldb.OpenFile(workingDir, o)

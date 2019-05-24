@@ -1,0 +1,13 @@
+query NAPParticipation($acaraIDs: [String]) {
+  pnp_events_report(acaraIDs: $acaraIDs) {
+        EventID
+        PSI
+        SchoolID
+        NAPTestLocalID
+        Adjustment {
+          PNPCodelist {
+            PNPCode
+         }
+       }
+  }
+}

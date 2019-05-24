@@ -17,6 +17,7 @@ var unfit bool
 
 func IngestResultsFile(resultsFilePath string) {
 
+	SetDBReadWrite();
 	db := GetDB()
 	ge := GobEncoder{}
 

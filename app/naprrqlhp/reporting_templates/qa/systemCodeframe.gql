@@ -1,0 +1,45 @@
+query CodeFrame {
+  codeframe_report {
+    Test {
+      TestContent {
+        TestName
+        TestType
+        TestLevel
+        TestDomain
+      }
+    }
+    Testlet {
+      TestletContent {
+        LocalId
+        Node
+        LocationInStage
+        TestletName
+        LocalId
+        TestletMaximumScore
+      }
+    }
+    Item {
+      ItemID
+      TestItemContent {
+        NAPTestItemLocalId
+        Subdomain
+        MaximumScore
+        CorrectAnswer
+        ItemDescriptor
+        ExemplarURL
+        ItemDifficulty
+        ItemType
+        MarkingType
+        ContentDescriptionList {
+          ContentDescription
+        }
+        ItemSubstitutedForList {
+          SubstituteItem {
+            SubstituteItemRefId
+          }
+        }
+      }
+    }
+  }
+}
+

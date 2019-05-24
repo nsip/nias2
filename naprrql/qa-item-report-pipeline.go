@@ -10,8 +10,9 @@ import (
 	"strconv"
 
 	"encoding/json"
+
 	"github.com/tidwall/gjson"
-	"gopkg.in/fatih/set.v0"
+	set "gopkg.in/fatih/set.v0"
 )
 
 //
@@ -180,7 +181,7 @@ func NonCodeframeItemsQuery() string {
 `
 }
 
-func runQAItemRespReportPipeline(schools []string) error {
+func RunQAItemRespReportPipeline(schools []string) error {
 
 	reports := []string{
 		"systemTestTypeItemImpacts.gql",

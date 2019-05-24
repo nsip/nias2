@@ -27,7 +27,7 @@ import (
 
 var codeframe [][]byte = nil
 
-func runXMLPipeline(schools []string) error {
+func RunXMLPipeline(schools []string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -66,7 +66,7 @@ func runXMLPipeline(schools []string) error {
 	return WaitForPipeline(errcList...)
 }
 
-func runXMLPipelinePerSchool(school string) error {
+func RunXMLPipelinePerSchool(school string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())

@@ -24,7 +24,7 @@ import (
 // Overall round-trip latency is less than querying for all data at once
 // and ensures we can't run out of memory
 //
-func runSchoolReportPipeline(queryFileName string, query string, school string) error {
+func RunSchoolReportPipeline(queryFileName string, query string, school string) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())

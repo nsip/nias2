@@ -1,0 +1,12 @@
+query NAPDataObjectCounts {
+  tests_count
+  testlets_count
+  testitems_count
+  codeframes_count
+  schools_count
+  students_count
+  events_count
+  responses_count
+  score_summaries_count
+}
+

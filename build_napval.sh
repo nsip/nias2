@@ -18,7 +18,7 @@ do_build() {
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
 	cd $CWD
 	cd ./app/napval
-	go get 
+	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
 	rsync -a napval/napval.toml napval/napval_nss.cfg napval/public napval/schemas napval/schoolslist napval/templates $OUTPUT/
@@ -89,23 +89,6 @@ build_windows64() {
 	echo "...all Windows64 binaries built..."
 }
 
-build_windows32() {
-	# WINDOWS 32
-	echo "Building Windows32 binaries..."
-	GOOS=windows
-	GOARCH=386
-	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Win32/napval
-	GNATS=nats-streaming-server.exe
-	HARNESS=napval.exe
-	ZIP=nias-napval-Win32.zip
-	do_build
-	#do_upx
-	do_bats
-	# do_zip
-	echo "...all Windows32 binaries built..."
-}
-
 build_linux64() {
 	# LINUX 64
 	echo "Building Linux64 binaries..."
@@ -123,35 +106,12 @@ build_linux64() {
 	echo "...all Linux64 binaries built..."
 }
 
-build_linux32() {
-	# LINUX 32
-	echo "Building Linux32 binaries..."
-	GOOS=linux
-	GOARCH=386
-	LDFLAGS="-s -w"
-	OUTPUT=$CWD/build/Linux32/napval
-	GNATS=nats-streaming-server
-	HARNESS=napval
-	ZIP=nias-napval-Linux32.zip
-	do_build
-	#do_goupx
-	do_shells
-	# do_zip
-	echo "...all Linux32 binaries built..."
-}
-
 # TODO ARM
 # GOOS=linux GOARCH=arm GOARM=7 go build -o $CWD/build/LinuxArm7/go-nias/aggregator
 
-if [ "$1" = "L32" ]
-then
-    build_linux32
-elif [ "$1" = "L64"  ]
+if [ "$1" = "L64"  ]
 then
     build_linux64
-elif [ "$1" = "W32"  ]
-then
-    build_windows32
 elif [ "$1" = "W64"  ]
 then
     build_windows64
@@ -161,8 +121,5 @@ then
 else
     build_mac64
     build_windows64
-    build_windows32
     build_linux64
-    build_linux32
 fi
-
