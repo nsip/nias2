@@ -276,11 +276,7 @@ func runItemPrintReports(schools []string) error {
 
 func runWritingExtractReports(schools []string, psi_exceptions []string, blacklist bool, psi2prompt map[string]string) error {
 	var pipelineError error
-// <<<<<<< monday-02-WithParams
-// 	pipelineError = RunWritingExtractPipeline(schools, psi_exceptions)
-// =======
 	pipelineError = RunWritingExtractPipeline(schools, psi_exceptions, blacklist, psi2prompt)
-// >>>>>>> master
 	return pipelineError
 
 }

@@ -1,2 +1,0 @@
-StudentID,YearLevel,School,EQID,FirstName,LastName,DateOfBirth,DateOfBirthRaw,IndigenousStatus,OtherLanguage,Sex,Class,PSI
-OtherIdList.OtherId.#[Type==TAAStudentId].Value,YearLevel,ASLSchoolId,OtherIdList.OtherId.#[Type==SectorStudentId].Value,GivenName,FamilyName,BirthDate,BirthDate,IndigenousStatus,LBOTE,Sex,ClassGroup,OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value

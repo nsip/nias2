@@ -1,6 +1,0 @@
-query studentsBySchoolYrLevel($acaraIDs: [String]){
-  students_by_school(acaraIDs: $acaraIDs) {
-    YearLevel
-    TestLevel
-  }
-}

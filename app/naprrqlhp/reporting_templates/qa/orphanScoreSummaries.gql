@@ -1,8 +1,0 @@
-query NAPScoreSummaries($acaraIDs: [String]) {
-  orphan_school_summary_report(acaraIDs: $acaraIDs){
-      SummaryID
-      SchoolInfoRefId
-      SchoolACARAId
-  }
-}
-

@@ -1,2 +1,0 @@
-Family Name,Given Name,Birth Date,YearLevel,PSI,Home ACARA ID,Event ACARA ID,Test Local ID
-Student.FamilyName,Student.GivenName,Student.BirthDate,Student.YearLevel,Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value,Student.ASLSchoolId,Event.SchoolID,Event.NAPTestLocalID

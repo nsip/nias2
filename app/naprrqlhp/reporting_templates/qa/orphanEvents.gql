@@ -1,8 +1,0 @@
-query NAPEvents($acaraIDs: [String]) {
-  orphan_event_report(acaraIDs: $acaraIDs){
-      EventID
-      SchoolRefID
-      SchoolID
-  }
-}
-

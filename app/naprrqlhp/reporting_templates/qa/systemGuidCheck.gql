@@ -1,9 +1,0 @@
-query GUIDCheck {
-  guid_check_report {
-    ObjectName
-    ObjectType
-    Guid
-    ShouldPointTo
-    PointsTo
-  }
-}

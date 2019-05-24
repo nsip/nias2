@@ -1,2 +1,0 @@
-Student Yr Level,Student PSI,Student TAA ID,School Name,Writing,Spelling,Numeracy,Reading,Grammar & Punctuation
-Student.YearLevel,Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value,Student.OtherIdList.OtherId.#[Type==TAAStudentId].Value,School.SchoolName,Summary.#[Domain==Writing].ParticipationCode,Summary.#[Domain==Spelling].ParticipationCode,Summary.#[Domain==Numeracy].ParticipationCode,Summary.#[Domain==Reading].ParticipationCode,Summary.#[Domain==Grammar and Punctuation].ParticipationCode
