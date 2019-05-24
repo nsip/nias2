@@ -54,7 +54,11 @@ query NAPItemResults($acaraIDs: [String]) {
         }
       }
     }
-    ParticipationCode
+     Event {
+       ParticipationCode
+        Date
+        StartTime
+    }   
     Response {
       PathTakenForDomain
       ParallelTest

@@ -26,6 +26,7 @@ var itemprint = flag.Bool("itemprint", false, "Creates .csv files reporting item
 
 var writingextract = flag.Bool("writingextract", false, "Creates .csv file extract of all writing items, for input into marking systems")
 var psiexceptions = flag.String("psiexceptions", "-", "File containing list of PSIs to ignore in generating writing extract")
+var psiwhitelist = flag.String("psiwhitelist", "-", "File containing list of PSIs to use in generating writing extract")
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
 var xml = flag.Bool("xml", false, "Reexports redacted xml of RRD dataset")
@@ -99,12 +100,19 @@ func main() {
 	// create the writing item report
 	if *writingextract {
 		// launch web-server
+		if *psiexceptions != "-" && *psiwhitelist != "-" {
+			log.Fatalln("\nCannot specify both psiexceptions and psiwhitelist, they are mutually exclusive!")
+		}
 		startWebServer(true)
 		filename := ""
+		blacklist := true
 		if *psiexceptions != "-" {
 			filename = *psiexceptions
+		} else if *psiwhitelist != "-" {
+			filename = *psiwhitelist
+			blacklist = false
 		}
-		writeWritingExtractReports(filename)
+		writeWritingExtractReports(filename, blacklist)
 		// shut down
 		closeDB()
 		os.Exit(1)
@@ -233,9 +241,9 @@ func writeItemPrintingReports() {
 //
 // create writing extract printing reports
 //
-func writeWritingExtractReports(psi_exceptions string) {
+func writeWritingExtractReports(psi_exceptions string, blacklist bool) {
 	log.Println("generating Writing item extract reports...")
-	naprrql.GenerateWritingExtractReports(psi_exceptions)
+	naprrql.GenerateWritingExtractReports(psi_exceptions, blacklist)
 	log.Println("Writing item extract reports generated...")
 }
 

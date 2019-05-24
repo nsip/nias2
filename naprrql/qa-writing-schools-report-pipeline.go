@@ -31,7 +31,7 @@ import (
 // Overall round-trip latency is less than querying for all data at once
 // and ensures we can't run out of memory
 //
-func runQAWritingSchoolSummaryPipeline(schools []string, outFileDir string, mapFileName string) error {
+func runQAWritingSchoolSummaryPipeline(schools []string, outFileDir string, mapFileName string, psi_exceptions []string, blacklist bool) error {
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -114,10 +114,25 @@ func runQAWritingSchoolSummaryPipeline(schools []string, outFileDir string, mapF
 	}
 	errcList = append(errcList, errc)
 
+	// NEW 2019: derive count of writing extracts generated, by taking into account whitelist/blacklist, and
+	// open test attempts
+	queryTemplates = getTemplates("./reporting_templates/writing_extract/")
+	for name, queryText := range queryTemplates {
+		if strings.Contains(name, "itemWritingPrinting.gql") {
+			query = queryText
+		}
+	}
+
+	qasummc6, errc, err := qaWritingExtractionFilter(ctx, query, DEF_GQL_URL, psi_exceptions, blacklist, qasummc5)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+
 	//
 	// transform stage 6: flatten summary & convert to gjson for writing to csv
 	//
-	jsonc, errc, err := qaTransformSummary(ctx, qasummc5)
+	jsonc, errc, err := qaTransformSummary(ctx, qasummc6)
 	if err != nil {
 		return err
 	}
@@ -329,6 +344,66 @@ func qaWritingYrLevelQueryExecutor(ctx context.Context, query string, url string
 					school.TestLvl9registered++
 				default:
 					school.TestLvlUnknowRegistered++
+				}
+			}
+
+			// Send the data to the output channel but return early
+			// if the context has been cancelled.
+			select {
+			case out <- school:
+			case <-ctx.Done():
+				return
+			}
+
+		}
+	}()
+	return out, errc, nil
+
+}
+
+// Count students per test level in school that have closed test attempts and that satisfy blacklist/whitelist
+func qaWritingExtractionFilter(ctx context.Context, query string, url string, psi_exceptions []string, blacklist bool, in <-chan schoolQASummary) (<-chan schoolQASummary, <-chan error, error) {
+	out := make(chan schoolQASummary)
+	errc := make(chan error, 1)
+	list := make(map[string]bool)
+	for _, s := range psi_exceptions {
+		list[s] = true
+	}
+
+	go func() {
+		defer close(out)
+		defer close(errc)
+		gql := NewGqlClient()
+		for school := range in {
+			vars := map[string]interface{}{"acaraIDs": []string{school.ACARAId}}
+			json, err := gql.DoQuery(url, query, vars)
+			if err != nil {
+				// Handle an error that occurs during the goroutine.
+				errc <- err
+				return
+			}
+
+			// this is the list of all closed response writing extracts for the school
+			for _, result := range json.Array() {
+				psi := result.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
+				if len(psi_exceptions) > 0 {
+					if blacklist {
+						if _, ok := list[psi]; ok {
+							continue
+						}
+					} else {
+						if _, ok := list[psi]; !ok {
+							continue
+						}
+					}
+				}
+				switch result.Get("Test.TestContent.TestLevel").String() {
+				case "5":
+					school.WritingExtractLvl5++
+				case "7":
+					school.WritingExtractLvl7++
+				case "9":
+					school.WritingExtractLvl9++
 				}
 			}
 

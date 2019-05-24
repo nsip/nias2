@@ -38,6 +38,9 @@ type schoolQASummary struct {
 	TestLvl7registered      int
 	TestLvl9registered      int
 	TestLvlUnknowRegistered int
+	WritingExtractLvl5      int
+	WritingExtractLvl7      int
+	WritingExtractLvl9      int
 	TotalStudents           int
 	DerivedSector           string
 	DerivedSystem           string

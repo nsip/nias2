@@ -994,6 +994,7 @@ func buildReportResolvers() map[string]interface{} {
 	}
 
 	// same as the above, but adds AnonymisedId; iterates all events, not just responses;
+	// uses full event;
 	// and leaves out open events (P participation status; no response container)
 	resolvers["NaplanData/writing_item_for_marking_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		wordcount := 0
@@ -1130,9 +1131,9 @@ func buildReportResolvers() map[string]interface{} {
 							}
 							irds := ItemResponseDataSetWordCount{TestItem: item, Response: resp1,
 								Student: student, Test: test, Testlet: tl,
-								SchoolDetails:     SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
-								ParticipationCode: event.ParticipationCode,
-								WordCount:         strconv.Itoa(wordcount)}
+								SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+								Event:         event,
+								WordCount:     strconv.Itoa(wordcount)}
 							results = append(results, irds)
 						}
 					}
@@ -1142,9 +1143,9 @@ func buildReportResolvers() map[string]interface{} {
 					} else {
 						irds := ItemResponseDataSetWordCount{TestItem: xml.NAPTestItem{}, Response: xml.NAPResponseSet{},
 							Student: student, Test: test, Testlet: xml.NAPTestlet{},
-							SchoolDetails:     SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
-							ParticipationCode: event.ParticipationCode,
-							WordCount:         "0"}
+							SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+							Event:         event,
+							WordCount:     "0"}
 						results = append(results, irds)
 					}
 				}

@@ -131,14 +131,14 @@ func (resps ItemResponseComparator) Less(i, j int) bool {
 
 // aggregating type used for reporting item responses against items with word count
 type ItemResponseDataSetWordCount struct {
-	WordCount         string
-	Test              xml.NAPTest
-	Testlet           xml.NAPTestlet
-	TestItem          xml.NAPTestItem
-	Student           xml.RegistrationRecord
-	Response          xml.NAPResponseSet
-	ParticipationCode string
-	SchoolDetails     SchoolDetails
+	WordCount     string
+	Test          xml.NAPTest
+	Testlet       xml.NAPTestlet
+	TestItem      xml.NAPTestItem
+	Student       xml.RegistrationRecord
+	Response      xml.NAPResponseSet
+	Event         xml.NAPEvent
+	SchoolDetails SchoolDetails
 }
 
 // struct for sorting support
