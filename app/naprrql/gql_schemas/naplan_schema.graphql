@@ -379,8 +379,8 @@ type ItemResponseDataSetWordCount {
         Response: NAPResponseSet
         ## the related test
         Test: NAPTest
-        ## Participation Code for the response
-        ParticipationCode: String
+        ## The event participated in
+        Event: NAPEvent
         ## The school involved
         SchoolDetails: SchoolDetails
 }

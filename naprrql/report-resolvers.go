@@ -993,7 +993,9 @@ func buildReportResolvers() map[string]interface{} {
 		return results, nil
 	}
 
-	// same as the above, but adds AnonymisedId, and iterates all events, not just responses
+	// same as the above, but adds AnonymisedId; iterates all events, not just responses;
+	// uses full event;
+	// and leaves out open events (P participation status; no response container)
 	resolvers["NaplanData/writing_item_for_marking_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		wordcount := 0
 		reqErr := checkRequiredParams(params)
@@ -1071,23 +1073,36 @@ func buildReportResolvers() map[string]interface{} {
 						return []interface{}{}, err
 					}
 				}
+				/*
+					for i, e := range events {
+						log.Printf("%d, %s : %s : %s\n", i, e.(xml.NAPEvent).PSI, e.(xml.NAPEvent).ParticipationCode, e.(xml.NAPEvent).NAPTestLocalID)
+					}
+				*/
 
 				responseRefId := getIdentifiers(testid + ":NAPStudentResponseSet:" + studentid)
 				responses, err := getObjects(responseRefId)
 				if err != nil {
-					log.Println("writing_item_for_marking_report_by_school #6", err)
-					return []interface{}{}, err
+					/*
+						log.Println("writing_item_for_marking_report_by_school #6", err)
+						return []interface{}{}, err
+					*/
+					// deem this an open event, which has not yet had a response registered; ignore
+					continue
 				}
 				var resp xml.NAPResponseSet
 				if len(responses) == 0 {
 					ok = false
 				} else {
+					/* ok iff there is an actual response recorded -- even if it is just &nbsp; */
 					resp, ok = responses[0].(xml.NAPResponseSet)
 					if ok {
 						ok = (len(resp.TestletList.Testlet) != 0)
 						if ok {
 							ok = (len(resp.TestletList.Testlet[0].ItemResponseList.ItemResponse) != 0)
 						}
+					}
+					if ok {
+						ok = (len(resp.TestletList.Testlet[0].ItemResponseList.ItemResponse[0].Response) != 0)
 					}
 				}
 				if ok {
@@ -1116,19 +1131,23 @@ func buildReportResolvers() map[string]interface{} {
 							}
 							irds := ItemResponseDataSetWordCount{TestItem: item, Response: resp1,
 								Student: student, Test: test, Testlet: tl,
-								SchoolDetails:     SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
-								ParticipationCode: event.ParticipationCode,
-								WordCount:         strconv.Itoa(wordcount)}
+								SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+								Event:         event,
+								WordCount:     strconv.Itoa(wordcount)}
 							results = append(results, irds)
 						}
 					}
 				} else {
-					irds := ItemResponseDataSetWordCount{TestItem: xml.NAPTestItem{}, Response: xml.NAPResponseSet{},
-						Student: student, Test: test, Testlet: xml.NAPTestlet{},
-						SchoolDetails:     SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
-						ParticipationCode: event.ParticipationCode,
-						WordCount:         "0"}
-					results = append(results, irds)
+					if event.ParticipationCode == "P" && len(event.StartTime) == 0 {
+						// no response recorded; consider this to be an open event, and ignore it
+					} else {
+						irds := ItemResponseDataSetWordCount{TestItem: xml.NAPTestItem{}, Response: xml.NAPResponseSet{},
+							Student: student, Test: test, Testlet: xml.NAPTestlet{},
+							SchoolDetails: SchoolDetails{ACARAId: event.SchoolID, SchoolName: schoolnames[event.SchoolID]},
+							Event:         event,
+							WordCount:     "0"}
+						results = append(results, irds)
+					}
 				}
 			}
 		}

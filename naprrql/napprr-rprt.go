@@ -3,6 +3,7 @@ package naprrql
 import (
 	"bufio"
 	"bytes"
+	"encoding/csv"
 	"io"
 	"io/ioutil"
 	"log"
@@ -132,15 +133,47 @@ func readLines(path string) (lines []string, err error) {
 // file for writing extract printing processes;
 // input for nap-writing-extract tool.
 //
-func GenerateWritingExtractReports(psi_exceptions_file string) {
+// If blacklist is on, treat as a naive list of PSIs
+// If blacklist is on, treat as a CSV file, of PSIs, followed by optional Prompts
+func GenerateWritingExtractReports(psi_exceptions_file string, blacklist bool) {
 
 	var psi_exceptions []string
+	var psi2prompt map[string]string
 	var err error
+
 	if len(psi_exceptions_file) > 0 {
-		psi_exceptions, err = readLines(psi_exceptions_file)
-		if err != nil {
-			log.Fatalln("File "+psi_exceptions_file+" not found: ", err)
+		if blacklist {
+			psi_exceptions, err = readLines(psi_exceptions_file)
+			if err != nil {
+				log.Fatalln("File "+psi_exceptions_file+" not found: ", err)
+			}
+		} else {
+			psi_exceptions = make([]string, 0)
+			psi2prompt = make(map[string]string)
+
+			file, err := os.Open(psi_exceptions_file)
+			defer file.Close()
+			if err != nil {
+				log.Fatalln("File "+psi_exceptions_file+" not found: ", err)
+			}
+
+			r := csv.NewReader(file)
+			r.FieldsPerRecord = -1 // don't immediately check number of columns
+			formatLines, err := r.ReadAll()
+			if err != nil {
+				if perr, ok := err.(*csv.ParseError); !ok || perr.Err != csv.ErrFieldCount {
+					log.Fatalln("Error reading "+psi_exceptions_file, err)
+				}
+			}
+			for _, l := range formatLines {
+				psi_exceptions = append(psi_exceptions, l[0])
+				if len(l) > 1 {
+					psi2prompt[l[0]] = l[1]
+				}
+			}
+
 		}
+
 	}
 
 	schools, err := getSchoolsList()
@@ -153,7 +186,7 @@ func GenerateWritingExtractReports(psi_exceptions_file string) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = runQAWritingSchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv")
+		err = runQAWritingSchoolSummaryPipeline(schools, "./out/writing_extract", "./reporting_templates/writing_extract/qaSchools_map.csv", psi_exceptions, blacklist)
 		if err != nil {
 			log.Println("Error creating writing extract qa summary report: ", err)
 		}
@@ -162,7 +195,7 @@ func GenerateWritingExtractReports(psi_exceptions_file string) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = runWritingExtractReports(schools, psi_exceptions)
+		err = runWritingExtractReports(schools, psi_exceptions, blacklist, psi2prompt)
 		if err != nil {
 			log.Println("Error creating writing extract report: ", err)
 		}
@@ -241,9 +274,13 @@ func runItemPrintReports(schools []string) error {
 
 }
 
-func runWritingExtractReports(schools []string, psi_exceptions []string) error {
+func runWritingExtractReports(schools []string, psi_exceptions []string, blacklist bool, psi2prompt map[string]string) error {
 	var pipelineError error
-	pipelineError = RunWritingExtractPipeline(schools, psi_exceptions)
+// <<<<<<< monday-02-WithParams
+// 	pipelineError = RunWritingExtractPipeline(schools, psi_exceptions)
+// =======
+	pipelineError = RunWritingExtractPipeline(schools, psi_exceptions, blacklist, psi2prompt)
+// >>>>>>> master
 	return pipelineError
 
 }
@@ -366,7 +403,7 @@ func getTemplates(templatesPath string) map[string]string {
 	}
 	files = append(files, gqlFiles...)
 	if len(files) == 0 {
-		log.Fatalln("No template (*.gql) files found in input folder " + templatesPath)
+		log.Println("No template (*.gql) files found in input folder " + templatesPath)
 	}
 
 	// store template against filename

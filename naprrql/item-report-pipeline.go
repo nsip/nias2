@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 )
 
 //
@@ -80,7 +81,11 @@ func RunItemPipeline(schools []string) error {
 }
 
 // Slight variant of the foregoing
-func RunWritingExtractPipeline(schools []string, psi_exceptions []string) error {
+// <<<<<<< monday-02-WithParams
+// func RunWritingExtractPipeline(schools []string, psi_exceptions []string) error {
+// =======
+func RunWritingExtractPipeline(schools []string, psi_exceptions []string, blacklist bool, psi2prompt map[string]string) error {
+// >>>>>>> master
 
 	// setup pipeline cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -115,13 +120,18 @@ func RunWritingExtractPipeline(schools []string, psi_exceptions []string) error 
 	}
 	errcList = append(errcList, errc)
 
-	jsonc0, errc, err := filterPSI(ctx, jsonc, psi_exceptions)
+	jsonc0, errc, err := filterPSI(ctx, jsonc, psi_exceptions, blacklist)
+	if err != nil {
+		return err
+	}
+	errcList = append(errcList, errc)
+	jsonc01, errc, err := replacePrompt(ctx, jsonc0, psi2prompt)
 	if err != nil {
 		return err
 	}
 	errcList = append(errcList, errc)
 
-	jsonc1, errc, err := splitter(ctx, jsonc0, 2)
+	jsonc1, errc, err := splitter(ctx, jsonc01, 2)
 	errcList = append(errcList, errc)
 
 	// sink stage
@@ -236,10 +246,12 @@ func itemQueryExecutor(ctx context.Context, query string, url string, in <-chan 
 	return out, errc, nil
 }
 
-func filterPSI(ctx context.Context, in <-chan gjson.Result, psi_exceptions []string) (<-chan gjson.Result, <-chan error, error) {
+// ignore an empty psi_exceptions array
+func filterPSI(ctx context.Context, in <-chan gjson.Result, psi_exceptions []string, blacklist bool) (<-chan gjson.Result, <-chan error, error) {
 	out := make(chan gjson.Result)
 	errc := make(chan error, 1)
 	exclude := make(map[string]bool)
+	ignore := len(psi_exceptions) == 0
 	for _, p := range psi_exceptions {
 		exclude[p] = true
 	}
@@ -248,8 +260,33 @@ func filterPSI(ctx context.Context, in <-chan gjson.Result, psi_exceptions []str
 		defer close(errc)
 		for record := range in {
 			psi := record.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
-			if exclude[psi] {
+			if !ignore && (exclude[psi] && blacklist || !exclude[psi] && !blacklist) {
 				continue
+			}
+			select {
+			case out <- record:
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+	return out, errc, nil
+}
+
+func replacePrompt(ctx context.Context, in <-chan gjson.Result, psi2prompt map[string]string) (<-chan gjson.Result, <-chan error, error) {
+	out := make(chan gjson.Result)
+	errc := make(chan error, 1)
+	ignore := len(psi2prompt) == 0
+	go func() {
+		defer close(out)
+		defer close(errc)
+		for record := range in {
+			psi := record.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
+			if !ignore {
+				if prompt, ok := psi2prompt[psi]; ok {
+					record1, _ := sjson.Set(record.Raw, "Test.TestContent.LocalId", prompt)
+					record = gjson.Parse(record1)
+				}
 			}
 			select {
 			case out <- record:

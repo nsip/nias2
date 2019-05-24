@@ -1,6 +1,6 @@
 ## nap-writing-print
 
-nap-writing-print is a standalone tool that generates pdf files of NAPLAN writing responses.
+nap-writing-print is a standalone tool that generates html files of NAPLAN writing responses.
 
 It is designed to work with the .csv file that is output by the naprrql data analysis tool when naprrql is run with the 
 --writingextract flag. If the word count is to be included as a column, it should be run with both the --writingextract
