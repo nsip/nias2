@@ -7,7 +7,7 @@ CWD=`pwd`
 
     do_build() {
         # comment out line below to exclude naprrqlhp from build
-        include_hp
+        # include_hp
         echo "Building NAPRRQL..."
         mkdir -p $OUTPUT
     	cd $CWD
