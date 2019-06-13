@@ -5,6 +5,8 @@ package main
 // on Win32 that hamper all other deployments so far.
 
 import (
+"bufio"
+"sort"
 	"flag"
 	"fmt"
 	"log"
@@ -12,10 +14,14 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/nsip/nias2/naprrql"
 	"github.com/nsip/nias2/version"
+
+"github.com/kylelemons/godebug/diff"
 )
 
 var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng data is overwritten.")
@@ -30,6 +36,8 @@ var psiwhitelist = flag.String("psiwhitelist", "-", "File containing list of PSI
 var qa = flag.Bool("qa", false, "Creates .csv files for QA checking of NAPLAN results")
 var vers = flag.Bool("version", false, "Reports version of NIAS distribution")
 var xml = flag.Bool("xml", false, "Reexports redacted xml of RRD dataset")
+
+var csvdiff = flag.Bool("csvdiff", false, "Compare two directories full of CSV files recursively")
 
 //
 // deprecated as at jan 2019 - all users want wordcount, removing flag avoids
@@ -86,6 +94,16 @@ func main() {
 		closeDB()
 		os.Exit(1)
 	}
+
+        // create the csv reports
+        if *csvdiff {
+		dir := flag.Args()
+		if len(dir) != 2 {
+			log.Fatalln("Must specify two directory names to csvdiff: naprrql -csvdiff dir1 dir2\n")
+		}
+		csvdiff_comparison_recursive(dir[0], dir[1])
+                os.Exit(1)
+        }
 
 	// create the csv reports
 	if *report {
@@ -207,6 +225,83 @@ func startWebServer(silent bool) {
 	}
 
 }
+
+func csvdiff_comparison_recursive(dir1, dir2 string){
+if _, err := os.Stat(dir1); os.IsNotExist(err) {
+	                        log.Fatalln("Directory " + dir1 + " does not exist!\n")
+}
+if _, err := os.Stat(dir2); os.IsNotExist(err) {
+	                        log.Fatalln("Directory " + dir2 + " does not exist!\n")
+}
+if _, err := os.Stat("compare"); os.IsNotExist(err) {
+err = os.Mkdir("compare", os.ModePerm)
+        if !os.IsExist(err) && err != nil {
+                log.Fatalln("Error trying to create comparison directory: ", err)
+        }
+}
+f, err:=os.Create("compare/comparison" + time.Now().Format("20060102150405") + ".txt")
+defer f.Close()
+
+
+
+err = filepath.Walk(dir1, func(path string, info os.FileInfo, err error) error {
+if err != nil {
+			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
+			return err
+		}
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".csv") {
+path2:=dir2 + strings.TrimPrefix(path, dir1)
+if _, err := os.Stat(path2); os.IsNotExist(err) {
+log.Printf("File %s does not exist, to compare with file %s\n", path2, path)
+return nil
+}
+csvdiff_comparison(path, path2, f)		
+}
+		return nil
+})
+if err != nil {
+		fmt.Printf("error walking the path %q: %v\n", dir1, err)
+		return
+	}
+
+}
+
+func csvdiff_comparison(file1, file2 string, rept *os.File) {
+	csv1 := readlines(file1)
+	csv2 := readlines(file2)
+	sort.Strings(csv1)
+	sort.Strings(csv2)
+	difference := strings.Split(diff.Diff(strings.TrimSpace(strings.Join(csv1, "\n")), strings.TrimSpace(strings.Join(csv2, "\n"))), "\n")
+	if(len(difference) > 1) {
+		rept.WriteString("Comparison, " + file1 + ", " + file2 + "\n\n")
+		for _, line := range difference {
+			if !strings.HasPrefix(line, " ") {
+				rept.WriteString(line + "\n")
+			}
+		}
+				rept.WriteString("\n")
+	}
+}
+
+func readlines(filename string) []string {
+file, err := os.Open(filename)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
+	ret := make([]string, 0)
+
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        ret = append(ret, scanner.Text())
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+	return ret
+}
+
 
 //
 // create .csv reports

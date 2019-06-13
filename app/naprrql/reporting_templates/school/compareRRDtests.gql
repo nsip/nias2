@@ -1,0 +1,35 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  domain_scores_event_report_by_school(acaraIDs: $acaraIDs) {
+    Test {
+      TestContent {
+        TestName
+        TestLevel
+        TestDomain
+      }
+    }
+    SchoolDetails {
+      ACARAId
+      SchoolName
+    }
+    Student {
+      FamilyName
+      GivenName
+      YearLevel
+      OtherIdList {
+        OtherId {
+          Type
+            Value
+        }
+      }
+    }
+    Event {
+      ParticipationCode
+      Date
+      StartTime
+    }
+    Response {
+      ParallelTest
+    }
+  }
+}
+
