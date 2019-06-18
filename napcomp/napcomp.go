@@ -57,6 +57,7 @@ func IngestData() {
 //
 func ingestResultsFile(resultsFilePath string) {
 
+	naprrql.SetDBReadWrite()
 	db := naprrql.GetDB()
 	ge := naprrql.GobEncoder{}
 
