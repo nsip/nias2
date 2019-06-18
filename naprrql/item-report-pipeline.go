@@ -280,8 +280,10 @@ func replacePrompt(ctx context.Context, in <-chan gjson.Result, psi2prompt map[s
 			psi := record.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
 			if !ignore {
 				if prompt, ok := psi2prompt[psi]; ok {
+if len(prompt)>0 {
 					record1, _ := sjson.Set(record.Raw, "Test.TestContent.LocalId", prompt)
 					record = gjson.Parse(record1)
+}
 				}
 			}
 			select {

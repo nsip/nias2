@@ -4,6 +4,7 @@ query NAPDomainScores($acaraIDs: [String]) {
       LocalId
         FamilyName
         GivenName
+        MiddleName
         Sex
         BirthDate
         YearLevel

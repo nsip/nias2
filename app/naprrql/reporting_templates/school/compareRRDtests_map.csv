@@ -1,0 +1,2 @@
+ACARA ID,School Name,Family Name,Given Name,Student PSI,Test Level,Test Domain,Parallel Path,Participation,Date,Start Time
+SchoolDetails.ACARAId,SchoolDetails.SchoolName,Student.FamilyName,Student.GivenName,Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value,Test.TestContent.TestLevel,Test.TestContent.TestDomain,Response.ParallelTest,Event.ParticipationCode,Event.Date,Event.StartTime
