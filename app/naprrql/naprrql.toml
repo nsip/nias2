@@ -1,4 +1,4 @@
-WritingRubrics = ["Spelling", "Audience", "Text structure", "Paragraphing", "Sentence structure", "Punctuation", "Ideas", "Persuasive devices", "Vocabulary", "Cohesion"]
+WritingRubrics = ["Spelling", "Audience", "Text structure", "Paragraphing", "Sentence structure", "Punctuation", "Ideas", "Character and setting", "Vocabulary", "Cohesion"]
 XMLFilter = [
 "/NAPStudentResponseSet[PathTakenForDomain != '']/TestletList/Testlet/ItemResponseList/ItemResponse/Response",
 "/NAPCodeFrame/TestletList/Testlet/TestItemList/TestItem/TestItemContent/CorrectAnswer",
