@@ -339,10 +339,9 @@ func qaTestCompleteness(ctx context.Context, in <-chan gjson.Result) (<-chan gjs
 					result["TestLevel"] = k2
 					result["P_Attempts_Count"] = strconv.Itoa(v3["P_attempts"].Size())
 					result["S_Attempts_Count"] = strconv.Itoa(v3["S_attempts"].Size())
-					result["F_Attempts_Count"] = strconv.Itoa(v3["F_attempts"].Size())
 					result["R_Attempts_Count"] = strconv.Itoa(v3["R_attempts"].Size())
 					result["Responses_Count"] = strconv.Itoa(v3["responses"].Size())
-					attempts := set.Union(v3["P_attempts"], v3["S_attempts"], v3["R_attempts"], v3["F_attempts"])
+					attempts := set.Union(v3["P_attempts"], v3["S_attempts"], v3["R_attempts"])
 					result["Attempts_With_No_Response"] = set.Difference(attempts, v3["responses"]).String()
 					result["Responses_With_No_Attempt"] = set.Difference(v3["responses"], attempts).String()
 					j, _ := json.Marshal(result)
