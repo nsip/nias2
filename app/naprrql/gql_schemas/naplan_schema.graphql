@@ -436,6 +436,8 @@ type NAPTestlet {
 	TestletID: String
 	## RefID of the NAPLAN Test that uses this Testlet
 	NAPTestRefId: String
+	## Local name/id for the NAPLAN test that uses the testlet
+	NAPTestLocalId: String
 	## Details of the Testlet
 	TestletContent: TestletContent
 	## The items used by the testlet
@@ -446,8 +448,6 @@ type NAPTestlet {
 type TestletContent {
 	## Local name/id for this testlet
 	LocalId: String
-	## Local name/id for the NAPLAN test that uses the testlet
-	NAPTestLocalId: String
 	## The official name of the testlet
 	TestletName: String
 	## The branching node locaiton of testlet in the test
