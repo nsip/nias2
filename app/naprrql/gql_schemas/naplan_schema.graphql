@@ -71,6 +71,8 @@ type NaplanData {
 	participation_report_by_school(acaraIDs: [String]): [ParticipationDataSet]
 	## reporting (ui) object for codeframes
 	codeframe_report: [CodeFrameDataSet]
+	## reporting (ui) object for writing rubrics
+	rubric_report: [CodeFrameDataSet]
         ## reporting (ui) object for item responses per student
 	item_results_report_by_school(acaraIDs: [String]): [ItemResponseDataSet]
         ## reporting (ui) object for writing item responses per student

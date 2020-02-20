@@ -746,6 +746,63 @@ func buildReportResolvers() map[string]interface{} {
 
 	}
 
+	resolvers["NaplanData/rubric_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		// get the codeframe objects
+		codeframes := make([]xml.NAPCodeFrame, 0)
+		codeframeIds := getIdentifiers("NAPCodeFrame:")
+		codeFrameObjs, err := getObjects(codeframeIds)
+		if err != nil {
+			log.Printf("No match for Codeframe %#v\n", codeframeIds)
+			return []interface{}{}, err
+		}
+		for _, codeframeObj := range codeFrameObjs {
+			codeFrame, _ := codeframeObj.(xml.NAPCodeFrame)
+			codeframes = append(codeframes, codeFrame)
+		}
+
+		cfds := make([]CodeFrameDataSet, 0)
+		for _, codeframe := range codeframes {
+			testObj, err := getObjects([]string{codeframe.NAPTestRefId})
+			if err != nil {
+				log.Printf("No match for Test %s\n", codeframe.NAPTestRefId)
+				return []interface{}{}, err
+			}
+			test, _ := testObj[0].(xml.NAPTest)
+			for _, cf_testlet := range codeframe.TestletList.Testlet {
+				tlObj, err := getObjects([]string{cf_testlet.NAPTestletRefId})
+				if err != nil {
+					log.Printf("No match for Testlet %s\n", cf_testlet.NAPTestletRefId)
+					return []interface{}{}, err
+				}
+				tl, _ := tlObj[0].(xml.NAPTestlet)
+				for _, cf_item := range cf_testlet.TestItemList.TestItem {
+					tiObj, err := getObjects([]string{cf_item.TestItemRefId})
+					if err != nil {
+						log.Printf("No match for Test Item %s\n", cf_item.TestItemRefId)
+						return []interface{}{}, err
+					}
+					ti_orig, _ := tiObj[0].(xml.NAPTestItem)
+					ti, _ := tiObj[0].(xml.NAPTestItem)
+					for _, wr := range ti_orig.TestItemContent.NAPWritingRubricList.NAPWritingRubric {
+						ti.TestItemContent.NAPWritingRubricList.NAPWritingRubric = []xml.NAPWritingRubric{wr}
+						cfd := CodeFrameDataSet{
+							Test:           test,
+							Testlet:        tl,
+							Item:           ti,
+							SequenceNumber: "unknown",
+						}
+						cfd.SequenceNumber = cfd.GetItemLocationInTestlet(ti.ItemID)
+
+						cfds = append(cfds, cfd)
+					}
+				}
+			}
+		}
+
+		return cfds, nil
+
+	}
+
 	resolvers["NaplanData/item_results_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
 
 		reqErr := checkRequiredParams(params)
