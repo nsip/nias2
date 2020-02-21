@@ -1,0 +1,44 @@
+query CodeFrame {
+  codeframe_report {
+    Test {
+      TestID
+    }
+    Item {
+      ItemID
+        TestItemContent {
+          NAPTestItemLocalId
+            ItemName
+            ItemType
+            Subdomain
+            ItemDescriptor
+            MultipleChoiceOptionCount
+            CorrectAnswer
+            MaximumScore
+            CorrectAnswer
+            ExemplarURL
+            ItemDifficulty
+            ItemDifficultyLogit5
+            ItemDifficultyLogit62
+            ItemDifficultyLogit5SE
+            ItemDifficultyLogit62SE
+            ItemProficiencyBand
+            ItemProficiencyLevel
+            ContentDescriptionList {
+              ContentDescription
+            }
+          ItemSubstitutedForList {
+            SubstituteItem {
+              SubstituteItemRefId
+                LocalId
+                PNPCodeList {
+                  PNPCode
+                }
+            }
+          }
+        }
+    }
+  }
+}
+
+
+

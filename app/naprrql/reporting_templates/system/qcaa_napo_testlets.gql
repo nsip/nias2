@@ -1,0 +1,16 @@
+query CodeFrame {
+  testlets {
+    TestletID
+      NAPTestLocalId
+      TestletContent {
+        LocalId
+          TestletName
+          Node
+          LocationInStage
+          TestletMaximumScore
+      }
+  }
+}
+
+
+

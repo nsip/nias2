@@ -1,0 +1,30 @@
+query CodeFrame {
+  rubric_report {
+    Test {
+      TestID
+        TestContent {
+          LocalId
+        }
+    }
+    Item {
+      ItemID
+        TestItemContent {
+          NAPTestItemLocalId
+            NAPWritingRubricList {
+              NAPWritingRubric {
+                RubricType
+                  Descriptor
+                  ScoreList {
+                    Score {
+                      MaxScoreValue
+                    }
+                  }
+              }
+            }
+        }
+    }
+  }
+}
+
+
+

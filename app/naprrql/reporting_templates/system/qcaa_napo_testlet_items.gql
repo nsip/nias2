@@ -1,0 +1,27 @@
+query CodeFrame {
+  codeframe_report {
+    Testlet {
+      TestletID
+        TestletContent {
+          LocalId
+            TestItemList {
+              TestItem {
+                TestItemRefId
+                  TestItemLocalId
+                  SequenceNumber
+              }
+            }
+        }
+    }
+    Item {
+      ItemID
+        TestItemContent{
+          NAPTestItemLocalId
+        }
+    }
+    SequenceNumber
+  }
+}
+
+
+

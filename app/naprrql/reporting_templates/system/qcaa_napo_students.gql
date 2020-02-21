@@ -1,0 +1,48 @@
+query QLDstudents {
+  students {
+    RefId
+      LocalId
+      StateProvinceId
+      FamilyName
+      GivenName
+      MiddleName
+      PreferredName
+      BirthDate
+      Sex
+      IndigenousStatus
+      CountryOfBirth
+      StudentLOTE
+      VisaCode
+      LBOTE
+      YearLevel
+      TestLevel
+      FTE
+      ASLSchoolId
+      SchoolLocalId
+      Parent1LOTE
+      Parent1Occupation
+      Parent1SchoolEducation
+      Parent1NonSchoolEducation
+      Parent2LOTE
+      Parent2Occupation
+      Parent2SchoolEducation
+      Parent2NonSchoolEducation
+      LocalCampusId
+      Homegroup
+      ClassGroup
+      MainSchoolFlag
+      FFPOS
+      ReportingSchoolId
+      OtherSchoolId
+      EducationSupport
+      HomeSchooledStudent
+      Sensitive
+      OfflineDelivery
+      OtherIdList {
+        OtherId {
+          Type
+            Value
+        }
+      }
+  }
+}

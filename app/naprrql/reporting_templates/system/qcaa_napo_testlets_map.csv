@@ -1,0 +1,2 @@
+REF_ID,TESTLET_ID,TEST_ID,NAME,NODE,LOCATION_IN_STAGE,MAXIMUM_SCORE
+TestletID,TestletContent.LocalId,NAPTestLocalId,TestletContent.TestletName,TestletContent.Node,TestletContent.LocationInStage,TestletContent.TestletMaximumScore

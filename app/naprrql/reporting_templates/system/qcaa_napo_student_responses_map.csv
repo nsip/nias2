@@ -1,0 +1,2 @@
+REF_ID,PLATFORM_STUDENT_IDENTIFIER,TEST_ID,TESTLET_ID,ITEM_ID,RESPONSE,RESPONSE_CORRECTNESS,SCORE,SEQUENCE_NUMBER,ITEM_WEIGHT
+Response.ResponseID,Response.PSI,Test.TestID,Testlet.TestletID,TestItem.ItemID,Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Response,Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.ResponseCorrectness,Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Score,Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SequenceNumber,Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.ItemWeight

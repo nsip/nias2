@@ -1,0 +1,22 @@
+query NAPDomainScores($acaraIDs: [String]) {
+  domain_scores_event_report_by_school(acaraIDs: $acaraIDs) {
+    Event {
+      EventID
+        PSI
+        SchoolID
+        NAPTestLocalID
+        ParticipationCode
+        ParticipationText
+        Adjustment {
+          PNPCodelist {
+            PNPCode
+          }
+          BookletType
+        }
+      Device
+        Date
+        StartTime
+        LapsedTimeTest
+    }
+  }
+}

@@ -1,0 +1,2 @@
+REF_ID,PLATFORM_STUDENT_IDENTIFIER,SCHOOL_ACARA_ID,TEST_ID,PARTICIPATION_CODE,PARTICIPATION_TEXT,ADJUSTMENT,DEVICE,TEST_DATE,TEST_START_TIME,LAPSED_TIME_TEST
+Event.EventID,Event.PSI,Event.SchoolID,Event.NAPTestLocalID,Event.ParticipationCode,Event.ParticipationText,Event.Adjustment.PNPCodelist.PNPCode,Event.Device,Event.Date,Event.StartTime,Event.LapsedTimeTest

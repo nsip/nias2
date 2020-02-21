@@ -1,0 +1,2 @@
+REF_ID,TEST_ID,ITEM_ID,RUBRIC,DESCRIPTOR,MAX_SCORE
+Test.TestID,Test.TestContent.LocalId,Item.ItemID,Item.TestItemContent.NAPWritingRubricList.NAPWritingRubric.0.RubricType,Item.TestItemContent.NAPWritingRubricList.NAPWritingRubric.0.Descriptor,Item.TestItemContent.NAPWritingRubricList.NAPWritingRubric.0.ScoreList.Score.0.MaxScoreValue

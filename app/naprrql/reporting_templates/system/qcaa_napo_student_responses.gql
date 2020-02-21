@@ -1,0 +1,35 @@
+query NAPItemResults($acaraIDs: [String]) {
+  item_results_report_by_school(acaraIDs: $acaraIDs) {
+    Test {
+      TestID
+      }
+    }
+    Testlet {
+      TestletID
+      }
+    }
+    TestItem {
+      ItemID
+      }
+    }
+    Response {
+      ResponseID
+      PSI
+      TestletList {
+        Testlet {
+          ItemResponseList {
+            ItemResponse {
+              LocalID
+              Response
+              ResponseCorrectness
+              Score
+              SequenceNumber
+              ItemWeight
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
