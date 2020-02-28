@@ -17,6 +17,12 @@ query NAPDomainScores($acaraIDs: [String]) {
       GivenName
       YearLevel
       LocalId
+      OtherIdList {
+        OtherId {
+          Type
+          Value
+        }
+      }
     }
     Event {
       ParticipationCode
