@@ -13,8 +13,6 @@ If you are using NIAS for the purposes of NAPLAN validation or postprocessing, y
 * [NAPRRQL CSV and Reporting Output Outline](https://github.com/nsip/nias2/blob/master/app/naprrql/NAPRRQLToolsetCsvAndReportingOutput_v06.pdf)
 * [NAPCOMP Readme](https://github.com/nsip/nias2/blob/master/napcomp/README.md) (Audit of registration data against reporting data)
 
-If you need a simple Java-based reader for SIF NAPLAN data, consider using https://github.com/rcaldous/naplan-sif34-to-csv (developed at the VCAA).
-
 The [NIAS2AG](https://github.com/nsip/nias2ag) repository hosts NIAS open-source components to be used for Australian Government data collections.
 
 # 1. Overview
