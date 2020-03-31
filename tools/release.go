@@ -17,6 +17,7 @@ import (
 type nsipConfig struct {
 	Username string
 	Password string
+	Token    string
 }
 
 var cfg nsipConfig
@@ -46,7 +47,8 @@ func getRelease(project string) jsonRelease {
 		// handle err
 	}
 	// XXX DO NOT RELEASE !!!
-	req.SetBasicAuth(cfg.Username, cfg.Password)
+	//req.SetBasicAuth(cfg.Username, cfg.Password)
+	req.Header.Add("Authorization", "token "+cfg.Token)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -101,7 +103,8 @@ func uploadFile(release jsonRelease, name string, filename string) jsonUpload {
 		// handle err
 		log.Printf("Error upload = %s", err)
 	}
-	req.SetBasicAuth(cfg.Username, cfg.Password)
+	//req.SetBasicAuth(cfg.Username, cfg.Password)
+	req.Header.Add("Authorization", "token "+cfg.Token)
 	req.Header.Set("Content-Type", "application/zip")
 	req.ContentLength = fi.Size()
 
