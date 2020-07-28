@@ -6,8 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/nats-io/go-nats-streaming"
+	//"github.com/nats-io/go-nats-streaming"
 	"github.com/nats-io/nuid"
+	"github.com/nats-io/stan.go"
 )
 
 // connection to the Streaming NATS server

@@ -2,8 +2,9 @@
 package sms
 
 import (
-	"github.com/nats-io/go-nats-streaming"
+	//"github.com/nats-io/go-nats-streaming"
 	"github.com/nats-io/nuid"
+	"github.com/nats-io/stan.go"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
 	"github.com/siddontang/goredis"

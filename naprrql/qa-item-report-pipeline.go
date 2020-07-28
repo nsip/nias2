@@ -398,7 +398,7 @@ func qaRubricSubscoreMatches(ctx context.Context, in <-chan gjson.Result) (<-cha
 	// expectedRubricTypesStr := []string{"Spelling", "Audience", "Text Structure", "Paragraphs",
 	//		"Sentence structure", "Punctuation", "Ideas", "Persuasive Devices", "Vocabulary", "Cohesion"}
 	expectedRubricTypesStr := config.WritingRubrics
-	expectedRubricTypes := set.New()
+	expectedRubricTypes := set.New(set.ThreadSafe).(*set.Set)
 	for _, s := range expectedRubricTypesStr {
 		expectedRubricTypes.Add(s)
 	}
@@ -413,11 +413,11 @@ func qaRubricSubscoreMatches(ctx context.Context, in <-chan gjson.Result) (<-cha
 			}
 			rubrics := record.Get("TestItem.TestItemContent.NAPWritingRubricList.NAPWritingRubric").Array()
 			subscores := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SubscoreList.Subscore").Array()
-			rubrictypes := set.New()
+			rubrictypes := set.New(set.ThreadSafe).(*set.Set)
 			for _, s := range rubrics {
 				rubrictypes.Add(s.Get("RubricType").String())
 			}
-			subscoretypes := set.New()
+			subscoretypes := set.New(set.ThreadSafe).(*set.Set)
 			for _, s := range subscores {
 				subscoretypes.Add(s.Get("SubscoreType").String())
 			}
@@ -656,7 +656,7 @@ func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result, noncode
 				seq[testid] = make(map[string]map[string]string)
 			}
 			if _, ok := cf[testid][testletid]; !ok {
-				cf[testid][testletid] = set.New()
+				cf[testid][testletid] = set.New(set.ThreadSafe).(*set.Set)
 				seq[testid][testletid] = make(map[string]string)
 			}
 			// any item in the codeframe is registered as being for that sequence number, even if it substitutes for another item;
@@ -666,7 +666,7 @@ func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result, noncode
 			if len(substitutes) > 0 {
 				//log.Printf("%s\t%+v\n", itemid, substitutes)
 				if _, ok := sub[itemid]; !ok {
-					sub[itemid] = set.New()
+					sub[itemid] = set.New(set.ThreadSafe).(*set.Set)
 				}
 				for _, s := range substitutes {
 					sub[itemid].Add(s.Get("LocalId").String())
@@ -679,7 +679,7 @@ func qaReadCodeframe(ctx context.Context, codeframe <-chan gjson.Result, noncode
 			substitutes := record.Get("TestItem.TestItemContent.ItemSubstitutedForList.SubstituteItem").Array()
 			if len(substitutes) > 0 {
 				if _, ok := sub[itemid]; !ok {
-					sub[itemid] = set.New()
+					sub[itemid] = set.New(set.ThreadSafe).(*set.Set)
 				}
 				for _, s := range substitutes {
 					//log.Printf("%s\t%+v\n", itemid, substitutes)
@@ -708,7 +708,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 		curr_locationinstage := ""
 		locationinstage := 0
 		locationinstage_str := ""
-		testitems := set.New()
+		testitems := set.New(set.ThreadSafe).(*set.Set)
 		item2seq := make(map[string]string)
 		result := QaItemExpectedResponseTypeNew()
 		for record := range in {
@@ -798,8 +798,8 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[string]*set.Set, sub map[string]*set.Set, seq map[string]map[string]map[string]string, curr_testid string, curr_testletid string, curr_locationinstage string, testitems *set.Set, item2seq map[string]string) QaItemExpectedResponseType {
 	if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
 
-		foundNotExp := set.New()
-		testitems_expansion := set.New()
+		foundNotExp := set.New(set.ThreadSafe).(*set.Set)
+		testitems_expansion := set.New(set.ThreadSafe).(*set.Set)
 		//log.Printf("Expected: %+v\n", expected_testitems)
 		//log.Printf("Found   : %+v\n", testitems)
 		for _, t := range set.StringSlice(testitems) {

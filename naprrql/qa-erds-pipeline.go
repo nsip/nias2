@@ -312,10 +312,10 @@ func qaTestCompleteness(ctx context.Context, in <-chan gjson.Result) (<-chan gjs
 			}
 			if _, ok := counts[acaraid][testdomain][testlevel]; !ok {
 				counts[acaraid][testdomain][testlevel] = make(map[string]*set.Set)
-				counts[acaraid][testdomain][testlevel]["P_attempts"] = set.New()
-				counts[acaraid][testdomain][testlevel]["S_attempts"] = set.New()
-				counts[acaraid][testdomain][testlevel]["R_attempts"] = set.New()
-				counts[acaraid][testdomain][testlevel]["responses"] = set.New()
+				counts[acaraid][testdomain][testlevel]["P_attempts"] = set.New(set.ThreadSafe).(*set.Set)
+				counts[acaraid][testdomain][testlevel]["S_attempts"] = set.New(set.ThreadSafe).(*set.Set)
+				counts[acaraid][testdomain][testlevel]["R_attempts"] = set.New(set.ThreadSafe).(*set.Set)
+				counts[acaraid][testdomain][testlevel]["responses"] = set.New(set.ThreadSafe).(*set.Set)
 			}
 			if participationcode == "P" {
 				counts[acaraid][testdomain][testlevel]["P_attempts"].Add(psi)
@@ -391,16 +391,16 @@ func qaObjectFrequency(ctx context.Context, in <-chan gjson.Result) (<-chan gjso
 			result["Events_Count"] = strconv.Itoa(len(v["events"]))
 			result["PRS_Events_Count"] = strconv.Itoa(len(v["events_with_response"]))
 			result["Responses_Count"] = strconv.Itoa(len(v["responses"]))
-			events_set := set.New()
+			events_set := set.New(set.ThreadSafe).(*set.Set)
 			for _, e := range v["events"] {
 				events_set.Add(e)
 			}
 			result["Events"] = events_set.String()
-			prs_events_set := set.New()
+			prs_events_set := set.New(set.ThreadSafe).(*set.Set)
 			for _, e := range v["events_with_response"] {
 				prs_events_set.Add(e)
 			}
-			response_set := set.New()
+			response_set := set.New(set.ThreadSafe).(*set.Set)
 			for _, e := range v["responses"] {
 				response_set.Add(e)
 			}

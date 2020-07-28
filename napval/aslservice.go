@@ -20,8 +20,8 @@ import (
 type ASLService struct{}
 
 // create set-filter instances, set thread-safe
-var ibf_aslid = set.New()
-var ibf_aslstateid = set.New()
+var ibf_aslid = set.New(set.ThreadSafe)
+var ibf_aslstateid = set.New(set.ThreadSafe)
 
 // create a new id service instance
 func NewASLService() (*ASLService, error) {

@@ -8,18 +8,20 @@ echo "Downloading CORE.json"
 curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > app/napval/schemas/core.json
 curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > app/napval/schemas/core_parent2.json
 echo "Downloading nats-streaming-server"
-go get github.com/nats-io/nats-streaming-server
+#go get github.com/nats-io/nats-streaming-server
+go get github.com/nats-io/stan.go
 
 do_build() {
 	echo "Building NAPVAL..."
 	mkdir -p $OUTPUT
         rm -rf $OUTPUT/*.csv
-	cd ../../nats-io/nats-streaming-server
-	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS
+	#cd ../../nats-io/nats-streaming-server
+	cd ../../nats-io/stan.go
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$GNATS -mod=mod
 	cd $CWD
 	cd ./app/napval
 	go get
-	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
+	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS -mod=mod
 	cd ..
 	rsync -a napval/napval.toml napval/napval_nss.cfg napval/public napval/schemas napval/schoolslist napval/templates $OUTPUT/
 	rsync -a napval/students.csv $OUTPUT/

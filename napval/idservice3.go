@@ -6,7 +6,8 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/nats-io/go-nats"
+	//"github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
 	"github.com/orcaman/concurrent-map"
@@ -129,10 +130,10 @@ func (ids *IDService3) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	// see if dataset exists for this transaction, create if not
 	ids.Transactions.SetIfAbsent(req.TxID,
 		TransactionIDs{Locations: cmap.New(),
-			SimpleKeysLocalId:  set.New(),
-			SimpleKeysPSI:      set.New(),
-			ExtendedKeys:       set.New(),
-			CrossSchoolMatches: set.New(),
+			SimpleKeysLocalId:  set.New(set.ThreadSafe).(*set.Set),
+			SimpleKeysPSI:      set.New(set.ThreadSafe).(*set.Set),
+			ExtendedKeys:       set.New(set.ThreadSafe).(*set.Set),
+			CrossSchoolMatches: set.New(set.ThreadSafe).(*set.Set),
 			CrossSchoolFTEs:    cmap.New(),
 		})
 

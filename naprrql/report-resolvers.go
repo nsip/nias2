@@ -14,7 +14,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/clipperhouse/jargon"
-	"github.com/clipperhouse/jargon/contractions"
+	"github.com/clipperhouse/jargon/filters/contractions"
 	"github.com/nats-io/nuid"
 	"github.com/nsip/nias2/xml"
 	graphql "github.com/playlyfe/go-graphql"
@@ -46,7 +46,7 @@ func checkRequiredParams(params *graphql.ResolveParams) error {
 	return nil
 }
 
-var lem = jargon.NewLemmatizer(contractions.Dictionary, 3)
+//var lem = jargon.NewLemmatizer(contractions.Dictionary, 3)
 var tokenRe = regexp.MustCompile("[a-zA-Z0-9]")
 var hyphens = regexp.MustCompile("-+")
 
@@ -61,11 +61,12 @@ func countwords(html string) int {
 	// Jargon lemmatiser tokenises text, and resolves contractions
 	// We will resolve hyphenated compounds ourselves
 	tokens := jargon.Tokenize(strings.NewReader(doc.Text()))
-	lemmas := lem.Lemmatize(tokens)
+	//lemmas := lem.Lemmatize(tokens)
+	lemmas := contractions.Expand(tokens)
 	wc := 0
 	for {
-		lemma := lemmas.Next()
-		if lemma == nil {
+		lemma, err := lemmas.Next()
+		if lemma == nil || err != nil {
 			break
 		}
 		wordpart := hyphens.Split(lemma.String(), -1)
@@ -579,8 +580,10 @@ func buildReportResolvers() map[string]interface{} {
 		return results, nil
 	}
 
-	// Because there are no Writing Yr 3 enrolments in the platform at all, we are cheating by providing the Numeracy enrolments instead
 	resolvers["NaplanData/domain_scores_event_report_by_school_writing_yr3"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		// TODO 2021
+		// If there are no Writing Yr 3 enrolments in the platform at all, we are cheating by providing the Numeracy enrolments instead
+		// Switch to Writing once confirmed that Yr 3 Writing results will be included in RRD
 		return domain_scores_event_report_by_school(params, "3", "Numeracy")
 	}
 	resolvers["NaplanData/domain_scores_event_report_by_school_writing_yr5"] = func(params *graphql.ResolveParams) (interface{}, error) {

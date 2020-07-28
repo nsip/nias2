@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gosexy/rest"
 	"github.com/nsip/nias2/napval"
-	"menteslibres.net/gosexy/rest"
 )
 
 var customClient *rest.Client

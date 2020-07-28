@@ -4,7 +4,8 @@ package lib
 
 import (
 	"encoding/gob"
-	"github.com/nats-io/go-nats"
+	//"github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 	"sync"
 )
 

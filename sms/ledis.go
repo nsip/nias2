@@ -4,9 +4,9 @@
 package sms
 
 import (
+	"github.com/ledisdb/ledisdb/config"
+	"github.com/ledisdb/ledisdb/server"
 	"github.com/siddontang/goredis"
-	"github.com/siddontang/ledisdb/config"
-	"github.com/siddontang/ledisdb/server"
 	"log"
 )
 
