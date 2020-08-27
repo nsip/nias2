@@ -18,11 +18,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gosexy/rest"
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/sms"
 	"github.com/nsip/nias2/xml"
 	"github.com/siddontang/goredis"
-	"menteslibres.net/gosexy/rest"
 )
 
 var customClient *rest.Client

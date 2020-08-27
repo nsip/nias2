@@ -320,6 +320,7 @@ func qaWritingYrLevelQueryExecutor(ctx context.Context, query string, url string
 				switch result.Get("YearLevel").String() {
 				case "3":
 					school.Yr3registered++
+					school.TotalStudents++ // student Writing 3 results are to be processed like all others
 				case "5":
 					school.Yr5registered++
 					school.TotalStudents++

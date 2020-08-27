@@ -4,7 +4,8 @@ package napval
 import (
 	"log"
 
-	"github.com/nats-io/go-nats-streaming"
+	//"github.com/nats-io/go-nats-streaming"
+	"github.com/nats-io/stan.go"
 	"github.com/nsip/nias2/lib"
 )
 

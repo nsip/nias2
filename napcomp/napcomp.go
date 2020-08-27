@@ -35,8 +35,8 @@ func IngestData() {
 
 	clearDBWorkingDirectory()
 
-	registrationKeys = set.New()
-	resultsKeys = set.New()
+	registrationKeys = set.New(set.ThreadSafe).(*set.Set)
+	resultsKeys = set.New(set.ThreadSafe).(*set.Set)
 
 	log.Println("reading results data files...")
 	resultsFiles := parseResultsFileDirectory()
