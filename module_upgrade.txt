@@ -1,0 +1,17 @@
+
+Notes on upgrading this package to support golang modules
+
+napval testing rest client:
+1. go mod tidy will fail becasue of an unfixable dependency problem with the rest client lib used in testing napval (gosexy/rest).
+2. gosexy/rest has been saved to github from its original location of menteslibres.net/gosexy/rest which no longer exists, but contains an internal link to menteslibres.net/gosexy/dig which does not exist
+3. go mod tidy runs all automated tests in all linked packages and the reference to menteslibres.net/gosexy/dig is in a test class of the menteslibres.net/gosexy/rest project.
+4. Hopefully the client still functions, as we don't need to run its tests, but the mod tidy will always fail.
+5. Possible consequence is that the rest client may have to be replaced in the napval unit tests.
+
+nats streaming server:
+1. server is rebuilt as part of overall build.
+2. as nias2 now under modules, need source of nats-streaming-server also to be available as non-GOPATH code, build file now assumes will be in the same github repository folder as nias2. E.g. ~/github/nsip/nias2 and ~/github/nats-io/nats-streaming-server
+3. removed go get statements in build files to fetch streaming server as this does not fetch code when project is under module control, but fetches module dependency, and we need code in order to build the server.
+4. Developers therefore need to clone nats-streamng-server before running build.sh
+
+
