@@ -4,19 +4,23 @@ import (
 	"bytes"
 	"encoding/json"
 	//"log"
-	"net/url"
+	//"net/url"
+	"net"
 	"os"
 	"path"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/gosexy/rest"
+	//"github.com/gosexy/rest"
+	"github.com/go-resty/resty/v2"
+	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/napval"
 )
 
-var customClient *rest.Client
+var customClient *resty.Client
 
+/*
 func post_file(filename string, endpoint string) (string, error) {
 	var f *os.File
 	var err error
@@ -40,6 +44,27 @@ func post_file(filename string, endpoint string) (string, error) {
 		return "", err
 	}
 	txid := dst["TxID"].(string)
+	return txid, nil
+}
+*/
+
+func post_file(filename string, endpoint string) (string, error) {
+	dst := lib.NiasMessage{}
+	resp, err := customClient.R().
+		SetFiles(map[string]string{
+			"validationFile": filename,
+		}).
+		SetFormData(map[string]string{
+			"name": path.Base(filename),
+		}).
+		SetResult(&dst).
+		Post(endpoint)
+	if err != nil {
+		return "", err
+	}
+	out := resp.Result().(*lib.NiasMessage)
+	//log.Printf("%+v", out)
+	txid := out.TxID
 	return txid, nil
 }
 
@@ -384,16 +409,18 @@ func errcheck(t *testing.T, err error) {
 /* if errfield is nil, we expect test to pass */
 func test_harness(t *testing.T, filename string, errfield string, errdescription string) {
 	var err error
-	bytebuf := []byte{}
+	//bytebuf := []byte{}
 	dat := map[string]string{}
 
 	txid, err := post_file(filename, "naplan/reg/validate")
 	errcheck(t, err)
 	time.Sleep(100 * time.Millisecond)
 
-	err = customClient.Get(&bytebuf, "naplan/reg/results/"+txid, nil)
+	//err = customClient.Get(&bytebuf, "naplan/reg/results/"+txid, nil)
+	resp, err := customClient.R().Get("naplan/reg/results/" + txid)
 	errcheck(t, err)
 	//log.Println("+++" + string(bytebuf))
+	bytebuf := resp.Body()
 
 	// we are getting back line delimited JSON
 	lines := bytes.Split(bytebuf, []byte{'\n'})
@@ -434,6 +461,9 @@ func test_harness(t *testing.T, filename string, errfield string, errdescription
 
 func TestMain(m *testing.M) {
 	config := napval.LoadNAPLANConfig()
-	customClient, _ = rest.New("http://localhost:" + config.WebServerPort + "/")
+	//customClient, _ = rest.New("http://localhost:" + config.WebServerPort + "/")
+	localAddress, _ := net.ResolveTCPAddr("tcp", "127.0.0.1")
+	customClient = resty.NewWithLocalAddr(localAddress)
+	customClient.SetHostURL("http://localhost:" + config.WebServerPort + "/")
 	os.Exit(m.Run())
 }

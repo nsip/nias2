@@ -11,6 +11,7 @@ require (
 	github.com/clipperhouse/jargon v1.0.7
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fatih/color v1.9.0 // indirect
+	github.com/go-resty/resty/v2 v2.3.0
 	github.com/gosexy/rest v0.0.0-20160109152940-b63cba93265b
 	github.com/kylelemons/godebug v1.1.0
 	github.com/labstack/echo v3.3.10+incompatible

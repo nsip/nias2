@@ -8,7 +8,7 @@ import (
 	"github.com/tidwall/sjson"
 	"github.com/xeipuuv/gojsonschema"
 	"io/ioutil"
-	//"log"
+	"log"
 )
 
 // implementaiton of the json schema validation service
@@ -89,8 +89,16 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 	if !result.Valid() {
 		seen := make(map[string]bool)
 		for _, desc := range result.Errors() {
-			//log.Printf("ERRRORRRRR: %d: %s\n", desc, req.SeqNo)
 			field := desc.Field()
+			field1 := desc.Details()["field"].(string)
+			field2 := desc.Details()["property"]
+			//log.Printf("ERRRORRRRR: %+v: [%s] [%s] [%s] %s\n", desc, field, field1, field2, req.SeqNo)
+			if field == "(root)" && field1 != "" {
+				field = field1
+			}
+			if field == "(root)" && field2 != nil && field2.(string) != "" {
+				field = field2.(string)
+			}
 
 			// Handle dependencies  errors
 			if desc.Field() == "(root)" {
