@@ -6,7 +6,7 @@ package naprrql
 import (
 	"errors"
 	"log"
-	"strconv"
+	//"strconv"
 	"strings"
 
 	"github.com/nsip/nias2/xml"
@@ -22,20 +22,20 @@ type ISRPrintItem struct {
 	YearLevel        string
 	SchoolID         string
 	SchoolName       string
-	R_Score          float64
-	R_Mean           float64
+	R_Score          string
+	R_Mean           string
 	R_Comment        string
-	W_Score          float64
-	W_Mean           float64
+	W_Score          string
+	W_Mean           string
 	W_Comment        string
-	S_Score          float64
-	S_Mean           float64
+	S_Score          string
+	S_Mean           string
 	S_Comment        string
-	G_Score          float64
-	G_Mean           float64
+	G_Score          string
+	G_Mean           string
 	G_Comment        string
-	N_Score          float64
-	N_Mean           float64
+	N_Score          string
+	N_Mean           string
 	N_Comment        string
 }
 
@@ -44,24 +44,24 @@ type ISRPrintItemExpanded struct {
 	Student         xml.RegistrationRecord
 	SchoolID        string
 	SchoolName      string
-	R_Score         float64
-	R_Mean          float64
+	R_Score         string
+	R_Mean          string
 	R_Comment       string
 	R_Participation string
-	W_Score         float64
-	W_Mean          float64
+	W_Score         string
+	W_Mean          string
 	W_Comment       string
 	W_Participation string
-	S_Score         float64
-	S_Mean          float64
+	S_Score         string
+	S_Mean          string
 	S_Comment       string
 	S_Participation string
-	G_Score         float64
-	G_Mean          float64
+	G_Score         string
+	G_Mean          string
 	G_Comment       string
 	G_Participation string
-	N_Score         float64
-	N_Mean          float64
+	N_Score         string
+	N_Mean          string
 	N_Comment       string
 	N_Participation string
 	G_Pathway       string
@@ -69,11 +69,11 @@ type ISRPrintItemExpanded struct {
 	W_Pathway       string
 	S_Pathway       string
 	N_Pathway       string
-	G_Stddev        float64
-	R_Stddev        float64
-	W_Stddev        float64
-	S_Stddev        float64
-	N_Stddev        float64
+	G_Stddev        string
+	R_Stddev        string
+	W_Stddev        string
+	S_Stddev        string
+	N_Stddev        string
 	G_DomainBand    string
 	R_DomainBand    string
 	W_DomainBand    string
@@ -137,20 +137,40 @@ func (isrpi *ISRPrintItem) allocateDomainScoreAndMean(event *xml.NAPEvent,
 	domain := strings.ToLower(test.TestContent.TestDomain)
 	switch {
 	case strings.Contains(domain, "gramm"):
-		isrpi.G_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.G_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.G_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.G_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.G_Score = resp.ScaledScoreValue
+		isrpi.G_Mean = summary.DomainSchoolAverage
 	case strings.Contains(domain, "num"):
-		isrpi.N_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.N_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.N_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.N_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.N_Score = resp.ScaledScoreValue
+		isrpi.N_Mean = summary.DomainSchoolAverage
 	case strings.Contains(domain, "read"):
-		isrpi.R_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.R_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.R_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.R_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.R_Score = resp.ScaledScoreValue
+		isrpi.R_Mean = summary.DomainSchoolAverage
 	case strings.Contains(domain, "writ"):
-		isrpi.W_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.W_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.W_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.W_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.W_Score = resp.ScaledScoreValue
+		isrpi.W_Mean = summary.DomainSchoolAverage
 	case strings.Contains(domain, "spell"):
-		isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.S_Score = resp.ScaledScoreValue
+		isrpi.S_Mean = summary.DomainSchoolAverage
 	default:
 		log.Println("Unknown test domain supplied (allocateDomainScore): ", domain)
 	}
@@ -176,37 +196,62 @@ func (isrpi *ISRPrintItemExpanded) allocateDomainScoreAndMeanAndParticipation(ev
 	domain := strings.ToLower(test.TestContent.TestDomain)
 	switch {
 	case strings.Contains(domain, "gramm"):
-		isrpi.G_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.G_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
-		isrpi.G_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.G_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.G_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
+			isrpi.G_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.G_Score = resp.ScaledScoreValue
+		isrpi.G_Stddev = resp.ScaledScoreStandardError
+		isrpi.G_Mean = summary.DomainSchoolAverage
 		isrpi.G_Participation = event.ParticipationCode
 		isrpi.G_Pathway = pathway
 		isrpi.G_DomainBand = resp.StudentDomainBand
 	case strings.Contains(domain, "num"):
-		isrpi.N_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.N_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
-		isrpi.N_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.N_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.N_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
+			isrpi.N_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.N_Score = resp.ScaledScoreValue
+		isrpi.N_Stddev = resp.ScaledScoreStandardError
+		isrpi.N_Mean = summary.DomainSchoolAverage
 		isrpi.N_Participation = event.ParticipationCode
 		isrpi.N_Pathway = pathway
 		isrpi.N_DomainBand = resp.StudentDomainBand
 	case strings.Contains(domain, "read"):
-		isrpi.R_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.R_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
-		isrpi.R_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.R_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.R_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
+			isrpi.R_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.R_Score = resp.ScaledScoreValue
+		isrpi.R_Stddev = resp.ScaledScoreStandardError
+		isrpi.R_Mean = summary.DomainSchoolAverage
 		isrpi.R_Participation = event.ParticipationCode
 		isrpi.R_Pathway = pathway
 		isrpi.R_DomainBand = resp.StudentDomainBand
 	case strings.Contains(domain, "writ"):
-		isrpi.W_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.W_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
-		isrpi.W_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.W_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.W_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
+			isrpi.W_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.W_Score = resp.ScaledScoreValue
+		isrpi.W_Stddev = resp.ScaledScoreStandardError
+		isrpi.W_Mean = summary.DomainSchoolAverage
 		isrpi.W_Participation = event.ParticipationCode
 		isrpi.W_Pathway = pathway
 		isrpi.W_DomainBand = resp.StudentDomainBand
 	case strings.Contains(domain, "spell"):
-		isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
-		isrpi.S_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
-		isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		/*
+			isrpi.S_Score, _ = strconv.ParseFloat(resp.ScaledScoreValue, 32)
+			isrpi.S_Stddev, _ = strconv.ParseFloat(resp.ScaledScoreStandardError, 32)
+			isrpi.S_Mean, _ = strconv.ParseFloat(summary.DomainSchoolAverage, 32)
+		*/
+		isrpi.S_Score = resp.ScaledScoreValue
+		isrpi.S_Stddev = resp.ScaledScoreStandardError
+		isrpi.S_Mean = summary.DomainSchoolAverage
 		isrpi.S_Participation = event.ParticipationCode
 		isrpi.S_Pathway = pathway
 		isrpi.S_DomainBand = resp.StudentDomainBand
