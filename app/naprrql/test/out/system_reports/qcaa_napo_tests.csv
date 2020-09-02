@@ -1,0 +1,23 @@
+REF_ID,TEST_ID,YEAR_LEVEL,DOMAIN,TEST_TYPE,STAGES_COUNT,TEST_NAME
+042f4a79-f380-47fd-b634-eb93e68d9256,x00106804_Numeracy,3,Numeracy,Normal,3,Numeracy Year 3
+0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,9,Writing,Normal,3,Writing Year 9
+2622d6dd-c57f-4f8b-a8eb-22a3dacc72d3,x001068013_Reading,7,Reading,Normal,3,Reading Year 7
+26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,7,Writing,Normal,3,Writing Year 7
+2d98a118-1b42-417a-80e3-5ffb6c4b7042,x001068018_Spelling,7,Spelling,Normal,2,Spelling Year 7
+305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,7,Writing,Normal,3,Writing Year 7
+3e6aabba-8c62-4bcd-a0f6-e6995c039453,x001068024_Spelling,9,Spelling,Normal,2,Spelling Year 9
+67e08ed8-8987-493f-ad89-5ea21cd8069d,x001068023_Grammar and Punctuation,9,Grammar and Punctuation,Normal,3,Grammar and Punctuation Year 9
+67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,9,Writing,Normal,3,Writing Year 9
+6bd3f5a7-7209-4a92-b001-f5214dc5a66e,x001068012_Spelling,5,Spelling,Normal,2,Spelling Year 5
+7605e4cf-6771-49b8-a842-3f6e88ac555e,x001068011_Grammar and Punctuation,5,Grammar and Punctuation,Normal,3,Grammar and Punctuation Year 5
+771639c7-329e-4279-baa8-a345f5fe838a,x001068022_Numeracy,9,Numeracy,Normal,3,Numeracy Year 9
+88b95ce2-baf4-4aa7-95f4-e9f3f8eec6ea,x001068019_Reading,9,Reading,Normal,3,Reading Year 9
+902f58ae-6cf2-4b5b-946d-982c2f043bf4,x001068016_Numeracy,7,Numeracy,Normal,3,Numeracy Year 7
+98209d06-e1d5-4082-a44a-e80ef8417d06,x001068017_Grammar and Punctuation,7,Grammar and Punctuation,Normal,3,Grammar and Punctuation Year 7
+ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,5,Writing,Normal,3,Writing Year 5
+b2506359-e0ad-4566-a49f-c60953bc24f4,x00106806_Spelling,3,Spelling,Normal,2,Spelling Year 3
+c826b480-d399-48b0-bbe0-13b24aca1496,x00106801_Reading,3,Reading,Normal,3,Reading Year 3
+cf12d6f0-84ae-4438-8242-81df5521cb32,x001068010_Numeracy,5,Numeracy,Normal,3,Numeracy Year 5
+eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,5,Writing,Normal,3,Writing Year 5
+f46beac0-bb55-4d12-a740-69b62660534d,x00106807_Reading,5,Reading,Normal,3,Reading Year 5
+f92adb81-a519-43a5-acbb-2f8b69711fca,x00106805_Grammar and Punctuation,3,Grammar and Punctuation,Normal,3,Grammar and Punctuation Year 3
