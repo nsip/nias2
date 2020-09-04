@@ -13,7 +13,7 @@ fi
 ./nats-streaming-server -p 4223 -sc napval_nss.cfg & echo $! > nias.pid
 
 # give the nats server time to come up
-sleep 2
+sleep 5
 
 ./napval & echo $! >> nias.pid
 

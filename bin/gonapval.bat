@@ -6,7 +6,7 @@ rem gnatsd MUST be the first program launched
 
 rem Run the NIAS services. Add to the BOTTOM of this list
 start nats-streaming-server -p 4223 -sc napval_nss.cfg
-timeout /t 3
+timeout /t 5
 start napval
 
 
