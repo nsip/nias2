@@ -443,6 +443,9 @@ func qaParticipationQueryExecutor(ctx context.Context, query string, url string,
 				iter := result.Get("Summary")
 				iter.ForEach(func(_, value gjson.Result) bool {
 					key := value.Get("ParticipationCode").String()
+					if key == "AF" {
+						key = "F"
+					}
 					school.AttemptParticipation[key]++
 					return true // keep iterating
 				})

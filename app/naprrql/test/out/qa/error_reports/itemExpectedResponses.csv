@@ -1,6 +1,6 @@
 PSI,Test,Participation Code,Testlet 1 Name,# Expected Items Testlet 1,# Correct Items Testlet 1,# Incorrect Items Testlet 1,# Not Attempted Items Testlet 1,# Not In Path Items testlet 1,Expected Items Not Found Testlet 1,Found Items Not Expected Testlet 1,Testlet 2 Name,# Expected Items Testlet 2,# Correct Items Testlet 2,# Incorrect Items Testlet 2,# Not Attempted Items Testlet 2,# Not In Path Items testlet 2,Expected Items Not Found Testlet 2,Found Items Not Expected Testlet 2,Testlet 3 Name,# Expected Items Testlet 3,# Correct Items Testlet 3,# Incorrect Items Testlet 3,# Not Attempted Items Testlet 3,# Not In Path Items testlet 3,Expected Items Not Found Testlet 3,Found Items Not Expected Testlet 3
 R100000000K,Grammar and Punctuation Year 7,P,P11,10,9,1,,,[],[],,,,,,,,,,,,,,,,
-R100000000K,Spelling Year 7,P,S12,19,7,2,1,,"[x00101888-04-AIA, x00101888-08-AIA, x00101888-06-AIA, x00101888-09-AIA, x00101888-00-AIA, x00101888-07-AIA, x00101888-02-AIA, x00101888-03-AIA, x00101888-05-AIA]",[],S32,5,3,2,,,[],[],,,,,,,,
-R100000000K,Numeracy Year 7,P,A2,19,13,2,1,,"[x00100804, x00100803, x00100802]",[],D2,19,12,4,,,"[x00100903, x00100904, x00100902]",[],C1,19,10,5,1,,"[x00100863, x00100864, x00100862]",[]
+R100000000K,Spelling Year 7,P,S12,19,7,2,1,,"[x00101888-06-AIA, x00101888-07-AIA, x00101888-05-AIA, x00101888-09-AIA, x00101888-02-AIA, x00101888-04-AIA, x00101888-08-AIA, x00101888-00-AIA, x00101888-03-AIA]",[],S32,5,3,2,,,[],[],,,,,,,,
+R100000000K,Numeracy Year 7,P,A2,19,13,2,1,,"[x00100803, x00100802, x00100804]",[],D2,19,12,4,,,"[x00100903, x00100904, x00100902]",[],C1,19,10,5,1,,"[x00100862, x00100864, x00100863]",[]
 R100000000K,Reading Year 7,P,A2,16,11,4,1,,[],[],B1,16,13,2,,1,[],[],C1,16,12,3,,1,[],[]
-R100000000K,Writing Year 7,P,Blank1,0,1,,,,,[x00101972],,,,,,,,,,,,,,,,
+R100000000K,Writing Year 7,P,Blank1,0,1,,,,[],[x00101972],,,,,,,,,,,,,,,,

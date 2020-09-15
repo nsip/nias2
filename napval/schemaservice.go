@@ -8,7 +8,7 @@ import (
 	"github.com/tidwall/sjson"
 	"github.com/xeipuuv/gojsonschema"
 	"io/ioutil"
-	"log"
+	//"log"
 )
 
 // implementaiton of the json schema validation service
