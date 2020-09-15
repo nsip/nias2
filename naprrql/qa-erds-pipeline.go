@@ -186,6 +186,9 @@ func qaTestTypeImpacts(ctx context.Context, in <-chan gjson.Result) (<-chan gjso
 		for record := range in {
 			domain := record.Get("Test.TestContent.TestDomain").String()
 			participationcode := record.Get("Event.ParticipationCode").String()
+			if participationcode == "AF" {
+				participationcode = "F"
+			}
 			pathtakenfordomain := record.Get("Response.PathTakenForDomain").String()
 			paralleltest := record.Get("Response.ParallelTest").String()
 
@@ -249,8 +252,12 @@ func qaParticipationCodeImpacts(ctx context.Context, in <-chan gjson.Result) (<-
 		for record := range in {
 			var j []byte
 			participationCode := record.Get("Event.ParticipationCode").String()
+			if participationCode == "AF" {
+				participationCode = "F"
+			}
 			rawscore := record.Get("Response.DomainScore.RawScore").String()
 			scaledscore := record.Get("Response.DomainScore.ScaledScoreValue").String()
+			domain := record.Get("Test.TestContent.TestDomain").String()
 			rawscore_num, _ := strconv.Atoi(rawscore)
 			j = nil
 			if (len(record.Get("Response.PathTakenForDomain").String()) > 0 ||
@@ -261,9 +268,9 @@ func qaParticipationCodeImpacts(ctx context.Context, in <-chan gjson.Result) (<-
 				m["Error"] = "Adaptive pathway without student undertaking test"
 				j, _ = json.Marshal(m)
 			} else if (len(rawscore) > 0 || len(scaledscore) > 0) &&
-				(participationCode != "P" && participationCode != "R") {
+				(participationCode != "P" && participationCode != "R" && !(participationCode == "F" && domain == "Writing")) {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Scored test with status other than P or R"
+				m["Error"] = "Scored test with status other than AF, P or R"
 				j, _ = json.Marshal(m)
 			} else if len(rawscore) > 0 &&
 				participationCode == "R" &&
@@ -272,9 +279,9 @@ func qaParticipationCodeImpacts(ctx context.Context, in <-chan gjson.Result) (<-
 				m["Error"] = "Non-zero score with status of R"
 				j, _ = json.Marshal(m)
 			} else if (len(rawscore) == 0 || len(scaledscore) == 0) &&
-				(participationCode == "P" || participationCode == "R") {
+				(participationCode == "P" || participationCode == "R" || (participationCode == "F" && domain == "Writing")) {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Unscored test with status of P or R"
+				m["Error"] = "Unscored test with status of AF, P or R"
 				j, _ = json.Marshal(m)
 			}
 			if j != nil {
@@ -301,6 +308,9 @@ func qaTestCompleteness(ctx context.Context, in <-chan gjson.Result) (<-chan gjs
 			testdomain := record.Get("Test.TestContent.TestDomain").String()
 			testlevel := record.Get("Test.TestContent.TestLevel").String()
 			participationcode := record.Get("Event.ParticipationCode").String()
+			if participationcode == "AF" {
+				participationcode = "F"
+			}
 			psi := record.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
 			responseid := record.Get("Response.ResponseID").String()
 
@@ -367,6 +377,9 @@ func qaObjectFrequency(ctx context.Context, in <-chan gjson.Result) (<-chan gjso
 		for record := range in {
 			psi := record.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
 			participationcode := record.Get("Event.ParticipationCode").String()
+			if participationcode == "AF" {
+				participationcode = "F"
+			}
 			eventcode := record.Get("SchoolDetails.ACARAId").String() + ":" + record.Get("Test.TestContent.TestLevel").String() + ":" + record.Get("Test.TestContent.TestDomain").String()
 			responseid := record.Get("Response.ResponseID").String()
 

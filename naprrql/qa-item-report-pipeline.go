@@ -334,6 +334,10 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 		var j []byte
 		for record := range in {
 			participationcode := record.Get("ParticipationCode").String()
+			if participationcode == "AF" {
+				participationcode = "F"
+			}
+			domain := record.Get("Test.TestContent.TestDomain").String()
 			lapsedtimeitem := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.LapsedTimeItem").String()
 			testletscore := record.Get("Response.TestletList.Testlet.0.TestletScore").String()
 			testletscore_num, _ := strconv.Atoi(testletscore)
@@ -343,16 +347,16 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 			j = nil
 			if (len(lapsedtimeitem) > 0 ||
 				len(record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.Response").String()) > 0) &&
-				participationcode != "P" && participationcode != "S" {
+				participationcode != "P" && participationcode != "S" && !(domain == "Writing" && participationcode == "F") {
 				m := record.Value().(map[string]interface{})
 				m["Error"] = "Response captured without student writing test"
 				j, _ = json.Marshal(m)
 			} else if (len(testletscore) > 0 ||
 				len(itemscore) > 0 ||
 				len(subscores) > 0) &&
-				participationcode != "P" && participationcode != "R" {
+				participationcode != "P" && participationcode != "R" && !(domain == "Writing" && participationcode == "F") {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Scored test with status other than P or R"
+				m["Error"] = "Scored test with status other than AF, P or R"
 				j, _ = json.Marshal(m)
 			} else if ((len(testletscore) > 0 && testletscore_num != 0) ||
 				(len(itemscore) > 0 && itemscore_num != 0) || len(subscores) > 0) &&
@@ -367,15 +371,14 @@ func qaParticipationCodeItemImpacts(ctx context.Context, in <-chan gjson.Result)
 				// ignore "F", those are non-adaptive
 				j, _ = json.Marshal(m)
 			} else if (len(itemscore) == 0) &&
-				(participationcode == "R" || participationcode == "P") {
+				(participationcode == "R" || participationcode == "P" || (domain == "Writing" && participationcode == "F")) {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Unscored test with status of P or R"
+				m["Error"] = "Unscored test with status of AF, P or R"
 				j, _ = json.Marshal(m)
-			} else if len(subscores) == 0 &&
-				record.Get("Test.TestContent.TestDomain").String() == "Writing" &&
-				(participationcode == "P") {
+			} else if len(subscores) == 0 && domain == "Writing" &&
+				(participationcode == "P" || participationcode == "F") {
 				m := record.Value().(map[string]interface{})
-				m["Error"] = "Unscored writing test with status of P"
+				m["Error"] = "Unscored writing test with status of P or AF"
 				j, _ = json.Marshal(m)
 			}
 			if j != nil {
@@ -509,6 +512,9 @@ func qaItemCounts(ctx context.Context, codeframe <-chan gjson.Result, noncodefra
 			testlevel := record.Get("Test.TestContent.TestLevel").String()
 			itemlocalid := record.Get("TestItem.TestItemContent.NAPTestItemLocalId").String()
 			participationcode := record.Get("ParticipationCode").String()
+			if participationcode == "AF" {
+				participationcode = "F"
+			}
 			if record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.ResponseCorrectness").String() == "Not In Path" {
 				continue
 			}
@@ -711,6 +717,8 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 		testitems := set.New(set.ThreadSafe).(*set.Set)
 		item2seq := make(map[string]string)
 		result := QaItemExpectedResponseTypeNew()
+		participationcode := ""
+		curr_participationcode := ""
 		for record := range in {
 			psi := record.Get("Response.PSI").String()
 			testletid := record.Get("Testlet.TestletContent.LocalId").String()
@@ -720,7 +728,10 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			itemid := record.Get("TestItem.TestItemContent.NAPTestItemLocalId").String()
 			correctness := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.ResponseCorrectness").String()
 			sequence := record.Get("Response.TestletList.Testlet.0.ItemResponseList.ItemResponse.0.SequenceNumber").String()
-			participationcode := record.Get("ParticipationCode").String()
+			participationcode = record.Get("ParticipationCode").String()
+			if participationcode == "AF" {
+				participationcode = "F"
+			}
 			// we're assuming LocationInStage is only 1, 2, 3
 			// locationinstage := record.Get("Testlet.TestletContent.LocationInStage").String()
 			// We're just incrementing testlets
@@ -729,7 +740,7 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			//}
 
 			if !testitems.IsEmpty() && (testletid != curr_testletid || testid != curr_testid || psi != curr_psi) {
-				result = checkExpectedItems(result, cf, sub, seq, curr_testid, curr_testletid, curr_locationinstage, testitems, item2seq)
+				result = checkExpectedItems(result, cf, sub, seq, curr_testid, curr_testletid, curr_locationinstage, testitems, item2seq, curr_participationcode)
 			}
 			if psi != curr_psi || testid != curr_testid {
 				if psi != curr_psi {
@@ -781,10 +792,11 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 			curr_testid = testid
 			curr_psi = psi
 			curr_locationinstage = locationinstage_str
+			curr_participationcode = participationcode
 			//log.Printf("%s\t%s\t%s\t%s\t%d\n", psi, testname, testletname, itemid, locationinstage)
 			// log.Printf("%+v\n", result)
 		}
-		result = checkExpectedItems(result, cf, sub, seq, curr_testid, curr_testletid, curr_locationinstage, testitems, item2seq)
+		result = checkExpectedItems(result, cf, sub, seq, curr_testid, curr_testletid, curr_locationinstage, testitems, item2seq, participationcode)
 		j, _ := json.Marshal(result)
 		select {
 		case out <- gjson.ParseBytes(j):
@@ -795,7 +807,12 @@ func qaItemExpectedResponses(ctx context.Context, codeframec <-chan gjson.Result
 	return out, errc, nil
 }
 
-func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[string]*set.Set, sub map[string]*set.Set, seq map[string]map[string]map[string]string, curr_testid string, curr_testletid string, curr_locationinstage string, testitems *set.Set, item2seq map[string]string) QaItemExpectedResponseType {
+func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[string]*set.Set, sub map[string]*set.Set, seq map[string]map[string]map[string]string, curr_testid string, curr_testletid string, curr_locationinstage string, testitems *set.Set, item2seq map[string]string, participationcode string) QaItemExpectedResponseType {
+	if participationcode == "F" {
+		result.ExpectedItemsNotFound["1"] = "[]"
+		result.FoundItemsNotExpected["1"] = "[]"
+		return result
+	}
 	if expected_testitems, ok := cf[curr_testid][curr_testletid]; ok {
 
 		foundNotExp := set.New(set.ThreadSafe).(*set.Set)
@@ -835,7 +852,7 @@ func checkExpectedItems(result QaItemExpectedResponseType, cf map[string]map[str
 		// log.Printf("FoundNEx : %+v\n", foundNotExp)
 		result.FoundItemsNotExpected[curr_locationinstage] = foundNotExp.String()
 	} else {
-		result.ExpectedItemsNotFound[curr_locationinstage] = ""
+		result.ExpectedItemsNotFound[curr_locationinstage] = "[]"
 		result.FoundItemsNotExpected[curr_locationinstage] = testitems.String()
 	}
 	return result

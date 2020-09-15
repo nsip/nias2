@@ -2,15 +2,12 @@ query NAPItemResults($acaraIDs: [String]) {
   item_results_report_by_school(acaraIDs: $acaraIDs) {
     Test {
       TestID
-      }
     }
     Testlet {
       TestletID
-      }
     }
     TestItem {
       ItemID
-      }
     }
     Response {
       ResponseID

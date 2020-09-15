@@ -1,61 +1,61 @@
 REF_ID,TEST_ID,ITEM_ID,RUBRIC,DESCRIPTOR,MAX_SCORE
 eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Audience,"The writer’s capacity to orient, engage and affect the reader",6
-eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Text Structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
+eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Text structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
 eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Ideas,"The creation, selection and crafting of ideas for a Persuasive text.",5
 eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Character and setting,The use of a range of persuasive devices to enhance a writer's position and persuade the reader.,4
 eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Vocabulary,The range and precision of language choices.,5
 eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Cohesion,"The control of multiple threads and relationships over the whole text, achieved through the use of referring words, substitutions, word associations and text connectives.",4
-eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Paragraphs,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
+eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Paragraphing,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
 eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Sentence structure,"The production of grammatically correct, structurally sound and meaningful sentences.",6
 eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Punctuation,The use of correct and appropriate punctuation to aid reading of the text.,5
 eb68cd7c-265c-4e1d-959e-e426f5cb3884,x00106808_Writing,ae56c9cf-8769-4cd9-9ee0-3b63a9f3167d,Spelling,The accuracy of spelling and the difficulty of the words used.,6
 305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Audience,"The writer’s capacity to orient, engage and affect the reader",6
-305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Text Structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
+305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Text structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
 305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Ideas,"The creation, selection and crafting of ideas for a Persuasive text.",5
 305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Character and setting,The use of a range of persuasive devices to enhance a writer's position and persuade the reader.,4
 305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Vocabulary,The range and precision of language choices.,5
 305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Cohesion,"The control of multiple threads and relationships over the whole text, achieved through the use of referring words, substitutions, word associations and text connectives.",4
-305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Paragraphs,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
+305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Paragraphing,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
 305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Sentence structure,"The production of grammatically correct, structurally sound and meaningful sentences.",6
 305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Punctuation,The use of correct and appropriate punctuation to aid reading of the text.,5
 305d1e8b-886d-4585-8d3b-0e1770c775bb,x001068015_Writing_alt,bb3a1de2-7e51-4914-9e87-817a0fbf69b6,Spelling,The accuracy of spelling and the difficulty of the words used.,6
 67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Audience,"The writer’s capacity to orient, engage and affect the reader",6
-67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Text Structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
+67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Text structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
 67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Ideas,"The creation, selection and crafting of ideas for a Persuasive text.",5
 67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Character and setting,The use of a range of persuasive devices to enhance a writer's position and persuade the reader.,4
 67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Vocabulary,The range and precision of language choices.,5
 67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Cohesion,"The control of multiple threads and relationships over the whole text, achieved through the use of referring words, substitutions, word associations and text connectives.",4
-67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Paragraphs,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
+67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Paragraphing,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
 67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Sentence structure,"The production of grammatically correct, structurally sound and meaningful sentences.",6
 67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Punctuation,The use of correct and appropriate punctuation to aid reading of the text.,5
 67e7474a-6cb1-426b-bf7f-5057e2790870,x001068021_Writing_alt,6157a9ce-8d75-40c7-aca2-bed45f59b3e6,Spelling,The accuracy of spelling and the difficulty of the words used.,6
 26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Audience,"The writer’s capacity to orient, engage and affect the reader",6
-26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Text Structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
+26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Text structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
 26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Ideas,"The creation, selection and crafting of ideas for a Persuasive text.",5
 26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Character and setting,The use of a range of persuasive devices to enhance a writer's position and persuade the reader.,4
 26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Vocabulary,The range and precision of language choices.,5
 26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Cohesion,"The control of multiple threads and relationships over the whole text, achieved through the use of referring words, substitutions, word associations and text connectives.",4
-26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Paragraphs,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
+26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Paragraphing,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
 26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Sentence structure,"The production of grammatically correct, structurally sound and meaningful sentences.",6
 26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Punctuation,The use of correct and appropriate punctuation to aid reading of the text.,5
 26aaae85-f9fb-4197-9425-a5342759d37d,x001068014_Writing,3283b4bf-6c75-4313-81a9-04915b67d4a8,Spelling,The accuracy of spelling and the difficulty of the words used.,6
 ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Audience,"The writer’s capacity to orient, engage and affect the reader",6
-ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Text Structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
+ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Text structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
 ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Ideas,"The creation, selection and crafting of ideas for a Persuasive text.",5
 ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Character and setting,The use of a range of persuasive devices to enhance a writer's position and persuade the reader.,4
 ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Vocabulary,The range and precision of language choices.,5
 ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Cohesion,"The control of multiple threads and relationships over the whole text, achieved through the use of referring words, substitutions, word associations and text connectives.",4
-ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Paragraphs,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
+ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Paragraphing,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
 ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Sentence structure,"The production of grammatically correct, structurally sound and meaningful sentences.",6
 ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Punctuation,The use of correct and appropriate punctuation to aid reading of the text.,5
 ace60df2-d6df-4edb-8cf1-2485e6bcf127,x00106809_Writing_alt,ddb76e4a-eaf3-4d0f-b3ad-05e83a6637b7,Spelling,The accuracy of spelling and the difficulty of the words used.,6
 0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Audience,"The writer’s capacity to orient, engage and affect the reader",6
-0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Text Structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
+0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Text structure,"The organisation of text features including introduction, body and conclusion into an appropriate and effective text structure.",4
 0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Ideas,"The creation, selection and crafting of ideas for a Persuasive text.",5
 0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Character and setting,The use of a range of persuasive devices to enhance a writer's position and persuade the reader.,4
 0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Vocabulary,The range and precision of language choices.,5
 0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Cohesion,"The control of multiple threads and relationships over the whole text, achieved through the use of referring words, substitutions, word associations and text connectives.",4
-0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Paragraphs,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
+0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Paragraphing,The segmenting of text into paragraphs that assists the reader to negotiate the text.,3
 0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Sentence structure,"The production of grammatically correct, structurally sound and meaningful sentences.",6
 0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Punctuation,The use of correct and appropriate punctuation to aid reading of the text.,5
 0671dece-24d6-4f58-bfd6-394bba87d5ae,x001068020_Writing,923cb050-bd9b-4b6d-8108-1002c7266573,Spelling,The accuracy of spelling and the difficulty of the words used.,6

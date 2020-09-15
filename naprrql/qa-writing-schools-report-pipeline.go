@@ -188,6 +188,9 @@ func qaWritingParticipationQueryExecutor(ctx context.Context, query string, url 
 						return true // skip this value
 					}
 					key := value.Get("ParticipationCode").String()
+					if key == "AF" {
+						key = "F"
+					}
 					school.AttemptParticipation[key]++
 					return true // keep iterating
 				})
@@ -274,8 +277,11 @@ func qaWritingAttemptsQueryExecutor(ctx context.Context, query string, url strin
 			school.TestAttempts = make(map[string]int)
 			for _, result := range json.Array() {
 				participation := result.Get("Event.ParticipationCode").String()
+				if participation == "AF" {
+					participation = "F"
+				}
 				domain := result.Get("Test.TestContent.TestDomain").String()
-				if domain == "Writing" && (participation == "P") {
+				if domain == "Writing" && (participation == "P" || participation == "F") {
 					key := result.Get("Test.TestContent.TestLevel").String() + ":" + domain
 					school.TestAttempts[key]++
 					school.TotalAttempts++
