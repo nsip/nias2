@@ -377,6 +377,7 @@ func qaObjectFrequency(ctx context.Context, in <-chan gjson.Result) (<-chan gjso
 		for record := range in {
 			psi := record.Get("Student.OtherIdList.OtherId.#[Type==NAPPlatformStudentId].Value").String()
 			participationcode := record.Get("Event.ParticipationCode").String()
+			testdomain := record.Get("Test.TestContent.TestDomain").String()
 			if participationcode == "AF" {
 				participationcode = "F"
 			}
@@ -390,7 +391,7 @@ func qaObjectFrequency(ctx context.Context, in <-chan gjson.Result) (<-chan gjso
 				counts[psi]["responses"] = make([]string, 0)
 			}
 			counts[psi]["events"] = append(counts[psi]["events"], eventcode)
-			if participationcode == "P" || participationcode == "R" || participationcode == "S" {
+			if participationcode == "P" || participationcode == "R" || participationcode == "S" || (participationcode == "F" && testdomain == "Writing") {
 				counts[psi]["events_with_response"] = append(counts[psi]["events_with_response"], eventcode)
 			}
 			if len(responseid) > 0 {
