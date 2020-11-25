@@ -70,8 +70,8 @@
             "id": "http://naplan.edu.au/FTE",
             "type": "string",
             "title": "FTE schema.",
-            "maximum": 1,
-            "minimum": 0,
+            "minLength": 1,
+            "maxLength": 4,
             "description": "Description",
             "name": "FTE"
         },
@@ -155,7 +155,7 @@
             "type": "string",
             "title": "MainSchoolFlag schema.",
             "description": "Description",
-            "enum": ["Y","1","01","2","02","3","03"],
+            "enum": ["Y","N","1","01","2","02","3","03"],
             "name": "MainSchoolFlag"
         },
         "MiddleName": {
@@ -296,7 +296,7 @@
             "title": "PreviousJurisdictionId schema.",
             "maxLength": 36,
             "description": "Student Id assigned by jurisdiction, such as a state-level ID, for this student in a previous cycle of NAPLAN.",
-            "name": "JurisdictionId"
+            "name": "PreviousJurisdictionId"
         },                
         "PreviousLocalId": {
             "id": "http://naplan.edu.au/PreviousLocalId",
@@ -338,13 +338,6 @@
             "description": "Description",
             "maxLength": 36,
             "name": "PreviousSectorId"
-        },
-        "PreviousStateProvinceId": {
-            "id": "http://naplan.edu.au/PreviousStateProvinceId",
-            "type": "string",
-            "title": "PreviousStateProvinceId schema.",
-            "description": "Description",
-            "name": "PreviousStateProvinceId"
         },
         "PreviousTAAId": {
             "id": "http://naplan.edu.au/PreviousTAAId",
@@ -394,14 +387,6 @@
             "enum":["1","2","3","9"],
             "description": "Description",
             "name": "Sex"
-        },
-        "StateProvinceId": {
-            "id": "http://naplan.edu.au/StateProvinceId",
-            "type": "string",
-            "title": "StateProvinceId schema.",
-            "maxLength": 36,
-            "description": "An identifier which is applied state wide. Persistent Jurisdiction Student Identifier e.g. VSN for VIC; in this case, the Id may be only for the purposes of NAPLAN.",
-            "name": "StateProvinceId"
         },
         "StudentLOTE": {
             "id": "http://naplan.edu.au/StudentLOTE",

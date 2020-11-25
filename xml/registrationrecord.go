@@ -89,6 +89,7 @@ type RegistrationRecord struct {
 	PreviousPlatformId           string      `json:",omitempty" xml:"-"`
 	PreviousSectorId             string      `json:",omitempty" xml:"-"`
 	PreviousStateProvinceId      string      `json:",omitempty" xml:"-"`
+	PreviousJurisdictionId       string      `json:",omitempty" xml:"-"`
 	PreviousTAAId                string      `json:",omitempty" xml:"-"`
 	SectorId                     string      `json:",omitempty" xml:"-"`
 	TAAId                        string      `json:",omitempty" xml:"-"`
