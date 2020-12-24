@@ -424,13 +424,17 @@ func qaRubricSubscoreMatches(ctx context.Context, in <-chan gjson.Result) (<-cha
 			for _, s := range subscores {
 				subscoretypes.Add(s.Get("SubscoreType").String())
 			}
-			rubricNotScored := set.Difference(rubrictypes, subscoretypes)
+			rubricNotUsed := set.Difference(rubrictypes, subscoretypes)
+			rubricNotExpected := set.Difference(subscoretypes, rubrictypes)
 			subscoreNotDefined := set.Difference(expectedRubricTypes, rubrictypes)
+			rubricsNotScored := set.Difference(rubrictypes, expectedRubricTypes)
 
-			if rubricNotScored.Size() > 0 || subscoreNotDefined.Size() > 0 {
+			if rubricNotUsed.Size() > 0 || rubricNotExpected.Size() > 0 || subscoreNotDefined.Size() > 0 || rubricsNotScored.Size() > 0 {
 				m := record.Value().(map[string]interface{})
-				m["RubricsNotScored"] = rubricNotScored.String()
+				m["ExpectedRubricsNotUsed"] = rubricNotUsed.String()
+				m["UsedRubricsNotExpected"] = rubricNotExpected.String()
 				m["SubscoresNotDefined"] = subscoreNotDefined.String()
+				m["RubricsNotScored"] = rubricsNotScored.String()
 				j, _ = json.Marshal(m)
 
 				select {
