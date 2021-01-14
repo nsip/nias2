@@ -101,7 +101,7 @@
                             <!-- links to other useful resources -->
                             <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="registration data set specification" href="https://github.com/nsip/registration-data-set" target="_blank"><i class="material-icons">web</i></a></li>
                             <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="registration data privacy" href="#modal1"><i class="material-icons">fingerprint</i></a></li>
-                            <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="registration validation help" href="/nias8help.pdf" target="_blank"><i class="material-icons">help</i></a></li>
+                            <li><a class="btn-floating blue tooltipped" data-position="top" data-delay="50" data-tooltip="registration validation help" href="#modal2" target="_blank"><i class="material-icons">help</i></a></li>
                         </ul>
                     </div>
                 </div>
@@ -124,6 +124,12 @@
                         <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Accept</a>
                     </div>
                 </div>
+                <div id="modal2" class="modal">
+                  <div class="modal-content">
+                    <h4>Documentation</h4>
+                    <p>Please see the latest version of NIAS documentation in the top level /documentation folder of your download of NIAS.</p>
+                  </div>
+                </div>
             </div>
         </div>
     </div>
@@ -133,100 +139,100 @@
     <!--  -->
     <!-- Display Analysis progress -->
     <div class="container">
-        <div class="row">
-            <div class="col s12">
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title">Progress</span>
-                        <div id="progress" class="progress">
-                            <div class="indeterminate"></div>
-                        </div>
-                        <p id="upload-message"></p>
-                        <p id="progress-message"></p>
-                        <ul class="collapsible hide" data-collapsible="accordion" id="manifest_accordion" >
-                              <li>
-                                      <div class="collapsible-header"><i class="material-icons">filter_drama</i>Records Manifest</div>
-                                            <div class="collapsible-body" id="manifest" style="margin: 5px;"></div>
-                                                </li>
-                        </ul>
-                        <p id="results-message"></p>
-                    </div>
-                    <!-- Enable downoad of results / convert to sif-xnl from here -->
-                    <div class="card-action">
-                        <a href="#" id="csv-download">Download results as CSV File</a>
-                        <a href="#" id="xml-convert">Convert this file to SIF-XML</a>
-                    </div>
-                </div>
+      <div class="row">
+        <div class="col s12">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Progress</span>
+              <div id="progress" class="progress">
+                <div class="indeterminate"></div>
+              </div>
+              <p id="upload-message"></p>
+              <p id="progress-message"></p>
+              <ul class="collapsible hide" data-collapsible="accordion" id="manifest_accordion" >
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">filter_drama</i>Records Manifest</div>
+                  <div class="collapsible-body" id="manifest" style="margin: 5px;"></div>
+                </li>
+              </ul>
+              <p id="results-message"></p>
             </div>
+            <!-- Enable downoad of results / convert to sif-xnl from here -->
+            <div class="card-action">
+              <a href="#" id="csv-download">Download results as CSV File</a>
+              <a href="#" id="xml-convert">Convert this file to SIF-XML</a>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
     <!--  -->
     <!--  -->
     <!-- Results Display -->
     <!--  -->
     <div class="container" id="results_container">
-        <div class="row">
-            <div class="col s12">
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title">Validation Results</span>
-                        <!--  -->
-                        <!-- Results navigation Graphs -->
-                        <!--  -->
-                        <div class="row">
-                            <div class="col s6">
-                                <div id="errors-chart">
-                                    <p>Validation Errors by Record Order</p>
-                                    <!-- <span class="reset" style="display: none;"></span> -->
-                                    <a class="" href="javascript:dc.filterAll(); dc.renderAll();" style="display: none;">reset</a>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </div>
-                            <div class="col s6">
-                                <div id="errors-by-type-chart">
-                                    <p>Errors By Validation Type</p>
-                                    <a class="" href="javascript:dc.filterAll(); dc.renderAll();" style="display: none;">reset</a>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12 valign-wrapper">
-                                <div class="dc-data-count">
-                                    <span class="filter-count"></span> selected out of <span class="total-count"></span> records | <a href="javascript:dc.filterAll(); dc.renderAll();">reset</a>
-                                </div>
-                            </div>
-                        </div>
-                        <!--  -->
-                        <!--  Results Data Table -->
-                        <!--  -->
-                        <div class="row">
-                            <div class="col s12">
-                                <table class="table table-hover dc-data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Original Line No.</th>
-                                            <th>Error Type</th>
-                                            <th>Error Field</th>
-                                            <th>Error Description</th>
-                                            <th>Severity</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- This is the end of the results content area -->
-                    <!--  -->
-                    <!--  Card footer -->
-                    <!-- Enable downoad of results / convert to sif-xnl from here -->
-                    <div class="card-action">
-                        <a href="#" id="csv-download2">Download results as CSV File</a>
-                        <a href="#" id="xml-convert2">Convert this file to SIF-XML</a>
-                    </div>
+      <div class="row">
+        <div class="col s12">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Validation Results</span>
+              <!--  -->
+              <!-- Results navigation Graphs -->
+              <!--  -->
+              <div class="row">
+                <div class="col s6">
+                  <div id="errors-chart">
+                    <p>Validation Errors by Record Order</p>
+                    <!-- <span class="reset" style="display: none;"></span> -->
+                    <a class="" href="javascript:dc.filterAll(); dc.renderAll();" style="display: none;">reset</a>
+                    <div class="clearfix"></div>
+                  </div>
                 </div>
+                <div class="col s6">
+                  <div id="errors-by-type-chart">
+                    <p>Errors By Validation Type</p>
+                    <a class="" href="javascript:dc.filterAll(); dc.renderAll();" style="display: none;">reset</a>
+                    <div class="clearfix"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12 valign-wrapper">
+                  <div class="dc-data-count">
+                    <span class="filter-count"></span> selected out of <span class="total-count"></span> records | <a href="javascript:dc.filterAll(); dc.renderAll();">reset</a>
+                  </div>
+                </div>
+              </div>
+              <!--  -->
+              <!--  Results Data Table -->
+              <!--  -->
+              <div class="row">
+                <div class="col s12">
+                  <table class="table table-hover dc-data-table">
+                    <thead>
+                      <tr>
+                        <th>Original Line No.</th>
+                        <th>Error Type</th>
+                        <th>Error Field</th>
+                        <th>Error Description</th>
+                        <th>Severity</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
             </div>
+            <!-- This is the end of the results content area -->
+            <!--  -->
+            <!--  Card footer -->
+            <!-- Enable downoad of results / convert to sif-xnl from here -->
+            <div class="card-action">
+              <a href="#" id="csv-download2">Download results as CSV File</a>
+              <a href="#" id="xml-convert2">Convert this file to SIF-XML</a>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
     <!--  -->
     <!--  -->
@@ -238,9 +244,9 @@
     <!-- hidden form for csv-xml conversion -->
     <!--  -->
     <div class="hide">
-        <form action="/naplan/reg/convert" method="post" enctype="multipart/form-data" id="convForm">
-            <input type="file" name="conversionFile" id="fileConvert">
-        </form>
+      <form action="/naplan/reg/convert" method="post" enctype="multipart/form-data" id="convForm">
+        <input type="file" name="conversionFile" id="fileConvert">
+      </form>
     </div>
 </body>
 
