@@ -4,9 +4,8 @@ set -e
 
 CWD=`pwd`
 
-BRANCH=add-splitter
 rm -rf dev-nrt
-git clone -b $BRANCH https://github.com/nsip/dev-nrt
+git clone https://github.com/nsip/dev-nrt
 
 # Linux64
 build_linux64() {
