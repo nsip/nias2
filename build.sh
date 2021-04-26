@@ -8,7 +8,7 @@ build_mac64() {
     echo "Building mac64 components..." 
     sh build_doc.sh M64
     sh build_napval.sh M64
-    sh build_naprrql.sh M64
+    sh build_naprrql_nrt.sh M64
     sh build_napcomp.sh M64
     sh build_nap-writing-print.sh M64
     sh build_nap-writing-sanitiser.sh M64
@@ -29,7 +29,7 @@ build_windows64() {
     echo "Building Windows64 components..."
     sh build_doc.sh W64
     sh build_napval.sh W64
-    sh build_naprrql.sh W64
+    sh build_naprrql_nrt.sh W64
     sh build_napcomp.sh W64
     sh build_nap-writing-print.sh W64
     sh build_nap-writing-sanitiser.sh W64
@@ -50,7 +50,7 @@ build_linux64() {
     echo "Building Linux64 components..."
     sh build_doc.sh L64
     sh build_napval.sh L64
-    sh build_naprrql.sh L64
+    sh build_naprrql_nrt.sh L64
     sh build_napcomp.sh L64
     sh build_nap-writing-print.sh L64
     sh build_nap-writing-sanitiser.sh L64
@@ -71,7 +71,7 @@ build_all() {
     echo "Building all components..."
     sh build_doc.sh
     sh build_napval.sh
-    sh build_naprrql.sh
+    sh build_naprrql_nrt.sh
     sh build_napcomp.sh
     sh build_nap-writing-print.sh
     sh build_nap-writing-sanitiser.sh
