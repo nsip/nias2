@@ -18,8 +18,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	ms "github.com/mitchellh/mapstructure"
 	//"github.com/nats-io/go-nats"
 	//"github.com/nats-io/go-nats-streaming"

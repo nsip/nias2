@@ -4,8 +4,8 @@ set -e
 
 CWD=`pwd`
 
-rm -rf dev-nrt
-git clone https://github.com/nsip/dev-nrt
+#rm -rf dev-nrt
+#git clone https://github.com/nsip/dev-nrt
 
 # Linux64
 build_linux64() {
