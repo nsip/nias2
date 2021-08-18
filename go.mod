@@ -14,7 +14,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0
 	github.com/labstack/echo/v4 v4.5.0
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.4
+	github.com/microcosm-cc/bluemonday v1.0.5
 	github.com/mitchellh/mapstructure v1.3.3
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
@@ -30,7 +30,7 @@ require (
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/subchen/go-xmldom v1.1.2
 	github.com/syndtr/goleveldb v0.0.0-20160425020131-cfa635847112
-	github.com/tidwall/gjson v1.6.0
+	github.com/tidwall/gjson v1.6.5
 	github.com/tidwall/sjson v1.1.1
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20170625071029-a843eda7bf09
