@@ -13,8 +13,6 @@ If you are using NIAS for the purposes of NAPLAN validation or postprocessing, y
 * [NAPRRQL CSV and Reporting Output Outline](https://github.com/nsip/nias2/blob/master/app/naprrql/NAPRRQLToolsetCsvAndReportingOutput_v06.pdf)
 * [NAPCOMP Readme](https://github.com/nsip/nias2/blob/master/napcomp/README.md) (Audit of registration data against reporting data)
 
-The [NIAS2AG](https://github.com/nsip/nias2ag) repository hosts NIAS open-source components to be used for Australian Government data collections.
-
 # 1. Overview
 
 NIAS is a suite of open-source components designed to enable as many different users as possible to quickly and easily solve issues of system integration using the Australian [SIF Data Model](http://specification.sifassociation.org/Implementation/AU/1.4/html/) for school education.
@@ -62,7 +60,7 @@ The product does not incorporate authentication or authorisation.
 
 * The key-value database in the product needs to be able to process a large number of open files; if you will be running NIAS on Mac/Linux with production-scale
 numbers of students in the results & reporting file, you will need  to increase your `ulimit` setting; we recommend 2048.
-  * For Mac, see https://blog.dekstroza.io/ulimit-shenanigans-on-osx-el-capitan/
+  * For Mac, see https://gist.github.com/tombigel/d503800a282fcadbee14b537735d202c
   * For Linux, ```ulimit -n 2048```
 
 # 2. Installation
@@ -90,31 +88,24 @@ In `$GOPATH/src/github.com/nsip` do:
 
 ## 2.4. Running NAPLAN Results & Reporting modules
 
-Separate executables are run to process NAPLAN data; see [NAPVAL readme](./napval/README.md), [NAPRR readme](./naprr/README.md)
+Separate executables are run to process NAPLAN data; see [NAPVAL readme](./napval/README.md), [dev-nrt readme](https://github.com/nsip/dev-nrt), [dev-nrt-splitter readme](https://github.com/nsip/dev-nrt-splitter)
 
 # 3. Code Structure
 
-See also [NAPRR readme](./naprr/README.md), [NAPLVAL readme](./napval/README.md)
-
-NIAS2 relies on the following infrastructure:
-* [ledis](http://ledisdb.com), a NoSQL database similar to [redis](http://redis.io)
-* xmllint, an XML validator included in the [libxml](http://xmlsoft.org) package
+See also [dev-nrt readme](./naprr/README.md), [NAPVAL readme](./napval/README.md)
 
 `unit_test_files/`
 * Contains files used in unit/integration testing of the code. Currently restricted to CSV files input into the validation module.
 
 `build.sh`, `build/`, `release.sh`
 * `build.sh` builds all NIAS2 executables for the various supported platforms
-* `build_sms.sh` builds the SSF and SMS application
 * `build_napval.sh` builds the NAPVAL application
 * `build_naprrql.sh` builds the NAPRRQL application  
 The builds for each platform are built in `build/{PLATFORM}/{APP}/`.
 
 #### The supported platforms are:
   * Mac OSX
-  * Windows 32 bit
   * Windows 64 bit
-  * Linux 32 bit
   * Linux 64 bit
 
 `bin/`
@@ -130,7 +121,6 @@ Contains utilities for managing NIAS2
 
 `app/`
 Contains the code to run executables within NIAS as single pieces of software, along with necessary configuration files, and test executables. The configuration fields are copied into the binary distributions of NIAS.
-  * `sms/` : the SIF Memory Store functionality of NIAS (ported from Ruby)
   * `napval/` : NAPLAN Registration records validation
   * `naprrql/` : NAPLAN Results and Reporting post-processing
   * `napcomp/` : Comparison of students between NAPLAN Registration and NAPLAN Results and Reporting (included in `naprrql` distribution)
@@ -140,9 +130,6 @@ NAPLAN Registration records validation
 
 `naprrql/`
 NAPLAN Results and Reporting post-processing
-
-`sms/`
-SIF Memory Store functionality of NIAS
 
 `xml/`
 Golang structs corresponding to SIF XML objects relevant to executables. Currently limited to NAPLAN-specific objects.
