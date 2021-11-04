@@ -5,6 +5,7 @@ package nap_writing_sanitiser
 import (
 	"context"
 	"encoding/csv"
+
 	//"fmt"
 	"log"
 	"os"
@@ -36,7 +37,7 @@ func createScriptWriterCSV(ctx context.Context, csvFileName string, in <-chan ma
 
 			// if the header hasn't been written then create it
 			if !headerWritten {
-				rowFormat, dataKeys = deriveRowFormat(record)
+				rowFormat, dataKeys = deriveRowFormat(record, csvFileName)
 				headerRow := make([][]string, 0)
 				headerRow = append(headerRow, rowFormat)
 				err := w.WriteAll(headerRow)
@@ -76,11 +77,23 @@ func emptyCsvRow(row []string) bool {
 	return true
 }
 
-func deriveRowFormat(resultMap map[string]string) (displayNames []string, dataKeys []string) {
+func deriveRowFormat(resultMap map[string]string, filename string) (displayNames []string, dataKeys []string) {
 	displayNames = make([]string, 0)
 	dataKeys = make([]string, 0)
 
-	for key, _ := range resultMap {
+	header := make([]string, len(resultMap))
+	i := 0
+	for k := range resultMap {
+		header[i] = k
+		i++
+	}
+	if filename == "writing_extract_sanitised.csv" {
+		header = []string{"Test Year", "Test level", "Jurisdiction Id", "ACARA ID", "PSI", "Local school student ID", "TAA student ID", "Participation Code", "Item Response", "Anonymised Id", "Test Id", "Word Count", "Date", "StartTime"}
+	} else if filename == "sanitiser_report.csv" {
+		header = []string{"Test Year", "Test level", "Jurisdiction Id", "ACARA ID", "PSI", "Local school student ID", "TAA student ID", "Participation Code", "Item Response", "Anonymised Id", "Test Id", "Word Count", "Date", "StartTime", "Original Item Response"}
+	}
+	//	for key, _ := range resultMap {
+	for _, key := range header {
 		displayNames = append(displayNames, key)
 		dataKeys = append(dataKeys, key)
 	}
