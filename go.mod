@@ -20,9 +20,8 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/myesui/uuid v1.0.0 // indirect
-	github.com/nats-io/jwt v1.2.2 // indirect
-	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
-	github.com/nats-io/nats.go v1.13.0
+	github.com/nats-io/nats-streaming-server v0.24.3 // indirect
+	github.com/nats-io/nats.go v1.13.1-0.20220308171302-2f2f6968e98d
 	github.com/nats-io/nuid v1.0.1
 	github.com/nats-io/stan.go v0.10.2
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
@@ -40,10 +39,7 @@ require (
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
-	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
-	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
+	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.28

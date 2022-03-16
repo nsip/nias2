@@ -4,7 +4,7 @@
 # ============================================================================
 
 # Baseline year for DOB checks
-TestYear = "2021"
+TestYear = "2022"
 
 # ValidationRoute = ["schema", "local","schema2", "dob", "id","asl", "psi", "numericvalid"]
 ValidationRoute = ["schema", "schema2", "dob", "id","asl", "psi", "numericvalid", "namevalid" ]
