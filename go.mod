@@ -14,7 +14,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0
 	github.com/labstack/echo/v4 v4.5.0
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.5
+	github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/mitchellh/mapstructure v1.3.3
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/nats-io/nats-streaming-server v0.24.3 // indirect
