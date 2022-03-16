@@ -8,7 +8,6 @@ require (
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/balacode/one-file-pdf v1.0.1
 	github.com/cenkalti/backoff v2.2.1+incompatible
-	github.com/chris-ramon/douceur v0.2.0 // indirect
 	github.com/clipperhouse/jargon v1.0.7
 	github.com/clipperhouse/uax29 v1.6.8 // indirect
 	github.com/fatih/color v1.9.0 // indirect
