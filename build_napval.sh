@@ -12,6 +12,8 @@ echo "Downloading nats-streaming-server"
 # go get github.com/nats-io/stan.go
 rm -rf nats-streaming-server
 git clone https://github.com/nats-io/nats-streaming-server
+cd nats-streaming-server
+cd ..
 
 do_build() {
 	echo "Building NAPVAL..."

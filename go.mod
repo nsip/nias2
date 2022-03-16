@@ -17,10 +17,10 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.5
 	github.com/mitchellh/mapstructure v1.3.3
 	github.com/myesui/uuid v1.0.0 // indirect
-	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
-	github.com/nats-io/nats.go v1.10.0
+	github.com/nats-io/nats-streaming-server v0.24.3 // indirect
+	github.com/nats-io/nats.go v1.13.1-0.20220308171302-2f2f6968e98d
 	github.com/nats-io/nuid v1.0.1
-	github.com/nats-io/stan.go v0.7.0
+	github.com/nats-io/stan.go v0.10.2
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
@@ -35,7 +35,7 @@ require (
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20170625071029-a843eda7bf09
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
+	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
