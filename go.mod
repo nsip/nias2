@@ -14,7 +14,7 @@ require (
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/kylelemons/godebug v1.1.0
-	github.com/labstack/echo/v4 v4.6.3
+	github.com/labstack/echo/v4 v4.9.0
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.18
