@@ -17,7 +17,7 @@ require (
 	github.com/labstack/echo/v4 v4.6.3
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.18
+	github.com/microcosm-cc/bluemonday v1.0.25
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/nats-io/nats-streaming-server v0.24.3 // indirect
@@ -39,7 +39,7 @@ require (
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
+	golang.org/x/net v0.12.0
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
