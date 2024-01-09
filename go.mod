@@ -4,14 +4,14 @@ go 1.21
 
 require (
 	github.com/BurntSushi/toml v1.0.0
-	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/balacode/one-file-pdf v1.0.1
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/clipperhouse/jargon v1.0.7
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/kylelemons/godebug v1.1.0
 	github.com/labstack/echo/v4 v4.9.0
-	github.com/microcosm-cc/bluemonday v1.0.25
+	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/nats-io/nats.go v1.28.0
 	github.com/nats-io/nuid v1.0.1
@@ -33,7 +33,7 @@ require (
 )
 
 require (
-	github.com/andybalholm/cascadia v1.3.1 // indirect
+	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/clipperhouse/uax29 v1.6.8 // indirect
