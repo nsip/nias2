@@ -3,11 +3,12 @@ package napval
 
 import (
 	"encoding/json"
+	"io/ioutil"
+
 	"github.com/nsip/nias2/lib"
 	"github.com/nsip/nias2/xml"
 	"github.com/tidwall/sjson"
 	"github.com/xeipuuv/gojsonschema"
-	"io/ioutil"
 	//"log"
 )
 
@@ -80,6 +81,7 @@ func (ss *SchemaService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage,
 	data, _ = sjson.DeleteBytes(data, "RefId")
 	data, _ = sjson.DeleteBytes(data, "OtherEnrollmentSchoolACARAId")
 	// validate with schema
+
 	payloadLoader := gojsonschema.NewStringLoader(string(data))
 	result, err := ss.schema.Validate(payloadLoader)
 	if err != nil {

@@ -4,6 +4,7 @@ package napval
 // handles all web interactions with users
 
 import (
+	"bytes"
 	gcsv "encoding/csv"
 	"encoding/json"
 	"encoding/xml"
@@ -13,6 +14,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+
 	//"os"
 	"path"
 	"strconv"
@@ -21,6 +23,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	ms "github.com/mitchellh/mapstructure"
+
 	//"github.com/nats-io/go-nats"
 	//"github.com/nats-io/go-nats-streaming"
 	"github.com/nats-io/nats.go"
@@ -31,6 +34,7 @@ import (
 	"github.com/twinj/uuid"
 	"github.com/wildducktheories/go-csv"
 	"golang.org/x/net/websocket"
+
 	//"time"
 	"encoding/gob"
 )
@@ -63,14 +67,12 @@ type StudentSchoolTally struct {
 	Tally map[string]int
 }
 
-//
 // read csv file as stream and post records onto processing queue
-//
 func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, error) {
 
 	ir := lib.IngestResponse{}
 
-	reader := csv.WithIoReader(file)
+	reader := csv.WithIoReader(NewBOMStripper(file))
 	defer reader.Close()
 
 	i := 0
@@ -112,6 +114,51 @@ func enqueueCSVforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 	return ir, nil
 }
 
+// BOM represents the UTF-8 Byte Order Mark (U+FEFF)
+var BOM = []byte{0xEF, 0xBB, 0xBF}
+
+// BOMStripper is a custom io.Reader that removes all instances of the BOM from the underlying reader
+type BOMStripper struct {
+	reader io.ReadCloser
+	buffer []byte
+}
+
+// NewBOMStripper creates a new BOMStripper
+func NewBOMStripper(r io.ReadCloser) *BOMStripper {
+	return &BOMStripper{
+		reader: r,
+		buffer: make([]byte, 0, len(BOM)),
+	}
+}
+
+// Read strips BOM bytes and passes the rest to the underlying reader
+func (bs *BOMStripper) Read(p []byte) (int, error) {
+	n, err := bs.reader.Read(p)
+	if err != nil && err != io.EOF {
+		return n, err
+	}
+
+	data := append(bs.buffer, p[:n]...)
+	filtered := bytes.ReplaceAll(data, BOM, nil)
+	copy(p, filtered)
+
+	// Handle leftover bytes
+	if len(filtered) > len(p) {
+		bs.buffer = filtered[len(p):]
+		return len(p), nil
+	}
+	bs.buffer = nil
+	return len(filtered), err
+}
+
+// Close closes the underlying reader if it implements io.Closer
+func (bs *BOMStripper) Close() error {
+	if bs.reader != nil {
+		return bs.reader.Close()
+	}
+	return nil
+}
+
 func enqueueManifest(studentcount map[string]int, txid string) {
 	tt.SetTxSize("manifest."+txid, 1)
 	msg := &lib.NiasMessage{}
@@ -136,9 +183,7 @@ func enqueueManifest(studentcount map[string]int, txid string) {
 
 }
 
-//
 // read xml file as stream and post records onto processing queue
-//
 func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, error) {
 
 	ir := lib.IngestResponse{}
@@ -199,9 +244,7 @@ func enqueueXMLforNAPLANValidation(file multipart.File) (lib.IngestResponse, err
 
 }
 
-//
 // start the server
-//
 func (vws *ValidationWebServer) Run(nats_cfg lib.NATSConfig) {
 	gob.Register(StudentSchoolTally{})
 	log.Println("NAPLAN: Connecting to message bus")

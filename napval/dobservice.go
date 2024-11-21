@@ -2,13 +2,14 @@
 package napval
 
 import (
-	"github.com/nsip/nias2/lib"
-	"github.com/nsip/nias2/xml"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/nsip/nias2/lib"
+	"github.com/nsip/nias2/xml"
 )
 
 const OOB string = "out_of_band"
@@ -71,7 +72,14 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 		return responses, nil
 	}
 
-	t, err := time.Parse(dob.layout, rr.BirthDate)
+	dateStr := rr.BirthDate
+	date, err := time.Parse("02-01-2006", rr.BirthDate)
+	if err == nil {
+		dateStr = date.Format("2006-01-02")
+		log.Println("Date converted to " + dateStr)
+	}
+
+	t, err := time.Parse(dob.layout, dateStr)
 	// log.Println("Provided birth date is: ", t)
 	if err != nil {
 		// log.Println("unable to parse date: ", err)

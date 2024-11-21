@@ -4,7 +4,7 @@ set -e
 
 CWD=`pwd`
 
-echo "Downloading CORE.json"
+#echo "Downloading CORE.json"
 #curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core.json > app/napval/schemas/core.json
 #curl https://raw.githubusercontent.com/nsip/registration-data-set/master/core_parent2.json > app/napval/schemas/core_parent2.json
 echo "Downloading nats-streaming-server"
