@@ -73,7 +73,7 @@ func (dob *DOBService) HandleMessage(req *lib.NiasMessage) ([]lib.NiasMessage, e
 	}
 
 	dateStr := rr.BirthDate
-	date, err := time.Parse("02-01-2006", rr.BirthDate)
+	date, err := time.Parse("02/01/2006", rr.BirthDate)
 	if err == nil {
 		dateStr = date.Format("2006-01-02")
 		log.Println("Date converted to " + dateStr)
