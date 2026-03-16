@@ -1,7 +1,7 @@
 *All files in this repository are licensed under Apache 2.0. For a full description of the license [click this link](LICENSE).*
 
 # NIAS2
-NSIP Integration As A Service.
+NAPLAN Integration As A Service.
 
 This is a Golang version of the [NIAS](http://github.com/nsip/nias) open-source components. This version incorporates [NAPLAN](https://www.nap.edu.au) validation and post-processing functionality, as well as the generic functionality of NIAS.
 
@@ -17,13 +17,11 @@ If you are using NIAS for the purposes of NAPLAN validation or postprocessing, y
 
 NIAS is a suite of open-source components designed to enable as many different users as possible to quickly and easily solve issues of system integration using the Australian [SIF Data Model](http://specification.sifassociation.org/Implementation/AU/1.4/html/) for school education.
 
-The product was developed by harnessing existing open source middleware components, including:
-* [NATS](http://nats.io) streaming queues
-* [Echo](https://github.com/labstack/echo) web framework
+The product was developed by harnessing existing open source middleware components, including the [NATS](http://nats.io) streaming queues.
 
 Over these components, two main modules have been built:
-* The __SIF Store & Forward (SSF)__ is an opinionated message queueing system, which ingests very large quantities of data and stores them for delivery to clients. XML messages on the system are assumed by default to be in SIF. The SSF service builds an education-standards aware REST interface on top of the NATS message queues, and provides a number of utility services to ease SIF-based integrations.
-* The __SIF Memory Store (SMS)__ is a database that builds its internal structures from the data it receives, using RefIds both as keys to access stored messages, and to map out a network graph for SIF objects.
+* The __SIF Store & Forward__ is an opinionated message queueing system, which ingests very large quantities of data and stores them for delivery to clients. XML messages on the system are assumed by default to be in SIF. The SSF service builds an education-standards aware REST interface on top of the NATS message queues, and provides a number of utility services to ease SIF-based integrations.
+* The __SIF Memory Store__ is a database that builds its internal structures from the data it receives, using RefIds both as keys to access stored messages, and to map out a network graph for SIF objects.
 
 The software also uses these components as architecture to support Test Administration Authorities' interaction with NAPLAN Online:
 * __napval__ validates NAPLAN registration records, in either SIF/XML or CSV format.
@@ -33,30 +31,20 @@ The software also uses these components as architecture to support Test Administ
 
 This product delivers the following high level functions:
 
-1. Support for persistent and ordered queues of SIF messages, which can be reread multiple times.
-2. Support for asynchronous queues in both clients and servers.
-3. Support for format-agnostic messaging infrastructure.
-4. Support for data exchange through an event/subscribe model (in brokered environments)  
-5. ~~Support for message validation.~~
-6. Support for extracting arbitrary relations between object types within SIF (bypassing need to configure service path queries, and simplifying the query API for objects).
-7. ~~Support for extracting arbitrary relations between object types from different standards (allowing multiple data standards to coexist in an integration, referring to the same entities).~~
-8. Support for privacy filtering in middleware (which releases object providers from having to do privacy filtering internally).
-9. ~~Support for simple and extensible interactive analytics.~~
-10. ~~Support for the ODDESSA data dictionary as a service.~~
-11. Support for data format conversions, including CSV to SIF, and SIF 2 to SIF 3.
+1. Validation of NAPLAN CSV and SIF XML files for student registration
+2. Generation of CSV and Fixed-File reports for use by Test Administration Authorities based on the NAPLAN Results and Reporting database (RRD)
+3. Generation of writing extracts for NAPLAN, for external marking
+4. Markup sanitisation of writing extracts
+5. Filtering of the NAPLAN RRD XML file
 
 This product only acts as middleware. It does not provide integration with the back ends of products (although this can be provided by combining NIAS with the [SIF Framework](https://github.com/nsip/sif3-framework-java)). It is not intended to deliver business value to end consumers, or to compete with existing market offerings.
-
-The product delivers only exemplar analytics, and the SIF team is not committing to developing analytics and queries for all product users. Users that do develop their own analytics and queries are encouraged to contribute these back as open source.
-
-~The product delivers only exemplar integrations between multiple standards (SIF/XML and [IMS OneRoster](https://www.imsglobal.org/lis/index.html)/CSV), and the SIF team is not committing to developing standards integrations for all product users. Users that do develop their own standards integrations are encouraged to contribute these back as open source.~
 
 The product does not incorporate authentication or authorisation.
 
 
 ## 1.2. Constraints
 
-* The product is released with the SIF-AU 3.4 XSD schema, and validates against it. Other schemas can be used, but may require re-coding of some modules.
+* The product is released with the SIF-AU 3.4+ XSD schema, and validates against it. Other schemas can be used, but may require re-coding of some modules.
 
 * The key-value database in the product needs to be able to process a large number of open files; if you will be running NIAS on Mac/Linux with production-scale
 numbers of students in the results & reporting file, you will need  to increase your `ulimit` setting; we recommend 2048.
