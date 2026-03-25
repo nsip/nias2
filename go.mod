@@ -8,7 +8,7 @@ require (
 	github.com/balacode/one-file-pdf v1.0.1
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/clipperhouse/jargon v1.0.7
-	github.com/go-resty/resty/v2 v2.3.0
+	github.com/go-resty/resty/v2 v2.17.2
 	github.com/kylelemons/godebug v1.1.0
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/microcosm-cc/bluemonday v1.0.26
