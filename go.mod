@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/BurntSushi/toml v1.0.0
-	github.com/PuerkitoBio/goquery v1.8.1
+	github.com/PuerkitoBio/goquery v1.12.0
 	github.com/balacode/one-file-pdf v1.0.1
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/clipperhouse/jargon v1.0.7
@@ -27,13 +27,13 @@ require (
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/net v0.51.0
+	golang.org/x/net v0.52.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/fatih/set.v0 v0.2.1
 )
 
 require (
-	github.com/andybalholm/cascadia v1.3.2 // indirect
+	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/clipperhouse/uax29 v1.6.8 // indirect
