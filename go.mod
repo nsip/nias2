@@ -15,7 +15,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/nats-io/nats.go v1.49.0
 	github.com/nats-io/nuid v1.0.1
-	github.com/nats-io/stan.go v0.10.2
+	github.com/nats-io/stan.go v0.10.4
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/playlyfe/go-graphql v0.0.0-20191219091308-23c3f22218ef
