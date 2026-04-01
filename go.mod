@@ -23,7 +23,7 @@ require (
 	github.com/subchen/go-xmldom v1.1.2
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/tidwall/gjson v1.18.0
-	github.com/tidwall/sjson v1.2.4
+	github.com/tidwall/sjson v1.2.5
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
 	github.com/xeipuuv/gojsonschema v1.2.0
