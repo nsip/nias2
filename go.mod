@@ -11,7 +11,7 @@ require (
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/kylelemons/godebug v1.1.0
 	github.com/labstack/echo/v4 v4.9.0
-	github.com/microcosm-cc/bluemonday v1.0.26
+	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nats-io/nats.go v1.49.0
 	github.com/nats-io/nuid v1.0.1
@@ -41,7 +41,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/gorilla/css v1.0.0 // indirect
+	github.com/gorilla/css v1.0.1 // indirect
 	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
