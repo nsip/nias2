@@ -10,7 +10,7 @@ require (
 	github.com/clipperhouse/jargon v1.0.9
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/kylelemons/godebug v1.1.0
-	github.com/labstack/echo/v4 v4.9.0
+	github.com/labstack/echo/v4 v4.15.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nats-io/nats.go v1.49.0
@@ -39,13 +39,12 @@ require (
 	github.com/clipperhouse/uax29 v1.11.0 // indirect
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/klauspost/compress v1.18.4 // indirect
-	github.com/labstack/gommon v0.3.1 // indirect
-	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/labstack/gommon v0.4.2 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/nats-io/nats-server/v2 v2.11.15 // indirect
@@ -55,11 +54,10 @@ require (
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
-	github.com/stretchr/testify v1.7.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v1.2.1 // indirect
+	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	golang.org/x/crypto v0.49.0 // indirect
@@ -68,5 +66,4 @@ require (
 	golang.org/x/time v0.15.0 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
