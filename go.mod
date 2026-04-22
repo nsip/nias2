@@ -13,7 +13,7 @@ require (
 	github.com/labstack/echo/v4 v4.15.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/nats-io/nats.go v1.50.0
+	github.com/nats-io/nats.go v1.51.0
 	github.com/nats-io/nuid v1.0.1
 	github.com/nats-io/stan.go v0.10.4
 	github.com/orcaman/concurrent-map v1.0.0
