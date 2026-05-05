@@ -10,7 +10,7 @@ require (
 	github.com/clipperhouse/jargon v1.0.9
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/kylelemons/godebug v1.1.0
-	github.com/labstack/echo/v4 v4.15.1
+	github.com/labstack/echo/v4 v4.15.2
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nats-io/nats.go v1.51.0
@@ -42,9 +42,9 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/klauspost/compress v1.18.5 // indirect
-	github.com/labstack/gommon v0.4.2 // indirect
+	github.com/labstack/gommon v0.5.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
-	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/nats-io/nats-server/v2 v2.11.15 // indirect
