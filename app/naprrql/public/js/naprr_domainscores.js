@@ -6,7 +6,7 @@ $(document).ready(function()
 {
 
     // initiate modals
-    $('.modal').modal();
+    M.AutoInit();
 
     // create the report when button is clicked
     $("#btn-domainscores").on("click", function(event)

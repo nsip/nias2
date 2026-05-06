@@ -21,10 +21,8 @@ $(document).ready(function()
     hideReport();
 
     // show the privacy warning
-    $('.modal').modal();
-    $('#modal1').modal('open');
-
-    $(".button-collapse").sideNav();
+    M.AutoInit();
+    M.Modal.getInstance(document.getElementById('modal1')).open();
 
 });
 

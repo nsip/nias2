@@ -4,11 +4,8 @@
 $(document).ready(function()
 {
 
-    // initialise modals plugin
-    $('.modal').modal();
-
-    // initialise collapsible plugin
-    $('.collapsible').collapsible();
+    // initialise materialize components (modals, collapsible)
+    M.AutoInit();
 
     // create the report when button is clicked
     $("#btn-codeframe").on("click", function(event)

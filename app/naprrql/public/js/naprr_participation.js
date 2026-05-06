@@ -4,7 +4,7 @@
 $(document).ready(function() {
 
     // initiate modals
-    $('.modal').modal();
+    M.AutoInit();
 
     // create the report when button is clicked
     $("#btn-participation").on("click", function(event) {

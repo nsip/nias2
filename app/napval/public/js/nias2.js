@@ -11,9 +11,8 @@ $(document).ready(function()
 
       hideResults();
       hideProgress();
-      $('.modal').modal();
-      // $('.modal').modal();
-      $('.modal').modal('open');
+      M.AutoInit();
+      M.Modal.getInstance(document.getElementById('modal1')).open();
 
 
       // handler for downloading error report
@@ -47,15 +46,15 @@ function CsvDownload()
   var filesList = $('#upload').prop('files');
   if (filesList.length < 1)
   {
-    var toastContent = $('<h5>No file selected</h5>');
-    Materialize.toast(toastContent, 3000, 'rounded green');
+    var toastContent = '<h5>No file selected</h5>';
+    M.toast({ html: toastContent, displayLength: 3000, classes: 'rounded green' });
     return
   }
 
   if (!txID)
   {
-    var toastContent = $('<h5>No results to download</h5>');
-    Materialize.toast(toastContent, 3000, 'rounded green');
+    var toastContent = '<h5>No results to download</h5>';
+    M.toast({ html: toastContent, displayLength: 3000, classes: 'rounded green' });
     return
 
   }
@@ -75,8 +74,8 @@ function Validate()
   var filesList = $('#upload').prop('files');
   if (filesList.length < 1)
   {
-    var toastContent = $('<h5>No file selected</h5>');
-    Materialize.toast(toastContent, 4000, 'rounded green');
+    var toastContent = '<h5>No file selected</h5>';
+    M.toast({ html: toastContent, displayLength: 4000, classes: 'rounded green' });
     return
   }
 
@@ -86,7 +85,7 @@ function Validate()
   showProgress(filesList[0].size);
   display_results_once = false;
 
-  Materialize.toast('Sending file to server...', 4000, 'rounded')
+  M.toast({ html: 'Sending file to server...', displayLength: 4000, classes: 'rounded' });
 
 
     $('#validateform').prop('action' , '/naplan/reg/validate');
@@ -103,7 +102,7 @@ function Validate()
           console.log(txID + ": " + txTotal)
           $('#upload').fileupload('destroy');
         startStreamSocket();
-        Materialize.toast('Analysis results generating...', 4000, 'rounded')
+        M.toast({ html: 'Analysis results generating...', displayLength: 4000, classes: 'rounded' });
 
       });
   $('#upload').fileupload('send',
@@ -121,8 +120,8 @@ function XmlConvert()
   var filesList = $('#upload').prop('files');
   if (filesList.length < 1)
   {
-    var toastContent = $('<h5>No file selected</h5>');
-    Materialize.toast(toastContent, 3000, 'rounded green');
+    var toastContent = '<h5>No file selected</h5>';
+    M.toast({ html: toastContent, displayLength: 3000, classes: 'rounded green' });
     return
   }
 
@@ -243,7 +242,7 @@ function onMessage(evt)
       websocket.close();
       // console.log("socket closed");
 
-      Materialize.toast('All records validated', 4000, 'rounded');
+      M.toast({ html: 'All records validated', displayLength: 4000, classes: 'rounded' });
     }
 
     if (msg.Payload.TxComplete)

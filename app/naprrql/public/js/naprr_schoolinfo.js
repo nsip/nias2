@@ -7,7 +7,7 @@ $(document).ready(function()
 {
 
     // initiate modals
-    $('.modal').modal();
+    M.AutoInit();
 
     // create the report when button is clicked
     $(".button-collapse").on("click", function(event)

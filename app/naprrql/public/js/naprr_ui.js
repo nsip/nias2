@@ -233,7 +233,7 @@ function initSchoolChooserHandlerQL() {
 
 // show the extended data modal form
 function showExtendedData() {
-    $('#ed-modal').modal('open');
+    M.Modal.getInstance(document.getElementById('ed-modal')).open();
 }
 
 // clear the ui
