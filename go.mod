@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/BurntSushi/toml v1.6.0
-	github.com/PuerkitoBio/goquery v1.12.0
+	github.com/PuerkitoBio/goquery v1.13.0
 	github.com/balacode/one-file-pdf v1.0.1
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/clipperhouse/jargon v1.0.9
@@ -27,13 +27,13 @@ require (
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/net v0.57.0
+	golang.org/x/net v0.58.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/fatih/set.v0 v0.2.1
 )
 
 require (
-	github.com/andybalholm/cascadia v1.3.3 // indirect
+	github.com/andybalholm/cascadia v1.3.4 // indirect
 	github.com/antchfx/xpath v1.3.6 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/clipperhouse/uax29 v1.11.0 // indirect
@@ -60,9 +60,9 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
-	golang.org/x/crypto v0.54.0 // indirect
+	golang.org/x/crypto v0.55.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.40.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
