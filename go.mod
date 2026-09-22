@@ -1,6 +1,6 @@
 module github.com/nsip/nias2
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/BurntSushi/toml v1.6.0
@@ -13,7 +13,7 @@ require (
 	github.com/labstack/echo/v4 v4.15.4
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/nats-io/nats.go v1.52.0
+	github.com/nats-io/nats.go v1.54.0
 	github.com/nats-io/nuid v1.0.1
 	github.com/nats-io/stan.go v0.10.4
 	github.com/orcaman/concurrent-map v1.0.0
@@ -27,7 +27,7 @@ require (
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/net v0.57.0
+	golang.org/x/net v0.58.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/fatih/set.v0 v0.2.1
 )
@@ -41,7 +41,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
-	github.com/klauspost/compress v1.18.5 // indirect
+	github.com/klauspost/compress v1.20.0 // indirect
 	github.com/labstack/gommon v0.5.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
@@ -49,7 +49,7 @@ require (
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/nats-io/nats-server/v2 v2.11.15 // indirect
 	github.com/nats-io/nats-streaming-server v0.24.6 // indirect
-	github.com/nats-io/nkeys v0.4.15 // indirect
+	github.com/nats-io/nkeys v0.4.16 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
@@ -60,9 +60,9 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
-	golang.org/x/crypto v0.54.0 // indirect
-	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.40.0 // indirect
+	golang.org/x/crypto v0.57.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
