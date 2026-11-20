@@ -10,7 +10,7 @@ require (
 	github.com/clipperhouse/jargon v1.0.9
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/kylelemons/godebug v1.1.0
-	github.com/labstack/echo/v4 v4.15.4
+	github.com/labstack/echo/v4 v4.16.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nats-io/nats.go v1.52.0
@@ -27,7 +27,7 @@ require (
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/net v0.59.0
+	golang.org/x/net v0.60.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/fatih/set.v0 v0.2.1
 )
