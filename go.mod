@@ -10,7 +10,7 @@ require (
 	github.com/clipperhouse/jargon v1.0.9
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/kylelemons/godebug v1.1.0
-	github.com/labstack/echo/v4 v4.16.1
+	github.com/labstack/echo/v4 v4.16.3
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nats-io/nats.go v1.52.0
@@ -22,7 +22,7 @@ require (
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/subchen/go-xmldom v1.1.2
 	github.com/syndtr/goleveldb v1.0.0
-	github.com/tidwall/gjson v1.19.0
+	github.com/tidwall/gjson v1.19.1
 	github.com/tidwall/sjson v1.2.5
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
@@ -41,15 +41,15 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
-	github.com/klauspost/compress v1.18.5 // indirect
+	github.com/klauspost/compress v1.18.7 // indirect
 	github.com/labstack/gommon v0.5.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/myesui/uuid v1.0.0 // indirect
-	github.com/nats-io/nats-server/v2 v2.11.15 // indirect
+	github.com/nats-io/nats-server/v2 v2.12.12 // indirect
 	github.com/nats-io/nats-streaming-server v0.24.6 // indirect
-	github.com/nats-io/nkeys v0.4.15 // indirect
+	github.com/nats-io/nkeys v0.4.16 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
