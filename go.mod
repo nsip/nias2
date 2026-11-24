@@ -22,8 +22,8 @@ require (
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/subchen/go-xmldom v1.1.2
 	github.com/syndtr/goleveldb v1.0.0
-	github.com/tidwall/gjson v1.19.1
-	github.com/tidwall/sjson v1.2.5
+	github.com/tidwall/gjson v1.20.5
+	github.com/tidwall/sjson v1.2.11
 	github.com/twinj/uuid v1.0.0
 	github.com/wildducktheories/go-csv v0.0.0-20210709120223-87450005fe47
 	github.com/xeipuuv/gojsonschema v1.2.0
@@ -55,7 +55,7 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.0 // indirect
+	github.com/tidwall/pretty v1.3.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
